@@ -122,6 +122,8 @@ case "$open_source" in
   echo "Adding 'LICENSE' file for '$license' license."
   # TODO: maybe use "-i,  --input-file=DATEI  in lokaler oder externer DATEI" option?
   wget -O LICENSE https://www.apache.org/licenses/LICENSE-2.0.txt
+  # TODO: Add contributing file
+#   OS-Apache-CONTRIBUTING.md
   ;;
 "n")
   echo "Not open source repository"
