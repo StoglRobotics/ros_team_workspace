@@ -16,3 +16,4 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: 'docs/'
+        pre-build-command: "apt-get update -y && apt-get install -y python3-pip && pip3 install sphinx_rtd_theme"
