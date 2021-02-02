@@ -1,0 +1,245 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:include filename="$(find $PKG_NAME$)/urdf/common.xacro" />
+
+  <xacro:macro name="$ROBOT_NAME$" params="prefix parent *origin">
+    <!-- LINKS -->
+    <!-- base link -->
+    <link name="${prefix}base_link">
+      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
+           to get more realistic behaviour-->
+      <xacro:default_inertial/>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <cylinder length="0.3" radius="0.3" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/base_link.dae" /> -->
+        </geometry>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <cylinder length="0.3" radius="0.3" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/base_link.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+    <!-- link 1 -->
+    <link name="${prefix}link_1">
+      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
+           to get more realistic behaviour-->
+      <xacro:default_inertial/>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.3" radius="0.15" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link_1.dae" /> -->
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.3" radius="0.15" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link_1.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+    <!-- link 2 -->
+    <link name="${prefix}link_2">
+      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
+           to get more realistic behaviour-->
+      <xacro:default_inertial/>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.8" radius="0.15" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link_2.dae" /> -->
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.8" radius="0.15" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link_2.stl"  /> -->
+        </geometry>
+      </collision>
+    </link>
+    <!-- link 3 -->
+    <link name="${prefix}link_3">
+      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
+           to get more realistic behaviour-->
+      <xacro:default_inertial/>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.5" radius="0.10" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link_3.dae" /> -->
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.5" radius="0.10" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link_3.stl"  /> -->
+        </geometry>
+      </collision>
+    </link>
+    <!-- link 4 -->
+    <link name="${prefix}link_4">
+      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
+           to get more realistic behaviour-->
+      <xacro:default_inertial/>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.1" radius="0.2" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link_4.dae" /> -->
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.1" radius="0.2" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link_4.stl"  /> -->
+        </geometry>
+      </collision>
+    </link>
+    <!-- link 5 -->
+    <link name="${prefix}link_5">
+      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
+           to get more realistic behaviour-->
+      <xacro:default_inertial/>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.2" radius="0.1" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link_5.dae" /> -->
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.2" radius="0.1" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link_5.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+    <!-- link 6 -->
+    <link name="${prefix}link_6">
+      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
+           to get more realistic behaviour-->
+      <xacro:default_inertial/>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.05" radius="0.1" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link_6.dae" /> -->
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.05" radius="0.1" />
+<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link_6.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- All-zero tool frame. This frame should correspond to the TOOL frame of the robot's controller.) -->
+    <link name="${prefix}tool0" />
+    <!-- tool link -->
+
+<!-- START: Delete if not needed -->
+    <!-- Standard frames for industrial robots. Also useful for manipulators.
+         (ROS-I specs - https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages#Standardised_links_.2F_frames)-->
+    <!-- This frame should correspond to the BASE coordinate system of robot's controller.) -->
+    <link name="${prefix}base" />
+    <!-- Frame for mounting EEF models to a manipulator. x+ axis points forward (REP 103). -->
+    <link name="${prefix}flange" />
+<!-- END: Delete if not needed  -->
+    <!-- END LINKS -->
+
+    <!-- JOINTS -->
+    <!-- base_joint fixes base_link to the environment -->
+    <joint name="${prefix}base_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}" />
+      <child link="${prefix}base_link" />
+    </joint>
+    <!-- joint 1 -->
+    <joint name="${prefix}joint_1" type="revolute">
+      <origin xyz="0 0 0.3" rpy="${pi} 0 0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}link_1" />
+      <axis xyz="0 0 1" />
+      <limit effort="0" lower="${radians(-180)}" upper="${radians(180)}" velocity="${radians(180)}" />
+    </joint>
+    <!-- joint 2 -->
+    <joint name="${prefix}joint_2" type="revolute">
+      <origin xyz="0 0 0.3" rpy="${pi/2} 0 0" />
+      <parent link="${prefix}link_1" />
+      <child link="${prefix}link_2" />
+      <axis xyz="0 0 1" />
+      <limit effort="0" lower="${radians(-180)}" upper="${radians(180)}" velocity="${radians(180)}" />
+    </joint>
+    <!-- joint 3 -->
+    <joint name="${prefix}joint_3" type="revolute">
+      <origin xyz="0.8 0 0" rpy="0 0 0" />
+      <parent link="${prefix}link_2" />
+      <child link="${prefix}link_3" />
+      <axis xyz="0 0 1" />
+      <limit effort="0" lower="${radians(-90)}" upper="${radians(180)}" velocity="${radians(270)}" />
+    </joint>
+    <!-- joint 4 -->
+    <joint name="${prefix}joint_4" type="revolute">
+      <origin xyz="0 0.1 0" rpy="0 ${-pi/2} 0" />
+      <parent link="${prefix}link_3" />
+      <child link="${prefix}link_4" />
+      <axis xyz="0 0 1" />
+      <limit effort="0" lower="${radians(-360)}" upper="${radians(360)}" velocity="${radians(360)}" />
+    </joint>
+    <!-- joint 5 -->
+    <joint name="${prefix}joint_5" type="revolute">
+      <origin xyz="0 0 -0.1" rpy="0 ${pi/2} 0" />
+      <parent link="${prefix}link_4" />
+      <child link="${prefix}link_5" />
+      <axis xyz="0 0 1" />
+      <limit effort="0" lower="${radians(-120)}" upper="${radians(120)}" velocity="${radians(540)}" />
+    </joint>
+    <!-- joint 6 -->
+    <joint name="${prefix}joint_6" type="revolute">
+      <origin xyz="0 0 0.1" rpy="0 ${-pi/2} 0" />
+      <parent link="${prefix}link_5" />
+      <child link="${prefix}link_6" />
+      <axis xyz="0 0 1" />
+      <limit effort="0" lower="${radians(-360)}" upper="${radians(360)}" velocity="${radians(720)}" />
+    </joint>
+
+    <!-- tool frame - fixed frame -->
+    <joint name="${prefix}joint_6-tool0" type="fixed">
+      <parent link="${prefix}link_6" />
+      <child link="${prefix}tool0" />
+      <origin xyz="0 0 -0.115" rpy="0 ${-pi} ${-pi/2}" />
+    </joint>
+    <!-- END JOINTS -->
+
+<!-- START: Delete if not needed -->
+    <!-- Standard frames for industrial robots. Also useful for manipulators.
+         (ROS-I specs - https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages#Standardised_links_.2F_frames)-->
+    <joint name="${prefix}base_link-base_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}base" />
+    </joint>
+
+    <joint name="${prefix}tool0-flange_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="${prefix}tool0" />
+      <child link="${prefix}flange" />
+    </joint>
+<!-- END: Delete if not needed  -->
+
+
+  </xacro:macro>
+</robot>

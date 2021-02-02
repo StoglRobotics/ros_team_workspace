@@ -6,6 +6,12 @@ DEFAULT_ROS_VERSION=2
 # We have two example teams. On is working with industrial and other with mobile robots
 TEAM_TEAM_NAMES=("Industrial" "Mobile")
 
+TEAM_LICENSE="Apache License 2.0"
+
+TEAM_REPOSITORY_SERVER="https://github.com"
+
+TEAM_WORKSPACE_ASSETS="/opt/RosTeamWS/assets/"
+
 ## END: definitions
 
 
@@ -27,12 +33,7 @@ setup_ros1_aliases () {
 
 setup_ros2_exports ()  {
 
-export RTI_LICENSE_FILE=/opt/rti.com/rti_connext_dds-5.3.1/rti_license.dat
-
-#  export RCUTILS_CONSOLE_OUTPUT_FORMAT="[{severity} {time}] [{name}]: {message} ({function_name}() at {file_name}:{line_number})"
-# export RCUTILS_COLORIZED_OUTPUT=1
-# export RCUTILS_LOGGING_USE_STDOUT=1
-#export RCUTILS_LOGGING_BUFFERED_STREAM=
+  export RTI_LICENSE_FILE=/opt/rti.com/rti_connext_dds-5.3.1/rti_license.dat
 
 }
 
@@ -71,15 +72,21 @@ framework_default_paths () {
     FRAMEWORK_NAME="ros_team_workspace"
     FRAMEWORK_BASE_PATH="/opt/RosTeamWS"
     FRAMEWORK_REPO_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro"
-    REMOTE_FRAMEWORK_BASE_PATH="/vol64_remote/IPR-Framework"
-    REMOTE_FRAMEWORK_PATH="$REMOTE_FRAMEWORK_BASE_PATH/IPR_ros_ws_$ros_distro"
-    #TODO: use this in the future
-    SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-    if [ ! -d "$FRAMEWORK_REPO_PATH" ]; then
-        echo "FRAMEWORK_REPO_PATH: local not found, set to remote..."
-        FRAMEWORK_REPO_PATH="$REMOTE_FRAMEWORK_PATH/src/intelligent_robotic_automation/scripts"
-    fi 
-    FRAMEWORK_REPO_PATH="$REMOTE_FRAMEWORK_PATH/src/intelligent_robotic_automation/scripts"
+    FRAMEWORK_PACKAGE_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro/src/ros_team_workspace"
+    #TODO: remove this in the future
+#     REMOTE_FRAMEWORK_BASE_PATH="/vol64_remote/IPR-Framework"
+#     REMOTE_FRAMEWORK_PATH="$REMOTE_FRAMEWORK_BASE_PATH/IPR_ros_ws_$ros_distro"
+#     #TODO: use this in the future
+#     SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+#     if [ ! -d "$FRAMEWORK_REPO_PATH" ]; then
+#         echo "FRAMEWORK_REPO_PATH: local not found, set to remote..."
+#         FRAMEWORK_REPO_PATH="$REMOTE_FRAMEWORK_PATH/src/ros_team_workspace/scripts"
+#     fi
+#     FRAMEWORK_REPO_PATH="$REMOTE_FRAMEWORK_PATH/src/ros_team_workspace/scripts"
+
+    # Script-specific variables
+    PACKAGE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/package"
+    ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/robot_description"
 }
 
 check_ros_distro () {

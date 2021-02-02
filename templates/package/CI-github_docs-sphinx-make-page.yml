@@ -1,0 +1,17 @@
+name: "Generate Docs Page"
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Push Sphinx Pages
+    runs-on: ubuntu-latest
+    steps:
+    - uses: seanzhengw/sphinx-pages@master
+      with:
+        create_readme: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        install_extensions: false
+        source_dir: '$DOCS_FOLDER$'

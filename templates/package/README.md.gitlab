@@ -1,0 +1,10 @@
+$NAME$
+==========================================
+
+## ROS Distro Support
+
+|         | Kinetic | Melodic |
+|:-------:|:-------:|:-------:|
+| Branch  | [`kinetic-devel`](https://gitlab.ipr.kit.edu/$NAMESPACE$/$NAME$/tree/kinetic-devel) | 
+| Status  | [![build status](https://gitlab.ipr.kit.edu/$NAMESPACE$/$NAME$/badges/kinetic-devel/pipeline.svg)](https://gitlab.ipr.kit.edu/$NAMESPACE$/$NAME$/commits/kinetic-devel) | |
+

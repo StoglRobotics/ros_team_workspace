@@ -1,0 +1,72 @@
+image: docker:git # docker and git clients
+
+# enable docker-in-docker
+services:
+  - docker:dind
+
+variables:
+  ROS_REPO: "ros"
+  
+  TMPDIR: "${CI_PROJECT_DIR}.tmp" #
+  
+  UPSTREAM_WORKSPACE: ".ci.repos"
+
+before_script:
+  - apk add --update bash coreutils tar # install industrial_ci dependencies
+  - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci -b master
+  - sed -i 's/https\:\/\/gitlab\.ipr\.kit\.edu/https\:\/\/gitlab-ci-token\:'${CI_JOB_TOKEN}'\@gitlab\.ipr\.kit\.edu/g' ${UPSTREAM_WORKSPACE}
+
+# define CI stages
+stages:
+  - build_and_test
+  - format_check
+  - format_check_flake
+  - linting
+
+# Tests
+noetic:
+  stage: build_and_test
+  script: .industrial_ci/gitlab.sh ROS_DISTRO=foxy
+  tags:
+    - docker
+
+format:
+  stage: format_check
+  image: ubuntu:xenial
+  before_script:
+    - apt-get update
+    - apt-get install -qq clang-format-3.8 wget git
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ipr.kit.edu/IPR/IntelligentRoboticAutomation.git
+  script: IntelligentRoboticAutomation/scripts/clang_format.sh
+  allow_failure: true
+
+format-check-clang:
+  stage: format_check_flake
+  variables:
+    # run clang format check
+    CLANG_FORMAT_VERSION: "6.0"
+    CLANG_FORMAT_CHECK: "file"
+  script:
+    # download config files if they do not exist
+    - test ! -f .clang-format && wget https://gitlab.ipr.kit.edu/IPR/intelligent_robotic_automation/raw/melodic/pkg_templates/.clang-format
+    - test ! -f .clang-tidy && wget https://gitlab.ipr.kit.edu/IPR/intelligent_robotic_automation/raw/melodic/pkg_templates/.clang-tidy
+    - test ! -f .flake8 && wget https://gitlab.ipr.kit.edu/IPR/intelligent_robotic_automation/raw/melodic/pkg_templates/.flake8
+    - test ! -f .pylintrc && wget https://gitlab.ipr.kit.edu/IPR/intelligent_robotic_automation/raw/melodic/pkg_templates/.pylintrc
+    - apt -yq install python-pip && pip -q install flake8 typing && python -m flake8
+  tags:
+    - docker # use docker runner
+  allow_failure: true
+
+warningbuild-linting:
+  stage: linting
+  variables:
+    ADDITIONAL_DEBS: "python-pip python-typing clang-tidy-7 clang-7"
+    CATKIN_LINT: "pedantic"
+    CMAKE_ARGS: "-DCMAKE_CXX_FLAGS=-Werror"
+    NOT_TEST_BUILD: "true"
+    AFTER_SCRIPT: IntelligentRoboticAutomation/pkg_templates/.ci/linting.sh
+  # run default -> build
+  script: .ci_config/gitlab.sh
+  tags:
+    - docker
+  allow_failure: true

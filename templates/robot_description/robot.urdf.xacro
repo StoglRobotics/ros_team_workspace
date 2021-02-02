@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="$ROBOT_NAME$">
+
+  <!-- Use this if parameters are set from the launch file, otherwise delete -->
+  <xacro:arg name="example_arg" default="test" />
+
+  <xacro:include filename="$(find $PKG_NAME$)/urdf/$ROBOT_NAME$/$ROBOT_NAME$_macro.xacro"/>
+  <xacro:include filename="$(find $PKG_NAME$)/urdf/$ROBOT_NAME$/$ROBOT_NAME$_macro.ros2_control.xacro"/>
+
+  <!-- create link fixed to the "world" -->
+  <link name="world" />
+
+  <!-- Load robot's macro with parameters -->
+  <!-- set prefix is multiple robots are used -->
+  <xacro:$ROBOT_NAME$ prefix="" parent="world" >
+    <origin xyz="0 0 0" rpy="0 0 0" />          <!-- position robot in the world -->
+  </xacro:$ROBOT_NAME$>
+
+  <xacro:$ROBOT_NAME$_ros2_control
+    name="$ROBOT_NAME$"
+    prefix=""
+    example_param="$(arg example_arg)" />
+
+</robot>
