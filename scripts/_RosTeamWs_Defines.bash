@@ -40,8 +40,19 @@ setup_ros2_exports ()  {
 
 setup_ros2_aliases () {
 
-    alias cba="colcon build --symlink-install"
-    alias cbap="colcon build --symlink-install --packages-select"
+    alias cb="colcon build --symlink-install"
+    alias cbp="colcon build --symlink-install --packages-select"
+    alias cbup="colcon build --symlink-install --packages-up-to"
+    alias cbar="colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release"
+
+    alias ct="colcon test"
+    alias ctp="colcon test --packages-select"
+    alias ctup="colcon test --packages-up-to"
+
+    alias ctr="colcon test-result"
+
+# cbap ros2_control_test_assets hardware_interface fake_components && colcon test --packages-select hardware_interface ^Cke_components && colcon test-result
+
     #colcon_build()
     #{
     #    local pkg=\$1
@@ -65,15 +76,21 @@ setup_ros2_aliases () {
 
 
 ## BEGIN: Framework functions
+print_and_exit() {
+  message=$1
+  echo ""
+  echo "$message  !!Exiting..."
+  exit
+}
 
 framework_default_paths () {
-    ros_distro=$1
+  ros_distro=$1
 
-    FRAMEWORK_NAME="ros_team_workspace"
-    FRAMEWORK_BASE_PATH="/opt/RosTeamWS"
-    FRAMEWORK_REPO_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro"
-    FRAMEWORK_PACKAGE_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro/src/ros_team_workspace"
-    #TODO: remove this in the future
+  FRAMEWORK_NAME="ros_team_workspace"
+  FRAMEWORK_BASE_PATH="/opt/RosTeamWS"
+  FRAMEWORK_REPO_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro"
+  FRAMEWORK_PACKAGE_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro/src/ros_team_workspace"
+  #TODO: remove this in the future
 #     REMOTE_FRAMEWORK_BASE_PATH="/vol64_remote/IPR-Framework"
 #     REMOTE_FRAMEWORK_PATH="$REMOTE_FRAMEWORK_BASE_PATH/IPR_ros_ws_$ros_distro"
 #     #TODO: use this in the future
@@ -84,37 +101,68 @@ framework_default_paths () {
 #     fi
 #     FRAMEWORK_REPO_PATH="$REMOTE_FRAMEWORK_PATH/src/ros_team_workspace/scripts"
 
-    # Script-specific variables
-    PACKAGE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/package"
-    ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/robot_description"
+  # Script-specific variables
+  PACKAGE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/package"
+  ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/robot_description"
+  ROS2_CONTROL_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control"
+  ROS2_CONTROL_HW_ITF_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control/hardware"
+  LICENSE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/licenses"
 }
 
 check_ros_distro () {
-    ros_distro=$1
-    if [ -z "$1" ]; then
-        ros_distro=$DEFAULT_ROS_DISTRO
-        echo "No ros_distro defined. Using default: '$ros_distro'"
-        if [ ! -d "/opt/ros/$ros_distro" ]; then
-            echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-            exit
-        fi
-        echo "Press <ENTER> to continue or <CTRL>+C to exit."
-        read
-    fi
-
+  ros_distro=$1
+  if [ -z "$1" ]; then
+    ros_distro=$DEFAULT_ROS_DISTRO
+    echo "No ros_distro defined. Using default: '$ros_distro'"
     if [ ! -d "/opt/ros/$ros_distro" ]; then
-        echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-        exit
+      print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+#             echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+#             exit
     fi
+    read -p "Press <ENTER> to continue or <CTRL>+C to exit."
+  fi
 
-    ros_version=$DEFAULT_ROS_VERSION
-    if [[ $ros_distro == "foxy" ]]; then
-      ros_version=2
-    elif [[ $ros_distro == "noetic" ]]; then
-      ros_version=1
-    fi
+  if [ ! -d "/opt/ros/$ros_distro" ]; then
+    print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+#         echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+#         exit
+  fi
 
-    framework_default_paths $ros_distro
+  ros_version=$DEFAULT_ROS_VERSION
+  if [[ $ros_distro == "foxy" ]]; then
+    ros_version=2
+  elif [[ $ros_distro == "noetic" ]]; then
+    ros_version=1
+  fi
+
+  framework_default_paths $ros_distro
+}
+
+# first param is package name, second (yes/no) for executing tests
+compile_and_source_package() {
+  pkg_name=$1
+  if [ -z "$1" ]; then
+    print_and_exit "No package to compile provided. Exiting..."
+  fi
+  test=$2
+  if [ -z "$2" ]; then
+    test="no"
+  fi
+  bn=`basename "$PWD"`
+  path=$bn
+  while [[ "$bn" != "src" ]]; do
+    cd ..
+    bn=`basename "$PWD"`
+    path="$bn/$path"
+  done
+  cd ..
+  colcon build --symlink-install --packages-select $pkg_name
+  source install/setup.bash
+  if [[ "$test" == "yes" ]]; then
+    colcon test --packages-select $pkg_name
+    colcon test-result | grep $pkg_name
+  fi
+  cd $path
 }
 
 # END: Framework functions

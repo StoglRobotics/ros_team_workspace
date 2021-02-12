@@ -18,9 +18,9 @@
 
 usage="setup-robot-description.bash ROBOT_NAME [PKG_NAME]"
 
-echo ""
-echo "Your path is `pwd`. Is this your package folder where to setup robot's description?"
-read -p "If so press <ENTER> otherise <CTRL>+C and start the script again from the description folder."
+# echo ""
+# echo "Your path is `pwd`. Is this your package folder where to setup robot's description?"
+# read -p "If so press <ENTER> otherise <CTRL>+C and start the script again from the description folder."
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
@@ -29,7 +29,7 @@ check_ros_distro ${ROS_DISTRO}
 
 ROBOT_NAME=$1
 if [ -z "$1" ]; then
-  echo "You should provide package description!"
+  echo "You should provide robot name!"
   exit 0
 fi
 
@@ -37,10 +37,13 @@ PKG_NAME=$2
 if [ -z "$2" ]; then
   current=`pwd`
   PKG_NAME=$(basename "$current")
-  echo "Package name guessed from the current path is '$PKG_NAME' is this correct?"
-  echo "If so press <ENTER> otherise <CTRL>+C and start the script with the package name as second parameter."
-  read
+  echo "Package name guessed from the current path is '$PKG_NAME' is this correct? If not provide it as second paramter."
 fi
+
+echo ""
+echo "ATTENTION: Setting up description configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '`pwd`'."
+echo ""
+read -p "If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name."
 
 # Create folders for meshes
 F_NAME="meshes/${ROBOT_NAME}/visual"
@@ -59,22 +62,19 @@ mkdir -p $F_NAME
 ROBOT_URDF_XACRO="urdf/${ROBOT_NAME}.urdf.xacro"
 ROBOT_MACRO="urdf/${ROBOT_NAME}/${ROBOT_NAME}_macro.xacro"
 ROBOT_MACRO_ROS2_CONTROL="urdf/${ROBOT_NAME}/${ROBOT_NAME}_macro.ros2_control.xacro"
-
 cp -n $ROBOT_DESCRIPTION_TEMPLATES/common.xacro urdf/common.xacro
 cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot.urdf.xacro $ROBOT_URDF_XACRO
 cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot_macro.xacro $ROBOT_MACRO
 cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro $ROBOT_MACRO_ROS2_CONTROL
 
 # Copy launch.py file for testing the description
-# TODO: Add here ros2_control launch file
 mkdir -p launch
 TEST_ROBOT_DESCRIPTION_LAUNCH="launch/test_${ROBOT_NAME}_description.launch.py"
 cp -n $ROBOT_DESCRIPTION_TEMPLATES/test_robot_description.launch.py $TEST_ROBOT_DESCRIPTION_LAUNCH
 
 # Copy YAML files
 mkdir -p config
-ROBOT_CONTROLLERS_YAML="config/${ROBOT_NAME}_controllers.yaml"
-cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot_controllers.yaml $ROBOT_CONTROLLERS_YAML
+touch config/.gitkeep
 
 # Copy rviz files
 mkdir -p rviz
@@ -90,7 +90,7 @@ for SED_FILE in "${FILES_TO_SED[@]}"; do
 done
 
 # Add dependencies if they not exist
-DEP_PKGS=("joint_state_publisher_gui" "robot_state_publisher" "rviz2")
+DEP_PKGS=("xacro" "rviz2" "robot_state_publisher" "joint_state_publisher_gui")
 
 for DEP_PKG in "${DEP_PKGS[@]}"; do
   if `grep -q $DEP_PKG package.xml`; then
@@ -105,22 +105,20 @@ done
 preppend_to_string="if(BUILD_TESTING)"
 sed -i "s/$preppend_to_string/install\(\\n  DIRECTORY config launch\/ meshes rviz urdf\\n  DESTINATION share\/\$\{PROJECT_NAME\}\\n\)\\n\\n$preppend_to_string/g" CMakeLists.txt
 
+# extend README with general instructions
+if [ -f README.md ]; then
+  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >> README.md
+  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
+  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
+fi
+
+#TODO: Set license
+
 git add .
 git commit -m "RosTeamWS: Description files for $ROBOT_NAME generated."
 
-# TODO: move this into separate, helper function
 # Compile and add new package the to the path
-bn=`basename "$PWD"`
-path=$bn
-while [[ "$bn" != "src" ]]; do
-  cd ..
-  bn=`basename "$PWD"`
-  path="$bn/$path"
-done
-cd ..
-colcon build --symlink-install --packages-select $PKG_NAME
-source install/setup.bash
-cd $path
+compile_and_source_package $PKG_NAME
 
 echo ""
 echo "FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME test_${ROBOT_NAME}_description.launch.py'"

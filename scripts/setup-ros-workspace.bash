@@ -2,7 +2,7 @@
 
 # workspace folder is relative to your home
 
-usage='Usage: ./setup-ros-workspace.bash "ros_distro" "ros_ws_suffix" "workspace_folder"'
+usage='Usage: setup-ros-workspace.bash ROS_DISTRO WS_SUFFIX WS_FOLDER'
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
@@ -26,22 +26,21 @@ fi
 # TODO: Write this automatically from the user's definitions
 echo "Please choose which workspace should be basis for yours:"
 echo "(0) <Use current sourced workspace>"
-echo "(1) Industrial"
-echo "(2) Mobile"
+# echo "(1) Industrial"
+# echo "(2) Mobile"
 read choice
 
 if [ -z "$choice" ]; then
-  echo "No workspace is chosen! Exiting..."
-  exit
+  print_and_exit "No workspace is chosen!"
 fi
 
 case "$choice" in
-"1")
-   base_ws=Industrial
-   ;;
-"2")
-   base_ws=Mobile
-   ;;
+# "1")
+#    base_ws=Industrial
+#    ;;
+# "2")
+#    base_ws=Mobile
+#    ;;
 "0")
    base_ws="<current>"
    ;;
@@ -51,8 +50,8 @@ case "$choice" in
 esac
 
 # TODO: Add here output of the <current> WS
-echo "Creating a new workspace in folder '$ws_folder' for ROS '$ros_distro' (ROS$ros_version) with suffix '$ros_ws_suffix' using '$base_ws' as base workspace. Press <ENTER> to continue..."
-read
+echo ""
+read -p "ATTENTION: Creating a new workspace in folder '$ws_folder' for ROS '$ros_distro' (ROS$ros_version) with suffix '$ros_ws_suffix' using '$base_ws' as base workspace. Press <ENTER> to continue..."
 
 # Create and initalise ROS-Workspace
 if [[ $base_ws != "<current>" ]]; then
@@ -77,7 +76,14 @@ fi
 
 cd
 
-fun_name="RosTeamWS_setup_ros$ros_version"
+alias_name=_ros${ros_version}
+if [ -z "$ros_ws_suffix" ]; then
+  fun_name="RosTeamWS_setup_ros$ros_version"
+  ros_ws_suffix="-"
+else
+  fun_name="RosTeamWS_setup_ros${ros_version}_$ros_ws_suffix"
+  alias_name=${alias_name}_$ros_ws_suffix
+fi
 
 cp ~/.bashrc ~/.bashrc.bkp
 # Comment out the old configuration is such exists - this is hard if using functions...
@@ -92,15 +98,17 @@ echo "  RosTeamWS_WS_FOLDER=$ws_folder" >> ~/.bashrc
 echo "  RosTeamWS_WS_SUFFIX=$ros_ws_suffix" >> ~/.bashrc
 echo "  source $FRAMEWORK_BASE_PATH/ros_ws_\$RosTeamWS_DISTRO/src/$FRAMEWORK_NAME/scripts/environment/setup.bash \$RosTeamWS_DISTRO \$RosTeamWS_WS_SUFFIX \$RosTeamWS_WS_FOLDER" >> ~/.bashrc
 echo "}" >> ~/.bashrc
-echo "alias st_ros$ros_version=$fun_name" >> ~/.bashrc
+echo "alias $alias_name=$fun_name" >> ~/.bashrc
 
 # Setup new workspace
 source ~/.bashrc
 
+# Update rosdep definitions
+rosdep update
+
 if [[ $ros_version == 1 ]]; then
-  rosdep update
   rospack profile
 fi
 
 echo "------------------------------------------------------"
-echo "Fnished: Please open new terminal and execute 'st_ros$ros_version'"
+echo "Fnished: Please open a new terminal and execute '$alias_name'"

@@ -9,7 +9,7 @@ source $script_own_dir/../_RosTeamWs_Defines.bash
 check_ros_distro $1
 
 ws_suffix=$2
-if [ -z "$2" ]; then
+if [[  "$2" == "-" ]]; then
   ws_suffix=""
 else
   ws_suffix="_$2"
@@ -35,5 +35,20 @@ elif [[ $ros_version == 2 ]]; then
 
   /opt/rti.com/rti_connext_dds-5.3.1/setenv_ros2rti.bash
   # export LANG=de_DE.UTF-8
-  source ~/$ws_folder/ros_ws_$ros_distro$ws_suffix/install/setup.bash
+  WS_FOLDER=""
+  WS_FOLDER_1="$HOME/$ws_folder/ros_ws_$ros_distro$ws_suffix"
+  WS_FOLDER_2="$HOME/$ws_folder/ros2_ws_$ros_distro$ws_suffix"
+  if [ -d "$WS_FOLDER_1" ]; then
+    WS_FOLDER=$WS_FOLDER_1
+  elif [ -d "$WS_FOLDER_2" ]; then
+    WS_FOLDER=$WS_FOLDER_2
+  else
+    print_and_exit "Neither '$WS_FOLDER_1' nor 'WS_FOLDER_2' exist. Can not find ROS workspace!"
+  fi
+
+  export COLCON_WS=$WS_FOLDER
+  source "$WS_FOLDER/install/setup.bash"
+
+  echo ""
+  echo "RosTeamWS: Sourced file: $WS_FOLDER/install/setup.bash"
 fi

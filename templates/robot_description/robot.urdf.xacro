@@ -2,7 +2,8 @@
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="$ROBOT_NAME$">
 
   <!-- Use this if parameters are set from the launch file, otherwise delete -->
-  <xacro:arg name="example_arg" default="test" />
+  <xacro:arg name="use_fake_hardware" default="true" />
+  <xacro:arg name="fake_sensor_commands" default="false" />
 
   <xacro:include filename="$(find $PKG_NAME$)/urdf/$ROBOT_NAME$/$ROBOT_NAME$_macro.xacro"/>
   <xacro:include filename="$(find $PKG_NAME$)/urdf/$ROBOT_NAME$/$ROBOT_NAME$_macro.ros2_control.xacro"/>
@@ -19,6 +20,7 @@
   <xacro:$ROBOT_NAME$_ros2_control
     name="$ROBOT_NAME$"
     prefix=""
-    example_param="$(arg example_arg)" />
+    use_fake_hardware="$(arg use_fake_hardware)"
+    fake_sensor_commands="$(arg fake_sensor_commands)" />
 
 </robot>
