@@ -96,8 +96,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../use-cases/configure_repository.html">Configure Repository</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../use-cases/create_package.html">Create New Package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../use-cases/create_setup_workspace.html">Create Setup Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/create_setup_workspace.html">Setup a new Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/setup_robot_bringup_package.html">Setup robot bringup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../use-cases/setup_robot_description_package.html">Setup robot description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/setup_robot_ros2_control_hardware.html">Setup robot’s ros2_control hardware package</a></li>
 </ul>
 
             
@@ -178,34 +180,46 @@
 ├── &lt;manufacturer&gt;[_&lt;robot_name&gt;[_&lt;type&gt;]|_manipulators]/       # Meta-package of the robot
 │   ├── CMakeLists.txt
 │   └── package.xml
-├── &lt;robot_name&gt;_bringup/                     # Launch and config files of the robot
-│   ├── [CMakeLists.txt]
+├── &lt;robot_name&gt;_bringup/                              # Launch and config files for starting the robot using ros2_control
+│   ├── [CMakeLists.txt]                               # if ament_cmake is used (recommended)
 │   ├── package.xml
-│   ├── [setup.py]
+│   ├── [setup.py]                                     # if amend_python is used
+│   ├── [setup.cfg]                                    # if amend_python is used
 │   ├── config/
-│   │   └── &lt;config&gt;.yaml
+│   │   ├── &lt;robot_name&gt;_controllers.yaml              # Controllers&#39; configuraiton for ros2_control
+│   │   ├── &lt;robot_name&gt;_forward_position_publisher.yaml  # Setup test publisher for forward position controller
+│   │   └── &lt;robot_name&gt;_joint_trajectory_publisher.yaml  # Setup test publisher for joint trajectory controller
 │   └── launch/
-│       └── &lt;something&gt;.launch.py
-├── &lt;manufacturer&gt;_description/                 # Robot&#39;s description files
-│   ├── [CMakeLists.txt]
+│       ├── &lt;robot_name&gt;.launch.py                     # Robot&#39;s default launch file
+│       ├── test_forward_position_controller.launch.py # Start test publisher for forward position controller
+│       └── test_joint_trajectory_controller.launch.py # Start test publisher for joint trajectory controller
+├── &lt;manufacturer|robot_name&gt;_description/             # Robot&#39;s description files
+│   ├── [CMakeLists.txt]                               # if ament_cmake is used (recommended)
 │   ├── package.xml
-│   ├── [setup.py]
-│   ├── config/
-│   │   └──
-│   ├── meshes/
-│   │   └── collision
-│   │       ├── &lt;link_xy&gt;.stl
-│   │       └── ...
+│   ├── [setup.py]                                     # if amend_python is used
+│   ├── [setup.cfg]                                    # if amend_python is used
+│   ├── config/                                        # general YAML files for a robot
+│   │   └── &lt;robot_name&gt;_&lt;someting_specific&gt;.yaml
+│   ├── launch/                                        # launch files related to testing robots&#39; description
+│   │   └── test_&lt;robot_name&gt;_description.launch.py
+│   ├── meshes/                                        # meshes used in &lt;robot_name&gt;_macro.urdf.xacro
+│   │   ├── collision
+│   │   │   └── &lt;robot_name|robot_model&gt;               # meshes are sorted by robot name or model
+│   │   │       ├── &lt;link_xy&gt;.stl
+│   │   │       └── ...
 │   │   └── visual
-│   │       ├── &lt;link_xy&gt;.dae
-│   │       └── ...
-│   ├── rviz/
+│   │       └── &lt;robot_name|robot_model&gt;
+│   │           ├── &lt;link_xy&gt;.dae
+│   │           └── ...
+│   ├── rviz/                                          # rviz display configurations
 │   │   └── &lt;robot_name&gt;_default.rviz
-│   └── urdf/
-│       ├── &lt;robot_name&gt;.urdf.xacro
-│       ├── &lt;robot_name&gt;_macro.ros2_control.xacro
-│       └── &lt;robot_name&gt;_macro.xacro
-└── &lt;robot_name&gt;_hardware_interface/          # Implementation of the ros2_control interface
+│   └── urdf/                                          # URDF file for the robot
+│       ├── common.xacro                               # Common XACRO definitions
+│       ├── &lt;robot_name&gt;.urdf.xacro                    # Main URDF for a robot - loads macro and other files
+│       └── &lt;robot_name|robot_model&gt;
+│           ├── &lt;robot_name&gt;_macro.xacro               # Macro file of the robot - can add prefix, define origin, etc.
+│           └── &lt;robot_name&gt;_macro.ros2_control.xacro  # URDF-part used to configure ros2_control
+└── &lt;robot_name&gt;_hardware_interface/                # Implementation of the ros2_control interface
 │   ├── CMakeLists.txt
 │   ├── package.xml
 │   ├── include/
