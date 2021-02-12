@@ -5,13 +5,16 @@ controller_manager:
     joint_state_controller:
       type: joint_state_controller/JointStateController
 
-    forward_position_controller:
+    forward_position_controller:              # delete entry if controller is not applicable
       type: forward_command_controller/ForwardCommandController
 
-    position_trajectory_controller:
+    forward_velocity_controller:              # delete entry if controller is not applicable
+      type: forward_command_controller/ForwardCommandController
+
+    joint_trajectory_controller:              # delete entry if controller is not applicable
       type: joint_trajectory_controller/JointTrajectoryController
 
-forward_position_controller:
+forward_position_controller:                  # delete entry if controller is not applicable
   ros__parameters:
     joints:
       - joint1
@@ -22,7 +25,18 @@ forward_position_controller:
       - joint6
     interface_name: position
 
-position_trajectory_controller:
+forward_velocity_controller:                  # delete entry if controller is not applicable
+  ros__parameters:
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
+    interface_name: velocity
+
+joint_trajectory_controller:
   ros__parameters:
     joints:
       - joint1

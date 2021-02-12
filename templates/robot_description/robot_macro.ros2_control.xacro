@@ -1,14 +1,19 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
 
-  <xacro:macro name="$ROBOT_NAME$_ros2_control" params="name prefix example_param:=^|test">
+  <xacro:macro name="$ROBOT_NAME$_ros2_control" params="name prefix use_fake_hardware:=^|true fake_sensor_commands:=^|false">
 
     <ros2_control name="${name}" type="system">
       <hardware>
-        <plugin>fake_components/GenericRobot</plugin>
-        <param name="example_param">${example_param}</param>
+        <xacro:if value="${use_fake_hardware}">
+          <plugin>fake_components/GenericRobot</plugin>
+          <param name="fake_sensor_commands">${fake_sensor_commands}</param>
+        </xacro:if>
+        <xacro:unless value="${use_fake_hardware}">
+          <plugin>robot_hardware_inteface/RobotHardwareInteface</plugin>
+        </xacro:unless>
       </hardware>
-      <joint name="${prefix}joint_1">
+      <joint name="${prefix}joint1">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -16,8 +21,9 @@
         <state_interface name="position"/>
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
+        <param name="initial_position">0.0</param>
       </joint>
-      <joint name="${prefix}joint_2">
+      <joint name="${prefix}joint2">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -25,8 +31,9 @@
         <state_interface name="position"/>
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
+        <param name="initial_position">0.0</param>
       </joint>
-      <joint name="${prefix}joint_3">
+      <joint name="${prefix}joint3">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -34,8 +41,9 @@
         <state_interface name="position"/>
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
+        <param name="initial_position">0.0</param>
       </joint>
-      <joint name="${prefix}joint_4">
+      <joint name="${prefix}joint4">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -43,8 +51,9 @@
         <state_interface name="position"/>
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
+        <param name="initial_position">0.0</param>
       </joint>
-      <joint name="${prefix}joint_5">
+      <joint name="${prefix}joint5">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -52,8 +61,9 @@
         <state_interface name="position"/>
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
+        <param name="initial_position">0.0</param>
       </joint>
-      <joint name="${prefix}joint_6">
+      <joint name="${prefix}joint6">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
           <param name="min">-1</param>
           <param name="max">1</param>
@@ -61,6 +71,7 @@
         <state_interface name="position"/>
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
+        <param name="initial_position">0.0</param>
       </joint>
       <sensor name="tcp_fts_sensor">            <!-- Remove/change sensors as needed -->
         <state_interface name="fx"/>

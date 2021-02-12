@@ -1,0 +1,10 @@
+<library path="$package_name$">
+  <class name="$package_name$/$ClassName$"
+         type="$package_name$::$ClassName$"
+         base_class_type="hardware_interface::$Interface_Type$Interface">
+    <description>
+      ros2_control hardware interface.
+    </description>
+  </class>
+</library>
+

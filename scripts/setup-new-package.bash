@@ -150,6 +150,8 @@ case "$choice" in
 
     fi
 
+    ## Move this from here into setup-repository.bash script
+
     # Add package to CI
     append_to_string="          #package-name:"
     sed -i "s/$append_to_string/$append_to_string\\n            #${PKG_NAME}/g" .github/workflows/ci-build.yml
@@ -162,6 +164,9 @@ case "$choice" in
     # Add short description to README.md
     append_to_string='### Packages in `'"${META_NAME}"'` metapackage'
     sed -i "s/$append_to_string/$append_to_string\\n* **${PKG_NAME}** - ${PKG_DESCRIPTION}/g" README.md
+
+    # Setup also subpackage README.md
+    head -4 $PACKAGE_TEMPLATES/README.md.github >> ${PKG_NAME}/README.md
 
     git add .
     git commit -m "RosTeamWS: Created sub-package $PKG_NAME."

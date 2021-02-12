@@ -87,25 +87,39 @@ case "$choice" in
   exit 0
 esac
 
+# This functionality is not provided in all framework versions
+if [[ -f "$PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md" ]]; then
+  # Ask if add How-to-use and ROS-Intro
+  read -p "Do you want to append description on 'How-to-use and ROS-Intro' to the README? (y/n) [n]" choice
+  choice=${choice="n"}
+
+  case "$choice" in
+  "y")
+    cat $PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md >> README.md
+    echo "Descrption is appended."
+  "n")
+    echo "Description not appended."
+  esac
+fi
+
 read -p "Enter namespace of the repository [default: $PKG_NAME]: " NAMESPACE
 NAMESPACE=${NAMESPACE:=$PKG_NAME}
 
 license_web="${LICENSE// /%20}"
 sed -i 's/\$NAME\$/'${PKG_NAME}'/g' README.md
 sed -i 's/\$ROS_DISTRO\$/'${ros_distro}'/g' README.md
+sed -i 's/\$Ros_distro\$/'${ros_distro^}'/g' README.md
 sed -i 's/\$DESCRIPTION\$/'"${PKG_DESCRIPTION}"'/g' README.md
 sed -i 's/\$LICENSE\$/'${license_web}'/g' README.md
 sed -i 's/\$NAMESPACE\$/'${NAMESPACE}'/g' README.md
 
 # Check if it is metapackage
 if [[ ! -f "package.xml" ]]; then
-
-echo "" >> README.md
-echo "" >> README.md
-echo "### Packages in \`${PKG_NAME}\` metapackage" >> README.md
-echo "" >> README.md
-echo "" >> README.md
-
+  echo "" >> README.md
+  echo "" >> README.md
+  echo "### Packages in \`${PKG_NAME}\` metapackage" >> README.md
+  echo "" >> README.md
+  echo "" >> README.md
 fi
 
 git add .
@@ -122,6 +136,8 @@ case "$open_source" in
   echo "Adding 'LICENSE' file for '$license' license."
   # TODO: maybe use "-i,  --input-file=DATEI  in lokaler oder externer DATEI" option?
   wget -O LICENSE https://www.apache.org/licenses/LICENSE-2.0.txt
+  # TODO: Add contributing file
+#   OS-Apache-CONTRIBUTING.md
   ;;
 "n")
   echo "Not open source repository"
