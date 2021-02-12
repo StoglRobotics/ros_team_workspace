@@ -1,0 +1,7 @@
+# Copyright (c) $YEAR$, $NAME_ON_LICENSE$
+# All rights reserved.
+#
+# Proprietary License
+#
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+# The file is considered confidential.
