@@ -24,6 +24,7 @@ jobs:
       - uses: 'ros-industrial/industrial_ci@master'
         env: ${{matrix.env}}
 
+## CI build from source is commented out by default to save time on runner
   #ci_source:
     #name: $ROS_DISTRO$ source job
     #runs-on: ubuntu-20.04

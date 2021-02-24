@@ -11,11 +11,11 @@ $LICENSE$
 namespace $package_name$
 {
 
-return_type $ClassName$::configure(
+hardware_interface::return_type $ClassName$::configure(
   const hardware_interface::HardwareInfo & info)
 {
-  if (configure_default(info) != return_type::OK) {
-    return return_type::ERROR;
+  if (configure_default(info) != hardware_interface::return_type::OK) {
+    return hardware_interface::return_type::ERROR;
   }
 
   // TODO(anyone): read parameters and initialize the hardware
@@ -23,7 +23,7 @@ return_type $ClassName$::configure(
   hw_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
   status_ = hardware_interface::status::CONFIGURED;
-  return return_type::OK;
+  return hardware_interface::return_type::OK;
 }
 
 std::vector<hardware_interface::StateInterface>
@@ -55,36 +55,36 @@ $ClassName$::export_command_interfaces()
 }
 
 
-return_type $ClassName$::start()
+hardware_interface::return_type $ClassName$::start()
 {
   // TODO(anyone): prepare the robot to receive commands
 
   status_ = hardware_interface::status::STARTED;
 
-  return return_type::OK;
+  return hardware_interface::return_type::OK;
 }
 
-return_type $ClassName$::stop()
+hardware_interface::return_type $ClassName$::stop()
 {
   // TODO(anyone): prepare the robot to stop receiving commands
 
   status_ = hardware_interface::status::STOPPED;
 
-  return return_type::OK;
+  return hardware_interface::return_type::OK;
 }
 
 hardware_interface::return_type $ClassName$::read()
 {
   // TODO(anyone): read robot states
 
-  return return_type::OK;
+  return hardware_interface::return_type::OK;
 }
 
 hardware_interface::return_type $ClassName$::write()
 {
   // TODO(anyone): write robot's commands'
 
-  return return_type::OK;
+  return hardware_interface::return_type::OK;
 }
 
 }  // namespace $package_name$

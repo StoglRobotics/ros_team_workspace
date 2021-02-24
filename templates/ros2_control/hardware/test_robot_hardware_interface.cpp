@@ -7,7 +7,7 @@ $LICENSE$
 #include "ros2_control_test_assets/descriptions.hpp"
 #include "ros2_control_test_assets/components_urdfs.hpp"
 
-class TestGenericSystem : public ::testing::Test
+class Test$ClassName$ : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -36,7 +36,7 @@ protected:
   std::string $file_name$_2dof_;
 };
 
-TEST_F(TestGenericSystem, load_$file_name$_2dof) {
+TEST_F(Test$ClassName$, load_$file_name$_2dof) {
   auto urdf =
     ros2_control_test_assets::urdf_head + $file_name$_2dof_ +
     ros2_control_test_assets::urdf_tail;

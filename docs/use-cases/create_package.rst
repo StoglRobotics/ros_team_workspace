@@ -5,21 +5,18 @@ Create New Package
 
 This use-case describes how to create a new package using scripts from the ROS Team Workspace (RosTeamWS) framework.
 
-.. contents:: Table of Contents
-   :depth: 2
-
 
 General Script for Creating Packages
 =====================================
 
-`setup-new-package.bash` script is used, accepting the package name and description as parameters.
+`create-new-package` script is used, accepting the package name and description as parameters.
 The script **has to be executed** from the *source* folder of your workspace.
 
 .. code-block:: bash
    :caption: Usage of script for setting up new packages.
    :name: create-package
 
-   setup-new-package.bash NAME DESCRIPTION
+   create-new-package NAME DESCRIPTION
 
 When executing the script, read all output carefully.
 If you make any wrong decision or enter incorrect data, use <CTRL>+C keys to terminate the script.
