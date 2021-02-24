@@ -36,7 +36,7 @@ forward_velocity_controller:                  # delete entry if controller is no
       - joint6
     interface_name: velocity
 
-joint_trajectory_controller:
+joint_trajectory_controller:                  # delete entry if controller is not applicable
   ros__parameters:
     joints:
       - joint1

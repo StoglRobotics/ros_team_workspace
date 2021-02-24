@@ -1,22 +1,20 @@
 #!/bin/bash
 #
-usage='setup-new-package.bash NAME DESCRIPTION'
+usage='create-new-package PKG_NAME PKG_DESCRIPTION'
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
-source $script_own_dir/_RosTeamWs_Defines.bash
+source $script_own_dir/../setup.bash
 check_ros_distro ${ROS_DISTRO}
 
 PKG_NAME=$1
 if [ -z "$1" ]; then
-  echo "Package name is not defined. Nothing to do, exiting..."
-  exit
+  print_and_exit "Package name is not defined. Nothing to do, exiting..." "$usage"
 fi
 
 PKG_DESCRIPTION=$2
 if [ -z "$2" ]; then
-  echo "Package description is not defined. Nothing to do, exiting..."
-  exit
+  print_and_exit "Package description is not defined. Nothing to do, exiting..." "$usage"
 fi
 
 echo ""
@@ -118,7 +116,7 @@ elif [[ $ros_version == 2 ]]; then
   fi
 fi
 
-read -p "Do you want to setup/update repository with the new package configuration? This will create a commit after making changes. (y/n) [n]: " choice
+read -p "Do you want to setup/update repository with the new package configuration? (y/n) [n]: " choice
 choice=${choice:="n"}
 
 case "$choice" in
@@ -131,7 +129,7 @@ case "$choice" in
       cd $PKG_NAME
     fi
 
-    $script_own_dir/setup-repository.bash $PKG_NAME "$PKG_DESCRIPTION" $LICENSE
+    $RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash $PKG_NAME "$PKG_DESCRIPTION" $LICENSE
 
   else
 
@@ -167,9 +165,19 @@ case "$choice" in
 
     # Setup also subpackage README.md
     head -4 $PACKAGE_TEMPLATES/README.md.github >> ${PKG_NAME}/README.md
+    sed -i 's/\$NAME\$/'${PKG_NAME}'/g' ${PKG_NAME}/README.md
+    sed -i 's/\$DESCRIPTION\$/'"${PKG_DESCRIPTION}"'/g' ${PKG_NAME}/README.md
 
-    git add .
-    git commit -m "RosTeamWS: Created sub-package $PKG_NAME."
+    read -p "Do you want to create a commit with your changes? (y/n) [n]: " choice
+    choice=${choice:="n"}
+
+    case "$choice" in
+    "y")
+      git add .
+      git commit -m "RosTeamWS: Created sub-package $PKG_NAME."
+      ;;
+    #"n")
+    esac
 
   fi
   ;;

@@ -1,115 +1,127 @@
-## BEGIN: definitions
-DEFAULT_ROS_DISTRO="foxy"
-DEFAULT_ROS_VERSION=2
+# Copyright (c) 2021, Stogl Robotics Consulting UG (haftungsbeschränkt)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
+## BEGIN: Default RosTeamWS Definitions
 
-# We have two example teams. On is working with industrial and other with mobile robots
-TEAM_TEAM_NAMES=("Industrial" "Mobile")
+function RosTeamWS_script_own_dir {
+  echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+}
 
-TEAM_LICENSE="Apache License 2.0"
-
-TEAM_REPOSITORY_SERVER="https://github.com"
-
-TEAM_WORKSPACE_ASSETS="/opt/RosTeamWS/assets/"
-
-## END: definitions
-
-
-## BEGIN: Team setup
-
-setup_ros1_exports () {
+function RosTeamWS_setup_ros1_exports {
 
 export ROSCONSOLE_FORMAT='[${severity}] [${walltime}: ${logger}] [${node}@${file}.${function}:${line}]: ${message}'
 export ROSCONSOLE_CONFIG_FILE='~/workspace/ros_ws/rosconsole.config'
 
 }
 
-setup_ros1_aliases () {
+function RosTeamWS_setup_ros1_aliases {
 
   alias cb="catkin build"
 
 }
 
 
-setup_ros2_exports ()  {
+function RosTeamWS_setup_ros2_exports {
 
   export RTI_LICENSE_FILE=/opt/rti.com/rti_connext_dds-5.3.1/rti_license.dat
 
 }
 
+function RosTeamWS_setup_ros2_aliases {
 
-setup_ros2_aliases () {
+  alias cb="colcon_build"
+  alias cbr="colcon_build_release"
+  alias cbup="colcon build --symlink-install --packages-up-to"
 
-    alias cb="colcon build --symlink-install"
-    alias cbp="colcon build --symlink-install --packages-select"
-    alias cbup="colcon build --symlink-install --packages-up-to"
-    alias cbar="colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release"
+  alias ct="colcon_test"
+  alias ctup="colcon test --packages-up-to"
 
-    alias ct="colcon test"
-    alias ctp="colcon test --packages-select"
-    alias ctup="colcon test --packages-up-to"
+  alias ctr="colcon test-result"
 
-    alias ctr="colcon test-result"
-
-# cbap ros2_control_test_assets hardware_interface fake_components && colcon test --packages-select hardware_interface ^Cke_components && colcon test-result
-
-    #colcon_build()
-    #{
-    #    local pkg=\$1
-    #    colcon build --symlink-install --packages-select \${pkg}
-    #}
-    #alias colcon_build="colcon_build \$@"
-
-    # Author: Jordan Palacios
-    #colcon_run_test()
-    #{
-    #    local pkg=\$1
-    #    colcon build --symlink-install --packages-select \${pkg} && \
-    #        colcon test --packages-select \${pkg} && \
-    #        colcon test-result
-    #}
-    #alias colcon_run_test=colcon_run_test \$@
-
+  alias ca="colcon_all"
 }
 
-## END: Team setup
+
+## some colcon helpers
+function colcon_helper_ros2 {
+  if [ -z "$1" ]; then
+    print_and_exit "This should never happen. Check your helpers definitions!"
+  fi
+
+  CMD="$1"
+  if [ -z "$2" ]; then
+    $CMD
+  else
+    $CMD --packages-select $2
+  fi
+}
+
+function colcon_build {
+  colcon_helper_ros2 "colcon build --symlink-install" "$*"
+}
+
+function colcon_build_release {
+  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release" "$*"
+}
+
+function colcon_test {
+  colcon_helper_ros2 "colcon test" "$*"
+}
+
+function colcon_all {
+  colcon_build "$*"
+  colcon_test "$*"
+  ctr
+}
+
+## END: Default Framework Definitions
 
 
 ## BEGIN: Framework functions
-print_and_exit() {
+function print_and_exit {
   message=$1
   echo ""
   echo "$message  !!Exiting..."
+  if [ ! -z "$2" ]; then
+    echo ""
+    echo "Usage: $2"
+  fi
   exit
 }
 
-framework_default_paths () {
+function framework_default_paths {
   ros_distro=$1
 
   FRAMEWORK_NAME="ros_team_workspace"
-  FRAMEWORK_BASE_PATH="/opt/RosTeamWS"
-  FRAMEWORK_REPO_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro"
-  FRAMEWORK_PACKAGE_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro/src/ros_team_workspace"
-  #TODO: remove this in the future
-#     REMOTE_FRAMEWORK_BASE_PATH="/vol64_remote/IPR-Framework"
-#     REMOTE_FRAMEWORK_PATH="$REMOTE_FRAMEWORK_BASE_PATH/IPR_ros_ws_$ros_distro"
-#     #TODO: use this in the future
-#     SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-#     if [ ! -d "$FRAMEWORK_REPO_PATH" ]; then
-#         echo "FRAMEWORK_REPO_PATH: local not found, set to remote..."
-#         FRAMEWORK_REPO_PATH="$REMOTE_FRAMEWORK_PATH/src/ros_team_workspace/scripts"
-#     fi
-#     FRAMEWORK_REPO_PATH="$REMOTE_FRAMEWORK_PATH/src/ros_team_workspace/scripts"
+  FRAMEWORK_BASE_PATH=${FRAMEWORK_BASE_PATH:=/opt/RosTeamWS}
+  FRAMEWORK_PACKAGE_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro/src/$FRAMEWORK_NAME"
+
+  if [ ! -d "$FRAMEWORK_PACKAGE_PATH" ]; then
+    FRAMEWORK_PACKAGE_PATH=$FRAMEWORK_MAIN_PATH
+  fi
+  RosTeamWS_FRAMEWORK_SCRIPTS_PATH="$FRAMEWORK_PACKAGE_PATH/scripts/"
 
   # Script-specific variables
   PACKAGE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/package"
   ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/robot_description"
   ROS2_CONTROL_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control"
   ROS2_CONTROL_HW_ITF_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control/hardware"
+  ROS2_CONTROL_CONTROLLER_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control/controller"
   LICENSE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/licenses"
 }
 
-check_ros_distro () {
+function check_ros_distro {
   ros_distro=$1
   if [ -z "$1" ]; then
     ros_distro=$DEFAULT_ROS_DISTRO
@@ -139,7 +151,7 @@ check_ros_distro () {
 }
 
 # first param is package name, second (yes/no) for executing tests
-compile_and_source_package() {
+function compile_and_source_package {
   pkg_name=$1
   if [ -z "$1" ]; then
     print_and_exit "No package to compile provided. Exiting..."
@@ -156,7 +168,7 @@ compile_and_source_package() {
     path="$bn/$path"
   done
   cd ..
-  colcon build --symlink-install --packages-select $pkg_name
+  colcon build --symlink-install --packages-up-to $pkg_name
   source install/setup.bash
   if [[ "$test" == "yes" ]]; then
     colcon test --packages-select $pkg_name
@@ -166,3 +178,5 @@ compile_and_source_package() {
 }
 
 # END: Framework functions
+
+FRAMEWORK_MAIN_PATH="$(RosTeamWS_script_own_dir)/../"

@@ -1,9 +1,8 @@
-
-usage='setup-new-package.bash "ros_distro" "ros_ws_suffix" "workspace_folder"'
+usage='setup.bash "ros_distro" "ros_ws_suffix" "workspace_folder"'
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
-source $script_own_dir/../_RosTeamWs_Defines.bash
+# script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+# source $script_own_dir/../_RosTeamWs_Defines.bash
 
 # ros distribution name will be set in $ros_distro
 check_ros_distro $1
@@ -19,6 +18,10 @@ ws_folder="$3"
 if [ -z "$3" ]; then
   ws_folder="workspace"
 fi
+
+unset CMAKE_PREFIX_PATH
+unset ROS_PACKAGE_PATH
+unset COLCON_WS
 
 if [[ $ros_version == 1 ]]; then
 

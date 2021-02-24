@@ -55,10 +55,11 @@ git commit -m "RosTeamWS: package created with initial files"
 
 # TODO: Check if uses want to configure CI
 # Build type
-echo "Which type of repository server are you using:"
+echo "Which type of repository server are you using [1]:"
 echo "(1) GitHub"
-echo "(2) Gitlab"
+echo "(2) Gitlab (not available yet - TBD)"
 read choice
+choice=${choice:=1}
 
 #TODO: Add automatically git remote
 
@@ -97,6 +98,7 @@ if [[ -f "$PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md" ]]; then
   "y")
     cat $PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md >> README.md
     echo "Descrption is appended."
+    ;;
   "n")
     echo "Description not appended."
   esac

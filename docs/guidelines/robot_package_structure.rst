@@ -1,6 +1,6 @@
-=====================
-ROS Package structure
-=====================
+============================
+ROS-Robot Package structure
+============================
 
 This documents proposes guidelines for structure of ROS packages in larger detail than provided by `ROS Enhancement Proposals (REPs) <https://github.com/ros-infrastructure/rep>`_
 

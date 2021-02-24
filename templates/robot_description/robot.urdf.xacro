@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="$ROBOT_NAME$">
 
   <!-- Use this if parameters are set from the launch file, otherwise delete -->
@@ -12,7 +12,7 @@
   <link name="world" />
 
   <!-- Load robot's macro with parameters -->
-  <!-- set prefix is multiple robots are used -->
+  <!-- set prefix if multiple robots are used -->
   <xacro:$ROBOT_NAME$ prefix="" parent="world" >
     <origin xyz="0 0 0" rpy="0 0 0" />          <!-- position robot in the world -->
   </xacro:$ROBOT_NAME$>
