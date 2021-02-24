@@ -137,6 +137,10 @@ if [[ "$LICENSE_HEADER" != "" ]]; then
     sed -i "s/\\\$NAME_ON_LICENSE\\\$/${NAME_ON_LICENSE}/g" $FILE_TO_LIC
   done
 #   echo "Licence header added to files: ("`declare -p FILES_TO_LICENSE`")"
+else
+  for FILE_TO_LIC in "${FILES_TO_LICENSE[@]}"; do
+    sed -i "/\\\$LICENSE\\\$/d" $FILE_TO_LIC
+  done
 fi
 
 FILES_TO_SED=("${FILES_TO_LICENSE[@]}")
