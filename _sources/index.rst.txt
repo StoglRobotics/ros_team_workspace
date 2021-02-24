@@ -1,3 +1,4 @@
+============================================================
 Welcome the documentation of *ROS Team Workspace*-Framework
 ============================================================
 
@@ -9,8 +10,8 @@ The framework is initiated by Denis Stogl in 2016 to increase collaboration at t
 
 From the 2021 the framework is maintained by Stogl Robotic Consulting.
 
-.. contents:: Table of Contents
-   :depth: 2
+.. .. contents:: Table of Contents
+..    :depth: 2
 
 
 Purpose of the *RosTeamWS*
@@ -40,30 +41,15 @@ To achieve this, RosTeamWS defines:
 #. often-used scripts for tests of small development-chunks.
 
 
-Overview
-========
-
-The RosTeamWS consists of the following files.
-
-.. .. toctree::
-..    :caption: Scripts:
-..    :maxdepth: 2
-
-.. toctree::
-   :caption: Guidelines:
-   :glob:
-
-   guidelines/*
-
-
-.. toctree::
-   :caption: Use Cases:
-   :glob:
-
-   use-cases/*
-
-
 DISCLAIMER
 ==========
 The work in the RosTeamWS-framework tries to follow, if applicable, `ROS Enhancement Proposals (REPs) <https://www.ros.org/reps/rep-0000.html>`_. Still, collisions in the best-practices proposals may occur.
 The opinions and proposals stated here are merely related to the authors' experiences.
+
+
+.. toctree::
+   :hidden:
+
+   getting_started/index.rst
+   guidelines/index.rst
+   use-cases/index.rst

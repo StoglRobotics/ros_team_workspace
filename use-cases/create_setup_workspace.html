@@ -85,21 +85,22 @@
               
             
             
-              <p class="caption"><span class="caption-text">Guidelines:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../guidelines/package_structure.html">ROS Package structure</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Use Cases:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="configure_repository.html">Configure Repository</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create_package.html">Create New Package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Setup a new Workspace</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#script-for-creating-workspace">Script for Creating Workspace</a></li>
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guidelines/index.html">Guidelines</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Use Cases</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="configure_repository.html">Configure Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_package.html">Create New Package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Setup a new Workspace</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#script-for-creating-workspace">Script for Creating Workspace</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="setup_robot_bringup_package.html">Setup robot bringup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="setup_robot_description_package.html">Setup robot description</a></li>
-<li class="toctree-l1"><a class="reference internal" href="setup_robot_ros2_control_hardware.html">Setup robot’s ros2_control hardware package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_robot_bringup_package.html">Setup robot bringup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_robot_description_package.html">Setup robot description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ros2_control/setup_controller.html">ros2_control: Setup contorller package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ros2_control/setup_robot_hardware_interface.html">ros2_control: Setup robot’s hardware package</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -148,6 +149,8 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
+          <li><a href="index.html">Use Cases</a> &raquo;</li>
+        
       <li>Setup a new Workspace</li>
     
     
@@ -170,25 +173,15 @@
            <div itemprop="articleBody">
             
   <div class="section" id="setup-a-new-workspace">
-<h1><a class="toc-backref" href="#id1">Setup a new Workspace</a><a class="headerlink" href="#setup-a-new-workspace" title="Permalink to this headline">¶</a></h1>
+<h1>Setup a new Workspace<a class="headerlink" href="#setup-a-new-workspace" title="Permalink to this headline">¶</a></h1>
 <p id="uc-setup-workspace">This use-case describes how to setup a new ROS workspace using scripts from the ROS Team Workspace (RosTeamWS) framework.</p>
-<div class="contents topic" id="table-of-contents">
-<p class="topic-title">Table of Contents</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="#setup-a-new-workspace" id="id1">Setup a new Workspace</a></p>
-<ul>
-<li><p><a class="reference internal" href="#script-for-creating-workspace" id="id2">Script for Creating Workspace</a></p></li>
-</ul>
-</li>
-</ul>
-</div>
 <div class="section" id="script-for-creating-workspace">
-<h2><a class="toc-backref" href="#id2">Script for Creating Workspace</a><a class="headerlink" href="#script-for-creating-workspace" title="Permalink to this headline">¶</a></h2>
-<p><cite>setup-ros-workspace.bash</cite> accepts ros distro name workspace suffix and workspace folder as parameters.
+<h2>Script for Creating Workspace<a class="headerlink" href="#script-for-creating-workspace" title="Permalink to this headline">¶</a></h2>
+<p><cite>setup-ros-workspace</cite> accepts ros distro name workspace suffix and workspace folder as parameters.
 All three parameters are optional.</p>
 <div class="literal-block-wrapper docutils container" id="setup-workspace">
 <div class="code-block-caption"><span class="caption-text">Usage of the script for setting up a new ROS workspace.</span><a class="headerlink" href="#setup-workspace" title="Permalink to this code">¶</a></div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace.bash ROS_DISTRO WS_SUFFIX WS_FOLDER
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace ROS_DISTRO WS_SUFFIX WS_FOLDER
 </pre></div>
 </div>
 </div>
