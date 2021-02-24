@@ -35,7 +35,7 @@ TEAM_REPOSITORY_SERVER="https://github.com"
 
 ## BEGIN: Framework definition adjustable by users
 # TBD
-# FRAMEWORK_BASE_PATH=
+#FRAMEWORK_BASE_PATH="~/tmp/ros_team_workspace/"
 
 ## END: Framework definitions adjustable by users
 
