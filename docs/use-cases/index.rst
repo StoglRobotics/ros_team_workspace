@@ -10,5 +10,6 @@ Check the repository and PRs for other, undocumented use-cases.
    :maxdepth: 1
    :glob:
 
-   *
+   operating_system/*
+   ros_packages/*
    ros2_control/*

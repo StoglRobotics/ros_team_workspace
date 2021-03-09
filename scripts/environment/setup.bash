@@ -1,8 +1,9 @@
 usage='setup.bash "ros_distro" "ros_ws_suffix" "workspace_folder"'
 
 # Load Framework defines
-# script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
-# source $script_own_dir/../_RosTeamWs_Defines.bash
+script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+source $script_own_dir/../_RosTeamWs_Defines.bash
+source $script_own_dir/../_Team_Defines.bash
 
 # ros distribution name will be set in $ros_distro
 check_ros_distro $1

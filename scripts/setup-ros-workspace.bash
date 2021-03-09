@@ -111,4 +111,4 @@ if [[ $ros_version == 1 ]]; then
 fi
 
 echo "------------------------------------------------------"
-echo "Fnished: Please open a new terminal and execute '$alias_name'"
+echo "Finished: Please open a new terminal and execute '$alias_name'"

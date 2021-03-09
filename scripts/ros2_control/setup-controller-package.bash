@@ -75,6 +75,9 @@ case "$choice" in
   LICENSE_HEADER="$LICENSE_TEMPLATES/propriatery_company_cpp.txt"
 esac
 
+read -p "Is package already configured? (yes/no) [no] " package_configured
+package_configured=${package_configured:="no"}
+
 echo ""
 echo "ATTENTION: Setting up ros2_control controller files with following parameters: file name '$FILE_NAME', class '$CLASS_NAME', package/namespace '$PKG_NAME'. Those will be placed in folder '`pwd`'."
 echo ""
@@ -95,10 +98,12 @@ PLUGIN_XML="$PKG_NAME.xml"
 TEST_CPP="test/test_load_$FILE_NAME.cpp"
 
 # Copy files
-cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/visibility_control.h $VC_H
+if [[ ! -f "$VC_H" ]]; then
+  cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/visibility_control.h $VC_H
+fi
+cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller_pluginlib.xml >> $PLUGIN_XML
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller.hpp $CTRL_HPP
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller.cpp $CTRL_CPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller_pluginlib.xml $PLUGIN_XML
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_load_controller.cpp $TEST_CPP
 
 echo "Template files copied."
@@ -110,7 +115,10 @@ echo "Template files copied."
 # list(APPEND AMENT_LINT_AUTO_EXCLUDE
 #    ament_cmake_copyright
 #  )
-FILES_TO_LICENSE=($VC_H $CTRL_HPP $CTRL_CPP $TEST_CPP)
+FILES_TO_LICENSE=("$CTRL_HPP" "$CTRL_CPP" "$TEST_CPP")
+if [[ "$package_configured" == "no" ]]; then
+  FILES_TO_LICENSE+=("$VC_H")
+fi
 TMP_FILE=".f_tmp"
 if [[ "$LICENSE_HEADER" != "" ]]; then
   touch $TMP_FILE
@@ -125,8 +133,8 @@ if [[ "$LICENSE_HEADER" != "" ]]; then
 #   echo "Licence header added to files: ("`declare -p FILES_TO_LICENSE`")"
 fi
 
-FILES_TO_SED=("${FILES_TO_LICENSE[@]}")
 # sed all needed files
+FILES_TO_SED=("${FILES_TO_LICENSE[@]}")
 FILES_TO_SED+=("$PLUGIN_XML")
 # declare -p FILES_TO_SED
 
@@ -183,26 +191,30 @@ echo ")" >> $TMP_FILE
 echo "# prevent pluginlib from using boost" >> $TMP_FILE
 echo "target_compile_definitions($PKG_NAME PUBLIC \"PLUGINLIB__DISABLE_BOOST_FUNCTIONS\")" >> $TMP_FILE
 
-echo "" >> $TMP_FILE
-echo "pluginlib_export_plugin_description_file(" >> $TMP_FILE
-echo "  controller_interface $PLUGIN_XML)" >> $TMP_FILE
+if [[ "$package_configured" == "no" ]]; then
 
-## Add install directives
-echo "" >> $TMP_FILE
-echo "install(" >> $TMP_FILE
-echo "  TARGETS" >> $TMP_FILE
-echo "  $PKG_NAME" >> $TMP_FILE
-echo "  RUNTIME DESTINATION bin" >> $TMP_FILE
-echo "  ARCHIVE DESTINATION lib" >> $TMP_FILE
-echo "  LIBRARY DESTINATION lib" >> $TMP_FILE
-echo ")" >> $TMP_FILE
+  echo "" >> $TMP_FILE
+  echo "pluginlib_export_plugin_description_file(" >> $TMP_FILE
+  echo "  controller_interface $PLUGIN_XML)" >> $TMP_FILE
 
-if [[ ! `grep -q "DIRECTORY include/" $TMP_FILE` ]]; then
+  ## Add install directives
   echo "" >> $TMP_FILE
   echo "install(" >> $TMP_FILE
-  echo "  DIRECTORY include/" >> $TMP_FILE
-  echo "  DESTINATION include" >> $TMP_FILE
+  echo "  TARGETS" >> $TMP_FILE
+  echo "  $PKG_NAME" >> $TMP_FILE
+  echo "  RUNTIME DESTINATION bin" >> $TMP_FILE
+  echo "  ARCHIVE DESTINATION lib" >> $TMP_FILE
+  echo "  LIBRARY DESTINATION lib" >> $TMP_FILE
   echo ")" >> $TMP_FILE
+
+  if [[ ! `grep -q "DIRECTORY include/" $TMP_FILE` ]]; then
+    echo "" >> $TMP_FILE
+    echo "install(" >> $TMP_FILE
+    echo "  DIRECTORY include/" >> $TMP_FILE
+    echo "  DESTINATION include" >> $TMP_FILE
+    echo ")" >> $TMP_FILE
+  fi
+
 fi
 
 echo ""  >> $TMP_FILE
@@ -225,23 +237,27 @@ echo ""
 # Add export definitions
 tail -n +$TEST_LINE CMakeLists.txt | head -$END_TEST_LINE | tail -1 >> $TMP_FILE
 
-echo "" >> $TMP_FILE
-echo "ament_export_include_directories(" >> $TMP_FILE
-echo "  include" >> $TMP_FILE
-echo ")" >> $TMP_FILE
+if [[ "$package_configured" == "no" ]]; then
 
-echo "ament_export_libraries(" >> $TMP_FILE
-echo "  $PKG_NAME" >> $TMP_FILE
-echo ")" >> $TMP_FILE
+  echo "" >> $TMP_FILE
+  echo "ament_export_include_directories(" >> $TMP_FILE
+  echo "  include" >> $TMP_FILE
+  echo ")" >> $TMP_FILE
 
-# TODO(anyone): use this from a list so its the same as above
-echo "ament_export_dependencies(" >> $TMP_FILE
-echo "  controller_interface" >> $TMP_FILE
-echo "  hardware_interface" >> $TMP_FILE
-echo "  pluginlib" >> $TMP_FILE
-echo "  rclcpp" >> $TMP_FILE
-echo "  rclcpp_lifecycle" >> $TMP_FILE
-echo ")" >> $TMP_FILE
+  echo "ament_export_libraries(" >> $TMP_FILE
+  echo "  $PKG_NAME" >> $TMP_FILE
+  echo ")" >> $TMP_FILE
+
+  # TODO(anyone): use this from a list so its the same as above
+  echo "ament_export_dependencies(" >> $TMP_FILE
+  echo "  controller_interface" >> $TMP_FILE
+  echo "  hardware_interface" >> $TMP_FILE
+  echo "  pluginlib" >> $TMP_FILE
+  echo "  rclcpp" >> $TMP_FILE
+  echo "  rclcpp_lifecycle" >> $TMP_FILE
+  echo ")" >> $TMP_FILE
+
+fi
 
 # Add last part
 let CUT_LINE=$END_TEST_LINE+1

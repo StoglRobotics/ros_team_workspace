@@ -73,6 +73,7 @@ case "$choice" in
    cp -n $PACKAGE_TEMPLATES/CI-github_ci-lint.yml .github/workflows/ci-lint.yml
    sed -i 's/\$NAME\$/'${PKG_NAME}'/g' .github/workflows/ci-lint.yml
    cp -n $PACKAGE_TEMPLATES/pkg_name.repos $PKG_NAME.repos
+   ln -s $PKG_NAME.repos $PKG_NAME.ci.repos
    echo "NOTE: To enable CI from source, uncomment it manually in '.github/workflows/ci-build.yml'"
    cp -n $PACKAGE_TEMPLATES/README.md.github README.md
    repository="github"

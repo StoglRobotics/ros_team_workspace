@@ -18,7 +18,7 @@ jobs:
           - {ROS_DISTRO: $ROS_DISTRO$, ROS_REPO: main}
           - {ROS_DISTRO: $ROS_DISTRO$, ROS_REPO: testing}
     env:
-      UPSTREAM_WORKSPACE: $NAME$.repos
+      UPSTREAM_WORKSPACE: $NAME$.ci.repos
     steps:
       - uses: actions/checkout@v1
       - uses: 'ros-industrial/industrial_ci@master'
