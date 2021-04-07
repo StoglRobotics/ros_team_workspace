@@ -5,10 +5,6 @@ Setup a new Workspace
 
 This use-case describes how to setup a new ROS workspace using scripts from the ROS Team Workspace (RosTeamWS) framework.
 
-
-Script for Creating Workspace
-==============================
-
 `setup-ros-workspace` accepts ros distro name workspace suffix and workspace folder as parameters.
 All three parameters are optional.
 
@@ -18,6 +14,5 @@ All three parameters are optional.
 
    setup-ros-workspace ROS_DISTRO WS_SUFFIX WS_FOLDER
 
-The script creates...
-
-
+The script creates in the ``$HOME/<WS_FOLDER>`` a new ROS workspace with name ``ros_ws_<ROS_DISTRO>_<WS_SUFFIX>``.
+Default value for ``<WS_FOLDER>`` is "workspace".

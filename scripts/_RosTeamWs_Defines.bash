@@ -18,6 +18,15 @@ function RosTeamWS_script_own_dir {
   echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 }
 
+# TODO(denis): add this into setup.bash
+function RosTeamWS_setup_aliases {
+
+# ROS
+  alias rosd="cd \$ROS_WS"
+  alias rosds="cd \$ROS_WS/src"
+  alias rosdb="cd \$ROS_WS/build"
+}
+
 function RosTeamWS_setup_ros1_exports {
 
 export ROSCONSOLE_FORMAT='[${severity}] [${walltime}: ${logger}] [${node}@${file}.${function}:${line}]: ${message}'
@@ -27,6 +36,10 @@ export ROSCONSOLE_CONFIG_FILE='~/workspace/ros_ws/rosconsole.config'
 
 function RosTeamWS_setup_ros1_aliases {
 
+# ROS
+  alias rosdd="cd \$ROS_WS/devel"
+
+# Catkin
   alias cb="catkin build"
 
 }
@@ -40,16 +53,21 @@ function RosTeamWS_setup_ros2_exports {
 
 function RosTeamWS_setup_ros2_aliases {
 
+# ROS
+  alias rosdi="cd \$ROS_WS/install"
+
+# COLCON
   alias cb="colcon_build"
   alias cbr="colcon_build_release"
-  alias cbup="colcon build --symlink-install --packages-up-to"
+  alias cbup="colcon_build_up_to"
 
   alias ct="colcon_test"
-  alias ctup="colcon test --packages-up-to"
+  alias ctup="colcon_test_up_to"
 
-  alias ctr="colcon test-result"
+  alias ctres="colcon_test_results"
 
   alias ca="colcon_all"
+  alias caup="colcon_all_up_to"
 }
 
 
@@ -59,16 +77,41 @@ function colcon_helper_ros2 {
     print_and_exit "This should never happen. Check your helpers definitions!"
   fi
 
+  cd $ROS_WS
+
   CMD="$1"
   if [ -z "$2" ]; then
     $CMD
   else
     $CMD --packages-select $2
   fi
+
+  cd -
+}
+
+function colcon_helper_ros2_up_to {
+  if [ -z "$1" ]; then
+    print_and_exit "This should never happen. Check your helpers definitions!"
+  fi
+
+  cd $ROS_WS
+
+  CMD="$1"
+  if [ -z "$2" ]; then
+    print_and_exit "You should provide package for this command!"
+  else
+    $CMD --packages-up-to $2
+  fi
+
+  cd -
 }
 
 function colcon_build {
   colcon_helper_ros2 "colcon build --symlink-install" "$*"
+}
+
+function colcon_build_up_to {
+  colcon_helper_ros2_up_to "colcon build --symlink-install" "$*"
 }
 
 function colcon_build_release {
@@ -79,10 +122,30 @@ function colcon_test {
   colcon_helper_ros2 "colcon test" "$*"
 }
 
+function colcon_test_up_to {
+  colcon_helper_ros2_up_to "colcon test" "$*"
+}
+
+function colcon_test_results {
+  cd $ROS_WS
+  if [ -z "$1" ]; then
+    colcon test-result
+  else
+    colcon test-result | grep "$*"
+  fi
+  cd -
+}
+
 function colcon_all {
   colcon_build "$*"
   colcon_test "$*"
-  ctr
+  colcon_test_results "$*"
+}
+
+function colcon_all_up_to {
+  colcon_build_up_to "$*"
+  colcon_test_up_to "$*"
+  colcon_test_results "$*"
 }
 
 ## END: Default Framework Definitions
@@ -162,12 +225,13 @@ function compile_and_source_package {
   fi
   bn=`basename "$PWD"`
   path=$bn
-  while [[ "$bn" != "src" ]]; do
-    cd ..
-    bn=`basename "$PWD"`
-    path="$bn/$path"
-  done
-  cd ..
+#   while [[ "$bn" != "src" ]]; do
+#     cd ..
+#     bn=`basename "$PWD"`
+#     path="$bn/$path"
+#   done
+#   cd ..
+  cd $ROS_WS
   colcon build --symlink-install --packages-up-to $pkg_name
   source install/setup.bash
   if [[ "$test" == "yes" ]]; then
