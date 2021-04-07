@@ -3,17 +3,16 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - $ROS_DISTRO$
   schedule:
-    # Run every morning to detect flakiness and broken dependencies
+    # Run every day to detect flakiness and broken dependencies
     - cron: '23 5 * * *'
 
 jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: ammaraskar/sphinx-action@master
+    - uses: ros-controls/control.ros.org-deployment-scripts@master
       with:
-        docs-folder: '$DOCS_FOLDER$'
-        pre-build-command: "apt-get update -y && apt-get install -y python3-pip && pip3 install sphinx_rtd_theme"
+        install_extensions: false
+
