@@ -18,6 +18,15 @@ function RosTeamWS_script_own_dir {
   echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 }
 
+# TODO(denis): add this into setup.bash
+function RosTeamWS_setup_aliases {
+
+# ROS
+  alias rosd="cd \$ROS_WS"
+  alias rosds="cd \$ROS_WS/src"
+  alias rosdb="cd \$ROS_WS/build"
+}
+
 function RosTeamWS_setup_ros1_exports {
 
 export ROSCONSOLE_FORMAT='[${severity}] [${walltime}: ${logger}] [${node}@${file}.${function}:${line}]: ${message}'
@@ -27,6 +36,10 @@ export ROSCONSOLE_CONFIG_FILE='~/workspace/ros_ws/rosconsole.config'
 
 function RosTeamWS_setup_ros1_aliases {
 
+# ROS
+  alias rosdd="cd \$ROS_WS/devel"
+
+# Catkin
   alias cb="catkin build"
 
 }
@@ -41,10 +54,7 @@ function RosTeamWS_setup_ros2_exports {
 function RosTeamWS_setup_ros2_aliases {
 
 # ROS
-  alias rosd="cd \$COLCON_WS"
-  alias rosds="cd \$COLCON_WS/src"
-  alias rosdb="cd \$COLCON_WS/build"
-  alias rosdi="cd \$COLCON_WS/install"
+  alias rosdi="cd \$ROS_WS/install"
 
 # COLCON
   alias cb="colcon_build"
@@ -67,7 +77,7 @@ function colcon_helper_ros2 {
     print_and_exit "This should never happen. Check your helpers definitions!"
   fi
 
-  cd $COLCON_WS
+  cd $ROS_WS
 
   CMD="$1"
   if [ -z "$2" ]; then
@@ -84,7 +94,7 @@ function colcon_helper_ros2_up_to {
     print_and_exit "This should never happen. Check your helpers definitions!"
   fi
 
-  cd $COLCON_WS
+  cd $ROS_WS
 
   CMD="$1"
   if [ -z "$2" ]; then
@@ -117,7 +127,7 @@ function colcon_test_up_to {
 }
 
 function colcon_test_results {
-  cd $COLCON_WS
+  cd $ROS_WS
   if [ -z "$1" ]; then
     colcon test-result
   else
@@ -221,7 +231,7 @@ function compile_and_source_package {
 #     path="$bn/$path"
 #   done
 #   cd ..
-  cd $COLCON_WS
+  cd $ROS_WS
   colcon build --symlink-install --packages-up-to $pkg_name
   source install/setup.bash
   if [[ "$test" == "yes" ]]; then

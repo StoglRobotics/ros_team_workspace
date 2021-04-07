@@ -150,14 +150,14 @@
     <link name="${prefix}tool0" />
     <!-- tool link -->
 
-<!-- START: Delete if not needed -->
+<!-- START Delete if not needed -->
     <!-- Standard frames for industrial robots. Also useful for manipulators.
          (ROS-I specs - https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages#Standardised_links_.2F_frames)-->
     <!-- This frame should correspond to the BASE coordinate system of robot's controller.) -->
     <link name="${prefix}base" />
     <!-- Frame for mounting EEF models to a manipulator. x+ axis points forward (REP 103). -->
     <link name="${prefix}flange" />
-<!-- END: Delete if not needed  -->
+<!-- END Delete if not needed  -->
     <!-- END LINKS -->
 
     <!-- JOINTS -->
@@ -224,7 +224,7 @@
     </joint>
     <!-- END JOINTS -->
 
-<!-- START: Delete if not needed -->
+<!-- START Delete if not needed -->
     <!-- Standard frames for industrial robots. Also useful for manipulators.
          (ROS-I specs - https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages#Standardised_links_.2F_frames)-->
     <joint name="${prefix}base_link-base_joint" type="fixed">
@@ -238,7 +238,7 @@
       <parent link="${prefix}tool0" />
       <child link="${prefix}flange" />
     </joint>
-<!-- END: Delete if not needed  -->
+<!-- END Delete if not needed  -->
 
 
   </xacro:macro>

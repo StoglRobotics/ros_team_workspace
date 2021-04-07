@@ -1,7 +1,7 @@
 =======================================================
-ros2_control: Setup contorller package
+ros2_control: Setup controller package
 =======================================================
-.. _uc-setup-ros2-contorller:
+.. _uc-setup-ros2-controller:
 
 This use-case describes how to set up a controller for the ros2_control framework using scripts from ROS Team Workspace (RosTeamWS) framework.
 

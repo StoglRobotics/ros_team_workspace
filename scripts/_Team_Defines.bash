@@ -24,8 +24,10 @@ TEAM_LICENSE="Apache License 2.0"
 
 TEAM_REPOSITORY_SERVER="https://github.com"
 
-# TODO(denis): implement here support for internal repos
-# TEAM_INTERNAL_ASSETS="/opt/RosTeamWS/assets/"
+TEAM_PRIVATE_CONFIG_PATH=""
+
+# Define a path to a repository with your internal assets and configurations
+TEAM_INTERNAL_ASSETS="/opt/RosTeamWS/assets/"
 
 ## END: definitions
 
@@ -44,6 +46,8 @@ check_ros_distro $DEFAULT_ROS_DISTRO
 
 # BEGIN: Define aliases for standard internal functions
 
+alias setup_aliases=RosTeamWS_setup_aliases
+
 alias setup_ros1_exports=RosTeamWS_setup_ros1_exports
 
 alias setup_ros1_aliases=RosTeamWS_setup_ros1_aliases
@@ -51,8 +55,6 @@ alias setup_ros1_aliases=RosTeamWS_setup_ros1_aliases
 alias setup_ros2_exports=RosTeamWS_setup_ros2_exports
 
 alias setup_ros2_aliases=RosTeamWS_setup_ros2_aliases
-
-
 # END: Define aliases for standard functions
 
 

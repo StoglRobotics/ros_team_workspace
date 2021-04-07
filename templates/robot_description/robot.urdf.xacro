@@ -4,6 +4,7 @@
   <!-- Use this if parameters are set from the launch file, otherwise delete -->
   <xacro:arg name="use_fake_hardware" default="true" />
   <xacro:arg name="fake_sensor_commands" default="false" />
+  <xacro:arg name="prefix" default="" />
 
   <xacro:include filename="$(find $PKG_NAME$)/urdf/$ROBOT_NAME$/$ROBOT_NAME$_macro.xacro"/>
   <xacro:include filename="$(find $PKG_NAME$)/urdf/$ROBOT_NAME$/$ROBOT_NAME$_macro.ros2_control.xacro"/>
@@ -13,13 +14,13 @@
 
   <!-- Load robot's macro with parameters -->
   <!-- set prefix if multiple robots are used -->
-  <xacro:$ROBOT_NAME$ prefix="" parent="world" >
+  <xacro:$ROBOT_NAME$ prefix="$(arg prefix)" parent="world" >
     <origin xyz="0 0 0" rpy="0 0 0" />          <!-- position robot in the world -->
   </xacro:$ROBOT_NAME$>
 
   <xacro:$ROBOT_NAME$_ros2_control
     name="$ROBOT_NAME$"
-    prefix=""
+    prefix="$(arg prefix)"
     use_fake_hardware="$(arg use_fake_hardware)"
     fake_sensor_commands="$(arg fake_sensor_commands)" />
 
