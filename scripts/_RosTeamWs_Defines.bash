@@ -223,15 +223,11 @@ function compile_and_source_package {
   if [ -z "$2" ]; then
     test="no"
   fi
+
   bn=`basename "$PWD"`
   path=$bn
-#   while [[ "$bn" != "src" ]]; do
-#     cd ..
-#     bn=`basename "$PWD"`
-#     path="$bn/$path"
-#   done
-#   cd ..
   cd $ROS_WS
+
   colcon build --symlink-install --packages-up-to $pkg_name
   source install/setup.bash
   if [[ "$test" == "yes" ]]; then

@@ -18,7 +18,7 @@ usage="setup-robot-ros2-control-hardware.bash FILE_NAME [CLASS_NAME] [PKG_NAME]"
 
 # echo ""
 # echo "Your path is `pwd`. Is this your package folder where to setup robot's bringup?"
-# read -p "If so press <ENTER> otherise <CTRL>+C and start the script again from the bringup folder."
+# read -p "If so press <ENTER> otherwise <CTRL>+C and start the script again from the bringup folder."
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
@@ -30,7 +30,7 @@ if [ -z "$1" ]; then
   print_and_exit "ERROR: You should provide the file name!" "$usage"
 fi
 if [ -f src/$FILE_NAME.cpp ]; then
-  print_and_exit "ERROR:The file '$FILE_NAME' alread exist!" "$usage"
+  print_and_exit "ERROR:The file '$FILE_NAME' already exist!" "$usage"
 fi
 
 CLASS_NAME=$2
@@ -120,7 +120,7 @@ cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/test_robot_hardware_interface.cpp $TEST_CPP
 echo "Template files copied."
 
 # Add license header to the files
-# TODO: When Propiatery then add the follwing before ament_lint_auto_find_test_dependencies()
+# TODO: When Propiatery then add the following before ament_lint_auto_find_test_dependencies()
 # list(APPEND AMENT_LINT_AUTO_EXCLUDE
 #    ament_cmake_copyright
 #  )
@@ -322,33 +322,3 @@ compile_and_source_package $PKG_NAME "yes"
 
 echo ""
 echo "FINISHED: Your package is set and the tests should be finished without any errors."
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

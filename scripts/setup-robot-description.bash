@@ -20,7 +20,7 @@ usage="setup-robot-description.bash ROBOT_NAME [PKG_NAME]"
 
 # echo ""
 # echo "Your path is `pwd`. Is this your package folder where to setup robot's description?"
-# read -p "If so press <ENTER> otherise <CTRL>+C and start the script again from the description folder."
+# read -p "If so press <ENTER> otherwise <CTRL>+C and start the script again from the description folder."
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
@@ -37,7 +37,7 @@ PKG_NAME=$2
 if [ -z "$2" ]; then
   current=`pwd`
   PKG_NAME=$(basename "$current")
-  echo "Package name guessed from the current path is '$PKG_NAME' is this correct? If not provide it as second paramter."
+  echo "Package name guessed from the current path is '$PKG_NAME' is this correct? If not provide it as second parameter."
 fi
 
 echo ""
@@ -69,8 +69,8 @@ cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro $ROBOT_MACRO_R
 
 # Copy launch.py file for testing the description
 mkdir -p launch
-TEST_ROBOT_DESCRIPTION_LAUNCH="launch/test_${ROBOT_NAME}_description.launch.py"
-cp -n $ROBOT_DESCRIPTION_TEMPLATES/test_robot_description.launch.py $TEST_ROBOT_DESCRIPTION_LAUNCH
+VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch.py"
+cp -n $ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.py $VIEW_ROBOT_LAUNCH
 
 # Copy YAML files
 mkdir -p config
@@ -82,7 +82,7 @@ ROBOT_RVIZ="rviz/${ROBOT_NAME}.rviz"
 cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot.rviz $ROBOT_RVIZ
 
 # sed all needed files
-FILES_TO_SED=($ROBOT_URDF_XACRO $ROBOT_MACRO $ROBOT_MACRO_ROS2_CONTROL $TEST_ROBOT_DESCRIPTION_LAUNCH)
+FILES_TO_SED=($ROBOT_URDF_XACRO $ROBOT_MACRO $ROBOT_MACRO_ROS2_CONTROL $VIEW_ROBOT_LAUNCH)
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
@@ -122,33 +122,3 @@ compile_and_source_package $PKG_NAME
 
 echo ""
 echo "FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME test_${ROBOT_NAME}_description.launch.py'"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

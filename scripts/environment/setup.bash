@@ -52,14 +52,18 @@ elif [[ $ros_version == 2 ]]; then
 #   /opt/rti.com/rti_connext_dds-5.3.1/setenv_ros2rti.bash
   # export LANG=de_DE.UTF-8
   WS_FOLDER=""
+  WS_FOLDER_0="$HOME/$ws_folder/$ros_distro$ws_suffix"
   WS_FOLDER_1="$HOME/$ws_folder/ros_ws_$ros_distro$ws_suffix"
   WS_FOLDER_2="$HOME/$ws_folder/ros2_ws_$ros_distro$ws_suffix"
-  if [ -d "$WS_FOLDER_1" ]; then
+
+  if [ -d "$WS_FOLDER_0" ]; then
+    WS_FOLDER=$WS_FOLDER_0
+  elif [ -d "$WS_FOLDER_1" ]; then
     WS_FOLDER=$WS_FOLDER_1
   elif [ -d "$WS_FOLDER_2" ]; then
     WS_FOLDER=$WS_FOLDER_2
   else
-    print_and_exit "Neither '$WS_FOLDER_1' nor '$WS_FOLDER_2' exist. Can not find ROS workspace!"
+    print_and_exit "Neither '$WS_FOLDER_0', '$WS_FOLDER_1' nor '$WS_FOLDER_2' exist. Can not find ROS workspace!"
   fi
 
   export ROS_WS=$WS_FOLDER

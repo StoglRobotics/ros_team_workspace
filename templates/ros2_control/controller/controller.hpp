@@ -1,18 +1,21 @@
 $LICENSE$
 
-
 #ifndef $PACKAGE_NAME$__$FILE_NAME$_HPP_
 #define $PACKAGE_NAME$__$FILE_NAME$_HPP_
 
 #include <string>
 #include <vector>
 
+#include "$package_name$/visibility_control.h"
 #include "controller_interface/controller_interface.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
+#include "realtime_tools/realtime_buffer.h"
+#include "realtime_tools/realtime_publisher.h"
 
-
-#include "$package_name$/visibility_control.h"
+// TODO(anyone): Replace with controller specific messages
+#include "control_msgs/msg/joint_controller_state.hpp"
+#include "control_msgs/msg/joint_jog.hpp"
 
 namespace $package_name$
 {
@@ -47,7 +50,19 @@ public:
 
 protected:
   std::vector<std::string> joint_names_;
-  std::vector<std::string> interface_names_;
+  std::string interface_name_;
+
+  // TODO(anyone): replace the state and command message types
+  using ControllerCommandMsg = control_msgs::msg::JointJog;
+  using ControllerStateMsg = control_msgs::msg::JointControllerState;
+
+  rclcpp::Subscription<ControllerCommandMsg>::SharedPtr command_subscriber_ = nullptr;
+  realtime_tools::RealtimeBuffer<std::shared_ptr<ControllerCommandMsg>> input_command_;
+
+  using StatePublisher = realtime_tools::RealtimePublisher<ControllerStateMsg>;
+
+  rclcpp::Publisher<ControllerStateMsg>::SharedPtr s_publisher_;
+  std::unique_ptr<StatePublisher> state_publisher_;
 };
 
 }  // namespace $package_name$

@@ -18,7 +18,7 @@ usage="setup-robot-bringup.bash ROBOT_NAME DESCRIPTION_PKG [PKG_NAME]"
 
 # echo ""
 # echo "Your path is `pwd`. Is this your package folder where to setup robot's bringup?"
-# read -p "If so press <ENTER> otherise <CTRL>+C and start the script again from the bringup folder."
+# read -p "If so press <ENTER> otherwise <CTRL>+C and start the script again from the bringup folder."
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
@@ -64,26 +64,24 @@ mkdir -p launch
 
 # Copy config files
 ROBOT_CONTROLLERS_YAML="config/${ROBOT_NAME}_controllers.yaml"
-ROBOT_FPC_PUB_YAML="config/${ROBOT_NAME}_forward_position_publisher.yaml"
-ROBOT_JTC_PUB_YAML="config/${ROBOT_NAME}_joint_trajectory_publisher.yaml"
+ROBOT_FPC_PUB_YAML="config/test_goal_publishers_config.yaml"
 cp -n $ROS2_CONTROL_TEMPLATES/robot_controllers.yaml $ROBOT_CONTROLLERS_YAML
-cp -n $ROS2_CONTROL_TEMPLATES/robot_forward_position_publisher.yaml $ROBOT_FPC_PUB_YAML
-cp -n $ROS2_CONTROL_TEMPLATES/robot_joint_trajectory_publisher.yaml $ROBOT_JTC_PUB_YAML
+cp -n $ROS2_CONTROL_TEMPLATES/test_goal_publishers_config.yaml $ROBOT_FPC_PUB_YAML
 
 # Copy launch files
 ROBOT_LAUNCH="launch/${ROBOT_NAME}.launch.py"
-TEST_FPC_PUB_LAUNCH="launch/test_forward_position_controller.launch.py"
+TEST_PUB_LAUNCH="launch/test_forward_position_controller.launch.py"
 TEST_JTC_PUB_LAUNCH="launch/test_joint_trajectory_controller.launch.py"
 cp -n $ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch.py ${ROBOT_LAUNCH}
-cp -n $ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch.py $TEST_FPC_PUB_LAUNCH
-cp -n $ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch.py $TEST_JTC_PUB_LAUNCH
+cp -n $ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch.py $TEST_PUB_LAUNCH
 
 
 # sed all needed files
-FILES_TO_SED=($ROBOT_LAUNCH $TEST_FPC_PUB_LAUNCH $TEST_JTC_PUB_LAUNCH)
+FILES_TO_SED=($ROBOT_LAUNCH $TEST_PUB_LAUNCH)
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
+  sed -i "s/\\\$RUNTIME_CONFIG_PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
   sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
   sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
 done
@@ -122,33 +120,3 @@ compile_and_source_package $PKG_NAME
 
 echo ""
 echo "FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME test_${ROBOT_NAME}_bringup.launch.py'"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
