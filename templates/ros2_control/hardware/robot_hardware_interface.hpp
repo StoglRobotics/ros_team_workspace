@@ -1,29 +1,24 @@
 $LICENSE$
 
-
 #ifndef $PACKAGE_NAME$__$FILE_NAME$_HPP_
 #define $PACKAGE_NAME$__$FILE_NAME$_HPP_
 
 #include <string>
 #include <vector>
 
-#include "hardware_interface/base_interface.hpp"
+#include "$package_name$/visibility_control.h"
 #include "hardware_interface/$interface_type$_interface.hpp"
+#include "hardware_interface/base_interface.hpp"
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_status_values.hpp"
-
-
-#include "$package_name$/visibility_control.h"
-
-
 #include "rclcpp/macros.hpp"
 
 namespace $package_name$
 {
-class $ClassName$ : public
-  hardware_interface::BaseInterface<hardware_interface::$Interface_Type$Interface>
+class $ClassName$
+  : public hardware_interface::BaseInterface<hardware_interface::$Interface_Type$Interface>
 {
 public:
   RCLCPP_SHARED_PTR_DEFINITIONS($ClassName$);
