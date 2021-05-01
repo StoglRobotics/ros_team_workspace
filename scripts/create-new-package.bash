@@ -96,7 +96,7 @@ read -p "If correct press <ENTER>, otherwise <CTRL>+C and start the script again
 
 
 if [[ $ros_version == 1 ]]; then
-  catkin_create_pkg $CREATE_PARAMS $PKG_NAME -V 0.0.1 -l $LICENSE -D "$PKG_DESCRIPTION"
+  catkin_create_pkg $CREATE_PARAMS $PKG_NAME -V 0.0.1 -l "$LICENSE" -D "$PKG_DESCRIPTION"
   catkin b -c
   source ~/.bashrc
 elif [[ $ros_version == 2 ]]; then
