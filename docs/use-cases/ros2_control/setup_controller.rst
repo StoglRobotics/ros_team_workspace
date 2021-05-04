@@ -31,3 +31,7 @@ Parameters:
 
   - ``PKG_NAME`` name of the controller's package.
     If not set, it is guessed from the current path using the folder's name.
+
+
+The script will ask you for some additional input.
+If you already set up the dependencies and other controllers in your package, answer "yes" to question if the package is already configured.
