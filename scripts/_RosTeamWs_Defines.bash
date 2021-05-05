@@ -225,13 +225,17 @@ function compile_and_source_package {
   fi
   bn=`basename "$PWD"`
   path=$bn
-#   while [[ "$bn" != "src" ]]; do
-#     cd ..
-#     bn=`basename "$PWD"`
-#     path="$bn/$path"
-#   done
-#   cd ..
-  cd $ROS_WS
+  if [[ -v $ROS_WS ]]; then
+    cd $ROS_WS
+  else
+    while [[ "$bn" != "src" ]]; do
+      cd ..
+      bn=`basename "$PWD"`
+      path="$bn/$path"
+    done
+    cd ..
+  fi
+  echo "Trying to compile a newly created package. If you get an error try to do this manually."
   colcon build --symlink-install --packages-up-to $pkg_name
   source install/setup.bash
   if [[ "$test" == "yes" ]]; then
