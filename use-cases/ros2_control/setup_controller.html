@@ -94,7 +94,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../ros_packages/create_package.html">Create New Package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ros_packages/setup_robot_bringup_package.html">Setup robot bringup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ros_packages/setup_robot_description_package.html">Setup robot description</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">ros2_control: Setup controller package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ros2_control: Setup controller package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="setup_robot_hardware_interface.html">ros2_control: Setup robot’s hardware package</a></li>
 </ul>
 </li>
@@ -171,23 +174,32 @@
             
   <div class="section" id="ros2-control-setup-controller-package">
 <h1>ros2_control: Setup controller package<a class="headerlink" href="#ros2-control-setup-controller-package" title="Permalink to this headline">¶</a></h1>
-<p id="uc-setup-ros2-controller">This use-case describes how to set up a controller for the ros2_control framework using scripts from ROS Team Workspace (RosTeamWS) framework.</p>
-<p><code class="docutils literal notranslate"><span class="pre">ros2_control_setup-controller-package</span></code> script accepts the file name of the controller and, optionally, class name and the package name.
-The file name should use standard ROS format &lt;my_cool_controller&gt;.
-A <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> and <code class="docutils literal notranslate"><span class="pre">.hpp</span></code> files will added using this name.
-If the class name is not set, it is guessed by camel-casing the file name.
-If the package name is not set, it is guessed from the current path using the folder’s name.
-The script <strong>has to be executed</strong> from the folder where the package should be generated.</p>
+<p id="uc-setup-ros2-controller">This use-case describes how to set up a controller for the ros2_control framework using scripts from ROS Team Workspace (RosTeamWS) framework.
+The scripts uses template files from <code class="docutils literal notranslate"><span class="pre">templates/ros2_control/controller</span></code> folder.
+The script creates a complete skeleton of a controller with plugin description and tests for loading controller and checking its basic functionality.</p>
 <p><strong>Note</strong>: it is recomended to setup your package using <a class="reference internal" href="../ros_packages/create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> scritpt.</p>
-<p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/ros2_control/controller</span></code> folder, rename the files, and replaces the placeholders.
-The scripts adds also a plugin description and simple test checking if the plugin can be loaded.</p>
+<p><strong>IMPORTANT</strong>: The script has to be executed from the folder where files should be generated.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Usage of script for setting up a controller.</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2_control_setup-controller-package FILE_NAME <span class="o">[</span>CLASS_NAME<span class="o">]</span> <span class="o">[</span>PKG_NAME<span class="o">]</span>
 </pre></div>
 </div>
 </div>
-<p>After all files are copied and placeholders set, a commit can be automatically created.</p>
+<p>Parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">FILE_NAME</span></code> file name used for controller’s <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> and <code class="docutils literal notranslate"><span class="pre">.hpp</span></code> files.
+It assumes standard ROS format, e.g, “my_cool_controller”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CLASS_NAME</span></code> optional name used for controller class.
+If not set, it is guessed by camel-casing the file name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PKG_NAME</span></code> name of the controller’s package.
+If not set, it is guessed from the current path using the folder’s name.</p></li>
+</ul>
+</div></blockquote>
+<p>The script will ask you for some additional input.</p>
+</div>
 </div>
 
 
