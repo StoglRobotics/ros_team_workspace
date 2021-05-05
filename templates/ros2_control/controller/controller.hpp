@@ -3,6 +3,7 @@ $LICENSE$
 #ifndef $PACKAGE_NAME$__$FILE_NAME$_HPP_
 #define $PACKAGE_NAME$__$FILE_NAME$_HPP_
 
+#include <memory>
 #include <string>
 #include <vector>
 

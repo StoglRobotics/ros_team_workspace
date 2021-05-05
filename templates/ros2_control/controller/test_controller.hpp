@@ -6,6 +6,9 @@ $LICENSE$
 #include <chrono>
 #include <memory>
 #include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 #include "$package_name$/$package_name$.hpp"
 #include "gmock/gmock.h"
