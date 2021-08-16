@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -177,7 +178,7 @@
 <p id="uc-setup-ros2-controller">This use-case describes how to set up a controller for the ros2_control framework using scripts from ROS Team Workspace (RosTeamWS) framework.
 The scripts uses template files from <code class="docutils literal notranslate"><span class="pre">templates/ros2_control/controller</span></code> folder.
 The script creates a complete skeleton of a controller with plugin description and tests for loading controller and checking its basic functionality.</p>
-<p><strong>Note</strong>: it is recomended to setup your package using <a class="reference internal" href="../ros_packages/create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> scritpt.</p>
+<p><strong>Note</strong>: it is recommended to setup your package using <a class="reference internal" href="../ros_packages/create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> script.</p>
 <p><strong>IMPORTANT</strong>: The script has to be executed from the folder where files should be generated.</p>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
@@ -198,7 +199,8 @@ If not set, it is guessed by camel-casing the file name.</p></li>
 If not set, it is guessed from the current path using the folder’s name.</p></li>
 </ul>
 </div></blockquote>
-<p>The script will ask you for some additional input.</p>
+<p>The script will ask for some additional input.</p>
+<p>After all files are copied and placeholders set, changes are automatically staged in git.</p>
 </div>
 </div>
 
@@ -216,7 +218,7 @@ If not set, it is guessed from the current path using the folder’s name.</p></
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Denis Stogl.
+        &#169; Copyright 2021, Stogl Robotics Consulting UG (haftungsbeschränkt).
 
     </p>
   </div>
