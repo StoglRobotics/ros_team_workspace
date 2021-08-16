@@ -53,7 +53,7 @@ git checkout -b $ros_distro
 git add .
 git commit -m "RosTeamWS: package created with initial files"
 
-# TODO: Check if uses want to configure CI
+# TODO: Check if a user want to configure CI
 # Build type
 echo "Which type of repository server are you using [1]:"
 echo "(1) GitHub"

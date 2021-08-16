@@ -12,13 +12,13 @@ jobs:
           linter: [cppcheck, copyright, lint_cmake]
     steps:
     - uses: actions/checkout@v1
-    - uses: ros-tooling/setup-ros@v0.1
+    - uses: ros-tooling/setup-ros@v0.2
     - uses: ros-tooling/action-ros-lint@v0.1
       with:
-        distribution: rolling
+        distribution: $ROS_DISTRO$
         linter: ${{ matrix.linter }}
         package-name:
-          $NAME$
+          $PKG_NAME$
 
   ament_lint_100:
     name: ament_${{ matrix.linter }}
@@ -29,10 +29,10 @@ jobs:
           linter: [cpplint]
     steps:
     - uses: actions/checkout@v1
-    - uses: ros-tooling/setup-ros@v0.1
+    - uses: ros-tooling/setup-ros@v0.2
     - uses: ros-tooling/action-ros-lint@v0.1
       with:
-        distribution: rolling
+        distribution: $ROS_DISTRO$
         linter: cpplint
         arguments: "--linelength=100 --filter=-whitespace/newline"
         package-name:

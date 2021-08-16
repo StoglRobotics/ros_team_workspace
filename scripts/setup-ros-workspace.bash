@@ -2,7 +2,7 @@
 
 # workspace folder is relative to your home
 
-usage='Usage: setup-ros-workspace.bash ROS_DISTRO WS_SUFFIX WS_FOLDER'
+usage="setup-ros-workspace.bash ROS_DISTRO WS_FOLDER WS_PREFIX WS_SUFFIX"
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
@@ -11,27 +11,31 @@ source $script_own_dir/_RosTeamWs_Defines.bash
 # ros distribution name will be set in ${ros_distro}
 check_ros_distro $1
 
-ros_ws_suffix="$2"
+ws_folder="$2"
 if [ -z "$2" ]; then
-  ros_ws_suffix=""
-  echo "No ros_ws_suffix used..."
-fi
-
-ws_folder="$3"
-if [ -z "$3" ]; then
   ws_folder="workspace"
   echo "Using default '~/workspace' folder to setup ros workspace"
+fi
+
+ros_ws_prefix="$3"
+if [ -z "$3" ]; then
+  ros_ws_prefix="-"
+  echo "No ros_ws_prefix used..."
+fi
+
+ros_ws_suffix="$4"
+if [ -z "$4" ]; then
+  ros_ws_suffix="-"
+  echo "No ros_ws_suffix used..."
 fi
 
 # TODO: Write this automatically from the user's definitions
 echo "Please choose which workspace should be basis for yours:"
 echo "(0) <Use current sourced workspace>"
-# echo "(1) Industrial"
-# echo "(2) Mobile"
 read choice
 
 if [ -z "$choice" ]; then
-  print_and_exit "No workspace is chosen!"
+  print_and_exit "No workspace is chosen!" "$usage"
 fi
 
 case "$choice" in
@@ -49,7 +53,16 @@ case "$choice" in
   exit
 esac
 
-ws_full_name=${ros_distro}_${ros_ws_suffix}
+# Form here the full name
+ws_full_name=${ros_distro}
+
+if [ "$ros_ws_prefix" != "-" ]; then
+  ws_full_name=${ros_ws_prefix}_${ws_full_name}
+fi
+if [ "$ros_ws_suffix" != "-" ]; then
+  ws_full_name=${ws_full_name}_${ros_ws_suffix}
+fi
+
 # TODO: Add here output of the <current> WS
 echo ""
 read -p "ATTENTION: Creating a new workspace in folder '${ws_folder}' for ROS '${ros_distro}' (ROS$ros_version) with suffix '${ros_ws_suffix}' (full path: '${ws_folder}/${ws_full_name}') using '${base_ws}' as base workspace. Press <ENTER> to continue..."
@@ -72,37 +85,44 @@ if [[ $ros_version == 1 ]]; then
   catkin build
 elif [[ $ros_version == 2 ]]; then
   mkdir src
-  colcon build --symlink-install
+#   cb
+  colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
 fi
 
+# Go to Home folder of the user
 cd
 
-alias_name=_ros${ros_version}
-if [ -z "${ros_ws_suffix}" ]; then
-  fun_name="RosTeamWS_setup_ros$ros_version"
-  ros_ws_suffix="-"
-else
-  fun_name="RosTeamWS_setup_ros${ros_version}_${ros_ws_suffix}"
-  alias_name=${alias_name}_${ros_ws_suffix}
+# Create a function name
+fun_name_suffix=${ros_distro}
+
+if [ "$ros_ws_prefix" != "-" ]; then
+  fun_name_suffix=${fun_name_suffix}_${ros_ws_prefix}
+fi
+if [ "$ros_ws_suffix" != "-" ]; then
+  fun_name_suffix=${fun_name_suffix}_${ros_ws_suffix}
 fi
 
-cp ~/.bashrc ~/.bashrc.bkp
-# Comment out the old configuration is such exists - this is hard if using functions...
-sed -i -e '/'"$fun_name"'/ s/^#*/OLD_/' ~/.bashrc
-sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' ~/.bashrc
+alias_name=_${ws_full_name}
+fun_name="RosTeamWS_setup_${fun_name_suffix}"
 
-echo "" >> ~/.bashrc
-echo "$fun_name () {" >> ~/.bashrc
-echo "  RosTeamWS_BASE_WS=\"${base_ws}\"" >> ~/.bashrc
-echo "  RosTeamWS_DISTRO=${ros_distro}" >> ~/.bashrc
-echo "  RosTeamWS_WS_FOLDER=${ws_folder}" >> ~/.bashrc
-echo "  RosTeamWS_WS_SUFFIX=${ros_ws_suffix}" >> ~/.bashrc
-echo "  source $FRAMEWORK_BASE_PATH/ros_ws_\$RosTeamWS_DISTRO/src/$FRAMEWORK_NAME/scripts/environment/setup.bash \$RosTeamWS_DISTRO \$RosTeamWS_WS_SUFFIX \$RosTeamWS_WS_FOLDER" >> ~/.bashrc
-echo "}" >> ~/.bashrc
-echo "alias $alias_name=$fun_name" >> ~/.bashrc
+cp ~/.ros_team_ws_rc ~/.ros_team_ws_rc.bkp
+# Comment out the old configuration is such exists - this is hard if using functions...
+sed -i -e '/'"$fun_name"'/ s/^#*/OLD_/' ~/.ros_team_ws_rc
+sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' ~/.ros_team_ws_rc
+
+echo "" >> ~/.ros_team_ws_rc
+echo "$fun_name () {" >> ~/.ros_team_ws_rc
+echo "  RosTeamWS_BASE_WS=\"${base_ws}\"" >> ~/.ros_team_ws_rc
+echo "  RosTeamWS_DISTRO=\"${ros_distro}\"" >> ~/.ros_team_ws_rc
+echo "  RosTeamWS_WS_FOLDER=\"${ws_folder}\"" >> ~/.ros_team_ws_rc
+echo "  RosTeamWS_WS_PREFIX=\"${ros_ws_prefix}\"" >> ~/.ros_team_ws_rc
+echo "  RosTeamWS_WS_SUFFIX=\"${ros_ws_suffix}\"" >> ~/.ros_team_ws_rc
+echo "  source $FRAMEWORK_BASE_PATH/ros_ws_\"\$RosTeamWS_DISTRO\"/src/$FRAMEWORK_NAME/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER"\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\" >> ~/.ros_team_ws_rc
+echo "}" >> ~/.ros_team_ws_rc
+echo "alias $alias_name=$fun_name" >> ~/.ros_team_ws_rc
 
 # Setup new workspace
-source ~/.bashrc
+source ~/.ros_team_ws_rc
 
 # Update rosdep definitions
 rosdep update

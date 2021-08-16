@@ -18,6 +18,45 @@ function RosTeamWS_script_own_dir {
   echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 }
 
+function RosTeamWS_setup_exports {
+
+  export TERMINAL_COLOR_NC='\e[0m' # No Color
+  export TERMINAL_COLOR_BLACK='\e[0;30m'
+  export TERMINAL_COLOR_GRAY='\e[1;30m'
+  export TERMINAL_COLOR_RED='\e[0;31m'
+  export TERMINAL_COLOR_LIGHT_RED='\e[1;31m'
+  export TERMINAL_COLOR_GREEN='\e[0;32m'
+  export TERMINAL_COLOR_LIGHT_GREEN='\e[1;32m'
+  export TERMINAL_COLOR_BROWN='\e[0;33m'
+  export TERMINAL_COLOR_YELLOW='\e[1;33m'
+  export TERMINAL_COLOR_BLUE='\e[0;34m'
+  export TERMINAL_COLOR_LIGHT_BLUE='\e[1;34m'
+  export TERMINAL_COLOR_PURPLE='\e[0;35m'
+  export TERMINAL_COLOR_LIGHT_PURPLE='\e[1;35m'
+  export TERMINAL_COLOR_CYAN='\e[0;36m'
+  export TERMINAL_COLOR_LIGHT_CYAN='\e[1;36m'
+  export TERMINAL_COLOR_LIGHT_GRAY='\e[0;37m'
+  export TERMINAL_COLOR_WHITE='\e[1;37m'
+  export RAW_TERMINAL_COLOR_NC=$'\e[0m' # No Color
+  export RAW_TERMINAL_COLOR_BLACK=$'\e[0;30m'
+  export RAW_TERMINAL_COLOR_GRAY=$'\e[1;30m'
+  export RAW_TERMINAL_COLOR_RED=$'\e[0;31m'
+  export RAW_TERMINAL_COLOR_LIGHT_RED=$'\e[1;31m'
+  export RAW_TERMINAL_COLOR_GREEN=$'\e[0;32m'
+  export RAW_TERMINAL_COLOR_LIGHT_GREEN=$'\e[1;32m'
+  export RAW_TERMINAL_COLOR_BROWN=$'\e[0;33m'
+  export RAW_TERMINAL_COLOR_YELLOW=$'\e[1;33m'
+  export RAW_TERMINAL_COLOR_BLUE=$'\e[0;34m'
+  export RAW_TERMINAL_COLOR_LIGHT_BLUE=$'\e[1;34m'
+  export RAW_TERMINAL_COLOR_PURPLE=$'\e[0;35m'
+  export RAW_TERMINAL_COLOR_LIGHT_PURPLE=$'\e[1;35m'
+  export RAW_TERMINAL_COLOR_CYAN=$'\e[0;36m'
+  export RAW_TERMINAL_COLOR_LIGHT_CYAN=$'\e[1;36m'
+  export RAW_TERMINAL_COLOR_LIGHT_GRAY=$'\e[0;37m'
+  export RAW_TERMINAL_COLOR_WHITE=$'\e[1;37m'
+
+}
+
 # TODO(denis): add this into setup.bash
 function RosTeamWS_setup_aliases {
 
@@ -25,6 +64,8 @@ function RosTeamWS_setup_aliases {
   alias rosd="cd \$ROS_WS"
   alias rosds="cd \$ROS_WS/src"
   alias rosdb="cd \$ROS_WS/build"
+  alias rosdi="cd \$ROS_WS/install"
+
 }
 
 function RosTeamWS_setup_ros1_exports {
@@ -58,6 +99,7 @@ function RosTeamWS_setup_ros2_aliases {
 
 # COLCON
   alias cb="colcon_build"
+  alias cbd="colcon_build_debug"
   alias cbr="colcon_build_release"
   alias cbup="colcon_build_up_to"
 
@@ -68,6 +110,8 @@ function RosTeamWS_setup_ros2_aliases {
 
   alias ca="colcon_all"
   alias caup="colcon_all_up_to"
+
+  alias crm="colcon_remove"
 }
 
 
@@ -107,11 +151,15 @@ function colcon_helper_ros2_up_to {
 }
 
 function colcon_build {
-  colcon_helper_ros2 "colcon build --symlink-install" "$*"
+  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo"  "$*"
 }
 
 function colcon_build_up_to {
-  colcon_helper_ros2_up_to "colcon build --symlink-install" "$*"
+  colcon_helper_ros2_up_to "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo" "$*"
+}
+
+function colcon_build_debug {
+  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug" "$*"
 }
 
 function colcon_build_release {
@@ -148,19 +196,39 @@ function colcon_all_up_to {
   colcon_test_results "$*"
 }
 
+function colcon_remove {
+  cd $ROS_WS
+  if [ -z "$1" ]; then
+    /bin/rm -rf build install log
+  else
+    for package in "$*"; do
+      /bin/rm -rf build/${package} install/${package}
+    done
+  fi
+  cd -
+}
+
 ## END: Default Framework Definitions
 
 
 ## BEGIN: Framework functions
+# Parameters:
+# *message* - message to display
+# *usage* - command usage description
 function print_and_exit {
+  # Get color definitions
+  RosTeamWS_setup_exports
+
   message=$1
   echo ""
-  echo "$message  !!Exiting..."
+  echo -e "${TERMINAL_COLOR_RED}$message  !!Exiting...${TERMINAL_COLOR_NC}"
   if [ ! -z "$2" ]; then
     echo ""
-    echo "Usage: $2"
+    echo -e "${TERMINAL_COLOR_YELLOW}Usage: '$2'${TERMINAL_COLOR_NC}"
   fi
-  exit
+  echo -e "${TERMINAL_COLOR_BLUE}Error has happened. Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
+  read -p ""
+  throw_error
 }
 
 function framework_default_paths {
@@ -228,27 +296,17 @@ function compile_and_source_package {
     test="no"
   fi
 
-  if [[ -v $ROS_WS ]]; then
-    cd $ROS_WS
-  else
-    echo "ROS_WS not found, searching manually for main workspace folder."
-    bn=`basename "$PWD"`
-    while [[ "$bn" != "src" ]]; do
-        cd ..
-        bn=`basename "$PWD"`
-    done
-    cd ..
-    echo "Using base workspace path: `pwd`"
-  fi
+  bn=`basename "$PWD"`
+  path=$bn
+  cd $ROS_WS
 
-  echo "Compiling packages up to '$1'. If you get an error try to compile it manually."
-  # TODO: Why can not use functions from this script? (colcon_test_up_to)
-  colcon build --symlink-install --packages-up-to $pkg_name
+  colcon_build_up_to $pkg_name
   source install/setup.bash
   if [[ "$test" == "yes" ]]; then
-    colcon test --packages-select $pkg_name    # Replace colcon_test_up_to
-    colcon test-result --all | grep $pkg_name  # replace colcon_test_result
+    colcon_test_up_to $pkg_name
+    colcon_test_results | grep $pkg_name
   fi
+#   cd $path
 }
 
 # END: Framework functions
