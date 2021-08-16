@@ -10,7 +10,7 @@ $LICENSE$
 #include <utility>
 #include <vector>
 
-#include "$package_name$/$package_name$.hpp"
+#include "$package_name$/$file_name$.hpp"
 #include "gmock/gmock.h"
 #include "hardware_interface/loaned_command_interface.hpp"
 #include "hardware_interface/loaned_state_interface.hpp"
@@ -30,9 +30,9 @@ using ControllerCommandMsg = control_msgs::msg::JointJog;
 namespace
 {
 constexpr auto NODE_SUCCESS =
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 constexpr auto NODE_ERROR =
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::ERROR;
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::ERROR;
 
 rclcpp::WaitResultKind wait_for(rclcpp::SubscriptionBase::SharedPtr subscription)
 {
@@ -69,12 +69,12 @@ public:
    *
    * @return true if new ControllerCommandMsg msg was received, false if timeout.
    */
-  bool
-  wait_for_commands(rclcpp::Executor & executor,
-                    const std::chrono::milliseconds & timeout = std::chrono::milliseconds{ 500 })
+  bool wait_for_commands(
+    rclcpp::Executor & executor,
+    const std::chrono::milliseconds & timeout = std::chrono::milliseconds{500})
   {
     bool success =
-        command_subscriber_wait_set_.wait(timeout).kind() == rclcpp::WaitResultKind::Ready;
+      command_subscriber_wait_set_.wait(timeout).kind() == rclcpp::WaitResultKind::Ready;
     if (success) {
       executor.spin_some();
     }
@@ -88,10 +88,7 @@ private:
 class $ClassName$Test : public ::testing::Test
 {
 public:
-  static void SetUpTestCase()
-  {
-    rclcpp::init(0, nullptr);
-  }
+  static void SetUpTestCase() { rclcpp::init(0, nullptr); }
 
   void SetUp()
   {
@@ -100,18 +97,12 @@ public:
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
     command_publisher_ = command_publisher_node_->create_publisher<ControllerCommandMsg>(
-        "/test_$package_name$/commands", rclcpp::SystemDefaultsQoS());
+      "/test_$package_name$/commands", rclcpp::SystemDefaultsQoS());
   }
 
-  static void TearDownTestCase()
-  {
-    rclcpp::shutdown();
-  }
+  static void TearDownTestCase() { rclcpp::shutdown(); }
 
-  void TearDown()
-  {
-    controller_.reset(nullptr);
-  }
+  void TearDown() { controller_.reset(nullptr); }
 
 protected:
   void SetUpController(bool set_parameters = true)
@@ -125,7 +116,7 @@ protected:
 
     for (auto i = 0u; i < joint_command_values_.size(); ++i) {
       command_itfs_.emplace_back(hardware_interface::CommandInterface(
-          joint_names_[i], interface_name_, &joint_command_values_[i]));
+        joint_names_[i], interface_name_, &joint_command_values_[i]));
       command_ifs.emplace_back(command_itfs_.back());
     }
     // TODO(anyone): Add other command interfaces, if any
@@ -135,8 +126,8 @@ protected:
     state_ifs.reserve(joint_state_values_.size());
 
     for (auto i = 0u; i < joint_state_values_.size(); ++i) {
-      state_itfs_.emplace_back(hardware_interface::StateInterface(joint_names_[i], interface_name_,
-                                                                  &joint_state_values_[i]));
+      state_itfs_.emplace_back(hardware_interface::StateInterface(
+        joint_names_[i], interface_name_, &joint_state_values_[i]));
       state_ifs.emplace_back(state_itfs_.back());
     }
     // TODO(anyone): Add other state interfaces, if any
@@ -144,8 +135,8 @@ protected:
     controller_->assign_interfaces(std::move(command_ifs), std::move(state_ifs));
 
     if (set_parameters) {
-      controller_->get_node()->set_parameter({ "joints", joint_names_ });
-      controller_->get_node()->set_parameter({ "interface_name", interface_name_ });
+      controller_->get_node()->set_parameter({"joints", joint_names_});
+      controller_->get_node()->set_parameter({"interface_name", interface_name_});
     }
   }
 
@@ -155,7 +146,7 @@ protected:
     rclcpp::Node test_subscription_node("test_subscription_node");
     auto subs_callback = [&](const ControllerStateMsg::SharedPtr) {};
     auto subscription = test_subscription_node.create_subscription<ControllerStateMsg>(
-        "/test_$package_name$/state", 10, subs_callback);
+      "/test_$package_name$/state", 10, subs_callback);
 
     // call update to publish the test value
     ASSERT_EQ(controller_->update(), controller_interface::return_type::OK);
@@ -175,7 +166,7 @@ protected:
       while (command_publisher_node_->count_subscribers(topic_name) == 0) {
         if (wait_count >= 5) {
           auto error_msg =
-              std::string("publishing to ") + topic_name + " but no node subscribes to it";
+            std::string("publishing to ") + topic_name + " but no node subscribes to it";
           throw std::runtime_error(error_msg);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -187,8 +178,8 @@ protected:
 
     ControllerCommandMsg msg;
     msg.joint_names = joint_names_;
-    msg.displacements = { 0.45 };
-    msg.velocities = { 0.0 };
+    msg.displacements = {0.45};
+    msg.velocities = {0.0};
     msg.duration = 1.25;
 
     command_publisher_->publish(msg);
@@ -198,10 +189,10 @@ protected:
   // TODO(anyone): adjust the members as needed
 
   // Controller-related parameters
-  const std::vector<std::string> joint_names_ = { "joint1" };
+  const std::vector<std::string> joint_names_ = {"joint1"};
   const std::string interface_name_ = "my_interface";
-  std::array<double, 1> joint_state_values_ = { 1.1 };
-  std::array<double, 1> joint_command_values_ = { 101.101 };
+  std::array<double, 1> joint_state_values_ = {1.1};
+  std::array<double, 1> joint_command_values_ = {101.101};
 
   std::vector<hardware_interface::StateInterface> state_itfs_;
   std::vector<hardware_interface::CommandInterface> command_itfs_;
@@ -214,19 +205,13 @@ protected:
 
 // From the tutorial: https://www.sandordargo.com/blog/2019/04/24/parameterized-testing-with-gtest
 class $ClassName$TestParameterizedParameters
-  : public $ClassName$Test,
-    public ::testing::WithParamInterface<std::tuple<std::string, rclcpp::ParameterValue>>
+: public $ClassName$Test,
+  public ::testing::WithParamInterface<std::tuple<std::string, rclcpp::ParameterValue>>
 {
 public:
-  virtual void SetUp()
-  {
-    $ClassName$Test::SetUp();
-  }
+  virtual void SetUp() { $ClassName$Test::SetUp(); }
 
-  static void TearDownTestCase()
-  {
-    $ClassName$Test::TearDownTestCase();
-  }
+  static void TearDownTestCase() { $ClassName$Test::TearDownTestCase(); }
 
 protected:
   void SetUpController(bool set_parameters = true)

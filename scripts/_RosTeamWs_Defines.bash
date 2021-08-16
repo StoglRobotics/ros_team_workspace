@@ -129,9 +129,9 @@ function colcon_test_up_to {
 function colcon_test_results {
   cd $ROS_WS
   if [ -z "$1" ]; then
-    colcon test-result
+    colcon test-result --all
   else
-    colcon test-result | grep "$*"
+    colcon test-result --all | grep "$*"
   fi
   cd -
 }
@@ -206,6 +206,10 @@ function check_ros_distro {
   ros_version=$DEFAULT_ROS_VERSION
   if [[ $ros_distro == "foxy" ]]; then
     ros_version=2
+  elif [[ $ros_distro == "galactic" ]]; then
+    ros_version=2
+  elif [[ $ros_distro == "rolling" ]]; then
+    ros_version=2
   elif [[ $ros_distro == "noetic" ]]; then
     ros_version=1
   fi
@@ -223,26 +227,28 @@ function compile_and_source_package {
   if [ -z "$2" ]; then
     test="no"
   fi
-  bn=`basename "$PWD"`
-  path=$bn
+
   if [[ -v $ROS_WS ]]; then
     cd $ROS_WS
   else
+    echo "ROS_WS not found, searching manually for main workspace folder."
+    bn=`basename "$PWD"`
     while [[ "$bn" != "src" ]]; do
-      cd ..
-      bn=`basename "$PWD"`
-      path="$bn/$path"
+        cd ..
+        bn=`basename "$PWD"`
     done
     cd ..
+    echo "Using base workspace path: `pwd`"
   fi
-  echo "Trying to compile a newly created package. If you get an error try to do this manually."
+
+  echo "Compiling packages up to '$1'. If you get an error try to compile it manually."
+  # TODO: Why can not use functions from this script? (colcon_test_up_to)
   colcon build --symlink-install --packages-up-to $pkg_name
   source install/setup.bash
   if [[ "$test" == "yes" ]]; then
-    colcon test --packages-select $pkg_name
-    colcon test-result | grep $pkg_name
+    colcon test --packages-select $pkg_name    # Replace colcon_test_up_to
+    colcon test-result --all | grep $pkg_name  # replace colcon_test_result
   fi
-  cd $path
 }
 
 # END: Framework functions

@@ -10,9 +10,7 @@ $LICENSE$
 
 namespace $package_name$
 {
-$ClassName$::$ClassName$() : controller_interface::ControllerInterface()
-{
-}
+$ClassName$::$ClassName$() : controller_interface::ControllerInterface() {}
 
 controller_interface::return_type $ClassName$::init(const std::string & controller_name)
 {
@@ -42,21 +40,21 @@ CallbackReturn $ClassName$::on_configure(const rclcpp_lifecycle::State & /*previ
     return false;
   };
 
-  auto get_string_array_param_and_error_if_empty = [&](std::vector<std::string> & parameter,
-                                                       const char * parameter_name) {
-    parameter = get_node()->get_parameter(parameter_name).as_string_array();
-    return error_if_empty(parameter, parameter_name);
-  };
+  auto get_string_array_param_and_error_if_empty =
+    [&](std::vector<std::string> & parameter, const char * parameter_name) {
+      parameter = get_node()->get_parameter(parameter_name).as_string_array();
+      return error_if_empty(parameter, parameter_name);
+    };
 
-  auto get_string_param_and_error_if_empty = [&](std::string & parameter,
-                                                 const char * parameter_name) {
-    parameter = get_node()->get_parameter(parameter_name).as_string();
-    return error_if_empty(parameter, parameter_name);
-  };
+  auto get_string_param_and_error_if_empty =
+    [&](std::string & parameter, const char * parameter_name) {
+      parameter = get_node()->get_parameter(parameter_name).as_string();
+      return error_if_empty(parameter, parameter_name);
+    };
 
-  if (get_string_array_param_and_error_if_empty(joint_names_, "joints") ||
-      get_string_param_and_error_if_empty(interface_name_, "interface_name"))
-  {
+  if (
+    get_string_array_param_and_error_if_empty(joint_names_, "joints") ||
+    get_string_param_and_error_if_empty(interface_name_, "interface_name")) {
     return CallbackReturn::ERROR;
   }
 
@@ -65,17 +63,18 @@ CallbackReturn $ClassName$::on_configure(const rclcpp_lifecycle::State & /*previ
     if (msg->joint_names.size() == joint_names_.size()) {
       input_command_.writeFromNonRT(msg);
     } else {
-      RCLCPP_ERROR(get_node()->get_logger(),
-                   "Received %zu , but expected %zu joints in command. Ignoring message.",
-                   msg->joint_names.size(), joint_names_.size());
+      RCLCPP_ERROR(
+        get_node()->get_logger(),
+        "Received %zu , but expected %zu joints in command. Ignoring message.",
+        msg->joint_names.size(), joint_names_.size());
     }
   };
   command_subscriber_ = get_node()->create_subscription<ControllerCommandMsg>(
-      "~/commands", rclcpp::SystemDefaultsQoS(), callback_command);
+    "~/commands", rclcpp::SystemDefaultsQoS(), callback_command);
 
   // State publisher
   s_publisher_ =
-      get_node()->create_publisher<ControllerStateMsg>("~/state", rclcpp::SystemDefaultsQoS());
+    get_node()->create_publisher<ControllerStateMsg>("~/state", rclcpp::SystemDefaultsQoS());
   state_publisher_ = std::make_unique<ControllerStatePublisher>(s_publisher_);
 
   // TODO(anyone): Reserve memory in state publisher depending on the message type
@@ -118,16 +117,15 @@ controller_interface::InterfaceConfiguration $ClassName$::state_interface_config
 // TODO(anyone): use the method from controller_interface/helpers.hpp when ros2_contol#370
 // is merged
 template <typename T>
-bool get_ordered_interfaces(std::vector<T> & unordered_interfaces,
-                            const std::vector<std::string> & joint_names,
-                            const std::string & interface_type,
-                            std::vector<std::reference_wrapper<T>> & ordered_interfaces)
+bool get_ordered_interfaces(
+  std::vector<T> & unordered_interfaces, const std::vector<std::string> & joint_names,
+  const std::string & interface_type, std::vector<std::reference_wrapper<T>> & ordered_interfaces)
 {
   for (const auto & joint_name : joint_names) {
     for (auto & command_interface : unordered_interfaces) {
-      if ((command_interface.get_name() == joint_name) &&
-          (command_interface.get_interface_name() == interface_type))
-      {
+      if (
+        (command_interface.get_name() == joint_name) &&
+        (command_interface.get_interface_name() == interface_type)) {
         ordered_interfaces.push_back(std::ref(command_interface));
       }
     }
