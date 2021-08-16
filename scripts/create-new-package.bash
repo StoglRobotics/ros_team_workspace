@@ -121,8 +121,8 @@ elif [[ $ros_version == 2 ]]; then
   fi
 fi
 
-read -p "Do you want to setup/update repository with the new package configuration? (y/n) [n]: " choice
-choice=${choice:="n"}
+read -p "Do you want to setup/update repository with the new package configuration? (y/n) [y]: " choice
+choice=${choice:="y"}
 
 case "$choice" in
 "y")

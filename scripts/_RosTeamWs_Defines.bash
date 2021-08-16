@@ -228,15 +228,29 @@ function compile_and_source_package {
     test="no"
   fi
 
-  bn=`basename "$PWD"`
-  path=$bn
-  cd $ROS_WS
+  if [[ -z "${ROS_WS}" ]]; then
+    echo "ROS_WS not found, searching manually for main workspace folder."
+    bn=`basename "$PWD"`
+    path=$bn
+    while [[ "$bn" != "src" ]]; do
+        cd ..
+        bn=`basename "$PWD"`
+        path="$bn/$path"
+    done
+    path="src/$path"
+    cd ..
+    echo "Using base workspace path: `pwd`"
+  else
+    cd $ROS_WS
+  fi
 
-  colcon_build_up_to $pkg_name
+  echo "Compiling packages up to '$1'."
+  # TODO: Why can not use functions from this script? (colcon_test_up_to)
+  colcon build --symlink-install --packages-up-to $pkg_name
   source install/setup.bash
   if [[ "$test" == "yes" ]]; then
-    colcon_test_up_to $pkg_name
-    colcon_test_results | grep $pkg_name
+    colcon test --packages-select $pkg_name    # Replace colcon_test_up_to
+    colcon test-result --all | grep $pkg_name  # replace colcon_test_result
   fi
 #   cd $path
 }

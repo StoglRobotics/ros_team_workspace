@@ -343,6 +343,8 @@ if [ -f README.md ]; then
 
 fi
 
+echo "Template files are adjusted."
+
 git add .
 # git commit -m "RosTeamWS: ros2_control skeleton files for $ROBOT_NAME generated."
 
@@ -352,4 +354,4 @@ git add .
 compile_and_source_package $PKG_NAME "yes"
 
 echo ""
-echo "FINISHED: Your package is set and the tests should be finished without any errors."
+echo "FINISHED: Your package is set and the tests should be finished without any errors. (linter errors possible!)"
