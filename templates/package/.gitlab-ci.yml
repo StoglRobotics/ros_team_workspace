@@ -6,9 +6,9 @@ services:
 
 variables:
   ROS_REPO: "ros"
-  
+
   TMPDIR: "${CI_PROJECT_DIR}.tmp" #
-  
+
   UPSTREAM_WORKSPACE: ".ci.repos"
 
 before_script:

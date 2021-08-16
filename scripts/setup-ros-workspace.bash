@@ -8,7 +8,7 @@ usage='Usage: setup-ros-workspace.bash ROS_DISTRO WS_SUFFIX WS_FOLDER'
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 source $script_own_dir/_RosTeamWs_Defines.bash
 
-# ros distribution name will be set in $ros_distro
+# ros distribution name will be set in ${ros_distro}
 check_ros_distro $1
 
 ros_ws_suffix="$2"
@@ -49,21 +49,22 @@ case "$choice" in
   exit
 esac
 
+ws_full_name=${ros_distro}_${ros_ws_suffix}
 # TODO: Add here output of the <current> WS
 echo ""
-read -p "ATTENTION: Creating a new workspace in folder '$ws_folder' for ROS '$ros_distro' (ROS$ros_version) with suffix '$ros_ws_suffix' using '$base_ws' as base workspace. Press <ENTER> to continue..."
+read -p "ATTENTION: Creating a new workspace in folder '${ws_folder}' for ROS '${ros_distro}' (ROS$ros_version) with suffix '${ros_ws_suffix}' (full path: '${ws_folder}/${ws_full_name}') using '${base_ws}' as base workspace. Press <ENTER> to continue..."
 
-# Create and initalise ROS-Workspace
-if [[ $base_ws != "<current>" ]]; then
+# Create and initialise ROS-Workspace
+if [[ ${base_ws} != "<current>" ]]; then
   if [[ $ros_version == 1 ]]; then
-    source $FRAMEWORK_BASE_PATH/${base_ws}_ros_ws_$ros_distro/devel/setup.bash
+    source $FRAMEWORK_BASE_PATH/${base_ws}_ros_ws_${ros_distro}/devel/setup.bash
   else
-    source $FRAMEWORK_BASE_PATH/${base_ws}_ros_ws_$ros_distro/install/setup.bash
+    source $FRAMEWORK_BASE_PATH/${base_ws}_ros_ws_${ros_distro}/install/setup.bash
   fi
 fi
 
-mkdir -p ~/$ws_folder/ros_ws_${ros_distro}_$ros_ws_suffix
-cd ~/$ws_folder/ros_ws_${ros_distro}_$ros_ws_suffix
+mkdir -p ~/${ws_folder}/${ws_full_name}
+cd ~/${ws_folder}/${ws_full_name}
 
 if [[ $ros_version == 1 ]]; then
   wstool init src
@@ -77,12 +78,12 @@ fi
 cd
 
 alias_name=_ros${ros_version}
-if [ -z "$ros_ws_suffix" ]; then
+if [ -z "${ros_ws_suffix}" ]; then
   fun_name="RosTeamWS_setup_ros$ros_version"
   ros_ws_suffix="-"
 else
-  fun_name="RosTeamWS_setup_ros${ros_version}_$ros_ws_suffix"
-  alias_name=${alias_name}_$ros_ws_suffix
+  fun_name="RosTeamWS_setup_ros${ros_version}_${ros_ws_suffix}"
+  alias_name=${alias_name}_${ros_ws_suffix}
 fi
 
 cp ~/.bashrc ~/.bashrc.bkp
@@ -92,10 +93,10 @@ sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' ~/.bashrc
 
 echo "" >> ~/.bashrc
 echo "$fun_name () {" >> ~/.bashrc
-echo "  RosTeamWS_BASE_WS=\"$base_ws\"" >> ~/.bashrc
-echo "  RosTeamWS_DISTRO=$ros_distro" >> ~/.bashrc
-echo "  RosTeamWS_WS_FOLDER=$ws_folder" >> ~/.bashrc
-echo "  RosTeamWS_WS_SUFFIX=$ros_ws_suffix" >> ~/.bashrc
+echo "  RosTeamWS_BASE_WS=\"${base_ws}\"" >> ~/.bashrc
+echo "  RosTeamWS_DISTRO=${ros_distro}" >> ~/.bashrc
+echo "  RosTeamWS_WS_FOLDER=${ws_folder}" >> ~/.bashrc
+echo "  RosTeamWS_WS_SUFFIX=${ros_ws_suffix}" >> ~/.bashrc
 echo "  source $FRAMEWORK_BASE_PATH/ros_ws_\$RosTeamWS_DISTRO/src/$FRAMEWORK_NAME/scripts/environment/setup.bash \$RosTeamWS_DISTRO \$RosTeamWS_WS_SUFFIX \$RosTeamWS_WS_FOLDER" >> ~/.bashrc
 echo "}" >> ~/.bashrc
 echo "alias $alias_name=$fun_name" >> ~/.bashrc

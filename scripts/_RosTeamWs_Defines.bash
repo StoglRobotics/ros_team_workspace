@@ -129,9 +129,9 @@ function colcon_test_up_to {
 function colcon_test_results {
   cd $ROS_WS
   if [ -z "$1" ]; then
-    colcon test-result
+    colcon test-result --all
   else
-    colcon test-result | grep "$*"
+    colcon test-result --all | grep "$*"
   fi
   cd -
 }
@@ -206,6 +206,10 @@ function check_ros_distro {
   ros_version=$DEFAULT_ROS_VERSION
   if [[ $ros_distro == "foxy" ]]; then
     ros_version=2
+  elif [[ $ros_distro == "galactic" ]]; then
+    ros_version=2
+  elif [[ $ros_distro == "rolling" ]]; then
+    ros_version=2
   elif [[ $ros_distro == "noetic" ]]; then
     ros_version=1
   fi
@@ -223,22 +227,18 @@ function compile_and_source_package {
   if [ -z "$2" ]; then
     test="no"
   fi
+
   bn=`basename "$PWD"`
   path=$bn
-#   while [[ "$bn" != "src" ]]; do
-#     cd ..
-#     bn=`basename "$PWD"`
-#     path="$bn/$path"
-#   done
-#   cd ..
   cd $ROS_WS
-  colcon build --symlink-install --packages-up-to $pkg_name
+
+  colcon_build_up_to $pkg_name
   source install/setup.bash
   if [[ "$test" == "yes" ]]; then
-    colcon test --packages-select $pkg_name
-    colcon test-result | grep $pkg_name
+    colcon_test_up_to $pkg_name
+    colcon_test_results | grep $pkg_name
   fi
-  cd $path
+#   cd $path
 }
 
 # END: Framework functions

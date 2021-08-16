@@ -75,7 +75,7 @@ case "$choice" in
   LICENSE_HEADER="$LICENSE_TEMPLATES/propriatery_company_cpp.txt"
 esac
 
-read -p "Is package already configured? (yes/no) [no] " package_configured
+read -p "Is package already configured (is in there a working controller already)? (yes/no) [no] " package_configured
 package_configured=${package_configured:="no"}
 
 echo ""
@@ -166,13 +166,13 @@ head -$CUT_LINE CMakeLists.txt >> $TMP_FILE
 
 # Add Plugin library stuff inside
 echo "add_library(" >> $TMP_FILE
-echo "  $PKG_NAME" >> $TMP_FILE
+echo "  $FILE_NAME" >> $TMP_FILE
 echo "  SHARED" >> $TMP_FILE
 echo "  $CTRL_CPP" >> $TMP_FILE
 echo ")" >> $TMP_FILE
 
 echo "target_include_directories(" >> $TMP_FILE
-echo "  $PKG_NAME" >> $TMP_FILE
+echo "  $FILE_NAME" >> $TMP_FILE
 echo "  PUBLIC" >> $TMP_FILE
 echo "  $<BUILD_INTERFACE:\${CMAKE_CURRENT_SOURCE_DIR}/include>" >> $TMP_FILE
 echo "  $<INSTALL_INTERFACE:include>" >> $TMP_FILE
@@ -180,7 +180,7 @@ echo ")" >> $TMP_FILE
 
 # TODO(anyone): Add this dependencies in a loop
 echo "ament_target_dependencies(" >> $TMP_FILE
-echo "  $PKG_NAME" >> $TMP_FILE
+echo "  $FILE_NAME" >> $TMP_FILE
 echo "  control_msgs" >> $TMP_FILE
 echo "  controller_interface" >> $TMP_FILE
 echo "  hardware_interface" >> $TMP_FILE
@@ -192,7 +192,7 @@ echo ")" >> $TMP_FILE
 
 # TODO(anyone): Delete after Foxy!!!
 echo "# prevent pluginlib from using boost" >> $TMP_FILE
-echo "target_compile_definitions($PKG_NAME PUBLIC \"PLUGINLIB__DISABLE_BOOST_FUNCTIONS\")" >> $TMP_FILE
+echo "target_compile_definitions($FILE_NAME PUBLIC \"PLUGINLIB__DISABLE_BOOST_FUNCTIONS\")" >> $TMP_FILE
 
 if [[ "$package_configured" == "no" ]]; then
 
@@ -204,7 +204,7 @@ if [[ "$package_configured" == "no" ]]; then
   echo "" >> $TMP_FILE
   echo "install(" >> $TMP_FILE
   echo "  TARGETS" >> $TMP_FILE
-  echo "  $PKG_NAME" >> $TMP_FILE
+  echo "  $FILE_NAME" >> $TMP_FILE
   echo "  RUNTIME DESTINATION bin" >> $TMP_FILE
   echo "  ARCHIVE DESTINATION lib" >> $TMP_FILE
   echo "  LIBRARY DESTINATION lib" >> $TMP_FILE
@@ -258,10 +258,13 @@ if [[ "$package_configured" == "no" ]]; then
   echo "  include" >> $TMP_FILE
   echo ")" >> $TMP_FILE
 
-  echo "ament_export_libraries(" >> $TMP_FILE
-  echo "  $PKG_NAME" >> $TMP_FILE
-  echo ")" >> $TMP_FILE
+fi
 
+echo "ament_export_libraries(" >> $TMP_FILE
+echo "  $FILE_NAME" >> $TMP_FILE
+echo ")" >> $TMP_FILE
+
+if [[ "$package_configured" == "no" ]]; then
   # TODO(anyone): use this from a list so its the same as above
   echo "ament_export_dependencies(" >> $TMP_FILE
   echo "  control_msgs" >> $TMP_FILE
@@ -334,7 +337,7 @@ sed -i "/<test_depend>ament_lint_common<\/test_depend>/d" package.xml
 if [ -f README.md ]; then
 
   echo "" >> README.md
-  echo "Pluginlib-Library: $PKG_NAME" >> README.md
+  echo "Pluginlib-Library: $FILE_NAME" >> README.md
   echo ""
   echo "Plugin: $PKG_NAME/${CLASS_NAME} (controller_interface::ControllerInterface)" >> README.md
 

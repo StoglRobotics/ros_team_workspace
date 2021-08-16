@@ -22,7 +22,7 @@ usage='setup-repository.bash PKG_NAME PKG_DESCRIPTION LICENSE'
 
 echo ""
 echo "Your path is `pwd`. Is this your package folder to setup repository?"
-read -p "If so press <ENTER> otherise <CTRL>+C and start the script again from your source folder."
+read -p "If so press <ENTER> otherwise <CTRL>+C and start the script again from your source folder."
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
@@ -43,7 +43,7 @@ fi
 
 LICENSE=$3
 if [ -z "$LICENSE" ]; then
-  echo "No package LICENSE defind! Using 'Propriatery' as default."
+  echo "No package LICENSE defined! Using 'Propriatery' as default."
   exit 0
 fi
 
@@ -67,11 +67,14 @@ repository=""
 case "$choice" in
 "1")
    mkdir -p .github/workflows
-   cp -n $PACKAGE_TEMPLATES/CI-github_ci-build.yml .github/workflows/ci-build.yml
-   sed -i 's/\$NAME\$/'${PKG_NAME}'/g' .github/workflows/ci-build.yml
-   sed -i 's/\$ROS_DISTRO\$/'${ros_distro}'/g' .github/workflows/ci-build.yml
-   cp -n $PACKAGE_TEMPLATES/CI-github_ci-lint.yml .github/workflows/ci-lint.yml
-   sed -i 's/\$NAME\$/'${PKG_NAME}'/g' .github/workflows/ci-lint.yml
+   CI_FILES_TO_COPY_AND_SED=("ci-build" "ci-format") # TODO(denis): Check if also "ci-lint" ?
+
+   for CI_FILE in "${CI_FILES_TO_COPY_AND_SED[@]}"; do
+     cp -n $PACKAGE_TEMPLATES/CI-github_${CI_FILE}.yml .github/workflows/${CI_FILE}.yml
+     sed -i 's/\$NAME\$/'${PKG_NAME}'/g' .github/workflows/${CI_FILE}.yml
+     sed -i 's/\$ROS_DISTRO\$/'${ros_distro}'/g' .github/workflows/${CI_FILE}.yml
+   done
+
    cp -n $PACKAGE_TEMPLATES/pkg_name.repos $PKG_NAME.repos
    ln -s $PKG_NAME.repos $PKG_NAME.ci.repos
    echo "NOTE: To enable CI from source, uncomment it manually in '.github/workflows/ci-build.yml'"
@@ -81,13 +84,18 @@ case "$choice" in
 "2")
   cp -n $PACKAGE_TEMPLATES/.gitlab-ci.yml .
   cp -n $PACKAGE_TEMPLATES/.ci.repos .
-  cp -n $PACKAGE_TEMPLATES/.clang-format .
   repository="gitlab"
    ;;
 *)
   echo "Invalid input! Exiting..."
   exit 0
 esac
+
+cp -n $PACKAGE_TEMPLATES/.clang-format .
+cp -n $PACKAGE_TEMPLATES/.pre-commit-config.yaml .
+pre-commit install
+pre-commit autoupdate
+
 
 # This functionality is not provided in all framework versions
 if [[ -f "$PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md" ]]; then
@@ -137,7 +145,7 @@ case "$open_source" in
   # TODO: Add here Licencse choice
   license="Apache-2.0"
   echo "Adding 'LICENSE' file for '$license' license."
-  # TODO: maybe use "-i,  --input-file=DATEI  in lokaler oder externer DATEI" option?
+  # TODO: maybe use "-i,  --input-file=DATEI  in local or external FILE" option?
   wget -O LICENSE https://www.apache.org/licenses/LICENSE-2.0.txt
   # TODO: Add contributing file
 #   OS-Apache-CONTRIBUTING.md
@@ -169,34 +177,4 @@ esac
 
 
 echo ""
-echo "FINISHED: Please create $repository repositry manually on $TEAM_REPOSITORY_SERVER/$NAMESPACE/$PKG_NAME add follow the explanation to push exisitng repository from command line."
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+echo "FINISHED: Please create $repository repository manually on $TEAM_REPOSITORY_SERVER/$NAMESPACE/$PKG_NAME add follow the explanation to push existing repository from command line."

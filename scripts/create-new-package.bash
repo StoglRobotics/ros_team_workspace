@@ -76,19 +76,24 @@ esac
 read -p "How do you want to licence your package? ['$TEAM_LICENSE']: " LICENSE
 LICENSE=${LICENSE:=$TEAM_LICENSE}
 
-# Build type
-read -p "Please choose your package build type (1 - ament_cmake, 2 - ament_python, 3 - cmake) [1]:" choice
+if [[ $ros_version == 1 ]]; then
+    BUILD_TYPE="catkin"
 
-case "$choice" in
-"2")
-   BUILD_TYPE="ament_python"
-   ;;
-"3")
-   BUILD_TYPE="cmake"
-   ;;
-*)
-  BUILD_TYPE="ament_cmake"
-esac
+elif [[ $ros_version == 2 ]]; then
+  # Build type
+  read -p "Please choose your package build type (1 - ament_cmake, 2 - ament_python, 3 - cmake) [1]:" choice
+
+  case "$choice" in
+  "2")
+    BUILD_TYPE="ament_python"
+    ;;
+  "3")
+    BUILD_TYPE="cmake"
+    ;;
+  *)
+    BUILD_TYPE="ament_cmake"
+  esac
+fi
 
 echo ""
 echo "ATTENTION: Creating package '$PKG_NAME' in '`pwd`' with description '$PKG_DESCRIPTION', licence '$LICENSE', build type '$BUILD_TYPE' and maintainer '$MAINTAINER_NAME <$MAINTAINER_EMAIL>'"

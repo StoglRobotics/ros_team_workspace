@@ -23,7 +23,7 @@ ROS2_VERSION=foxy
 sudo apt-add-repository -y ppa:kubuntu-ppa/backports
 sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 
-### Usefull tools
+### Useful tools
 sudo apt -y install vim ssh git trash-cli htop unrar yakuake screen finger ksshaskpass kompare
 # Dolphin Plugins
 sudo apt -y install kdesdk-dolphin-plugins kdesdk-kio-plugins kdesdk-scripts
@@ -35,7 +35,7 @@ then
   sudo apt -y install gvfs-bin gvfs-fuse gvfs-backends
 fi
 
-# Usefull libraries
+# Useful libraries
 sudo apt -y install libxml2-dev
 
 if ([[ $computer_type != "robot" ]])
@@ -112,7 +112,7 @@ then
   sudo apt -y install libappindicator3-1
   wget https://github.com/TheGoddessInari/hamsket/releases/download/0.6.2/hamsket_0.6.2_amd64.deb
   sudo dpkg -i hamsket_0.6.2_amd64.deb
-  
+
   # KDE-PIM
   sudo apt -y install kontact korganizer kmail kjots kaddressbook kdepim*
 
@@ -126,5 +126,3 @@ sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 
 # Configs
 # Yakuake
-
-
