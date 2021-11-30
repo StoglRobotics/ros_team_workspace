@@ -14,7 +14,7 @@
 
 ## BEGIN: Team specific definitions
 
-DEFAULT_ROS_DISTRO="foxy"
+DEFAULT_ROS_DISTRO="rolling"
 DEFAULT_ROS_VERSION=2
 
 # TODO(denis): We have two example teams. On is working with industrial and other with mobile robots
@@ -32,7 +32,7 @@ TEAM_INTERNAL_ASSETS="/opt/RosTeamWS/assets/"
 ## END: definitions
 
 # TODO(denis): implement here support for internal repos
-#source $TEAM_INTERNAL_ASSETS
+source $TEAM_INTERNAL_ASSETS/setup.bash
 
 
 ## BEGIN: Framework definition adjustable by users
@@ -45,6 +45,8 @@ TEAM_INTERNAL_ASSETS="/opt/RosTeamWS/assets/"
 check_ros_distro $DEFAULT_ROS_DISTRO
 
 # BEGIN: Define aliases for standard internal functions
+
+alias setup_exports=RosTeamWS_setup_exports
 
 alias setup_aliases=RosTeamWS_setup_aliases
 
@@ -64,6 +66,8 @@ alias setup_ros2_aliases=RosTeamWS_setup_ros2_aliases
 alias create-new-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/create-new-package.bash
 
 alias setup-repository=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash
+
+alias setup-repository-ci=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ci-config.bash
 
 alias setup-ros-workspace=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ros-workspace.bash
 

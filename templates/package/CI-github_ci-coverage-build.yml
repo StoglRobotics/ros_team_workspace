@@ -1,28 +1,32 @@
-name: Build Source
+name: Coverage Build
 on:
-  push:
+  pull_request:
     branches:
-      - $ROS_DISTRO$
-  schedule:
-    # Run every day to detect flakiness and broken dependencies
-    - cron: '28 3 * * *'
+      - $branch$
 
 jobs:
-  source:
-    name: source build
+  coverage:
+    name: coverage build
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
+    env:
+      ROS_DISTRO: $ROS_DISTRO$
     steps:
-      - uses: ros-tooling/setup-ros@0.0.26
-      - uses: ros-tooling/action-ros-ci@0.2
+      - uses: ros-tooling/setup-ros@v0.2
         with:
-          target-ros2-distro: $ROS_DISTRO$
+          required-ros-distributions: ${{ env.ROS_DISTRO }}
+      - uses: actions/checkout@v2
+      - uses: ros-tooling/action-ros-ci@v0.2
+        with:
+          target-ros2-distro: ${{ env.ROS_DISTRO }}
+          import-token: ${{ secrets.GITHUB_TOKEN }}
+          # build all packages listed in the meta package
           # build all packages listed in the meta package
           package-name:
-            $NAME$
+            $PKG_NAME$
           vcs-repo-file-url: |
-            https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/$NAME$.repos
+            https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/$NAME$-not-released.${{ env.ROS_DISTRO }}.repos?token=${{ secrets.GITHUB_TOKEN }}
           colcon-defaults: |
             {
               "build": {
@@ -30,6 +34,7 @@ jobs:
               }
             }
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+          skip-tests: true
       - uses: codecov/codecov-action@v1.0.14
         with:
           file: ros_ws/lcov/total_coverage.info
