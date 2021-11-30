@@ -10,13 +10,13 @@ then
   read
 fi
 
-sudo apt update && sudo apt -y install curl gnupg2 lsb-release
-curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
-
+if [[ ! -f "/etc/apt/sources.list.d/ros2-latest.list" ]]; then
+  sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+  curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+fi
 sudo apt update
 
-# ROS: Usefull tools
+# ROS: Useful tools
 sudo apt -y install python3-vcstool
 
 sudo apt -y install ros-${ROS_DISTRO}-desktop
