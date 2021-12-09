@@ -4,10 +4,3 @@ $NAME$
 $DESCRIPTION$
 
 ![Licence](https://img.shields.io/badge/License-$LICENSE$-blue.svg)
-
-
-|         | $ROS_DISTRO$    | Rolling
-|:-------:|:-------:|:-------:|
-| Branch  | [`$ROS_DISTRO$`](https://github.com/$NAMESPACE$/$NAME$/tree/$ROS_DISTRO$) | TBD
-| Build  | Linux: [![Build Status](https://github.com/$NAMESPACE$/$NAME$/workflows/Build/badge.svg)](https://github.com/$NAMESPACE$/$NAME$/actions?query=workflow%3A"Build") | TBD |
-| Lint  | [![Linters Status](https://github.com/$NAMESPACE$/$NAME$/workflows/Lint/badge.svg)](https://github.com/$NAMESPACE$/$NAME$/actions?query=workflow%3A"Lint") | TBD |

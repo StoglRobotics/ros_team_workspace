@@ -1,6 +1,7 @@
 # This is a format job. Pre-commit has a first-party GitHub action, so we use
 # that: https://github.com/pre-commit/action
 
+# Use this on private repositories
 name: Format
 
 on:
@@ -8,7 +9,7 @@ on:
   pull_request:
   push:
     branches:
-      - $branch$
+      - $ROS_DISTRO
 
 jobs:
   pre-commit:
@@ -16,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: actions/setup-python@v2
       with:
         python-version: 3.9.7
@@ -24,3 +27,4 @@ jobs:
     - uses: pre-commit/action@v2.0.3
       with:
         extra_args: --all-files --hook-stage manual
+        token: ${{ secrets.GITHUB_TOKEN }}
