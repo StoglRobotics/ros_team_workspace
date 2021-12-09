@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>ros2_control: Setup robot’s hardware package &mdash; ROS Team Workspace Jan 2021 documentation</title>
@@ -169,8 +170,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ros2-control-setup-robot-s-hardware-package">
-<h1>ros2_control: Setup robot’s hardware package<a class="headerlink" href="#ros2-control-setup-robot-s-hardware-package" title="Permalink to this headline">¶</a></h1>
+  <section id="ros2-control-setup-robot-s-hardware-package">
+<h1>ros2_control: Setup robot’s hardware package<a class="headerlink" href="#ros2-control-setup-robot-s-hardware-package" title="Permalink to this headline"></a></h1>
 <p id="uc-setup-ros2-control-hardware">This use-case describes how to set up a robot’s hardware interface for the ros2_control framework using scripts from ROS Team Workspace (RosTeamWS) framework.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ros2_control_setup-hardware-interface-package</span></code> script accepts the file name of the robot’s hardware interfacea and, optionally, class name and the package name.
 The file name should use standard ROS format &lt;my_cool_robot_hardware&gt;.
@@ -182,13 +183,13 @@ The script <strong>has to be executed</strong> from the folder where the package
 <p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/ros2_control/hardware</span></code> folder, rename the files, and replaces the placeholders.
 The scripts adds also a plugin description and simple test checking if the plugin can be loaded.</p>
 <div class="literal-block-wrapper docutils container" id="ros2-control-setup-hardware-interface-package">
-<div class="code-block-caption"><span class="caption-text">Usage of script for setting up the robot bringup.</span><a class="headerlink" href="#ros2-control-setup-hardware-interface-package" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Usage of script for setting up the robot bringup.</span><a class="headerlink" href="#ros2-control-setup-hardware-interface-package" title="Permalink to this code"></a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2_control_setup-hardware-interface-package FILE_NAME <span class="o">[</span>CLASS_NAME<span class="o">]</span> <span class="o">[</span>PKG_NAME<span class="o">]</span>
 </pre></div>
 </div>
 </div>
 <p>After all files are copied and placeholders set, a commit can be automatically created.</p>
-</div>
+</section>
 
 
            </div>

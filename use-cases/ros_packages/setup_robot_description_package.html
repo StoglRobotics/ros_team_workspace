@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Setup robot description &mdash; ROS Team Workspace Jan 2021 documentation</title>
@@ -173,26 +174,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="setup-robot-description">
-<h1>Setup robot description<a class="headerlink" href="#setup-robot-description" title="Permalink to this headline">¶</a></h1>
+  <section id="setup-robot-description">
+<h1>Setup robot description<a class="headerlink" href="#setup-robot-description" title="Permalink to this headline"></a></h1>
 <p id="uc-setup-robot-description">This use-case describes how to set up a robot description package using scripts from ROS Team Workspace (RosTeamWS) framework.
 The package follows as far as possible best practices for <a class="reference external" href="http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages">robot support packages</a> from ROS-Industrial consortia. (<strong>This has to be verified!</strong>)</p>
-<div class="section" id="script-for-setting-up-description-package">
-<h2>Script for Setting up Description Package<a class="headerlink" href="#script-for-setting-up-description-package" title="Permalink to this headline">¶</a></h2>
+<section id="script-for-setting-up-description-package">
+<h2>Script for Setting up Description Package<a class="headerlink" href="#script-for-setting-up-description-package" title="Permalink to this headline"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">setup-robot-description</span></code> script accepts the robot name and, optionally, the package name.
 If the package name is not set, it is guessed from the current path using the folder’s name.
 The script <strong>has to be executed</strong> from the folder where the description should be generated.</p>
 <p><strong>Note</strong>: it is recomended to setup your package using <a class="reference internal" href="create_package.html#uc-new-package"><span class="std std-ref">create-new-package</span></a> scritpt.</p>
 <p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/robot_description</span></code> folder, rename the files, and replaces the placeholders.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Usage of script for setting up the robot description.</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Usage of script for setting up the robot description.</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-robot-description ROBOT_NAME <span class="o">[</span>PKG_NAME<span class="o">]</span>
 </pre></div>
 </div>
 </div>
 <p>After all files are copied and placeholders set, a commit is automatically created.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
