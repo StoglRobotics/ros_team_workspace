@@ -1,6 +1,10 @@
-# Docker Container ubuntu_20_04_ros2_foxy
+# Docker Container ubuntu_20_04_ros2_multi
 
-Ubuntu 20.04 with  ROS 2 [Foxy Fitzroy (codename ‘foxy’)](https://docs.ros.org/en/foxy/index.html) installed with x11 forwading.
+Ubuntu 20.04 with  ROS 2 and 
+* [Foxy Fitzroy (codename ‘foxy’)](https://docs.ros.org/en/foxy/index.html)
+* [Galactic Geochelone (codename ‘galactic’)](https://docs.ros.org/en/galactic/index.html)
+* [Rolling Ridley (codename ‘rolling’)](https://docs.ros.org/en/rolling/index.html)  
+installed with x11 forwading.
 
 ## container
 The container should support forwarding of the x11-session. If this is not working please open an issue on github.  
