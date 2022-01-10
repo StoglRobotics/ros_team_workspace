@@ -1,1 +1,12 @@
 docs/_build/*
+_build/*
+
+# nixos and direnv specific
+shell.nix
+shell_nix_requirements.txt
+.envrc
+.direnv/*
+
+# python virtual env
+venv/*
+.venv/*
