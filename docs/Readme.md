@@ -1,4 +1,4 @@
-﻿# Ros_Team_workspace Documentation
+# Ros_Team_workspace Documentation
 ### Installation and building
 If you want to edit the docs you first have to install sphinx. From within the docs directory run:
 ```bash
@@ -8,4 +8,4 @@ After the requirements have been installed, the docs can then be build if you ru
 ```bash
 make html
 ```
-You can then view the docs by opening the `docs/_build/html/index.html` in your browser. 
+You can then view the docs by opening the `docs/_build/html/index.html` in your browser.

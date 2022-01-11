@@ -13,7 +13,7 @@ The general package structure is the following:
 ├── [setup.py]                                     # if amend_python is used
 ├── [setup.cfg]                                    # if amend_python is used
 ├── config/
-│   ├── <robot_name>_controllers.yaml              # Controllers' configuraiton for ros2_control
+│   ├── <robot_name>_controllers.yaml              # Controllers' configuration for ros2_control
 │   ├── <robot_name>_forward_position_publisher.yaml  # Setup test publisher for forward position controller
 │   └── <robot_name>_joint_trajectory_publisher.yaml  # Setup test publisher for joint trajectory controller
 └── launch/
@@ -62,7 +62,7 @@ The sections below describe their usage.
 ### Joint State Controller
 Joint state Controllers provides output of robot's internal states to `/joint_states` and `/dynamic_joint_states` ROS2-topics.
 
-In a new terminal with sourced ROS2 environement load, configure and start `joint_state_controller`:
+In a new terminal with sourced ROS2 environment load, configure and start `joint_state_controller`:
   ```
   ros2 control load_start_controller joint_state_controller
   ```
@@ -161,7 +161,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ros2 launch ros2_control_demo_robot test_joint_trajectory_controller.launch.py
    ```
 
-**NOTE**: You can swith contorllers (step 1 and 2) also with one command:
+**NOTE**: You can switch contorllers (step 1 and 2) also with one command:
 ```
 ros2 control switch_controllers --stop-controllers forward_<controller_type>_controller --start-controllers joint_trajectory_controller
 ```

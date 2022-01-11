@@ -1,10 +1,10 @@
 # Docker Container ubuntu_20_04_ros2_multi
 
-Ubuntu 20.04 with  ROS 2 and 
+Ubuntu 20.04 with  ROS 2 and
 * [Foxy Fitzroy (codename ‘foxy’)](https://docs.ros.org/en/foxy/index.html)
 * [Galactic Geochelone (codename ‘galactic’)](https://docs.ros.org/en/galactic/index.html)
-* [Rolling Ridley (codename ‘rolling’)](https://docs.ros.org/en/rolling/index.html)  
-installed with x11 forwading.
+* [Rolling Ridley (codename ‘rolling’)](https://docs.ros.org/en/rolling/index.html)
+installed with x11 forwarding.
 
 ## How to use
 Have a look at README.md in `ros_team_workspace/test/test_container_docker` for a detailed description on how to use.

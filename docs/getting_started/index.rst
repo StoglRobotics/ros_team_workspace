@@ -35,8 +35,8 @@ You then have to append the following lines in to your ``.bashrc`` file:
    if [ -f ~/.ros_team_ws_rc ]; then
        . ~/.ros_team_ws_rc
    fi
-This will look for the ``.ros_team_ws_rc`` inside your home directory and if present source it.
+This will look for the ``.ros_team_ws_rc`` inside your home directory and if present source it. You then have to resource your ``.bashrc`` to apply the changes.
 
 What next?
-************   
+************
 Now checkout :ref:`use-cases <uc-index>` for how-to-use descriptions.
