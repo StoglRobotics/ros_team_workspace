@@ -7,7 +7,7 @@ ARG gid
 ARG home
 
 # make bash default
-SHELL ["/bin/bash", "-c"] 
+SHELL ["/bin/bash", "-c"]
 
 # install locales
 RUN apt-get update -y && apt-get install -y locales
@@ -19,8 +19,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Set the locale to include UTF-8. UTF-8 compatible locales are needed for install
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 # Make sure UTF-8 is supported
@@ -39,8 +39,11 @@ RUN apt-get update -y && DEBIAN_FRONTEND=noniteractive apt-get install -y ros-fo
 RUN pip install -U rosdep && \
     rosdep init
 
+# setup standard .bashrc
+COPY bashrc ${home}/.bashrc
+
 # clone user into docker image, add to sudo users needed for xsharing
-# the passwd delet is needed to update /etc/shadow otherwise user cannot use sudo
+# the passwd delete is needed to update /etc/shadow otherwise user cannot use sudo
 RUN mkdir -p ${home} && \
   echo "${user}:x:${uid}:${gid}:${user},,,:${home}:/bin/bash" >> /etc/passwd && \
   echo "${user}:x:${uid}:" >> /etc/group && \
@@ -48,10 +51,8 @@ RUN mkdir -p ${home} && \
   chmod 0440 "/etc/sudoers.d/${user}" && \
   usermod -aG sudo ${user} && \
   passwd -d ${user} && \
+  mkdir ${home}/workspace && \
   chown ${uid}:${gid} -R ${home}
-
-# setup environment of ros for usage
-COPY bashrc ${home}/.bashrc
 
 #switch to user
 USER ${user}
