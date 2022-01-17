@@ -74,14 +74,9 @@ These instructions assume you are running Ubuntu 20.04:
    ```
    cd $COLCON_WS
    git clone git@github.com:$NAMESPACE$/$NAME$.git src/$NAME$
-   vcs import src --input src/$NAME$/$NAME$.repos
+   vcs import src --input src/$NAME$/$NAME$.<ros-distro>.repos
    rosdep install --ignore-src --from-paths src -y -r       # install also is there are unreleased packages
-   ```
-
-   Sometimes packages do not list all their dependencies so `rosdep` will not install everything.
-   If you are getting missing dependency errors, try manually install the following packages:
-   ```
-   sudo apt install ros2-foxy-forward_command_controller ros2-foxy-joint_state_controller ros2-foxy-joint_trajectory_controller ros2-foxy-xacro
+   cd ..
    ```
 
 ### Configure and Build Workspace:
@@ -91,7 +86,7 @@ To configure and build workspace execute following commands:
   colcon build --symlink-install --mixin rel-with-deb-info compile-commands ccache
   ```
 
-## Running Executales
+## Running Executable
 
 See `README.md` files of the packages for information regarding running executables.
 

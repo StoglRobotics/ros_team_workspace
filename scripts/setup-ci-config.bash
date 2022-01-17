@@ -15,7 +15,7 @@
 # limitations under the License.
 
 
-usage='setup-ci-config.bash "repo_name" "repo_namespace"'
+usage='setup-ci-config.bash "repo_name" "repo_namespace" "[list of packages]"'
 #
 
 # Load Framework defines
@@ -128,6 +128,12 @@ while true; do
 
   if ! grep -q "## Build status" README.md; then
     cat ${PACKAGE_TEMPLATES}/_append_to_README_build_status.md >> README.md
+
+    sed -i 's/\$branch\$/'${some_branch}'/g' README.md
+    sed -i 's/\$ros_distro\$/'${some_ros_distro}'/g' README.md
+    sed -i 's/\$Ros_distro\$/'${some_ros_distro^}'/g' README.md
+    sed -i 's/\$NAME\$/'${repo_name}'/g' README.md
+    sed -i 's/\$NAMESPACE\$/'${repo_namespace}'/g' README.md
   fi
 
   # Get line with "### Explanation of different build types"
