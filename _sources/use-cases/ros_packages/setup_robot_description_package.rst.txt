@@ -28,5 +28,9 @@ The scripts copies template files from the ``templates/robot_description`` folde
 After all files are copied and placeholders set, a commit is automatically created.
 
 To test the generated files compile and source your workspace and execute:
-  ```
-  ros2 launch <PKG_NAME>  view_<ROBOT_NAME>.launch.py
+
+.. code-block:: bash
+   :caption: Test generated files.
+   :name: test-generated-files
+
+   ros2 launch <PKG_NAME>  view_<ROBOT_NAME>.launch.py
