@@ -178,9 +178,9 @@ The file name should use standard ROS format &lt;my_cool_robot_hardware&gt;.
 A <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> and <code class="docutils literal notranslate"><span class="pre">.hpp</span></code> files will added using this name.
 If the class name is not set, it is guessed by camel-casing the file name.
 If the package name is not set, it is guessed from the current path using the folder’s name.
-The script <strong>has to be executed</strong> from the folder where the package should be generated.</p>
-<p><strong>Note</strong>: it is recomended to setup your package using <a class="reference internal" href="../ros_packages/create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> scritpt.</p>
-<p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/ros2_control/hardware</span></code> folder, rename the files, and replaces the placeholders.
+The script <strong>has to be executed</strong> from the package folder where the package should be generated.</p>
+<p><strong>Note</strong>: it is recommended to setup your package using <a class="reference internal" href="../ros_packages/create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> script.</p>
+<p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/ros2_control/hardware</span></code> folder, renames the files, and replaces the placeholders.
 The scripts adds also a plugin description and simple test checking if the plugin can be loaded.</p>
 <div class="literal-block-wrapper docutils container" id="ros2-control-setup-hardware-interface-package">
 <div class="code-block-caption"><span class="caption-text">Usage of script for setting up the robot bringup.</span><a class="headerlink" href="#ros2-control-setup-hardware-interface-package" title="Permalink to this code"></a></div>
