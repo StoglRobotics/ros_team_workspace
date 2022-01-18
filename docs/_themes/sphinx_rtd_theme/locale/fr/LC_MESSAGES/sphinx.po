@@ -3,11 +3,11 @@
 # This file is distributed under the same license as the sphinx_rtd_theme
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
-# 
+#
 # Translators:
 # Radina Matic <radina.matic@gmail.com>, 2020
 # Anthony <aj@ohess.org>, 2020
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: sphinx_rtd_theme 0.4.3.dev0\n"
@@ -71,7 +71,7 @@ msgid "Built with %(sphinx_web)s using a"
 msgstr "Compilé avec %(sphinx_web)s en utilisant un"
 
 #. "theme" refers to a theme for Sphinx, which alters the appearance of the
-#. generated documenation
+#. generated documentation
 #: sphinx_rtd_theme/footer.html:54
 msgid "theme"
 msgstr "thème"
@@ -110,7 +110,7 @@ msgstr "Logo"
 
 #: sphinx_rtd_theme/search.html:31
 msgid "Please activate JavaScript to enable the search functionality."
-msgstr "Activez JavaScript pour accéder à la fonction de recherche."
+msgstr "Activez JavaScript pour accéder à la function de recherche."
 
 #. Search is a noun, not a verb
 #: sphinx_rtd_theme/search.html:39

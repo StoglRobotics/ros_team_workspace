@@ -12,7 +12,7 @@ If the class name is not set, it is guessed by camel-casing the file name.
 If the package name is not set, it is guessed from the current path using the folder's name.
 The script **has to be executed** from the folder where the package should be generated.
 
-**Note**: it is recomended to setup your package using :ref:`setup-new-package <uc-new-package>` scritpt.
+**Note**: it is recommended to setup your package using :ref:`setup-new-package <uc-new-package>` script.
 
 The scripts copies template files from the ``templates/ros2_control/hardware`` folder, rename the files, and replaces the placeholders.
 The scripts adds also a plugin description and simple test checking if the plugin can be loaded.
