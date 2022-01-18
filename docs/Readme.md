@@ -8,4 +8,6 @@ After the requirements have been installed, the docs can then be build if you ru
 ```bash
 make html
 ```
+from within the `docs/` folder.
+
 You can then view the docs by opening the `docs/_build/html/index.html` in your browser.
