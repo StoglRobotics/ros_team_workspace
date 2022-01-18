@@ -32,8 +32,11 @@ TEAM_INTERNAL_ASSETS="/opt/RosTeamWS/assets/"
 ## END: definitions
 
 # TODO(denis): implement here support for internal repos
-source $TEAM_INTERNAL_ASSETS/setup.bash
-
+if [ -f $TEAM_INTERNAL_ASSETS/setup.bash ]; then
+  source $TEAM_INTERNAL_ASSETS/setup.bash
+else
+  echo "Info: You currently don't have defined any assest under \"$TEAM_INTERNAL_ASSETS\". Skip sourcing them."
+fi
 
 ## BEGIN: Framework definition adjustable by users
 # TBD
