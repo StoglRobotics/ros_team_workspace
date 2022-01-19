@@ -32,6 +32,9 @@ public:
   controller_interface::return_type init(const std::string & controller_name) override;
 
   $PACKAGE_NAME$_PUBLIC
+  CallbackReturn on_init() override;
+
+  $PACKAGE_NAME$_PUBLIC
   controller_interface::InterfaceConfiguration command_interface_configuration() const override;
 
   $PACKAGE_NAME$_PUBLIC
@@ -47,7 +50,7 @@ public:
   CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
 
   $PACKAGE_NAME$_PUBLIC
-  controller_interface::return_type update() override;
+  controller_interface::return_type update(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 protected:
   std::vector<std::string> joint_names_;

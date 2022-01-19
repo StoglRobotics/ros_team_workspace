@@ -1,3 +1,4 @@
+#general
 docs/_build/*
 *.swp
 _build/*
@@ -16,3 +17,6 @@ docs/venv/*
 docs/.venv/*
 venv/*
 .venv/*
+
+#ides
+.vscode
