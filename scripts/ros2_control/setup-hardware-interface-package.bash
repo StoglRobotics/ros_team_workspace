@@ -158,6 +158,30 @@ for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/\\\$Interface_Type\\\$/${INTERFACE_TYPE^}/g" $SED_FILE
 done
 
+# If type is "sensor" remove write and command_interfaces methods
+if [[ "$INTERFACE_TYPE" == "sensor" ]]; then
+  METHODS_TO_DELETE=("write()" "export_command_interfaces()")
+  # Clean HPP
+  for DEL_METHOD in "${METHODS_TO_DELETE[@]}"; do
+    line_nr=`grep -n "${DEL_METHOD}" $HW_ITF_HPP | awk -F ":" '{print $1;}'`
+    let start_line=${line_nr}-1
+    let end_line=${line_nr}+1
+    sed -i "${start_line},${end_line}d" $HW_ITF_HPP
+  done
+  # Clean CPP
+  line_nr=`grep -n "write()" $HW_ITF_CPP | awk -F ":" '{print $1;}'`
+  let start_line=${line_nr}-1
+  let end_line=${line_nr}+5
+  sed -i "${start_line},${end_line}d" $HW_ITF_CPP
+
+  line_nr=`grep -n "export_command_interfaces()" $HW_ITF_CPP | awk -F ":" '{print $1;}'`
+  let start_line=${line_nr}-1
+  let end_line=${line_nr}+10
+  sed -i "${start_line},${end_line}d" $HW_ITF_CPP
+
+  # Remove command interfaces from test URDF
+  sed -i '/command_interface/d' $TEST_CPP
+fi
 
 # CMakeLists.txt: Remove comments if there any and add library
 DEL_STRINGS=("# uncomment the following" "# further" "# find_package(<dependency>")
@@ -191,6 +215,7 @@ echo "ament_target_dependencies(" >> $TMP_FILE
 echo "  $PKG_NAME" >> $TMP_FILE
 echo "  hardware_interface" >> $TMP_FILE
 echo "  rclcpp" >> $TMP_FILE
+echo "  rclcpp_lifecycle" >> $TMP_FILE
 echo ")" >> $TMP_FILE
 
 # TODO(anyone): Delete after Foxy!!!
@@ -252,6 +277,7 @@ echo "ament_export_dependencies(" >> $TMP_FILE
 echo "  hardware_interface" >> $TMP_FILE
 echo "  pluginlib" >> $TMP_FILE
 echo "  rclcpp" >> $TMP_FILE
+echo "  rclcpp_lifecycle" >> $TMP_FILE
 echo ")" >> $TMP_FILE
 
 # Add last part
@@ -261,7 +287,7 @@ tail -n +$TEST_LINE CMakeLists.txt | tail -n +$CUT_LINE >> $TMP_FILE
 mv $TMP_FILE CMakeLists.txt
 
 # CMakeLists.txt & package.xml: Add dependencies if they not exist
-DEP_PKGS=("rclcpp" "pluginlib" "hardware_interface")
+DEP_PKGS=("rclcpp_lifecycle" "rclcpp" "pluginlib" "hardware_interface")
 
 for DEP_PKG in "${DEP_PKGS[@]}"; do
 
