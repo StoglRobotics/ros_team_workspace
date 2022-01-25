@@ -1,7 +1,7 @@
 # Docker Container for testing
 
-## container
-The container should support forwarding of the x11-session. If this is not working please make sure docker is granted access to the x-server by running `./start.sh`. Otherwise open an issue on github.
+## Container
+The container should support forwarding of the x11-session. If this is not working please make sure docker is granted access to the x-server by running `./start.sh`.
 The container itself should clone your `user` inside the docker container. The _ros_team_workspace_ folder is then shared with the docker container and mounted under _~/workspace/ros_team_workspace/_ inside the container.
 
 ## Usage of the docker container
