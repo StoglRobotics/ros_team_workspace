@@ -15,6 +15,7 @@ $LICENSE$
 #include "hardware_interface/loaned_command_interface.hpp"
 #include "hardware_interface/loaned_state_interface.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
+#include "rclcpp/time.hpp"
 #include "rclcpp/parameter_value.hpp"
 #include "rclcpp/utilities.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
@@ -149,7 +150,9 @@ protected:
       "/test_$package_name$/state", 10, subs_callback);
 
     // call update to publish the test value
-    ASSERT_EQ(controller_->update(), controller_interface::return_type::OK);
+    rclcpp::Time node_time = controller_->get_node()->get_clock()->now();
+    rclcpp::Duration duration = rclcpp::Duration::from_nanoseconds(10000);
+    ASSERT_EQ(controller_->update(node_time, duration), controller_interface::return_type::OK);
 
     // wait for message to be passed
     ASSERT_EQ(wait_for(subscription), rclcpp::WaitResultKind::Ready);

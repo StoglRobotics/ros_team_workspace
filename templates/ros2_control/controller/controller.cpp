@@ -30,6 +30,11 @@ controller_interface::return_type $ClassName$::init(const std::string & controll
   return controller_interface::return_type::OK;
 }
 
+CallbackReturn $ClassName$::on_init()
+{
+  return CallbackReturn::SUCCESS;
+}
+
 CallbackReturn $ClassName$::on_configure(const rclcpp_lifecycle::State & /*previous_state*/)
 {
   auto error_if_empty = [&](const auto & parameter, const char * parameter_name) {
@@ -150,7 +155,7 @@ CallbackReturn $ClassName$::on_deactivate(const rclcpp_lifecycle::State & /*prev
   return CallbackReturn::SUCCESS;
 }
 
-controller_interface::return_type $ClassName$::update()
+controller_interface::return_type $ClassName$::update(const rclcpp::Time & time, const rclcpp::Duration & period)
 {
   auto current_command = input_command_.readFromRT();
 
@@ -161,7 +166,7 @@ controller_interface::return_type $ClassName$::update()
   }
 
   if (state_publisher_ && state_publisher_->trylock()) {
-    state_publisher_->msg_.header.stamp = get_node()->now();
+    state_publisher_->msg_.header.stamp = time;
     state_publisher_->msg_.set_point = command_interfaces_[0].get_value();
 
     state_publisher_->unlockAndPublish();

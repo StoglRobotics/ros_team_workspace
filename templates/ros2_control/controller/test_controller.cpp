@@ -17,7 +17,7 @@ TEST_P($ClassName$TestParameterizedParameters, one_parameter_is_missing)
 }
 
 // TODO(anyone): the new gtest version after 1.8.0 uses INSTANTIATE_TEST_SUITE_P
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   MissingMandatoryParameterDuringConfiguration, $ClassName$TestParameterizedParameters,
   ::testing::Values(
     std::make_tuple(std::string("joints"), rclcpp::ParameterValue(std::vector<std::string>())),
@@ -96,7 +96,10 @@ TEST_F($ClassName$Test, update_success)
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
-  ASSERT_EQ(controller_->update(), controller_interface::return_type::OK);
+
+  rclcpp::Time node_time = controller_->get_node()->get_clock()->now();
+  rclcpp::Duration duration = rclcpp::Duration::from_nanoseconds(10000);
+  ASSERT_EQ(controller_->update(node_time, duration), controller_interface::return_type::OK);
 }
 
 TEST_F($ClassName$Test, deactivate_success)
@@ -116,7 +119,10 @@ TEST_F($ClassName$Test, reactivate_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_deactivate(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
-  ASSERT_EQ(controller_->update(), controller_interface::return_type::OK);
+
+  rclcpp::Time node_time = controller_->get_node()->get_clock()->now();
+  rclcpp::Duration duration = rclcpp::Duration::from_nanoseconds(10000);
+  ASSERT_EQ(controller_->update(node_time, duration), controller_interface::return_type::OK);
 }
 
 TEST_F($ClassName$Test, publish_status_success)
@@ -125,7 +131,10 @@ TEST_F($ClassName$Test, publish_status_success)
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
-  ASSERT_EQ(controller_->update(), controller_interface::return_type::OK);
+
+  rclcpp::Time node_time = controller_->get_node()->get_clock()->now();
+  rclcpp::Duration duration = rclcpp::Duration::from_nanoseconds(10000);
+  ASSERT_EQ(controller_->update(node_time, duration), controller_interface::return_type::OK);
 
   ControllerStateMsg msg;
   subscribe_and_get_messages(msg);
@@ -141,7 +150,10 @@ TEST_F($ClassName$Test, receive_message_and_publish_updated_status)
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
-  ASSERT_EQ(controller_->update(), controller_interface::return_type::OK);
+
+  rclcpp::Time node_time = controller_->get_node()->get_clock()->now();
+  rclcpp::Duration duration = rclcpp::Duration::from_nanoseconds(10000);
+  ASSERT_EQ(controller_->update(node_time, duration), controller_interface::return_type::OK);
 
   ControllerStateMsg msg;
   subscribe_and_get_messages(msg);
@@ -151,7 +163,8 @@ TEST_F($ClassName$Test, receive_message_and_publish_updated_status)
   publish_commands();
   ASSERT_TRUE(controller_->wait_for_commands(executor));
 
-  ASSERT_EQ(controller_->update(), controller_interface::return_type::OK);
+  node_time = controller_->get_node()->get_clock()->now();
+  ASSERT_EQ(controller_->update(node_time, duration), controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[0], 0.45);
 
