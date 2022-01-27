@@ -4,8 +4,8 @@ on:
     branches:
       - $branch$
   schedule:
-    # Run every morning to detect flakiness and broken dependencies
-    - cron: '43 1 * * *'
+    # Run every day to detect flakiness and broken dependencies
+    - cron: '03 3 * * *'
 
 jobs:
   rolling_source:
