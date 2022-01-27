@@ -27,8 +27,11 @@ repos:
       - id: check-yaml
       - id: debug-statements
       - id: end-of-file-fixer
+        exclude: ^(docs/_themes/)
       - id: mixed-line-ending
+        exclude: ^(docs/_themes/)
       - id: trailing-whitespace
+        exclude: ^(docs/_themes/)
       - id: fix-byte-order-marker
 
   # Python hooks
@@ -67,12 +70,6 @@ repos:
         language: system
         files: \.(c|cc|cxx|cpp|frag|glsl|h|hpp|hxx|ih|ispc|ipp|java|js|m|proto|vert)$
         args: ['-fallback-style=none', '-i']
-  # The same options as in ament_cppcheck are used, but its not working...
-  #- repo: https://github.com/pocc/pre-commit-hooks
-    #rev: v1.1.1
-    #hooks:
-      #- id: cppcheck
-        #args: ['--error-exitcode=1', '-f', '--inline-suppr', '-q', '-rp', '--suppress=internalAstError', '--suppress=unknownMacro', '--verbose']
 
   - repo: local
     hooks:
@@ -134,10 +131,9 @@ repos:
       - id: rst-inline-touching-normal
 
   # Spellcheck in comments and docs
-  # skipping of *.svg files is not working...
   - repo: https://github.com/codespell-project/codespell
     rev: v2.0.0
     hooks:
       - id: codespell
         args: ['--write-changes']
-        exclude: \.(svg|pyc)$
+        exclude: ^(docs/_themes/)|(\.(svg|pyc))$
