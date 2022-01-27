@@ -79,4 +79,14 @@ alias setup-robot-description=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-robot-desc
 alias ros2_control_setup-hardware-interface-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/ros2_control/setup-hardware-interface-package.bash
 alias ros2_control_setup-controller-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/ros2_control/setup-controller-package.bash
 
+# Team General aliases and functions
+function generate_gif_from_video {
+
+  if [ -z "$1" ]; then
+    print_and_exit "File name has to be defined!"
+  fi
+
+  ffmpeg -i $1 -filter_complex "[0:v] fps=12,scale=w=960:h=-1,split [a][b];[a] palettegen [p];[b][p] paletteuse" $1.gif
+}
+
 # END Define aliases for standard functions
