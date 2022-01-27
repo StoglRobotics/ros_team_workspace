@@ -1,6 +1,8 @@
 name: ABI Compatibility Check
 on:
   pull_request:
+    branches:
+      - $branch$
 
 jobs:
   abi_check:
@@ -9,7 +11,6 @@ jobs:
       matrix:
         env:
           - {ROS_DISTRO: $ROS_DISTRO$, ROS_REPO: main}
-          - {ROS_DISTRO: $ROS_DISTRO$, ROS_REPO: testing}
     steps:
       - uses: actions/checkout@v2
       - uses: ros-industrial/industrial_ci@master
