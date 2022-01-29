@@ -1,17 +1,31 @@
-# To use:
+# How to use:
 #
-#     pre-commit run -a
+# Detailed:
+#   See https://github.com/pre-commit/pre-commit
+#
+# Short:
+# First install pre-commit. For example: pip install pre-commit
+#
+# You can then install the git hook scripts with:
+#
+#     pre-commit install  # (NOTE after this pre-commit runs every time you run git commit)
+#
+# To skip pre-commit you then have to run: git commit -n
 #
 # Or:
+# Just run pre-commit manually
 #
-#     pre-commit install  # (runs every time you commit in git)
+#     pre-commit run
+#
+# To rerun for all files:
+#
+#     pre-commit run -a
 #
 # To update this file:
 #
 #     pre-commit autoupdate
 #
-# See https://github.com/pre-commit/pre-commit
-
+#
 repos:
   # Standard hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -136,4 +150,4 @@ repos:
     hooks:
       - id: codespell
         args: ['--write-changes']
-        exclude: ^(docs/_themes/)|(\.(svg|pyc))$
+        exclude: ^(docs/_themes/)|(\.(svg|pyc|drawio))$|(CHANGELOG\.rst)
