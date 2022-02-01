@@ -37,7 +37,7 @@ This package targets the following stakeholders:
 
 **To achieve this, RosTeamWS defines**:
 
-#. an architecture of overlayed workspaces for sharing standard ROS packages;
+#. an architecture of overlaid workspaces for sharing standard ROS packages;
 #. standardized package structure for straightforward collaboration;
 #. scripts for workspace and package management to keep their internal structure familiar to everyone in the team;
 #. often-used scripts for tests of small development-chunks.
