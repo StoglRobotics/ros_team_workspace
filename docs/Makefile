@@ -15,7 +15,7 @@ help:
 
 multiversion: Makefile
 	sphinx-multiversion $(SPHINXOPTS) "$(SOURCEDIR)" "$(BUILDDIR)/html"
-	@echo "<html><head><meta http-equiv=\"refresh\" content=\"0; url=foxy/index.html\" /></head></html>" > "$(BUILDDIR)"/html/index.html
+	@echo "<html><head><meta http-equiv=\"refresh\" content=\"0; url=master/index.html\" /></head></html>" > "$(BUILDDIR)"/html/index.html
 
 # https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
 .PHONY: help Makefile multiversion

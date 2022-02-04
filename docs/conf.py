@@ -181,7 +181,7 @@ epub_exclude_files = ["search.html"]
 # Output file base name for HTML help builder.
 htmlhelp_basename = "ROSTeamWorkspacedoc"
 
-html_baseurl = "https://stoglrobotics.github.io/ros_team_workspace/" + ros_distro
+html_baseurl = "https://stoglrobotics.github.io/ros_team_workspace/" + ros_distro + "/"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -218,12 +218,12 @@ html_context = {
     "display_github": True,
     "github_user": "StoglRobotics",
     "github_repo": "ros_team_workspace",
-    "github_version": ros_distro + "/",
+    "github_version": repos_file_branch + "/",
     "conf_py_path": "/docs/",
     "source_suffix": source_suffix,
 }
 
-# smv_tag_whitelist = None
+# Add branches you want to whtielist here.
 smv_branch_whitelist = r"^(master|foxy)$"
 smv_released_pattern = r"^refs/(heads|remotes/[^/]+)/(foxy).*$"
 smv_remote_whitelist = r"^(origin)$"
