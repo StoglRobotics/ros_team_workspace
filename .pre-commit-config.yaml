@@ -25,7 +25,10 @@
 #
 #     pre-commit autoupdate
 #
-#
+
+# files that should be ignored globally
+exclude: ^(docs/_themes/)
+
 repos:
   # Standard hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -41,11 +44,8 @@ repos:
       - id: check-yaml
       - id: debug-statements
       - id: end-of-file-fixer
-        exclude: ^(docs/_themes/)
       - id: mixed-line-ending
-        exclude: ^(docs/_themes/)
       - id: trailing-whitespace
-        exclude: ^(docs/_themes/)
       - id: fix-byte-order-marker
 
   # Python hooks
@@ -150,4 +150,4 @@ repos:
     hooks:
       - id: codespell
         args: ['--write-changes']
-        exclude: ^(docs/_themes/)|(\.(svg|pyc|drawio))$|(CHANGELOG\.rst)
+        exclude: (\.(svg|pyc|drawio))$|(CHANGELOG\.rst)
