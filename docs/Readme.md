@@ -21,4 +21,7 @@ If you want to build multiversion docs you have to run:
 make multiversion
 ```
 from within the `docs/` folder. You can then view the docs by opening the `docs/_build/html/index.html`.
-:exclamation: However, be aware that changes to the multiversion docs only appear after committing them. :exclamation: If you want to see them immediate, you have to build using `make html`.
+| :exclamation:  Note   :exclamation:                                                                                                                              |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|However, be aware that changes to the multiversion docs only appear after committing them. If you want to see them immediate, you have to build using `make html`.|
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
