@@ -14,7 +14,7 @@ Script for Setting up Description Package
 If the package name is not set, it is guessed from the current path using the folder's name.
 The script **has to be executed** from the folder where the bringup should be generated.
 
-**Note**: it is recomended to setup your package using :ref:`setup-new-package <uc-new-package>` scritpt.
+**Note**: it is recommended to setup your package using :ref:`setup-new-package <uc-new-package>` script.
 
 The scripts copies template files from the ``templates/robot_bringup`` folder, rename the files, and replaces the placeholders.
 

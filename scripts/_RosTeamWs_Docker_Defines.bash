@@ -15,7 +15,3 @@
 ## BEGIN: Default RosTeamWS Docker Definitions and Aliases
 
 # function _run_docker()
-
-
-
-
