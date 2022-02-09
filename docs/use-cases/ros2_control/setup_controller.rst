@@ -33,6 +33,6 @@ Parameters:
     If not set, it is guessed from the current path using the folder's name.
 
 
-The script will ask for some additional input. 
+The script will ask for some additional input.
 
 After all files are copied and placeholders set, changes are automatically staged in git.

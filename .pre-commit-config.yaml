@@ -1,21 +1,38 @@
-# To use:
+# How to use:
 #
-#     pre-commit run -a
+# Detailed:
+#   See https://github.com/pre-commit/pre-commit
+#
+# Short:
+# First install pre-commit. For example: pip install pre-commit
+#
+# You can then install the git hook scripts with:
+#
+#     pre-commit install  # (NOTE after this pre-commit runs every time you run git commit)
+#
+# To skip pre-commit you then have to run: git commit -n
 #
 # Or:
+# Just run pre-commit manually
 #
-#     pre-commit install  # (runs every time you commit in git)
+#     pre-commit run
+#
+# To rerun for all files:
+#
+#     pre-commit run -a
 #
 # To update this file:
 #
 #     pre-commit autoupdate
 #
-# See https://github.com/pre-commit/pre-commit
+
+# files that should be ignored globally
+exclude: ^(docs/_themes/)
 
 repos:
   # Standard hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.1.0
     hooks:
       - id: check-added-large-files
       - id: check-ast
@@ -33,13 +50,13 @@ repos:
 
   # Python hooks
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.12.0
+    rev: v2.31.0
     hooks:
     -   id: pyupgrade
         args: [--py36-plus]
 
   - repo: https://github.com/psf/black
-    rev: 20.8b1
+    rev: 21.12b0
     hooks:
       - id: black
         args: ["--line-length=99"]
@@ -52,7 +69,7 @@ repos:
       args: ["--ignore=D100,D101,D102,D103,D104,D105,D106,D107,D203,D212,D404"]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 3.9.0
+    rev: 4.0.1
     hooks:
     - id: flake8
       args: ["--ignore=E501"]
@@ -67,12 +84,6 @@ repos:
         language: system
         files: \.(c|cc|cxx|cpp|frag|glsl|h|hpp|hxx|ih|ispc|ipp|java|js|m|proto|vert)$
         args: ['-fallback-style=none', '-i']
-  # The same options as in ament_cppcheck are used, but its not working...
-  #- repo: https://github.com/pocc/pre-commit-hooks
-    #rev: v1.1.1
-    #hooks:
-      #- id: cppcheck
-        #args: ['--error-exitcode=1', '-f', '--inline-suppr', '-q', '-rp', '--suppress=internalAstError', '--suppress=unknownMacro', '--verbose']
 
   - repo: local
     hooks:
@@ -119,14 +130,14 @@ repos:
 
   # Docs - RestructuredText hooks
   - repo: https://github.com/PyCQA/doc8
-    rev: 0.9.0a1
+    rev: 0.10.1
     hooks:
       - id: doc8
         args: ['--max-line-length=100', '--ignore=D001']
         exclude: CHANGELOG\.rst$
 
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.8.0
+    rev: v1.9.0
     hooks:
       - id: rst-backticks
         exclude: CHANGELOG\.rst$
@@ -134,10 +145,9 @@ repos:
       - id: rst-inline-touching-normal
 
   # Spellcheck in comments and docs
-  # skipping of *.svg files is not working...
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.0.0
+    rev: v2.1.0
     hooks:
       - id: codespell
         args: ['--write-changes']
-        exclude: \.(svg|pyc)$
+        exclude: (\.(svg|pyc|drawio))$|(CHANGELOG\.rst)
