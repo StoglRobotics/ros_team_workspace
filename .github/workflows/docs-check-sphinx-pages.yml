@@ -25,11 +25,11 @@ jobs:
         cd docs/
         python -m pip install --upgrade pip
         pip install --upgrade --requirement requirements.txt
-    - name: Build multiversion with API
+    - name: Build multiversion
       run: |
         cd docs/
         make multiversion
-    - name: Check html pages
-      uses: Cyb3r-Jak3/html5validator-action
-      with:
-        root: docs/_build/html
+    - name: Check HTML
+        uses: chabad360/htmlproofer@master
+        with:
+          directory: "./docs/_build/html/"
