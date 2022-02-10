@@ -1,13 +1,15 @@
-name: Build and deploy pages
+name: Check Build
 
 on:
+  workflow_dispatch:
+  pull_request:
   push:
     branches:
       - master
       - foxy
-  
 
-  deploy-multiversion:
+jobs:
+  build-multiversion:
     name: Deploy Multiversion
     runs-on: ubuntu-latest
     steps:
@@ -27,9 +29,7 @@ on:
       run: |
         cd docs/
         make multiversion
-    - name: Deploy Pages
-      if: ${{ success() }}
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Check html pages
+      uses: Cyb3r-Jak3/html5validator-action
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/_build/html
+        root: docs/_build/html
