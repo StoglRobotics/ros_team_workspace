@@ -121,4 +121,4 @@ git commit -m "RosTeamWS: Description files for $ROBOT_NAME generated."
 compile_and_source_package $PKG_NAME
 
 echo ""
-echo "FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME test_${ROBOT_NAME}_description.launch.py'"
+echo "FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch.py'"
