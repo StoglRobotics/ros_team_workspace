@@ -1,4 +1,4 @@
-name: Check Build
+name: Build and Check Sphinx Page
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Build and Deploy Pages
+name: Build Check and Deploy Pages
 
 on:
   workflow_dispatch:
@@ -28,10 +28,6 @@ jobs:
       run: |
         cd docs/
         make multiversion
-    - name: Check HTML
-      uses: chabad360/htmlproofer@master
-      with:
-        directory: "./docs/_build/html/"
     - name: Deploy Pages
       if: ${{ success() }}
       uses: peaceiris/actions-gh-pages@v3
