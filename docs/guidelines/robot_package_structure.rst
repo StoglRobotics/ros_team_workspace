@@ -23,7 +23,7 @@ Here proposed architecture try to split the robot's files to minimize per-packag
   │   ├── [setup.py]                                     # if amend_python is used
   │   ├── [setup.cfg]                                    # if amend_python is used
   │   ├── config/
-  │   │   ├── <robot_name>_controllers.yaml              # Controllers' configuraiton for ros2_control
+  │   │   ├── <robot_name>_controllers.yaml              # Controllers' configuration for ros2_control
   │   │   ├── <robot_name>_forward_position_publisher.yaml  # Setup test publisher for forward position controller
   │   │   └── <robot_name>_joint_trajectory_publisher.yaml  # Setup test publisher for joint trajectory controller
   │   └── launch/

@@ -14,7 +14,7 @@ Script for Setting up Description Package
 If the package name is not set, it is guessed from the current path using the folder's name.
 The script **has to be executed** from the package folder where the description should be generated.
 
-**Note**: it is recomended to setup your package using :ref:`create-new-package <uc-new-package>` script.
+**Note**: it is recommended to setup your package using :ref:`create-new-package <uc-new-package>` script.
 
 The scripts copies template files from the ``templates/robot_description`` folder, rename the files, and replaces the placeholders.
 

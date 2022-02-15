@@ -106,7 +106,7 @@ if [[ -f "$PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md" ]]; then
   case "$choice" in
   "y")
     cat $PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md >> README.md
-    echo "Descrption is appended."
+    echo "Description is appended."
     ;;
   "n")
     echo "Description not appended."

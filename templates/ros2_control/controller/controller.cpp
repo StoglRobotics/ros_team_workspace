@@ -1,33 +1,29 @@
 $LICENSE$
 
+#include "$package_name$/$file_name$.hpp"
+
 #include <limits>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "$package_name$/$file_name$.hpp"
 #include "controller_interface/helpers.hpp"
 
 namespace $package_name$
 {
 $ClassName$::$ClassName$() : controller_interface::ControllerInterface() {}
 
-controller_interface::return_type $ClassName$::init(const std::string & controller_name)
+CallbackReturn $ClassName$::on_init()
 {
-  auto ret = ControllerInterface::init(controller_name);
-  if (ret != controller_interface::return_type::OK) {
-    return ret;
-  }
-
   try {
-    get_node()->declare_parameter<std::vector<std::string>>("joints", {});
+    get_node()->declare_parameter<std::vector<std::string>>("joints", std::vector<std::string>({}));
     get_node()->declare_parameter<std::string>("interface_name", "");
   } catch (const std::exception & e) {
     fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
-    return controller_interface::return_type::ERROR;
+    return CallbackReturn::ERROR;
   }
 
-  return controller_interface::return_type::OK;
+  return CallbackReturn::SUCCESS;
 }
 
 CallbackReturn $ClassName$::on_configure(const rclcpp_lifecycle::State & /*previous_state*/)
@@ -150,7 +146,8 @@ CallbackReturn $ClassName$::on_deactivate(const rclcpp_lifecycle::State & /*prev
   return CallbackReturn::SUCCESS;
 }
 
-controller_interface::return_type $ClassName$::update()
+controller_interface::return_type $ClassName$::update(
+  const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
   auto current_command = input_command_.readFromRT();
 
@@ -161,7 +158,7 @@ controller_interface::return_type $ClassName$::update()
   }
 
   if (state_publisher_ && state_publisher_->trylock()) {
-    state_publisher_->msg_.header.stamp = get_node()->now();
+    state_publisher_->msg_.header.stamp = time;
     state_publisher_->msg_.set_point = command_interfaces_[0].get_value();
 
     state_publisher_->unlockAndPublish();

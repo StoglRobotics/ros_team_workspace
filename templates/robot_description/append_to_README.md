@@ -39,7 +39,7 @@ The general package structure is the following:
 
 1. Go to the root of your workspace folder (there where `src`, `build`, `install` and `log` files are).
 2. Install the package by calling `colcon build --symlink-install --packages-select $PKG_NAME$`
-3. (Re-)Source environemnt `source install/setup.bash`
+3. (Re-)Source environment `source install/setup.bash`
 4. Launch description test:
    ```
    ros2 launch $PKG_NAME$ test_$ROBOT_NAME$_description.launch.py
