@@ -1,0 +1,31 @@
+name: Build and Check Sphinx Page
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+      - foxy
+
+jobs:
+  build-multiversion:
+    name: Check Multiversion
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        cache: 'pip'
+    - name: Install Python dependencies
+      run: |
+        cd docs/
+        python -m pip install --upgrade pip
+        pip install --upgrade --requirement requirements.txt
+    - name: Build multiversion
+      run: |
+        cd docs/
+        make multiversion
