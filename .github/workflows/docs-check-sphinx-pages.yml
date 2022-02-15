@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-multiversion:
-    name: Deploy Multiversion
+    name: Check Multiversion
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -29,7 +29,3 @@ jobs:
       run: |
         cd docs/
         make multiversion
-    - name: Check HTML
-      uses: chabad360/htmlproofer@master
-      with:
-        directory: "./docs/_build/html/"
