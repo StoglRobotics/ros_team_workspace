@@ -20,7 +20,7 @@ jobs:
         arguments: [""]
         include:
           - linter: copyright
-            arguments: "--exclude=templates/"
+            arguments: "--exclude=templates/*,docs/conf.py,CONTRIBUTING.md"
     steps:
     - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@master
