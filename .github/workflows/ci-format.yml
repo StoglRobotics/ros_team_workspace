@@ -2,13 +2,12 @@
 # that: https://github.com/pre-commit/action
 
 name: Format
-
 on:
   workflow_dispatch:
   pull_request:
-  branches:
-    # only while updating the files, remove if finished
-    - update_ci
+  push:
+    branches:
+      - update_ci
 
 jobs:
   pre-commit:
