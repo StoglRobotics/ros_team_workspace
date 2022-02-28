@@ -127,6 +127,7 @@ repos:
         stages: [commit]
         entry: ament_copyright
         language: system
+        exclude: ^(templates/)
 
   # Docs - RestructuredText hooks
   - repo: https://github.com/PyCQA/doc8
