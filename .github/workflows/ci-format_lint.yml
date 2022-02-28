@@ -16,11 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@master
-    - uses: ros-tooling/action-ros-lint@master
-      with:
-        distribution: rolling
-        package-name:
-          ros_team_workspace
     - uses: actions/setup-python@v2
       with:
         python-version: '3.8'
