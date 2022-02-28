@@ -16,11 +16,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        linter: [cppcheck, cpplint, lint_cmake]
+        linter: [cppcheck, lint_cmake]
         arguments: [""]
         include:
           - linter: copyright
-            arguments: "--exclude=templates/*,docs/conf.py,CONTRIBUTING.md"
+            arguments: "--exclude=templates/ docs/conf.py CONTRIBUTING.md"
+          - linter: cpplint
+            arguments: "--exclude=templates/"
     steps:
     - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@master
