@@ -6,9 +6,9 @@ name: Format
 on:
   workflow_dispatch:
   pull_request:
-  push:
-    branches:
-      - rolling
+  branches:
+    # only while updating the files, remove if finished
+    - update_ci
 
 jobs:
   pre-commit:

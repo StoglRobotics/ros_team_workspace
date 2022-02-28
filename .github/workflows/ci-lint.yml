@@ -1,6 +1,9 @@
 name: Lint
 on:
+  workflow_dispatch:
   pull_request:
+  branches:
+    - update_ci
 
 jobs:
   ament_lint:
