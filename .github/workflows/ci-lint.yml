@@ -16,14 +16,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        linter: copyright
-        arguments: "--exclude=templates/"
-        linter: cppcheck
+        linter: [cppcheck, cpplint, lint_cmake]
         arguments: ""
-        linter: cpplint
-        arguments: ""
-        linter: lint_cmake
-        arguments: ""
+        include:
+          - linter: copyright
+            arguments: "--exclude=templates/"
     steps:
     - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@master
