@@ -11,18 +11,14 @@ on:
 
 jobs:
   pre-commit:
-    name: Format
+    name: Run pre-commit
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        linter: [cppcheck, cpplint, lint_cmake]
     steps:
     - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@master
     - uses: ros-tooling/action-ros-lint@master
       with:
         distribution: rolling
-        linter: ${{ matrix.linter }}
         package-name:
           ros_team_workspace
     - uses: actions/setup-python@v2
