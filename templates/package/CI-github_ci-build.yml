@@ -9,7 +9,7 @@ on:
     - cron: '28 6 * * *'
 
 jobs:
-  binary:
+  binary-build:
     name: binary build
     runs-on: ubuntu-latest
     strategy:
@@ -28,7 +28,7 @@ jobs:
 ## Build with cache
 # ! NOT_TESTED... !
 # TODO: Test
-  binary:
+  binary-build-foxy:
     name: binary build
     runs-on: ubuntu-latest
     strategy:
