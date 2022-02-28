@@ -13,15 +13,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Old setup
-        # linter: [copyright, cppcheck, cpplint, flake8, pep257, uncrustify, xmllint]
         linter: [copyright]
     steps:
-    - uses: actions/checkout@v1
-    - uses: ros-tooling/setup-ros@v0.1
-    - uses: ros-tooling/action-ros-lint@v0.1
+    - uses: actions/checkout@v2
+    - uses: ros-tooling/setup-ros@master
+    - uses: ros-tooling/action-ros-lint@master
       with:
-        distribution: foxy
+        distribution: rolling
         linter: ${{ matrix.linter }}
         package-name:
           ros_team_workspace

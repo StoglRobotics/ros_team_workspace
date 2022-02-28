@@ -9,7 +9,7 @@ This use-case describes how to create a new package using scripts from the ROS T
 General Script for Creating Packages
 =====================================
 
-`create-new-package` script is used, accepting the package name and description as parameters.
+``create-new-package`` script is used, accepting the package name and description as parameters.
 The script **has to be executed** from the *source* folder of your workspace.
 
 .. code-block:: bash
@@ -37,5 +37,5 @@ The script supports the following options and opportunities for data entry:
 
 
 After a package is created, you can choose to configure or update the repository.
-When a new package or metapackage is created, the `setup-repository.bash` script is called.
+When a new package or metapackage is created, the ``setup-repository.bash`` script is called.
 Check :ref:`here <uc-configure-repo>` for its documentation.

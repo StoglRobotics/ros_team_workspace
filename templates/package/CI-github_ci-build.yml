@@ -26,7 +26,8 @@ jobs:
 
 
 ## Build with cache
-NOT_TESTED...
+# ! NOT_TESTED... !
+# TODO: Test
   binary:
     name: binary build
     runs-on: ubuntu-latest

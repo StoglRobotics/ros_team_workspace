@@ -13,9 +13,22 @@ jobs:
   pre-commit:
     name: Format
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        linter: [copyright, cppcheck, cpplint, lint_cmake]
     steps:
     - uses: actions/checkout@v2
+    - uses: ros-tooling/setup-ros@master
+    - uses: ros-tooling/action-ros-lint@master
+      with:
+        distribution: rolling
+        linter: ${{ matrix.linter }}
+        package-name:
+          ros_team_workspace
     - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        cache: 'pip'
     - name: Install clang-format-10
       run: sudo apt-get install clang-format-10
     - uses: pre-commit/action@v2.0.0
