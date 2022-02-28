@@ -13,6 +13,11 @@ jobs:
   pre-commit:
     name: Run pre-commit
     runs-on: ubuntu-latest
+    container:
+      image: rostooling/setup-ros-docker:ubuntu-focal-ros-galactic-ros-base-latest
+      options: -u root
+    strategy:
+      fail-fast: false
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
