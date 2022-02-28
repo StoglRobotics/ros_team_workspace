@@ -10,10 +10,20 @@ jobs:
   ament_lint:
     name: ament_${{ matrix.linter }}
     runs-on: ubuntu-latest
+    container:
+      image: rostooling/setup-ros-docker:ubuntu-focal-ros-galactic-ros-base-latest
+      options: -u root
     strategy:
       fail-fast: false
       matrix:
-        linter: [copyright, cppcheck, copyright, lint_cmake]
+        linter: copyright
+        arguments: "--exclude=templates/"
+        linter: cppcheck
+        arguments: ""
+        linter: cpplint
+        arguments: ""
+        linter: lint_cmake
+        arguments: ""
     steps:
     - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@master
@@ -21,5 +31,6 @@ jobs:
       with:
         distribution: rolling
         linter: ${{ matrix.linter }}
+        arguments: ${{ matrix.arguments }}
         package-name:
           ros_team_workspace
