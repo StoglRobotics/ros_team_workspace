@@ -23,13 +23,6 @@ jobs:
         cache: 'pip'
     - name: Install clang-format-10
       run: sudo apt-get install clang-format-10
-    - uses: ros-tooling/setup-ros@master
-    - uses: ros-tooling/action-ros-lint@master
-      with:
-        distribution: galactic
-        linter: [cppcheck]
-        package-name:
-          ros_team_workspace
-    - name: source ros
-      run: /usr/bin/bash -c source /opt/ros/galactic/setup.sh
     - uses: pre-commit/action@v2.0.3
+      with:
+        extra_args: --all-files --hook-stage manual
