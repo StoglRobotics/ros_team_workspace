@@ -28,7 +28,7 @@ jobs:
     - uses: ros-tooling/setup-ros@master
     - uses: ros-tooling/action-ros-lint@master
       with:
-        distribution: rolling
+        distribution: galactic
         linter: ${{ matrix.linter }}
         arguments: ${{ matrix.arguments }}
         package-name:
