@@ -27,6 +27,8 @@ jobs:
     - uses: ros-tooling/action-ros-lint@master
       with:
         distribution: galactic
+        package-name:
+          ros_team_workspace
     - name: source ros
       run: /usr/bin/bash -c source /opt/ros/galactic/setup.sh
     - uses: pre-commit/action@v2.0.3
