@@ -27,7 +27,7 @@ jobs:
     - uses: ros-tooling/action-ros-lint@master
       with:
         distribution: galactic
-        linter: [cppcheck]
+        linter: cppcheck
         package-name:
           ros_team_workspace
     - name: source ros
