@@ -1,7 +1,6 @@
 $LICENSE$
 
 #include <gmock/gmock.h>
-
 #include <memory>
 
 #include "controller_manager/controller_manager.hpp"

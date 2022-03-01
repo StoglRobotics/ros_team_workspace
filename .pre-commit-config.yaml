@@ -72,7 +72,7 @@ repos:
     rev: 4.0.1
     hooks:
     - id: flake8
-      args: ["--ignore=E501"]
+      args: ["--ignore=E501, W503"]
 
   # CPP hooks
   - repo: local
@@ -127,6 +127,7 @@ repos:
         stages: [commit]
         entry: ament_copyright
         language: system
+        exclude: ^(templates/)
 
   # Docs - RestructuredText hooks
   - repo: https://github.com/PyCQA/doc8

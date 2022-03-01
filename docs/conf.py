@@ -13,7 +13,6 @@ import itertools
 import os
 import sys
 import time
-import sphinx_rtd_theme
 
 from docutils.parsers.rst import Directive
 
@@ -244,6 +243,7 @@ macros = {
     "REPOS_FILE_BRANCH": repos_file_branch,
 }
 
+
 # Add any paths that contain custom themes here, relative to this directory.
 class RedirectFrom(Directive):
 
@@ -328,7 +328,6 @@ class RedirectFrom(Directive):
 def make_router(origin, destination):
     def _missing_reference(app, env, node, contnode):
         from docutils import nodes
-        from docutils.utils import relative_path
         from sphinx.util import docname_join
 
         doctarget = docname_join(node["refdoc"], node["reftarget"])

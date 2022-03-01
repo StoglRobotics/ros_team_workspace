@@ -1,23 +1,29 @@
 name: Lint
 on:
+  workflow_dispatch:
   pull_request:
 
 jobs:
   ament_lint:
     name: ament_${{ matrix.linter }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        # Old setup
-        # linter: [copyright, cppcheck, cpplint, flake8, pep257, uncrustify, xmllint]
-        linter: [copyright]
+        linter: [cppcheck, lint_cmake]
+        arguments: [""]
+        include:
+          - linter: copyright
+            arguments: "--exclude CONTRIBUTING.md conf.py test_robot_description.launch.py view_robot.launch.py controller.cpp controller.hpp test_controller.cpp test_controller.hpp test_load_controller.cpp robot_hardware_interface.cpp robot_hardware_interface.hpp test_robot_hardware_interface.cpp visibility_control.h robot_ros2_control.launch.py test_forward_position_controller.launch.py test_joint_trajectory_controller.launch.py"
+          - linter: cpplint
+            arguments: "--exclude ./templates/ros2_control/controller/controller.cpp ./templates/ros2_control/controller/controller.hpp ./templates/ros2_control/controller/test_controller.cpp ./templates/ros2_control/controller/test_controller.hpp ./templates/ros2_control/controller/test_load_controller.cpp ./templates/ros2_control/controller/test_load_controller.hpp ./templates/ros2_control/hardware/robot_hardware_interface.cpp ./templates/ros2_control/hardware/robot_hardware_interface.hpp ./templates/ros2_control/hardware/visibility_control.cpp ./templates/ros2_control/hardware/test_robot_hardware_interface.cpp ./templates/ros2_control/hardware/visibility_control.h"
     steps:
-    - uses: actions/checkout@v1
-    - uses: ros-tooling/setup-ros@v0.1
-    - uses: ros-tooling/action-ros-lint@v0.1
+    - uses: actions/checkout@v2
+    - uses: ros-tooling/setup-ros@master
+    - uses: ros-tooling/action-ros-lint@master
       with:
-        distribution: foxy
+        distribution: galactic
         linter: ${{ matrix.linter }}
+        arguments: ${{ matrix.arguments }}
         package-name:
           ros_team_workspace
