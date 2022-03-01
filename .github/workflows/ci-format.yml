@@ -5,9 +5,6 @@ name: Format
 on:
   workflow_dispatch:
   pull_request:
-  push:
-    branches:
-      - update_ci
 
 jobs:
   pre-commit:
@@ -22,7 +19,7 @@ jobs:
         python-version: '3.9.7'
         cache: 'pip'
     - name: Install clang-format-10
-      run: sudo apt-get install clang-format-10
+      run: sudo apt-get install clang-format-11
     - uses: pre-commit/action@v2.0.3
       with:
         extra_args: --all-files --hook-stage manual
