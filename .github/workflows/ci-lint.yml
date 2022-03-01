@@ -20,9 +20,9 @@ jobs:
         arguments: [""]
         include:
           - linter: copyright
-            arguments: "--exclude conf.py"
+            arguments: "--exclude conf.py test_robot_description.launch.py view_robot.launch.py controller.cpp controller.hpp test_controller.cpp test_controller.hpp test_load_controller.cpp robot_hardware_interface.cpp robot_hardware_interface.hpp test_robot_hardware_interface.cpp visibility_control.h robot_ros2_control.launch.py test_forward_position_controller.launch.py test_joint_trajectory_controller.launch.py"
           - linter: cpplint
-            arguments: ""
+            arguments: "--exclude controller.cpp controller.hpp test_controller.cpp test_controller.hpp test_load_controller.cpp test_load_controller.hpp robot_hardware_interface.cpp robot_hardware_interface.hpp visibility_control.cpp visibility_control.h"
     steps:
     - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@master
