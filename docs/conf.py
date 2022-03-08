@@ -363,7 +363,7 @@ def smv_rewrite_configs(app, config):
             "REPOS_FILE_BRANCH": branch,
         }
         app.config.html_baseurl = app.config.html_baseurl + "/" + distro + "/"
-        app.config.project = "MoveIt Documentation: " + distro.title()
+        app.config.project = "ROS Team Workspace Documentation: " + distro.title()
         app.config.html_logo = "_static/images/" + distro + "-small.png"
     else:
         # If we are not building a multiversion build, default to the rolling logo
