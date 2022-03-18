@@ -50,9 +50,11 @@ fi
 # File-suffix definitions
 CI_ROS_LINT="ci-ros-lint"
 CI_COVERAGE="ci-coverage-build"
+CI_REUSABLE_INDUSTRIAL_CI="reusable-industrial-ci-with-cache"
+CI_REUSABLE_ROS_TOOLING="reusable-ros-tooling-source-build"
+PRE_RELEASE="prerelease-check"
 
 CI_ABI_COMPATIBILITY="abi-compatibility"
-
 CI_BINARY_BUILD="binary-build"
 CI_SEMI_BINARY_BUILD="semi-binary-build"
 CI_SOURCE_BUILD="source-build"
@@ -64,6 +66,9 @@ CI_GENERAL_FILES=(
   $CI_FORMAT
   $CI_ROS_LINT
   $CI_COVERAGE
+  $CI_REUSABLE_INDUSTRIAL_CI
+  $CI_REUSABLE_ROS_TOOLING
+  $PRE_RELEASE
 )
 
 CI_DISTRIBUTION_FILES=(
