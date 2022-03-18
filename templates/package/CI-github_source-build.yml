@@ -1,8 +1,5 @@
 name: $Ros_distro$ Source Build
 on:
-  pull_request:
-    branches:
-      - $branch$
   push:
     branches:
       - $branch$
