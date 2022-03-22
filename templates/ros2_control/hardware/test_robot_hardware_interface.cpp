@@ -8,17 +8,17 @@ $LICENSE$
 #include "ros2_control_test_assets/components_urdfs.hpp"
 #include "ros2_control_test_assets/descriptions.hpp"
 
-class Test$ClassName$ : public ::testing::Test
+class TestDummyClassName : public ::testing::Test
 {
 protected:
   void SetUp() override
   {
     // TODO(anyone): Extend this description to your robot
-    $file_name$_2dof_ =
+    dummy_file_name_2dof_ =
       R"(
-        <ros2_control name="$ClassName$2dof" type="$interface_type$">
+        <ros2_control name="DummyClassName2dof" type="dummy_interface_type">
           <hardware>
-            <plugin>$package_name$/$ClassName$</plugin>
+            <plugin>dummy_package_namespace/DummyClassName</plugin>
           </hardware>
           <joint name="joint1">
             <command_interface name="position"/>
@@ -34,12 +34,12 @@ protected:
     )";
   }
 
-  std::string $file_name$_2dof_;
+  std::string dummy_file_name_2dof_;
 };
 
-TEST_F(Test$ClassName$, load_$file_name$_2dof)
+TEST_F(TestDummyClassName, load_dummy_file_name_2dof)
 {
   auto urdf =
-    ros2_control_test_assets::urdf_head + $file_name$_2dof_ + ros2_control_test_assets::urdf_tail;
+    ros2_control_test_assets::urdf_head + dummy_file_name_2dof_ + ros2_control_test_assets::urdf_tail;
   ASSERT_NO_THROW(hardware_interface::ResourceManager rm(urdf));
 }

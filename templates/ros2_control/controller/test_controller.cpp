@@ -1,6 +1,6 @@
 $LICENSE$
 
-#include "test_$file_name$.hpp"
+#include "test_dummy_file_name.hpp"
 
 #include <memory>
 #include <string>
@@ -9,7 +9,7 @@ $LICENSE$
 
 // When there are many mandatory parameters, set all by default and remove one by one in a
 // parameterized test
-TEST_P($ClassName$TestParameterizedParameters, one_parameter_is_missing)
+TEST_P(DummyClassNameTestParameterizedParameters, one_parameter_is_missing)
 {
   SetUpController();
 
@@ -18,12 +18,12 @@ TEST_P($ClassName$TestParameterizedParameters, one_parameter_is_missing)
 
 // TODO(anyone): the new gtest version after 1.8.0 uses INSTANTIATE_TEST_SUITE_P
 INSTANTIATE_TEST_SUITE_P(
-  MissingMandatoryParameterDuringConfiguration, $ClassName$TestParameterizedParameters,
+  MissingMandatoryParameterDuringConfiguration, DummyClassNameTestParameterizedParameters,
   ::testing::Values(
     std::make_tuple(std::string("joints"), rclcpp::ParameterValue(std::vector<std::string>({}))),
     std::make_tuple(std::string("interface_name"), rclcpp::ParameterValue(""))));
 
-TEST_F($ClassName$Test, joint_names_parameter_not_set)
+TEST_F(DummyClassNameTest, joint_names_parameter_not_set)
 {
   SetUpController(false);
 
@@ -38,7 +38,7 @@ TEST_F($ClassName$Test, joint_names_parameter_not_set)
   ASSERT_TRUE(controller_->interface_name_.empty());
 }
 
-TEST_F($ClassName$Test, interface_parameter_not_set)
+TEST_F(DummyClassNameTest, interface_parameter_not_set)
 {
   SetUpController(false);
 
@@ -50,7 +50,7 @@ TEST_F($ClassName$Test, interface_parameter_not_set)
   ASSERT_TRUE(controller_->interface_name_.empty());
 }
 
-TEST_F($ClassName$Test, all_parameters_set_configure_success)
+TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
 {
   SetUpController();
 
@@ -69,7 +69,7 @@ TEST_F($ClassName$Test, all_parameters_set_configure_success)
   ASSERT_TRUE(controller_->interface_name_ == interface_name_);
 }
 
-TEST_F($ClassName$Test, check_intefaces)
+TEST_F(DummyClassNameTest, check_intefaces)
 {
   SetUpController();
 
@@ -82,7 +82,7 @@ TEST_F($ClassName$Test, check_intefaces)
   ASSERT_EQ(state_intefaces.names.size(), joint_state_values_.size());
 }
 
-TEST_F($ClassName$Test, activate_success)
+TEST_F(DummyClassNameTest, activate_success)
 {
   SetUpController();
 
@@ -90,7 +90,7 @@ TEST_F($ClassName$Test, activate_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 }
 
-TEST_F($ClassName$Test, update_success)
+TEST_F(DummyClassNameTest, update_success)
 {
   SetUpController();
 
@@ -102,7 +102,7 @@ TEST_F($ClassName$Test, update_success)
   ASSERT_EQ(controller_->update(node_time, duration), controller_interface::return_type::OK);
 }
 
-TEST_F($ClassName$Test, deactivate_success)
+TEST_F(DummyClassNameTest, deactivate_success)
 {
   SetUpController();
 
@@ -111,7 +111,7 @@ TEST_F($ClassName$Test, deactivate_success)
   ASSERT_EQ(controller_->on_deactivate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 }
 
-TEST_F($ClassName$Test, reactivate_success)
+TEST_F(DummyClassNameTest, reactivate_success)
 {
   SetUpController();
 
@@ -125,7 +125,7 @@ TEST_F($ClassName$Test, reactivate_success)
   ASSERT_EQ(controller_->update(node_time, duration), controller_interface::return_type::OK);
 }
 
-TEST_F($ClassName$Test, publish_status_success)
+TEST_F(DummyClassNameTest, publish_status_success)
 {
   SetUpController();
 
@@ -142,7 +142,7 @@ TEST_F($ClassName$Test, publish_status_success)
   ASSERT_EQ(msg.set_point, 101.101);
 }
 
-TEST_F($ClassName$Test, receive_message_and_publish_updated_status)
+TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;

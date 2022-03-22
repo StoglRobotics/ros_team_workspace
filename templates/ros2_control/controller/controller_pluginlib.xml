@@ -1,8 +1,8 @@
-<library path="$package_name$">
-  <class name="$package_name$/$ClassName$"
-         type="$package_name$::$ClassName$" base_class_type="controller_interface::ControllerInterface">
+<library path="dummy_package_namespace">
+  <class name="dummy_package_namespace/DummyClassName"
+         type="dummy_package_namespace::DummyClassName" base_class_type="controller_interface::ControllerInterface">
   <description>
-    $ClassName$ ros2_control controller.
+    DummyClassName ros2_control controller.
   </description>
   </class>
 </library>

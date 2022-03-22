@@ -1,13 +1,13 @@
 $LICENSE$
 
-#ifndef $PACKAGE_NAME$__$FILE_NAME$_HPP_
-#define $PACKAGE_NAME$__$FILE_NAME$_HPP_
+#ifndef DUMMY_PACKAGE_NAME__DUMMY_FILE_NAME_HPP_
+#define DUMMY_PACKAGE_NAME__DUMMY_FILE_NAME_HPP_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "$package_name$/visibility_control.h"
+#include "dummy_package_namespace/visibility_control.h"
 #include "controller_interface/controller_interface.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
@@ -18,35 +18,35 @@ $LICENSE$
 #include "control_msgs/msg/joint_controller_state.hpp"
 #include "control_msgs/msg/joint_jog.hpp"
 
-namespace $package_name$
+namespace dummy_package_namespace
 {
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
-class $ClassName$ : public controller_interface::ControllerInterface
+class DummyClassName : public controller_interface::ControllerInterface
 {
 public:
-  $PACKAGE_NAME$_PUBLIC
-  $ClassName$();
+  DUMMY_PACKAGE_NAME_PUBLIC
+  DummyClassName();
 
-  $PACKAGE_NAME$_PUBLIC
+  DUMMY_PACKAGE_NAME_PUBLIC
   CallbackReturn on_init() override;
 
-  $PACKAGE_NAME$_PUBLIC
+  DUMMY_PACKAGE_NAME_PUBLIC
   controller_interface::InterfaceConfiguration command_interface_configuration() const override;
 
-  $PACKAGE_NAME$_PUBLIC
+  DUMMY_PACKAGE_NAME_PUBLIC
   controller_interface::InterfaceConfiguration state_interface_configuration() const override;
 
-  $PACKAGE_NAME$_PUBLIC
+  DUMMY_PACKAGE_NAME_PUBLIC
   CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
 
-  $PACKAGE_NAME$_PUBLIC
+  DUMMY_PACKAGE_NAME_PUBLIC
   CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state) override;
 
-  $PACKAGE_NAME$_PUBLIC
+  DUMMY_PACKAGE_NAME_PUBLIC
   CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
 
-  $PACKAGE_NAME$_PUBLIC
+  DUMMY_PACKAGE_NAME_PUBLIC
   controller_interface::return_type update(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
@@ -68,6 +68,6 @@ protected:
   std::unique_ptr<ControllerStatePublisher> state_publisher_;
 };
 
-}  // namespace $package_name$
+}  // namespace dummy_package_namespace
 
-#endif  // $PACKAGE_NAME$__$FILE_NAME$_HPP_
+#endif  // DUMMY_PACKAGE_NAME__DUMMY_FILE_NAME_HPP_

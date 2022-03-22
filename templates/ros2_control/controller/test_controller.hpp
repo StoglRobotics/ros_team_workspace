@@ -1,7 +1,7 @@
 $LICENSE$
 
-#ifndef TEST_$PACKAGE_NAME$_HPP_
-#define TEST_$PACKAGE_NAME$_HPP_
+#ifndef TEST_DUMMY_PACKAGE_NAME_HPP_
+#define TEST_DUMMY_PACKAGE_NAME_HPP_
 
 #include <chrono>
 #include <memory>
@@ -10,7 +10,7 @@ $LICENSE$
 #include <utility>
 #include <vector>
 
-#include "$package_name$/$file_name$.hpp"
+#include "dummy_package_namespace/dummy_file_name.hpp"
 #include "gmock/gmock.h"
 #include "hardware_interface/loaned_command_interface.hpp"
 #include "hardware_interface/loaned_state_interface.hpp"
@@ -46,16 +46,16 @@ rclcpp::WaitResultKind wait_for(rclcpp::SubscriptionBase::SharedPtr subscription
 }  // namespace
 
 // subclassing and friending so we can access member variables
-class Testable$ClassName$ : public $package_name$::$ClassName$
+class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
-  FRIEND_TEST($ClassName$Test, joint_names_parameter_not_set);
-  FRIEND_TEST($ClassName$Test, interface_parameter_not_set);
-  FRIEND_TEST($ClassName$Test, all_parameters_set_configure_success);
+  FRIEND_TEST(DummyClassNameTest, joint_names_parameter_not_set);
+  FRIEND_TEST(DummyClassNameTest, interface_parameter_not_set);
+  FRIEND_TEST(DummyClassNameTest, all_parameters_set_configure_success);
 
 public:
   CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override
   {
-    auto ret = $package_name$::$ClassName$::on_configure(previous_state);
+    auto ret = dummy_package_namespace::DummyClassName::on_configure(previous_state);
     // Only if on_configure is successful create subscription
     if (ret == CallbackReturn::SUCCESS) {
       command_subscriber_wait_set_.add_subscription(command_subscriber_);
@@ -86,7 +86,7 @@ private:
   rclcpp::WaitSet command_subscriber_wait_set_;
 };
 
-class $ClassName$Test : public ::testing::Test
+class DummyClassNameTest : public ::testing::Test
 {
 public:
   static void SetUpTestCase() { rclcpp::init(0, nullptr); }
@@ -94,11 +94,11 @@ public:
   void SetUp()
   {
     // initialize controller
-    controller_ = std::make_unique<Testable$ClassName$>();
+    controller_ = std::make_unique<TestableDummyClassName>();
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
     command_publisher_ = command_publisher_node_->create_publisher<ControllerCommandMsg>(
-      "/test_$package_name$/commands", rclcpp::SystemDefaultsQoS());
+      "/test_dummy_package_namespace/commands", rclcpp::SystemDefaultsQoS());
   }
 
   static void TearDownTestCase() { rclcpp::shutdown(); }
@@ -108,7 +108,7 @@ public:
 protected:
   void SetUpController(bool set_parameters = true)
   {
-    const auto result = controller_->init("test_$package_name$");
+    const auto result = controller_->init("test_dummy_package_namespace");
     ASSERT_EQ(result, controller_interface::return_type::OK);
 
     std::vector<hardware_interface::LoanedCommandInterface> command_ifs;
@@ -147,7 +147,7 @@ protected:
     rclcpp::Node test_subscription_node("test_subscription_node");
     auto subs_callback = [&](const ControllerStateMsg::SharedPtr) {};
     auto subscription = test_subscription_node.create_subscription<ControllerStateMsg>(
-      "/test_$package_name$/state", 10, subs_callback);
+      "/test_dummy_package_namespace/state", 10, subs_callback);
 
     // call update to publish the test value
     rclcpp::Time node_time = controller_->get_node()->now();
@@ -201,27 +201,27 @@ protected:
   std::vector<hardware_interface::CommandInterface> command_itfs_;
 
   // Test related parameters
-  std::unique_ptr<Testable$ClassName$> controller_;
+  std::unique_ptr<TestableDummyClassName> controller_;
   rclcpp::Node::SharedPtr command_publisher_node_;
   rclcpp::Publisher<ControllerCommandMsg>::SharedPtr command_publisher_;
 };
 
 // From the tutorial: https://www.sandordargo.com/blog/2019/04/24/parameterized-testing-with-gtest
-class $ClassName$TestParameterizedParameters
-: public $ClassName$Test,
+class DummyClassNameTestParameterizedParameters
+: public DummyClassNameTest,
   public ::testing::WithParamInterface<std::tuple<std::string, rclcpp::ParameterValue>>
 {
 public:
-  virtual void SetUp() { $ClassName$Test::SetUp(); }
+  virtual void SetUp() { DummyClassNameTest::SetUp(); }
 
-  static void TearDownTestCase() { $ClassName$Test::TearDownTestCase(); }
+  static void TearDownTestCase() { DummyClassNameTest::TearDownTestCase(); }
 
 protected:
   void SetUpController(bool set_parameters = true)
   {
-    $ClassName$Test::SetUpController(set_parameters);
+    DummyClassNameTest::SetUpController(set_parameters);
     controller_->get_node()->set_parameter({std::get<0>(GetParam()), std::get<1>(GetParam())});
   }
 };
 
-#endif  // TEST_$PACKAGE_NAME$_HPP_
+#endif  // TEST_DUMMY_PACKAGE_NAME_HPP_
