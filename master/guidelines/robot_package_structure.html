@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>ROS-Robot Package structure &mdash; ROS Team Workspace Documentation: Galactic Mar 2022 documentation</title>
@@ -178,11 +179,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ros-robot-package-structure">
+  <section id="ros-robot-package-structure">
 <h1>ROS-Robot Package structure<a class="headerlink" href="#ros-robot-package-structure" title="Permalink to this headline"></a></h1>
 <p>This documents proposes guidelines for structure of ROS packages in larger detail than provided by <a class="reference external" href="https://github.com/ros-infrastructure/rep">ROS Enhancement Proposals (REPs)</a></p>
 <p><strong>NOTE</strong>: All the proposal here are the resuls of authors’ personal experiences. Saying that, if you don’t like some of it, you are free to change what you want and need (and hopefully propose it as PR).</p>
-<div class="section" id="package-structure-for-robot-support-in-ros">
+<section id="package-structure-for-robot-support-in-ros">
 <h2>Package structure for Robot support in ROS<a class="headerlink" href="#package-structure-for-robot-support-in-ros" title="Permalink to this headline"></a></h2>
 <p>Here proposed architecture try to split the robot’s files to minimize per-package dependencies.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;manufacturer&gt;_&lt;robot_name&gt;[_&lt;type&gt;]/                     # Repository
@@ -246,8 +247,8 @@
         └── &lt;robot_specific_controller&gt;.cpp
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
