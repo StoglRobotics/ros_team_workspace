@@ -16,12 +16,11 @@ jobs:
       - uses: ros-tooling/setup-ros@v0.2
         with:
           required-ros-distributions: ${{ env.ROS_DISTRO }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ros-tooling/action-ros-ci@v0.2
         with:
           target-ros2-distro: ${{ env.ROS_DISTRO }}
           import-token: ${{ secrets.GITHUB_TOKEN }}
-          # build all packages listed in the meta package
           # build all packages listed in the meta package
           package-name:
             $PKG_NAME$

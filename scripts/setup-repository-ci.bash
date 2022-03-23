@@ -47,23 +47,36 @@ if  [[ "$choice" == "yes" ]]; then
   CI_FORMAT="ci-format-private"
 fi
 
+# File-suffix definitions
 CI_ROS_LINT="ci-ros-lint"
 CI_COVERAGE="ci-coverage-build"
+CI_REUSABLE_INDUSTRIAL_CI="reusable-industrial-ci-with-cache"
+CI_REUSABLE_ROS_TOOLING="reusable-ros-tooling-source-build"
+PRE_RELEASE="prerelease-check"
+
+CI_ABI_COMPATIBILITY="abi-compatibility"
 CI_BINARY_BUILD="binary-build"
 CI_SEMI_BINARY_BUILD="semi-binary-build"
 CI_SOURCE_BUILD="source-build"
+CI_RHEL_BINARY_BUILD="rhel-binary-build"
 
 
+# Lists for different generation stages
 CI_GENERAL_FILES=(
   $CI_FORMAT
   $CI_ROS_LINT
   $CI_COVERAGE
+  $CI_REUSABLE_INDUSTRIAL_CI
+  $CI_REUSABLE_ROS_TOOLING
+  $PRE_RELEASE
 )
 
 CI_DISTRIBUTION_FILES=(
+  $CI_ABI_COMPATIBILITY
   $CI_BINARY_BUILD
   $CI_SEMI_BINARY_BUILD
   $CI_SOURCE_BUILD
+  $CI_RHEL_BINARY_BUILD
 )
 
 read -p "${RAW_TERMINAL_COLOR_BROWN}Name of the default ROS distro?${RAW_TERMINAL_COLOR_NC} [default: rolling] " default_ros_distro

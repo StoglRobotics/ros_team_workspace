@@ -1,4 +1,6 @@
 name: $Ros_distro$ Semi-Binary Build
+# description: 'Build & test that compiles the main dependencies from source.'
+
 on:
   pull_request:
     branches:
@@ -8,49 +10,12 @@ on:
       - $branch$
   schedule:
     # Run every morning to detect flakiness and broken dependencies
-    - cron: '13 4 * * *'
+    - cron: '33 1 * * *'
 
 jobs:
-  $ROS_DISTRO$_semi_binary:
-    name: $ROS_DISTRO$ semi-binary build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        env:
-          - {ROS_DISTRO: $ROS_DISTRO$, ROS_REPO: main}
-          - {ROS_DISTRO: $ROS_DISTRO$, ROS_REPO: testing}
-    env:
-      UPSTREAM_WORKSPACE: $NAME$.${{ matrix.env.ROS_DISTRO }}.repos
-      CCACHE_DIR: ${{ github.workspace }}/.ccache
-      BASEDIR: ${{ github.workspace }}/.work
-      CACHE_PREFIX: ${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}
-    steps:
-      - uses: actions/checkout@v1
-      # The target directory cache doesn't include the source directory because
-      # that comes from the checkout.  See "prepare target_ws for cache" task below
-      - name: cache target_ws
-        if: ${{ ! matrix.env.CCOV }}
-        uses: pat-s/always-upload-cache@v2.1.5
-        with:
-          path: ${{ env.BASEDIR }}/target_ws
-          key: target_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('**/CMakeLists.txt', '**/package.xml') }}-${{ github.run_id }}
-          restore-keys: |
-            target_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('**/CMakeLists.txt', '**/package.xml') }}
-      - name: cache ccache
-        uses: pat-s/always-upload-cache@v2.1.5
-        with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ccache-${{ env.CACHE_PREFIX }}-${{ github.sha }}-${{ github.run_id }}
-          restore-keys: |
-            ccache-${{ env.CACHE_PREFIX }}-${{ github.sha }}
-            ccache-${{ env.CACHE_PREFIX }}
-      - uses: 'ros-industrial/industrial_ci@master'
-        with:
-          config: ${{toJSON(matrix.env)}}
-      - name: prepare target_ws for cache
-        if: ${{ always() && ! matrix.env.CCOV }}
-        run: |
-          du -sh ${{ env.BASEDIR }}/target_ws
-          sudo find ${{ env.BASEDIR }}/target_ws -wholename '*/test_results/*' -delete
-          sudo rm -rf ${{ env.BASEDIR }}/target_ws/src
-          du -sh ${{ env.BASEDIR }}/target_ws
+  semi_binary:
+    uses: ./.github/workflows/reusable-industrial-ci-with-cache.yml
+    with:
+      ros_distro: $ROS_DISTRO$
+      upstream_workspace: $NAME$.$ROS_DISTRO$.repos
+      ref_for_scheduled_build: $branch$
