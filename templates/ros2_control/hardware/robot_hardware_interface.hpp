@@ -1,7 +1,7 @@
 $LICENSE$
 
-#ifndef DUMMY_PACKAGE_NAME__DUMMY_FILE_NAME_HPP_
-#define DUMMY_PACKAGE_NAME__DUMMY_FILE_NAME_HPP_
+#ifndef TEMPLATES__ROS2_CONTROL__HARDWARE__ROBOT_HARDWARE_INTERFACE_HPP_
+#define TEMPLATES__ROS2_CONTROL__HARDWARE__ROBOT_HARDWARE_INTERFACE_HPP_
 
 #include <string>
 #include <vector>
@@ -21,25 +21,25 @@ class DummyClassName : public hardware_interface::Dummy_Interface_TypeInterface
 public:
   RCLCPP_SHARED_PTR_DEFINITIONS(DummyClassName);
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__HARDWARE_PUBLIC
   CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__HARDWARE_PUBLIC
   std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__HARDWARE_PUBLIC
   std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__HARDWARE_PUBLIC
   CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state) override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__HARDWARE_PUBLIC
   CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__HARDWARE_PUBLIC
   hardware_interface::return_type read() override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__HARDWARE_PUBLIC
   hardware_interface::return_type write() override;
 
 private:
@@ -49,4 +49,4 @@ private:
 
 }  // namespace dummy_package_namespace
 
-#endif  // DUMMY_PACKAGE_NAME__DUMMY_FILE_NAME_HPP_
+#endif // TEMPLATES__ROS2_CONTROL__HARDWARE__ROBOT_HARDWARE_INTERFACE_HPP_

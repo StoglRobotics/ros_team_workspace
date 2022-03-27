@@ -1,6 +1,6 @@
 $LICENSE$
 
-#include "dummy_package_namespace/dummy_file_name.hpp"
+#include "dummy_package_namespace/dummy_controller.hpp"
 
 #include <limits>
 #include <memory>
@@ -171,4 +171,5 @@ controller_interface::return_type DummyClassName::update(
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(dummy_package_namespace::DummyClassName, controller_interface::ControllerInterface)
+PLUGINLIB_EXPORT_CLASS(
+  dummy_package_namespace::DummyClassName, controller_interface::ControllerInterface)

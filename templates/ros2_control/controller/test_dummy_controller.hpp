@@ -1,7 +1,7 @@
 $LICENSE$
 
-#ifndef TEST_DUMMY_PACKAGE_NAME_HPP_
-#define TEST_DUMMY_PACKAGE_NAME_HPP_
+#ifndef TEST_TEMPLATES__ROS2_CONTROL__CONTROLLER_HPP_
+#define TEST_TEMPLATES__ROS2_CONTROL__CONTROLLER_HPP_
 
 #include <chrono>
 #include <memory>
@@ -10,7 +10,7 @@ $LICENSE$
 #include <utility>
 #include <vector>
 
-#include "dummy_package_namespace/dummy_file_name.hpp"
+#include "dummy_package_namespace/dummy_controller.hpp"
 #include "gmock/gmock.h"
 #include "hardware_interface/loaned_command_interface.hpp"
 #include "hardware_interface/loaned_state_interface.hpp"
@@ -224,4 +224,4 @@ protected:
   }
 };
 
-#endif  // TEST_DUMMY_PACKAGE_NAME_HPP_
+#endif // TEST_TEMPLATES__ROS2_CONTROL__CONTROLLER_HPP_

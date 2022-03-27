@@ -1,7 +1,7 @@
 $LICENSE$
 
-#ifndef DUMMY_PACKAGE_NAME__DUMMY_FILE_NAME_HPP_
-#define DUMMY_PACKAGE_NAME__DUMMY_FILE_NAME_HPP_
+#ifndef TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_CONTROLLER_HPP_
+#define TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_CONTROLLER_HPP_
 
 #include <memory>
 #include <string>
@@ -25,28 +25,28 @@ using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface
 class DummyClassName : public controller_interface::ControllerInterface
 {
 public:
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__CONTROLLER_PUBLIC
   DummyClassName();
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__CONTROLLER_PUBLIC
   CallbackReturn on_init() override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__CONTROLLER_PUBLIC
   controller_interface::InterfaceConfiguration command_interface_configuration() const override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__CONTROLLER_PUBLIC
   controller_interface::InterfaceConfiguration state_interface_configuration() const override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__CONTROLLER_PUBLIC
   CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__CONTROLLER_PUBLIC
   CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state) override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__CONTROLLER_PUBLIC
   CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
 
-  DUMMY_PACKAGE_NAME_PUBLIC
+  TEMPLATES__ROS2_CONTROL__CONTROLLER_PUBLIC
   controller_interface::return_type update(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
@@ -70,4 +70,4 @@ protected:
 
 }  // namespace dummy_package_namespace
 
-#endif  // DUMMY_PACKAGE_NAME__DUMMY_FILE_NAME_HPP_
+#endif // TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_CONTROLLER_HPP_

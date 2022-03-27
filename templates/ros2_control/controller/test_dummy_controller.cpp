@@ -1,6 +1,6 @@
 $LICENSE$
 
-#include "test_dummy_file_name.hpp"
+#include "test_dummy_controller.hpp"
 
 #include <memory>
 #include <string>

@@ -149,13 +149,13 @@ FILES_TO_SED+=("$PLUGIN_XML")
 # declare -p FILES_TO_SED
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
-  sed -i "s/DUMMY_PACKAGE_NAME/${PKG_NAME^^}/g" $SED_FILE
-  sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/dummy_file_name/${FILE_NAME}/g" $SED_FILE
-  sed -i "s/DUMMY_FILE_NAME/${FILE_NAME^^}/g" $SED_FILE
-  sed -i "s/DummyClassName/${CLASS_NAME}/g" $SED_FILE
-  sed -i "s/dummy_interface_type/${INTERFACE_TYPE}/g" $SED_FILE
-  sed -i "s/Dummy_Interface_Type/${INTERFACE_TYPE^}/g" $SED_FILE
+  sed -i "s/TEMPLATES__ROS2_CONTROL__HARDWARE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
+  sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
+  sed -i "s/dummy_file_name/${FILE_NAME}/g" $SED_FILE # file name
+  sed -i "s/ROBOT_HARDWARE_INTERFACE/${FILE_NAME^^}/g" $SED_FILE # file name for include guard
+  sed -i "s/DummyClassName/${CLASS_NAME}/g" $SED_FILE # class name
+  sed -i "s/dummy_interface_type/${INTERFACE_TYPE}/g" $SED_FILE # interface type for includes
+  sed -i "s/Dummy_Interface_Type/${INTERFACE_TYPE^}/g" $SED_FILE # Interface type in namespace resolution
 done
 
 # If type is "sensor" remove write and command_interfaces methods

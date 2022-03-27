@@ -39,7 +39,7 @@ protected:
 
 TEST_F(TestDummyClassName, load_dummy_file_name_2dof)
 {
-  auto urdf =
-    ros2_control_test_assets::urdf_head + dummy_file_name_2dof_ + ros2_control_test_assets::urdf_tail;
+  auto urdf = ros2_control_test_assets::urdf_head + dummy_file_name_2dof_ +
+              ros2_control_test_assets::urdf_tail;
   ASSERT_NO_THROW(hardware_interface::ResourceManager rm(urdf));
 }

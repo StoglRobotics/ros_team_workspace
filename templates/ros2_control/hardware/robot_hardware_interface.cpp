@@ -3,7 +3,7 @@ $LICENSE$
 #include <limits>
 #include <vector>
 
-#include "dummy_package_namespace/dummy_file_name.hpp"
+#include "dummy_package_namespace/dummy_controller.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
@@ -78,4 +78,5 @@ hardware_interface::return_type DummyClassName::write()
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(dummy_package_namespace::DummyClassName, hardware_interface::Dummy_Interface_TypeInterface)
+PLUGINLIB_EXPORT_CLASS(
+  dummy_package_namespace::DummyClassName, hardware_interface::Dummy_Interface_TypeInterface)
