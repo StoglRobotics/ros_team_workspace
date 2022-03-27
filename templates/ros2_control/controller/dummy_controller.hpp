@@ -7,8 +7,8 @@ $LICENSE$
 #include <string>
 #include <vector>
 
-#include "dummy_package_namespace/visibility_control.h"
 #include "controller_interface/controller_interface.hpp"
+#include "dummy_package_namespace/visibility_control.h"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 #include "realtime_tools/realtime_buffer.h"
@@ -70,4 +70,4 @@ protected:
 
 }  // namespace dummy_package_namespace
 
-#endif // TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_CONTROLLER_HPP_
+#endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_CONTROLLER_HPP_

@@ -49,4 +49,4 @@ private:
 
 }  // namespace dummy_package_namespace
 
-#endif // TEMPLATES__ROS2_CONTROL__HARDWARE__ROBOT_HARDWARE_INTERFACE_HPP_
+#endif  // TEMPLATES__ROS2_CONTROL__HARDWARE__ROBOT_HARDWARE_INTERFACE_HPP_
