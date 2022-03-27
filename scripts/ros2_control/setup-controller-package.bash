@@ -48,7 +48,7 @@ fi
 
 PKG_NAME=$3
 if [ -z "$3" ]; then
-  current=`pwd`
+  current=$(pwd)
   PKG_NAME=$(basename "$current")
   echo "Package name guessed from the current path is '$PKG_NAME'. Is this correct? If not provide it as the third parameter."
 fi
@@ -63,7 +63,7 @@ choice=${choice:="1"}
 if [ "$choice" != 0 ]; then
   read -p "Insert your company or personal name (copyright): " NAME_ON_LICENSE
   NAME_ON_LICENSE=${NAME_ON_LICENSE=""}
-  YEAR_ON_LICENSE=`date +%Y`
+  YEAR_ON_LICENSE=$(date +%Y)
 fi
 
 LICENSE_HEADER=""
@@ -103,12 +103,12 @@ TEST_HPP="test/test_$FILE_NAME.hpp"
 if [[ ! -f "$VC_H" ]]; then
   cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/visibility_control.h $VC_H
 fi
-cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller_pluginlib.xml >> $PLUGIN_XML
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller.hpp $CTRL_HPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller.cpp $CTRL_CPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_load_controller.cpp $LOAD_TEST_CPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_controller.cpp $TEST_CPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_controller.hpp $TEST_HPP
+cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_pluginlib.xml >> $PLUGIN_XML
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.hpp $CTRL_HPP
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.cpp $CTRL_CPP
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_load_dummy_controller.cpp $LOAD_TEST_CPP
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.cpp $TEST_CPP
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.hpp $TEST_HPP
 
 echo "Template files copied."
 
@@ -124,8 +124,7 @@ if [[ "$LICENSE_HEADER" != "" ]]; then
   touch $TMP_FILE
   for FILE_TO_LIC in "${FILES_TO_LICENSE[@]}"; do
     cat $LICENSE_HEADER > $TMP_FILE
-    cat $FILE_TO_LIC >> $TMP_FILE
-    sed -i "/\\\$LICENSE\\\$/d" $TMP_FILE
+    sed "1,14d" $FILE_TO_LIC >> $TMP_FILE # delete first 14 lines which correspond to fake license
     mv $TMP_FILE $FILE_TO_LIC
     sed -i "s/\\\$YEAR\\\$/${YEAR_ON_LICENSE}/g" $FILE_TO_LIC
     sed -i "s/\\\$NAME_ON_LICENSE\\\$/${NAME_ON_LICENSE}/g" $FILE_TO_LIC
