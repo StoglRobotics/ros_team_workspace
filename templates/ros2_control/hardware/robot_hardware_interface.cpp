@@ -16,7 +16,7 @@
 #include <limits>
 #include <vector>
 
-#include "dummy_package_namespace/dummy_controller.hpp"
+#include "dummy_package_namespace/dummy_file_name.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 

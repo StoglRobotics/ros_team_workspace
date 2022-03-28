@@ -138,7 +138,8 @@ FILES_TO_SED+=("$PLUGIN_XML")
 # declare -p FILES_TO_SED
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
-  sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER/${PKG_NAME^^}/g" $SED_FILE # Package name for include guard
+  sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
+  sed -i "s/TEMPLATES__ROS2_CONTROL__HARDWARE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard from hardware
   sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
   sed -i "s/dummy_controller/${FILE_NAME}/g" $SED_FILE # file name
   sed -i "s/DUMMY_CONTROLLER/${FILE_NAME^^}/g" $SED_FILE # file name for include guard
