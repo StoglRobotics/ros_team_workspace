@@ -124,7 +124,7 @@ if [[ "$LICENSE_HEADER" != "" ]]; then
   touch $TMP_FILE
   for FILE_TO_LIC in "${FILES_TO_LICENSE[@]}"; do
     cat $LICENSE_HEADER > $TMP_FILE
-    sed "1,14d" $FILE_TO_LIC >> $TMP_FILE # delete first 14 lines which correspond to fake license
+    sed "1,13d" $FILE_TO_LIC >> $TMP_FILE # delete first 13 lines which correspond to fake license
     mv $TMP_FILE $FILE_TO_LIC
     sed -i "s/\\\$YEAR\\\$/${YEAR_ON_LICENSE}/g" $FILE_TO_LIC
     sed -i "s/\\\$NAME_ON_LICENSE\\\$/${NAME_ON_LICENSE}/g" $FILE_TO_LIC

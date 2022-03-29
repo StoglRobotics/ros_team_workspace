@@ -14,7 +14,7 @@ jobs:
         arguments: [""]
         include:
           - linter: copyright
-            arguments: "--exclude CONTRIBUTING.md conf.py test_robot_description.launch.py view_robot.launch.py dummy_controller.cpp dummy_controller.hpp test_dummy_controller.cpp test_dummy_controller.hpp test_load_dummy_controller.cpp robot_hardware_interface.cpp robot_hardware_interface.hpp test_robot_hardware_interface.cpp visibility_control.h robot_ros2_control.launch.py test_forward_position_controller.launch.py test_joint_trajectory_controller.launch.py"
+            arguments: "--exclude conf.py test_robot_description.launch.py view_robot.launch.py robot_ros2_control.launch.py test_forward_position_controller.launch.py test_joint_trajectory_controller.launch.py"
     steps:
     - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@master
