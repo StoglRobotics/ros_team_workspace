@@ -104,7 +104,7 @@ if [[ ! -f "$VC_H" ]]; then
   cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/visibility_control.h $VC_H
 fi
 cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_pluginlib.xml >> $PLUGIN_XML
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.hpp $CTRL_HPP
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/dummy_controller.hpp $CTRL_HPP
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.cpp $CTRL_CPP
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_load_dummy_controller.cpp $LOAD_TEST_CPP
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.cpp $TEST_CPP
@@ -138,6 +138,7 @@ FILES_TO_SED+=("$PLUGIN_XML")
 # declare -p FILES_TO_SED
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
+  sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
   sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
   sed -i "s/TEMPLATES__ROS2_CONTROL__HARDWARE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard from hardware
   sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
@@ -173,9 +174,8 @@ echo ")" >> $TMP_FILE
 
 echo "target_include_directories(" >> $TMP_FILE
 echo "  $FILE_NAME" >> $TMP_FILE
-echo "  PUBLIC" >> $TMP_FILE
-echo "  $<BUILD_INTERFACE:\${CMAKE_CURRENT_SOURCE_DIR}/include>" >> $TMP_FILE
-echo "  $<INSTALL_INTERFACE:include>" >> $TMP_FILE
+echo "  PRIVATE" >> $TMP_FILE
+echo "  include" >> $TMP_FILE
 echo ")" >> $TMP_FILE
 
 # TODO(anyone): Add this dependencies in a loop
@@ -189,10 +189,6 @@ echo "  rclcpp" >> $TMP_FILE
 echo "  rclcpp_lifecycle" >> $TMP_FILE
 echo "  realtime_tools" >> $TMP_FILE
 echo ")" >> $TMP_FILE
-
-# TODO(anyone): Delete after Foxy!!!
-echo "# prevent pluginlib from using boost" >> $TMP_FILE
-echo "target_compile_definitions($FILE_NAME PUBLIC \"PLUGINLIB__DISABLE_BOOST_FUNCTIONS\")" >> $TMP_FILE
 
 if [[ "$package_configured" == "no" ]]; then
 

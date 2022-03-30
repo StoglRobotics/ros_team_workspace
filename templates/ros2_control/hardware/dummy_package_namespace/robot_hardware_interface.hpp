@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TEMPLATES__ROS2_CONTROL__HARDWARE__ROBOT_HARDWARE_INTERFACE_HPP_
-#define TEMPLATES__ROS2_CONTROL__HARDWARE__ROBOT_HARDWARE_INTERFACE_HPP_
+#ifndef TEMPLATES__ROS2_CONTROL__HARDWARE__DUMMY_PACKAGE_NAMESPACE__ROBOT_HARDWARE_INTERFACE_HPP_
+#define TEMPLATES__ROS2_CONTROL__HARDWARE__DUMMY_PACKAGE_NAMESPACE__ROBOT_HARDWARE_INTERFACE_HPP_
 
 #include <string>
 #include <vector>
@@ -28,11 +28,11 @@
 
 namespace dummy_package_namespace
 {
+using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+
 class DummyClassName : public hardware_interface::Dummy_Interface_TypeInterface
 {
 public:
-  RCLCPP_SHARED_PTR_DEFINITIONS(DummyClassName);
-
   TEMPLATES__ROS2_CONTROL__HARDWARE_PUBLIC
   CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
 
@@ -61,4 +61,4 @@ private:
 
 }  // namespace dummy_package_namespace
 
-#endif  // TEMPLATES__ROS2_CONTROL__HARDWARE__ROBOT_HARDWARE_INTERFACE_HPP_
+#endif  // TEMPLATES__ROS2_CONTROL__HARDWARE__DUMMY_PACKAGE_NAMESPACE__ROBOT_HARDWARE_INTERFACE_HPP_

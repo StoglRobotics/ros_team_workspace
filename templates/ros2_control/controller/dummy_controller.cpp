@@ -120,28 +120,6 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
   return state_interfaces_config;
 }
 
-// Fill ordered_interfaces with references to the matching interfaces
-// in the same order as in joint_names
-// TODO(anyone): use the method from controller_interface/helpers.hpp when ros2_contol#370
-// is merged
-template <typename T>
-bool get_ordered_interfaces(
-  std::vector<T> & unordered_interfaces, const std::vector<std::string> & joint_names,
-  const std::string & interface_type, std::vector<std::reference_wrapper<T>> & ordered_interfaces)
-{
-  for (const auto & joint_name : joint_names) {
-    for (auto & command_interface : unordered_interfaces) {
-      if (
-        (command_interface.get_name() == joint_name) &&
-        (command_interface.get_interface_name() == interface_type)) {
-        ordered_interfaces.push_back(std::ref(command_interface));
-      }
-    }
-  }
-
-  return joint_names.size() == ordered_interfaces.size();
-}
-
 CallbackReturn DummyClassName::on_activate(const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // Set default value in command
