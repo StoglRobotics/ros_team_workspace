@@ -250,6 +250,7 @@ function framework_default_paths {
   ROS2_CONTROL_HW_ITF_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control/hardware"
   ROS2_CONTROL_CONTROLLER_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control/controller"
   LICENSE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/licenses"
+  DOCKER_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/docker"
 }
 
 function check_ros_distro {
