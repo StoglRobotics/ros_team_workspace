@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# This is used for docker, to include ros_team_workspace inside docker and auto source it.
+
+# RosTeamWS - main setup
+# ros_team_workspace is alway at same location inside docker.
+source /opt/RosTeamWS/ros_ws_RTW_DISTRO/src/ros_team_workspace/setup.bash
+
+# User specific setup / variables
+
+#export CYCLONEDDS_URI='<CycloneDDS><Domain><General><NetworkInterfaceAddress>ADD_HERE_INTERFACE_NAME</NetworkInterfaceAddress></General></Domain></CycloneDDS>'
+
+export ROS_DOMAIN_ID=46  # Set your Domain ID if you are in a network with multiple computers
+
+# Logging setup
+# export RCUTILS_LOGGING_CONFIG_FILE="/home/deniss/workspace/ros2_logging_config"
+#export RCUTILS_CONSOLE_OUTPUT_FORMAT="[{severity} {time}] [{name}]: {message} ({function_name}() at {file_name}:{line_number})"  # Custom logging format
+export RCUTILS_COLORIZED_OUTPUT=1
+#export RCUTILS_LOGGING_USE_STDOUT=1  # force all logging output to stdout
+
+# WORKSPACES

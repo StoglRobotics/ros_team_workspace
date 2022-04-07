@@ -63,7 +63,13 @@ alias setup_ros2_aliases=RosTeamWS_setup_ros2_aliases
 # BEGIN: Define aliases for standard scripts
 # Change those to your custom ones you would like to use.
 
-alias create-new-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/create-new-package.bash
+create-new-package () {
+    "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/create-new-package.bash create_workspace "$@"
+}
+
+create-new-package-docker () {
+    "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/create-new-package.bash create_workspace_docker "$@"
+}
 
 alias setup-repository=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash
 
