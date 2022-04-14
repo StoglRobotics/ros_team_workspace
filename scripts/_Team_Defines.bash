@@ -69,12 +69,13 @@ alias setup-repository=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash
 alias setup-repository-ci=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ci-config.bash
 
 alias setup-ros-workspace=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ros-workspace.bash
+
 setup-ros-workspace () {
-    "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-ros-workspace.bash create_workspace "$@"
+    . "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-ros-workspace.bash create_workspace "$@"
 }
 
 setup-ros-workspace-docker () {
-    "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-ros-workspace.bash create_workspace_docker "$@"
+   . "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-ros-workspace.bash create_workspace_docker "$@"
 }
 
 alias setup-robot-bringup=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-robot-bringup.bash

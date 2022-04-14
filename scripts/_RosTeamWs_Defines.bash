@@ -315,4 +315,4 @@ function compile_and_source_package {
 
 # END: Framework functions
 
-FRAMEWORK_MAIN_PATH="$(RosTeamWS_script_own_dir)/../"
+FRAMEWORK_MAIN_PATH="$(RosTeamWS_script_own_dir)/.."

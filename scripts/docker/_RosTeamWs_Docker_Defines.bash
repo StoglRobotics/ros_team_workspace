@@ -14,10 +14,10 @@
 # limitations under the License.
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
-source $script_own_dir/../_RosTeamWs_Defines.bash
+docker_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+source $docker_script_own_dir/../_RosTeamWs_Defines.bash
 
-ros_team_ws_dir="$script_own_dir/../../../ros_team_workspace"
+ros_team_ws_dir="$docker_script_own_dir/../../../ros_team_workspace"
 
 # assoziative array which maps the chosen rosdistro to the name which is used to install the corresponding
 # ros distribution inside docker
@@ -30,16 +30,28 @@ build_docker_container () {
     echo "No docker image tage specified. Can not create image."
     return 1
   fi
+  if [ -z "$2" ]; then
+    echo "No docker file specified. Can not create image."
+    return 1
+  fi
   local docker_image_tag=$1
+  local docker_file_path=$2
 
-  echo "Building docker image $docker_image_tag. This can take a while..."
+  # apparently docker checks every file in dir, its best to be in new dir
+  prev_pwd=$(pwd)
+  cd $(dirname "$docker_file_path")
+
+  echo "Building docker image $docker_image_tag with docker file $docker_file_path. This can take a while..."
   sleep 1 # sleep a second, so that user can read above message
   docker build \
   --build-arg user=$USER \
   --build-arg uid=$UID \
   --build-arg gid=$GROUPS \
   --build-arg home=$HOME \
-  -t "$docker_image_tag" .
+  -t "$docker_image_tag" \
+  -f "$docker_file_path" .
+  
+  cd "$prev_pwd"
 }
 
 create_docker_image () {
@@ -64,7 +76,15 @@ create_docker_image () {
   echo "Instantiating docker image $docker_image_tag and map workspace folder $ws_folder_name to $HOME/."
   echo "ros_team_ws is mounted under /opt/RosTeamWS/ros_ws_"$RosTeamWS_DISTRO"/src/ros_team_workspace"
   xhost +local:docker
-  docker run --net=host -h "$docker_image_tag"-docker -e DISPLAY --tmpfs /tmp -v /tmp/.X11-unix/:/tmp/.X11-unix:rw -v "$HOME/$ws_folder":"$HOME/$ws_folder_name":rw -v "$ros_team_ws_dir":/opt/RosTeamWS/ros_ws_"$RosTeamWS_DISTRO"/src/ros_team_workspace:rw --name "$docker_image_tag"-instance -it "$docker_image_tag" /bin/bash
+  docker run \
+  --net=host -h "$docker_image_tag"-docker \
+  -e DISPLAY \
+  --tmpfs /tmp \
+  -v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
+  -v "$HOME/$ws_folder":"$HOME/$ws_folder_name":rw \
+  -v "$ros_team_ws_dir":/opt/RosTeamWS/ros_ws_"$RosTeamWS_DISTRO"/src/ros_team_workspace:rw \
+  --name "$docker_image_tag"-instance \
+  -it "$docker_image_tag" /bin/bash
 }
 
 connect_user () {

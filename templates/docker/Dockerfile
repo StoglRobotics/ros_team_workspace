@@ -41,7 +41,7 @@ RUN pip install -U rosdep && \
 
 # setup standard .bashrc
 COPY bashrc ${home}/.bashrc
-COPY .ros_team_ws_rc_docker ${home}/.ros_team_ws_rc
+COPY ros_team_ws_rc_docker ${home}/.ros_team_ws_rc
 
 # clone user into docker image, add to sudo users needed for xsharing
 # the passwd delete is needed to update /etc/shadow otherwise user cannot use sudo
