@@ -1,6 +1,18 @@
-$LICENSE$
+// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "$package_name$/$file_name$.hpp"
+#include "dummy_package_namespace/dummy_controller.hpp"
 
 #include <limits>
 #include <memory>
@@ -9,11 +21,11 @@ $LICENSE$
 
 #include "controller_interface/helpers.hpp"
 
-namespace $package_name$
+namespace dummy_package_namespace
 {
-$ClassName$::$ClassName$() : controller_interface::ControllerInterface() {}
+DummyClassName::DummyClassName() : controller_interface::ControllerInterface() {}
 
-CallbackReturn $ClassName$::on_init()
+CallbackReturn DummyClassName::on_init()
 {
   try {
     get_node()->declare_parameter<std::vector<std::string>>("joints", std::vector<std::string>({}));
@@ -26,7 +38,7 @@ CallbackReturn $ClassName$::on_init()
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn $ClassName$::on_configure(const rclcpp_lifecycle::State & /*previous_state*/)
+CallbackReturn DummyClassName::on_configure(const rclcpp_lifecycle::State & /*previous_state*/)
 {
   auto error_if_empty = [&](const auto & parameter, const char * parameter_name) {
     if (parameter.empty()) {
@@ -82,7 +94,7 @@ CallbackReturn $ClassName$::on_configure(const rclcpp_lifecycle::State & /*previ
   return CallbackReturn::SUCCESS;
 }
 
-controller_interface::InterfaceConfiguration $ClassName$::command_interface_configuration() const
+controller_interface::InterfaceConfiguration DummyClassName::command_interface_configuration() const
 {
   controller_interface::InterfaceConfiguration command_interfaces_config;
   command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
@@ -95,7 +107,7 @@ controller_interface::InterfaceConfiguration $ClassName$::command_interface_conf
   return command_interfaces_config;
 }
 
-controller_interface::InterfaceConfiguration $ClassName$::state_interface_configuration() const
+controller_interface::InterfaceConfiguration DummyClassName::state_interface_configuration() const
 {
   controller_interface::InterfaceConfiguration state_interfaces_config;
   state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
@@ -108,29 +120,7 @@ controller_interface::InterfaceConfiguration $ClassName$::state_interface_config
   return state_interfaces_config;
 }
 
-// Fill ordered_interfaces with references to the matching interfaces
-// in the same order as in joint_names
-// TODO(anyone): use the method from controller_interface/helpers.hpp when ros2_contol#370
-// is merged
-template <typename T>
-bool get_ordered_interfaces(
-  std::vector<T> & unordered_interfaces, const std::vector<std::string> & joint_names,
-  const std::string & interface_type, std::vector<std::reference_wrapper<T>> & ordered_interfaces)
-{
-  for (const auto & joint_name : joint_names) {
-    for (auto & command_interface : unordered_interfaces) {
-      if (
-        (command_interface.get_name() == joint_name) &&
-        (command_interface.get_interface_name() == interface_type)) {
-        ordered_interfaces.push_back(std::ref(command_interface));
-      }
-    }
-  }
-
-  return joint_names.size() == ordered_interfaces.size();
-}
-
-CallbackReturn $ClassName$::on_activate(const rclcpp_lifecycle::State & /*previous_state*/)
+CallbackReturn DummyClassName::on_activate(const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // Set default value in command
   std::shared_ptr<ControllerCommandMsg> msg = std::make_shared<ControllerCommandMsg>();
@@ -141,12 +131,12 @@ CallbackReturn $ClassName$::on_activate(const rclcpp_lifecycle::State & /*previo
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn $ClassName$::on_deactivate(const rclcpp_lifecycle::State & /*previous_state*/)
+CallbackReturn DummyClassName::on_deactivate(const rclcpp_lifecycle::State & /*previous_state*/)
 {
   return CallbackReturn::SUCCESS;
 }
 
-controller_interface::return_type $ClassName$::update(
+controller_interface::return_type DummyClassName::update(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
   auto current_command = input_command_.readFromRT();
@@ -167,8 +157,9 @@ controller_interface::return_type $ClassName$::update(
   return controller_interface::return_type::OK;
 }
 
-}  // namespace $package_name$
+}  // namespace dummy_package_namespace
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS($package_name$::$ClassName$, controller_interface::ControllerInterface)
+PLUGINLIB_EXPORT_CLASS(
+  dummy_package_namespace::DummyClassName, controller_interface::ControllerInterface)

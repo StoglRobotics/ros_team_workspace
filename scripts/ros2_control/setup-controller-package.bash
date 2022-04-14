@@ -48,7 +48,7 @@ fi
 
 PKG_NAME=$3
 if [ -z "$3" ]; then
-  current=`pwd`
+  current=$(pwd)
   PKG_NAME=$(basename "$current")
   echo "Package name guessed from the current path is '$PKG_NAME'. Is this correct? If not provide it as the third parameter."
 fi
@@ -63,7 +63,7 @@ choice=${choice:="1"}
 if [ "$choice" != 0 ]; then
   read -p "Insert your company or personal name (copyright): " NAME_ON_LICENSE
   NAME_ON_LICENSE=${NAME_ON_LICENSE=""}
-  YEAR_ON_LICENSE=`date +%Y`
+  YEAR_ON_LICENSE=$(date +%Y)
 fi
 
 LICENSE_HEADER=""
@@ -103,12 +103,12 @@ TEST_HPP="test/test_$FILE_NAME.hpp"
 if [[ ! -f "$VC_H" ]]; then
   cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/visibility_control.h $VC_H
 fi
-cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller_pluginlib.xml >> $PLUGIN_XML
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller.hpp $CTRL_HPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/controller.cpp $CTRL_CPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_load_controller.cpp $LOAD_TEST_CPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_controller.cpp $TEST_CPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_controller.hpp $TEST_HPP
+cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_pluginlib.xml >> $PLUGIN_XML
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/dummy_controller.hpp $CTRL_HPP
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.cpp $CTRL_CPP
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_load_dummy_controller.cpp $LOAD_TEST_CPP
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.cpp $TEST_CPP
+cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.hpp $TEST_HPP
 
 echo "Template files copied."
 
@@ -124,8 +124,7 @@ if [[ "$LICENSE_HEADER" != "" ]]; then
   touch $TMP_FILE
   for FILE_TO_LIC in "${FILES_TO_LICENSE[@]}"; do
     cat $LICENSE_HEADER > $TMP_FILE
-    cat $FILE_TO_LIC >> $TMP_FILE
-    sed -i "/\\\$LICENSE\\\$/d" $TMP_FILE
+    sed "1,13d" $FILE_TO_LIC >> $TMP_FILE # delete first 13 lines which correspond to fake license
     mv $TMP_FILE $FILE_TO_LIC
     sed -i "s/\\\$YEAR\\\$/${YEAR_ON_LICENSE}/g" $FILE_TO_LIC
     sed -i "s/\\\$NAME_ON_LICENSE\\\$/${NAME_ON_LICENSE}/g" $FILE_TO_LIC
@@ -139,13 +138,15 @@ FILES_TO_SED+=("$PLUGIN_XML")
 # declare -p FILES_TO_SED
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
-  sed -i "s/\\\$PACKAGE_NAME\\\$/${PKG_NAME^^}/g" $SED_FILE
-  sed -i "s/\\\$package_name\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$file_name\\\$/${FILE_NAME}/g" $SED_FILE
-  sed -i "s/\\\$FILE_NAME\\\$/${FILE_NAME^^}/g" $SED_FILE
-  sed -i "s/\\\$ClassName\\\$/${CLASS_NAME}/g" $SED_FILE
-  sed -i "s/\\\$interface_type\\\$/${INTERFACE_TYPE}/g" $SED_FILE
-  sed -i "s/\\\$Interface_Type\\\$/${INTERFACE_TYPE^}/g" $SED_FILE
+  sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
+  sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
+  sed -i "s/TEMPLATES__ROS2_CONTROL__HARDWARE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard from hardware
+  sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
+  sed -i "s/dummy_controller/${FILE_NAME}/g" $SED_FILE # file name
+  sed -i "s/DUMMY_CONTROLLER/${FILE_NAME^^}/g" $SED_FILE # file name for include guard
+  sed -i "s/DummyClassName/${CLASS_NAME}/g" $SED_FILE # class name
+  sed -i "s/dummy_interface_type/${INTERFACE_TYPE}/g" $SED_FILE # interface type for includes
+  sed -i "s/Dummy_Interface_Type/${INTERFACE_TYPE^}/g" $SED_FILE # Interface type in namespace resolution
 done
 
 
@@ -173,9 +174,8 @@ echo ")" >> $TMP_FILE
 
 echo "target_include_directories(" >> $TMP_FILE
 echo "  $FILE_NAME" >> $TMP_FILE
-echo "  PUBLIC" >> $TMP_FILE
-echo "  $<BUILD_INTERFACE:\${CMAKE_CURRENT_SOURCE_DIR}/include>" >> $TMP_FILE
-echo "  $<INSTALL_INTERFACE:include>" >> $TMP_FILE
+echo "  PRIVATE" >> $TMP_FILE
+echo "  include" >> $TMP_FILE
 echo ")" >> $TMP_FILE
 
 # TODO(anyone): Add this dependencies in a loop
@@ -189,10 +189,6 @@ echo "  rclcpp" >> $TMP_FILE
 echo "  rclcpp_lifecycle" >> $TMP_FILE
 echo "  realtime_tools" >> $TMP_FILE
 echo ")" >> $TMP_FILE
-
-# TODO(anyone): Delete after Foxy!!!
-echo "# prevent pluginlib from using boost" >> $TMP_FILE
-echo "target_compile_definitions($FILE_NAME PUBLIC \"PLUGINLIB__DISABLE_BOOST_FUNCTIONS\")" >> $TMP_FILE
 
 if [[ "$package_configured" == "no" ]]; then
 

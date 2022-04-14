@@ -112,7 +112,7 @@ TEST_CPP="test/test_$FILE_NAME.cpp"
 
 # Copy files
 cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/visibility_control.h $VC_H
-cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/robot_hardware_interface.hpp $HW_ITF_HPP
+cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/dummy_package_namespace/robot_hardware_interface.hpp $HW_ITF_HPP
 cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/robot_hardware_interface.cpp $HW_ITF_CPP
 cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/robot_pluginlib.xml $PLUGIN_XML
 cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/test_robot_hardware_interface.cpp $TEST_CPP
@@ -130,8 +130,7 @@ if [[ "$LICENSE_HEADER" != "" ]]; then
   touch $TMP_FILE
   for FILE_TO_LIC in "${FILES_TO_LICENSE[@]}"; do
     cat $LICENSE_HEADER > $TMP_FILE
-    cat $FILE_TO_LIC >> $TMP_FILE
-    sed -i "/\\\$LICENSE\\\$/d" $TMP_FILE
+    sed "1,13d" $FILE_TO_LIC >> $TMP_FILE # delete first 13 lines which correspond to fake license
     mv $TMP_FILE $FILE_TO_LIC
     sed -i "s/\\\$YEAR\\\$/${YEAR_ON_LICENSE}/g" $FILE_TO_LIC
     sed -i "s/\\\$NAME_ON_LICENSE\\\$/${NAME_ON_LICENSE}/g" $FILE_TO_LIC
@@ -149,13 +148,13 @@ FILES_TO_SED+=("$PLUGIN_XML")
 # declare -p FILES_TO_SED
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
-  sed -i "s/\\\$PACKAGE_NAME\\\$/${PKG_NAME^^}/g" $SED_FILE
-  sed -i "s/\\\$package_name\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$file_name\\\$/${FILE_NAME}/g" $SED_FILE
-  sed -i "s/\\\$FILE_NAME\\\$/${FILE_NAME^^}/g" $SED_FILE
-  sed -i "s/\\\$ClassName\\\$/${CLASS_NAME}/g" $SED_FILE
-  sed -i "s/\\\$interface_type\\\$/${INTERFACE_TYPE}/g" $SED_FILE
-  sed -i "s/\\\$Interface_Type\\\$/${INTERFACE_TYPE^}/g" $SED_FILE
+  sed -i "s/TEMPLATES__ROS2_CONTROL__HARDWARE__DUMMY_PACKAGE_NAMESPACE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
+  sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
+  sed -i "s/dummy_file_name/${FILE_NAME}/g" $SED_FILE # file name
+  sed -i "s/ROBOT_HARDWARE_INTERFACE/${FILE_NAME^^}/g" $SED_FILE # file name for include guard
+  sed -i "s/DummyClassName/${CLASS_NAME}/g" $SED_FILE # class name
+  sed -i "s/dummy_interface_type/${INTERFACE_TYPE}/g" $SED_FILE # interface type for includes
+  sed -i "s/Dummy_Interface_Type/${INTERFACE_TYPE^}/g" $SED_FILE # Interface type in namespace resolution
 done
 
 # If type is "sensor" remove write and command_interfaces methods

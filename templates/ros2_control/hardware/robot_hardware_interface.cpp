@@ -1,17 +1,29 @@
-$LICENSE$
+// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <limits>
 #include <vector>
 
-#include "$package_name$/$file_name$.hpp"
+#include "dummy_package_namespace/dummy_file_name.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-namespace $package_name$
+namespace dummy_package_namespace
 {
-CallbackReturn $ClassName$::on_init(const hardware_interface::HardwareInfo & info)
+CallbackReturn DummyClassName::on_init(const hardware_interface::HardwareInfo & info)
 {
-  if (hardware_interface::$Interface_Type$Interface::on_init(info) != CallbackReturn::SUCCESS) {
+  if (hardware_interface::Dummy_Interface_TypeInterface::on_init(info) != CallbackReturn::SUCCESS) {
     return CallbackReturn::ERROR;
   }
 
@@ -22,7 +34,7 @@ CallbackReturn $ClassName$::on_init(const hardware_interface::HardwareInfo & inf
   return CallbackReturn::SUCCESS;
 }
 
-std::vector<hardware_interface::StateInterface> $ClassName$::export_state_interfaces()
+std::vector<hardware_interface::StateInterface> DummyClassName::export_state_interfaces()
 {
   std::vector<hardware_interface::StateInterface> state_interfaces;
   for (uint i = 0; i < info_.joints.size(); i++) {
@@ -34,7 +46,7 @@ std::vector<hardware_interface::StateInterface> $ClassName$::export_state_interf
   return state_interfaces;
 }
 
-std::vector<hardware_interface::CommandInterface> $ClassName$::export_command_interfaces()
+std::vector<hardware_interface::CommandInterface> DummyClassName::export_command_interfaces()
 {
   std::vector<hardware_interface::CommandInterface> command_interfaces;
   for (uint i = 0; i < info_.joints.size(); i++) {
@@ -46,36 +58,37 @@ std::vector<hardware_interface::CommandInterface> $ClassName$::export_command_in
   return command_interfaces;
 }
 
-CallbackReturn $ClassName$::on_activate(const rclcpp_lifecycle::State & /*previous_state*/)
+CallbackReturn DummyClassName::on_activate(const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // TODO(anyone): prepare the robot to receive commands
 
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn $ClassName$::on_deactivate(const rclcpp_lifecycle::State & /*previous_state*/)
+CallbackReturn DummyClassName::on_deactivate(const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // TODO(anyone): prepare the robot to stop receiving commands
 
   return CallbackReturn::SUCCESS;
 }
 
-hardware_interface::return_type $ClassName$::read()
+hardware_interface::return_type DummyClassName::read()
 {
   // TODO(anyone): read robot states
 
   return hardware_interface::return_type::OK;
 }
 
-hardware_interface::return_type $ClassName$::write()
+hardware_interface::return_type DummyClassName::write()
 {
   // TODO(anyone): write robot's commands'
 
   return hardware_interface::return_type::OK;
 }
 
-}  // namespace $package_name$
+}  // namespace dummy_package_namespace
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS($package_name$::$ClassName$, hardware_interface::$Interface_Type$Interface)
+PLUGINLIB_EXPORT_CLASS(
+  dummy_package_namespace::DummyClassName, hardware_interface::Dummy_Interface_TypeInterface)
