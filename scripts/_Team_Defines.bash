@@ -42,7 +42,7 @@ source $TEAM_INTERNAL_ASSETS/setup.bash
 ## END: Framework definitions adjustable by users
 
 # Check ROS and Load base paths
-check_ros_distro $DEFAULT_ROS_DISTRO
+check_ros_distro $RosTeamWS_DISTRO # is passed as parameter from .ros_team_ws_rc setup
 
 # BEGIN: Define aliases for standard internal functions
 
