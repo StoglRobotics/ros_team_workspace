@@ -12,19 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-## BEGIN: Team specific definitions
-
-DEFAULT_ROS_DISTRO="rolling"
-DEFAULT_ROS_VERSION=2
+## BEGIN: definitions
 
 # TODO(denis): We have two example teams. On is working with industrial and other with mobile robots
 # TEAM_TEAM_NAMES=("Industrial" "Mobile")
-
-TEAM_LICENSE="Apache License 2.0"
-
-TEAM_REPOSITORY_SERVER="https://github.com"
-
-TEAM_PRIVATE_CONFIG_PATH=""
 
 # Define a path to a repository with your internal assets and configurations
 TEAM_INTERNAL_ASSETS="/opt/RosTeamWS/assets/"
@@ -32,8 +23,9 @@ TEAM_INTERNAL_ASSETS="/opt/RosTeamWS/assets/"
 ## END: definitions
 
 # TODO(denis): implement here support for internal repos
-source $TEAM_INTERNAL_ASSETS/setup.bash
-
+if [ -f $TEAM_INTERNAL_ASSETS/setup.bash ]; then
+  source $TEAM_INTERNAL_ASSETS/setup.bash
+fi
 
 ## BEGIN: Framework definition adjustable by users
 # TBD
