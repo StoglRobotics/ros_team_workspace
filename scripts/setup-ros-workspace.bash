@@ -236,7 +236,7 @@ create_workspace_docker () {
   cp "$DOCKER_TEMPLATES/ros_team_ws_rc_docker" "$ws_docker_folder/."
   # make copied .ros_team_ws match to source
   local rtw_file="$ws_docker_folder/ros_team_ws_rc_docker"
-  sed -i "s/RTW_DISTRO/${chosen_ros_distro}/g" "$rtw_file"
+  sed -i "s/ROS_DUMMY_VERSION/${chosen_ros_distro}/g" "$rtw_file"
   setup_ros_team_ws_file "$rtw_file" "$use_docker" "true"
 
   # now we are all set for building the container

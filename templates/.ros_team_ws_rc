@@ -1,7 +1,16 @@
 #!/bin/bash
 
 # RosTeamWS - main setup
-source <PATH TO ros_team_workspace>/setup.bash
+DEFAULT_ROS_DISTRO="rolling"
+DEFAULT_ROS_VERSION=2
+
+TEAM_LICENSE="Apache License 2.0"
+
+TEAM_REPOSITORY_SERVER="https://github.com"
+
+TEAM_PRIVATE_CONFIG_PATH=""
+
+source <Path to ros_team_workspace>/setup.bash
 
 # User specific setup / variables
 

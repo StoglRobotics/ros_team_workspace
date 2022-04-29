@@ -3,8 +3,17 @@
 # This is used for docker, to include ros_team_workspace inside docker and auto source it.
 
 # RosTeamWS - main setup
+DEFAULT_ROS_DISTRO="ROS_DUMMY_VERSION"
+DEFAULT_ROS_VERSION=2
+
+TEAM_LICENSE="Apache License 2.0"
+
+TEAM_REPOSITORY_SERVER="https://github.com"
+
+TEAM_PRIVATE_CONFIG_PATH=""
+
 # ros_team_workspace is alway at same location inside docker.
-source /opt/RosTeamWS/ros_ws_RTW_DISTRO/src/ros_team_workspace/setup.bash
+source /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/setup.bash
 
 # User specific setup / variables
 
