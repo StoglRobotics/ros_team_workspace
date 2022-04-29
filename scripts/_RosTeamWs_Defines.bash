@@ -228,7 +228,7 @@ function print_and_exit {
   fi
   echo -e "${TERMINAL_COLOR_BLUE}Error has happened. Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
   read -p ""
-  throw_error
+  exit 1
 }
 
 function framework_default_paths {
