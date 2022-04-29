@@ -39,7 +39,7 @@ build_docker_container () {
 
   # apparently docker checks every file in dir, its best to be in new dir
   prev_pwd=$(pwd)
-  cd $(dirname "$docker_file_path")
+  cd "$(dirname "$docker_file_path")" || { echo "Could not change directory to new workspace"; return 1; }
 
   echo "Building docker image $docker_image_tag with docker file $docker_file_path. This can take a while..."
   sleep 1 # sleep a second, so that user can read above message
@@ -48,10 +48,9 @@ build_docker_container () {
   --build-arg uid=$UID \
   --build-arg gid=$GROUPS \
   --build-arg home=$HOME \
-  -t "$docker_image_tag" \
-  -f "$docker_file_path" .
+  -t "$docker_image_tag" . || { return 1; }
   
-  cd "$prev_pwd"
+  cd "$prev_pwd" || { print_and_exit "Build of docker container succeded but changing back previous working directory failed. Exting."; }
 }
 
 create_docker_image () {
