@@ -131,7 +131,6 @@ stop_container () {
 }
 
 start_and_connect_user_to_docker () {
-  echo "CALLED start_and_connect_user_to_docker"
   if [ -z "$1" ]; then
     print_and_exit "The given docker tag is empty, something went wrong. Does your current workspace contain a RosTeamWS_DOCKER_TAG in .ros_team_ws_rc ?"
   fi
@@ -142,7 +141,6 @@ start_and_connect_user_to_docker () {
 }
 
 start_and_connect_root_to_docker () {
-  echo "CALLED start_and_connect_root_to_docker"
   if [ -z "$1" ]; then
     print_and_exit "The given docker tag is empty, something went wrong. Does your current workspace contain a RosTeamWS_DOCKER_TAG in .ros_team_ws_rc ?"
   fi
@@ -153,7 +151,6 @@ start_and_connect_root_to_docker () {
 }
 
 stop_docker_container () {
-  echo "CALLED stop_docker_container"
   if [ -z "$1" ]; then
     print_and_exit "The given docker tag is empty, something went wrong. Does your current workspace contain a RosTeamWS_DOCKER_TAG in .ros_team_ws_rc ?"
   fi

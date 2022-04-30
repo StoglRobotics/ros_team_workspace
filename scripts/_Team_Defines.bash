@@ -71,32 +71,26 @@ setup-ros-workspace-docker () {
 }
 
 rtw_switch_to_docker () {
-  echo "Called 1.1"
   if [ -z "$RosTeamWS_WS_DOCKER_SUPPORT" ] || [ "$RosTeamWS_WS_DOCKER_SUPPORT" == false ]; then
     print_and_exit "It seems your current workspace does not support docker. If it should, did you activate it by executing _\"<ws_alias>\"?"
   fi
 
-    echo "Called 1"
   . "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/docker/_RosTeamWs_Docker_Defines.bash start_and_connect_user_to_docker "$RosTeamWS_DOCKER_TAG"
 }
 
 rtw_switch_to_docker_root () {
-  echo "Called 2.1"
   if [ -z "$RosTeamWS_WS_DOCKER_SUPPORT" ] || [ "$RosTeamWS_WS_DOCKER_SUPPORT" == false ]; then
     print_and_exit "It seems your current workspace does not support docker. If it should, did you activate it by executing _\"<ws_alias>\"?"
   fi
   
-  echo "Called 2"
   . "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/docker/_RosTeamWs_Docker_Defines.bash start_and_connect_root_to_docker "$RosTeamWS_DOCKER_TAG"
 }
 
 rtw_stop_docker () {
-  echo "Called 3.1"
   if [ -z "$RosTeamWS_WS_DOCKER_SUPPORT" ] || [ "$RosTeamWS_WS_DOCKER_SUPPORT" == false ]; then
     print_and_exit "It seems your current workspace does not support docker. If it should, did you activate it by executing _\"<ws_alias>\"?"
   fi
 
-  echo "Called 3"
   . "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/docker/_RosTeamWs_Docker_Defines.bash stop_docker_container "$RosTeamWS_DOCKER_TAG"
 }
 
