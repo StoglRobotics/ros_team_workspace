@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM UBUNTU_DUMMY_VERSION
 
 #Arguments maybe add defaults?
 ARG user

@@ -102,6 +102,17 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
+ws_inited_check_file=~/.rtw_ws_inited
+ws_folder=DUMMY_WS_FOLDER
+if [ ! -e "$ws_inited_check_file" ]; then
+    touch "$ws_inited_check_file" 
+    cd "$HOME/$ws_folder" || { echo "Could not init workspace $ws_folder. You have to init the workspace yourself."; return 1;}
+    mkdir src
+    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    rosdep update
+    cd ~/
+fi 
+
 # source ros_team_ws_rc automatically
 if [ -f ~/.ros_team_ws_rc ]; then
     . ~/.ros_team_ws_rc

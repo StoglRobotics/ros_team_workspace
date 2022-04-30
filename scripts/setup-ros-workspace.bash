@@ -17,6 +17,30 @@ check_user_input () {
     print_and_exit "Workspace names for docker cannot contain \"-\"."
   fi
 
+  # Todo Manuel make this more generic
+  if [ "$use_docker" == true ]; then
+    if [ "$ros_distro" == "rolling" ]; then
+      echo "$ros_distro is currently supported on multiple versions of Ubuntu. Which version of ubuntu would you like to choose:"
+      select ubuntu_version in Ubuntu_20_04 Ubuntu_22_04;
+      do
+        case "$ubuntu_version" in
+              Ubuntu_20_04)
+                  ubuntu_version="ubuntu:20.04"
+                  ubuntu_version_tag="ubuntu_20_04"
+                  break
+                ;;
+              Ubuntu_22_04)
+                  ubuntu_version="ubuntu:22.04"
+                  ubuntu_version_tag="ubuntu_22_04"
+                  break
+                ;;
+        esac
+      done
+    else
+      ubuntu_version="ubuntu:20.04"
+      ubuntu_version_tag="ubuntu_20_04"
+    fi
+  fi
 
   ros_ws_prefix="$3"
   if [ -z "$3" ]; then
@@ -130,14 +154,14 @@ setup_ros_team_ws_file() {
   sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' "$ros_team_ws_file"
 
   if [ "$use_docker" = true ]; then
-    docker_image_tag=$(sed "s/-//g" <(echo "ubuntu_20_04_${ros_ws_prefix}_${ws_folder}_${ros_ws_suffix}_${chosen_ros_distro}"))      
+    docker_image_tag=$(sed "s/-//g" <(echo "${ubuntu_version_tag}_${ros_ws_prefix}_${ws_folder}_${ros_ws_suffix}_${chosen_ros_distro}"))      
   else
     docker_image_tag="-"
   fi
 
   local docker_support="$use_docker"
   if [ "$is_docker_rtw_file" = true ]; then
-    source_path_rtw="  source /opt/RosTeamWS/ros_ws_$chosen_ros_distro/src/ros_team_workspace/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\"" 
+    source_path_rtw="  source /opt/RosTeamWS/ros_ws_$chosen_ros_distro/src/ros_team_workspace/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\"" 
     docker_support=false # don't use docker in docker
   else
     source_path_rtw="  source $FRAMEWORK_BASE_PATH/ros_ws_\"\$RosTeamWS_DISTRO\"/src/$FRAMEWORK_NAME/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\""
@@ -146,6 +170,7 @@ setup_ros_team_ws_file() {
   echo "" >> "$ros_team_ws_file"
   echo "$fun_name () {" >> "$ros_team_ws_file"
   echo "  RosTeamWS_BASE_WS=\"${base_ws}\"" >> "$ros_team_ws_file"
+
   echo "  RosTeamWS_DISTRO=\"${chosen_ros_distro}\"" >> "$ros_team_ws_file"
   echo "  RosTeamWS_WS_FOLDER=\"${ws_folder}\"" >> "$ros_team_ws_file"
   echo "  RosTeamWS_WS_PREFIX=\"${ros_ws_prefix}\"" >> "$ros_team_ws_file"
@@ -226,10 +251,16 @@ create_workspace_docker () {
 
   # setup .bashrc
   cp "$DOCKER_TEMPLATES/bashrc" "$ws_docker_folder/."
+  # add the name of the workspace folder in docker, so that it can be inited in bashrc the first time used.
+  local docker_ws_folder
+  docker_ws_folder="$ws_folder/${docker_ros_distro_name}"
+  sed -i "s|DUMMY_WS_FOLDER|${docker_ws_folder}|g" "$ws_docker_folder/bashrc"
+  echo "" >> "$ws_docker_folder/bashrc"
   echo "$alias_name" >> "$ws_docker_folder/bashrc"
 
   # setup Dockerfile: set correct docker version
   cp "$DOCKER_TEMPLATES/Dockerfile" "$ws_docker_folder/."
+  sed -i "s/UBUNTU_DUMMY_VERSION/${ubuntu_version}/g" "$ws_docker_folder/Dockerfile"
   sed -i "s/ROS_DUMMY_VERSION/${docker_ros_distro_name}/g" "$ws_docker_folder/Dockerfile"
 
   # setup ros_team_ws
