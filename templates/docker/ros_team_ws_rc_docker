@@ -12,7 +12,7 @@ TEAM_REPOSITORY_SERVER="https://github.com"
 
 TEAM_PRIVATE_CONFIG_PATH=""
 
-# ros_team_workspace is alway at same location inside docker.
+# ros_team_workspace is always at same location inside docker.
 source /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/setup.bash
 
 # User specific setup / variables

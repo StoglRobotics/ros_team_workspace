@@ -154,18 +154,18 @@ setup_ros_team_ws_file() {
   sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' "$ros_team_ws_file"
 
   if [ "$use_docker" = true ]; then
-    docker_image_tag=$(sed "s/-//g" <(echo "${ubuntu_version_tag}_${ros_ws_prefix}_${ws_folder}_${ros_ws_suffix}_${chosen_ros_distro}"))      
+    docker_image_tag=$(sed "s/-//g" <(echo "${ubuntu_version_tag}_${ros_ws_prefix}_${ws_folder}_${ros_ws_suffix}_${chosen_ros_distro}"))
   else
     docker_image_tag="-"
   fi
 
   local docker_support="$use_docker"
   if [ "$is_docker_rtw_file" = true ]; then
-    source_path_rtw="  source /opt/RosTeamWS/ros_ws_$chosen_ros_distro/src/ros_team_workspace/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\"" 
+    source_path_rtw="  source /opt/RosTeamWS/ros_ws_$chosen_ros_distro/src/ros_team_workspace/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\""
     docker_support=false # don't use docker in docker
   else
     source_path_rtw="  source $FRAMEWORK_BASE_PATH/ros_ws_\"\$RosTeamWS_DISTRO\"/src/$FRAMEWORK_NAME/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\""
-  fi 
+  fi
 
   echo "" >> "$ros_team_ws_file"
   echo "$fun_name () {" >> "$ros_team_ws_file"
@@ -212,7 +212,7 @@ create_workspace () {
   check_user_input "$@"
   local chosen_ros_distro=$ros_distro
   setup_new_workspace
-  
+
   local is_docker_rtw_file=false
   update_config
 
@@ -228,7 +228,7 @@ create_workspace_docker () {
   check_user_input "$@"
   local chosen_ros_distro=$ros_distro # need to store, ros_distro gets overwritten while creating workspace...
   setup_new_workspace
-  
+
   local is_docker_rtw_file=false
   update_config
 

@@ -48,8 +48,8 @@ build_docker_container () {
   --build-arg gid=$GROUPS \
   --build-arg home=$HOME \
   -t "$docker_image_tag" . || { return 1; }
-  
-  cd "$prev_pwd" || { print_and_exit "Build of docker container succeded but changing back previous working directory failed. Exting."; }
+
+  cd "$prev_pwd" || { print_and_exit "Build of docker container succeeded but changing back previous working directory failed. Exting."; }
 }
 
 create_docker_image () {
