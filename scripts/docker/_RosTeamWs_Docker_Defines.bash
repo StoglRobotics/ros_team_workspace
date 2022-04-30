@@ -26,7 +26,7 @@ declare -r -A ros_distro_to_rtw_branch=( ["foxy"]="foxy" ["galactic"]="master" [
 # $2 = Dockerfile which is used for creating the image
 build_docker_container () {
   if [ -z "$1" ]; then
-    echo "No docker image tage specified. Can not create image."
+    echo "No docker image tag specified. Can not create image."
     return 1
   fi
   if [ -z "$2" ]; then
