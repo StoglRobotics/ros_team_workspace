@@ -17,11 +17,10 @@
 docker_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 source $docker_script_own_dir/../_RosTeamWs_Defines.bash
 
-ros_team_ws_dir="$docker_script_own_dir/../../../ros_team_workspace"
-
 # assoziative array which maps the chosen rosdistro to the name which is used to install the corresponding
 # ros distribution inside docker
 declare -r -A map_to_docker_ros_distro_name=( ["foxy"]="foxy" ["galactic"]="galactic" ["rolling"]="rolling" )
+declare -r -A ros_distro_to_rtw_branch=( ["foxy"]="foxy" ["galactic"]="master" ["rolling"]="master")
 
 # $1 = name (tag) of the created docker image
 # $2 = Dockerfile which is used for creating the image
@@ -81,7 +80,6 @@ create_docker_image () {
   --tmpfs /tmp \
   -v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
   -v "$HOME/$ws_folder":"$HOME/$ws_folder_name":rw \
-  -v "$ros_team_ws_dir":/opt/RosTeamWS/ros_ws_"$RosTeamWS_DISTRO"/src/ros_team_workspace:rw \
   --name "$docker_image_tag"-instance \
   -it "$docker_image_tag" /bin/bash
 }

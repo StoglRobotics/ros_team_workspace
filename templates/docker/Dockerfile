@@ -39,6 +39,9 @@ RUN apt-get update -y && DEBIAN_FRONTEND=noniteractive apt-get install -y ros-RO
 RUN pip install -U rosdep && \
     rosdep init
 
+# setup ros_team_ws 
+RUN git clone -b ROS_TEAM_WS_DUMMY_BRANCH https://github.com/StoglRobotics/ros_team_workspace.git /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/
+
 # setup standard .bashrc
 COPY bashrc ${home}/.bashrc
 COPY ros_team_ws_rc_docker ${home}/.ros_team_ws_rc
