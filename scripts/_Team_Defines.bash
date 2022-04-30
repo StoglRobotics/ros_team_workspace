@@ -34,7 +34,7 @@ fi
 ## END: Framework definitions adjustable by users
 
 # Check ROS and Load base paths
-check_ros_distro $DEFAULT_ROS_DISTRO 
+check_ros_distro $DEFAULT_ROS_DISTRO
 
 # BEGIN: Define aliases for standard internal functions
 
@@ -82,7 +82,7 @@ rtw_switch_to_docker_root () {
   if [ -z "$RosTeamWS_WS_DOCKER_SUPPORT" ] || [ "$RosTeamWS_WS_DOCKER_SUPPORT" == false ]; then
     print_and_exit "It seems your current workspace does not support docker. If it should, did you activate it by executing _\"<ws_alias>\"?"
   fi
-  
+
   . "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/docker/_RosTeamWs_Docker_Defines.bash start_and_connect_root_to_docker "$RosTeamWS_DOCKER_TAG"
 }
 
