@@ -243,6 +243,13 @@ create_workspace_docker () {
   else
     print_and_exit "For $chosen_ros_distro does no docker container exist."
   fi
+  local rtw_branch_for_ros_distro
+  if [[ -v "ros_distro_to_rtw_branch[$docker_ros_distro_name]" ]];then
+    rtw_branch_for_ros_distro=${ros_distro_to_rtw_branch["$docker_ros_distro_name"]}
+  else
+    print_and_exit "For $docker_ros_distro_name does no RosTeamWorkspace branch exist."
+  fi
+
 
   # setup Dockerfile basrc and .ros_team_ws_rc
   # and copy needed files to workspace dir
@@ -262,6 +269,7 @@ create_workspace_docker () {
   cp "$DOCKER_TEMPLATES/Dockerfile" "$ws_docker_folder/."
   sed -i "s/UBUNTU_DUMMY_VERSION/${ubuntu_version}/g" "$ws_docker_folder/Dockerfile"
   sed -i "s/ROS_DUMMY_VERSION/${docker_ros_distro_name}/g" "$ws_docker_folder/Dockerfile"
+  sed -i "s/ROS_TEAM_WS_DUMMY_BRANCH/${rtw_branch_for_ros_distro}/g" "$ws_docker_folder/Dockerfile"
 
   # setup ros_team_ws
   cp "$DOCKER_TEMPLATES/ros_team_ws_rc_docker" "$ws_docker_folder/."
