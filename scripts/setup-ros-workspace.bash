@@ -56,9 +56,11 @@ check_user_input () {
 }
 
 setup_new_workspace () {
-    # TODO: Write this automatically from the user's definitions
+  ros_distro_base_workspace_source_path="/opt/ros/$ros_distro/setup.bash"
+
+  # TODO: Write this automatically from the user's definitions
   echo "Please choose which workspace should be basis for yours:"
-  echo "(0) <Use current sourced workspace>"
+  echo "(0) <Use current sourced workspace> (or if non sourced, source '${ros_distro_base_workspace_source_path}')"
   read choice
 
   if [ -z "$choice" ]; then
@@ -79,6 +81,14 @@ setup_new_workspace () {
     print_and_exit "No workspace chosen! Exiting..."
   esac
 
+  base_ws_path=""
+
+  if [ -z "$ROS_DISTRO" ]; then
+    echo -e "${TERMINAL_COLOR_YELLOW}No workspace is sourced, sourcing: '${ros_distro_base_workspace_source_path}'${TERMINAL_COLOR_NC}"
+    source ${ros_distro_base_workspace_source_path}
+    base_ws_path="${ros_distro_base_workspace_source_path}"
+  fi
+
   # Form here the full name
   ws_full_name=${ros_distro}
 
@@ -90,9 +100,10 @@ setup_new_workspace () {
   fi
 
   # TODO: Add here output of the <current> WS
-  echo ""
-  read -p "ATTENTION: Creating a new workspace in folder '${ws_folder}' for ROS '${ros_distro}' (ROS$ros_version) with suffix '${ros_ws_suffix}' (full path: '${ws_folder}/${ws_full_name}') using '${base_ws}' as base workspace. Press <ENTER> to continue..."
+  echo -e "\n${TERMINAL_COLOR_PURPLE}ATTENTION: Creating a new workspace in folder '${ws_folder}' for ROS '${ros_distro}' (ROS$ros_version) with suffix '${ros_ws_suffix}' (full path: '${ws_folder}/${ws_full_name}') using '${base_ws}' (${base_ws_path}) as base workspace. Press <ENTER> to continue...${TERMINAL_COLOR_NC}"
+  read
 
+  # TODO(destogl): This part with base workspaces should be updated!!! - this is obsolete logic
   # Create and initialise ROS-Workspace
   if [[ ${base_ws} != "<current>" ]]; then
     if [[ $ros_version == 1 ]]; then
@@ -154,9 +165,11 @@ setup_ros_team_ws_file() {
   sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' "$ros_team_ws_file"
 
   if [ "$use_docker" = true ]; then
-    docker_image_tag=$(sed "s/-//g" <(echo "${ubuntu_version_tag}_${ros_ws_prefix}_${ws_folder}_${ros_ws_suffix}_${chosen_ros_distro}"))
+    docker_image_tag=$(sed "s/[\/]/-/g" <(echo "ros-team-ws_${ubuntu_version_tag}__${ws_folder}__${ws_full_name}"))
+    docker_host_name="rtw-${ws_full_name}-docker"
   else
     docker_image_tag="-"
+    docker_host_name="-"
   fi
 
   local docker_support="$use_docker"
@@ -229,6 +242,7 @@ create_workspace_docker () {
   local chosen_ros_distro=$ros_distro # need to store, ros_distro gets overwritten while creating workspace...
   setup_new_workspace
 
+  # TODO(destogl): we should remove updating of configs if docker is used - can we do this already?
   local is_docker_rtw_file=false
   update_config
 
@@ -251,7 +265,7 @@ create_workspace_docker () {
   fi
 
 
-  # setup Dockerfile basrc and .ros_team_ws_rc
+  # setup Dockerfile bashrc and .ros_team_ws_rc
   # and copy needed files to workspace dir
   ws_docker_folder="${ws_folder}/.rtw_docker_defines"
   mkdir -p "$ws_docker_folder"
@@ -260,7 +274,7 @@ create_workspace_docker () {
   cp "$DOCKER_TEMPLATES/bashrc" "$ws_docker_folder/."
   # add the name of the workspace folder in docker, so that it can be inited in bashrc the first time used.
   local docker_ws_folder
-  docker_ws_folder="$ws_folder/${docker_ros_distro_name}"
+  docker_ws_folder="$ws_folder/${docker_ros_distro_name}"${TERMINAL_COLOR_NC}
   sed -i "s|DUMMY_WS_FOLDER|${docker_ws_folder}|g" "$ws_docker_folder/bashrc"
   echo "" >> "$ws_docker_folder/bashrc"
   echo "$alias_name" >> "$ws_docker_folder/bashrc"
@@ -287,7 +301,7 @@ create_workspace_docker () {
   echo "######################################################################################################################"
   sleep 2 # give user time to read above message before switching to docker container
 
-  create_docker_image "$docker_image_tag" "$ws_folder" "$chosen_ros_distro"
+  create_docker_image "$docker_image_tag" "$ws_folder" "$chosen_ros_distro" "$docker_host_name"
 }
 
 # needed for expanding the arguments

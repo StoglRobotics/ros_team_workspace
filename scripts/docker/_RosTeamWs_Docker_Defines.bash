@@ -49,7 +49,7 @@ build_docker_container () {
   --build-arg home=$HOME \
   -t "$docker_image_tag" . || { return 1; }
 
-  cd "$prev_pwd" || { print_and_exit "Build of docker container succeeded but changing back previous working directory failed. Exting."; }
+  cd "$prev_pwd" || { print_and_exit "Build of docker container succeeded but changing back previous working directory failed."; }
 }
 
 create_docker_image () {
@@ -68,14 +68,20 @@ create_docker_image () {
   fi
   local RosTeamWS_DISTRO=$3
 
+  if [ -z "$4" ]; then
+    print_and_exit "No docker host name given. Can not instantiate image."
+  fi
+  local docker_host_name=$4
+
   local ws_folder_name
   ws_folder_name=$(basename "$ws_folder") # assigen separate https://github.com/koalaman/shellcheck/wiki/SC2155
 
-  echo "Instantiating docker image $docker_image_tag and map workspace folder $ws_folder_name to $HOME/."
-  echo "ros_team_ws is mounted under /opt/RosTeamWS/ros_ws_"$RosTeamWS_DISTRO"/src/ros_team_workspace"
+  echo "Instantiating docker image '$docker_image_tag' and map workspace folder '$ws_folder_name' to $HOME/."
+  echo "ros_team_ws is mounted under /opt/RosTeamWS/ros_ws_${RosTeamWS_DISTRO}/src/ros_team_workspace"
   xhost +local:docker
   docker run \
-  --net=host -h "$docker_image_tag"-docker \
+  --net=host \
+  -h ${docker_host_name} \
   -e DISPLAY \
   --tmpfs /tmp \
   -v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
