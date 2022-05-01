@@ -8,6 +8,16 @@ usage="setup-ros-workspace.bash ROS_DISTRO WS_FOLDER WS_PREFIX WS_SUFFIX"
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 source $script_own_dir/_RosTeamWs_Defines.bash
 
+# TODO(destogl): can we somehow reuse this in each and every script: a function? or source?
+if [ -z "$1" ]; then
+  print_and_exit "No input parameters provided" "$usage"
+  return 2>/dev/null || exit
+elif [[ $1 == "--help" || $1 == "-h" ]]; then
+  print_and_exit "Here is the usage help for this script:" "$usage"
+  return 2>/dev/null || exit
+fi
+
+
 # ros distribution name will be set in ${ros_distro}
 check_ros_distro $1
 
@@ -36,6 +46,7 @@ read choice
 
 if [ -z "$choice" ]; then
   print_and_exit "No workspace is chosen!" "$usage"
+  return 2>/dev/null || exit
 fi
 
 case "$choice" in

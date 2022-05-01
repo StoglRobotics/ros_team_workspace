@@ -221,13 +221,14 @@ function print_and_exit {
 
   message=$1
   echo ""
-  echo -e "${TERMINAL_COLOR_RED}$message  !!Exiting...${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_RED}$message${TERMINAL_COLOR_NC}"
   if [ ! -z "$2" ]; then
     echo ""
     echo -e "${TERMINAL_COLOR_YELLOW}Usage: '$2'${TERMINAL_COLOR_NC}"
   fi
-  echo -e "${TERMINAL_COLOR_BLUE}Error has happened. Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_BLUE}Error has happened. Exiting... Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
   read -p ""
+  return 2>/dev/null || exit
   throw_error
 }
 
