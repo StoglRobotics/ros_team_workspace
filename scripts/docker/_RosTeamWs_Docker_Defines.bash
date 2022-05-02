@@ -86,7 +86,7 @@ create_docker_image () {
   --tmpfs /tmp \
   -v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
   -v "$HOME/$ws_folder":"$HOME/$ws_folder":rw \
-  -v "$HOME/.ssh":"$HOME/.ssh":r \
+  -v "$HOME/.ssh":"$HOME/.ssh":ro \
   --name "$docker_image_tag"-instance \
   -it "$docker_image_tag" /bin/bash
 }
