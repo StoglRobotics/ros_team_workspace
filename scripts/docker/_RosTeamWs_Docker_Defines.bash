@@ -76,7 +76,7 @@ create_docker_image () {
   local ws_folder_name
   ws_folder_name=$(basename "$ws_folder") # assigen separate https://github.com/koalaman/shellcheck/wiki/SC2155
 
-  echo "Instantiating docker image '$docker_image_tag' and map workspace folder '$ws_folder_name' to $HOME/."
+  echo "Instantiating docker image '$docker_image_tag' and mapping workspace folder '$HOME/$ws_folder'."
   echo "ros_team_ws is mounted under /opt/RosTeamWS/ros_ws_${RosTeamWS_DISTRO}/src/ros_team_workspace"
   xhost +local:docker
   docker run \
@@ -85,7 +85,8 @@ create_docker_image () {
   -e DISPLAY \
   --tmpfs /tmp \
   -v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
-  -v "$HOME/$ws_folder":"$HOME/$ws_folder_name":rw \
+  -v "$HOME/$ws_folder":"$HOME/$ws_folder":rw \
+  -v "$HOME/.ssh":"$HOME/.ssh":r \
   --name "$docker_image_tag"-instance \
   -it "$docker_image_tag" /bin/bash
 }
