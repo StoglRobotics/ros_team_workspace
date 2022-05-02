@@ -55,9 +55,11 @@ function RosTeamWS_setup_exports {
   export RAW_TERMINAL_COLOR_LIGHT_GRAY=$'\e[0;37m'
   export RAW_TERMINAL_COLOR_WHITE=$'\e[1;37m'
 
+  ## Define semantics of each color
   export TERMINAL_COLOR_USER_NOTICE=${TERMINAL_COLOR_YELLOW}
   export TERMINAL_COLOR_USER_INPUT_DECISION=${TERMINAL_COLOR_PURPLE}
   export TERMINAL_COLOR_USER_CONFIRMATION=${TERMINAL_COLOR_BLUE}
+  export RTW_COLOR_NOTIFY_USER=${TERMINAL_COLOR_YELLOW}
 }
 
 # TODO(denis): add this into setup.bash
@@ -259,14 +261,18 @@ function framework_default_paths {
 function check_ros_distro {
   ros_distro=$1
   if [ -z "$1" ]; then
-    ros_distro=$DEFAULT_ROS_DISTRO
-    echo "No ros_distro defined. Using default: '$ros_distro'"
-    if [ ! -d "/opt/ros/$ros_distro" ]; then
-      print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-#             echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-#             exit
+    if [ -n "$DEFAULT_ROS_DISTRO" ]; then
+      ros_distro=$DEFAULT_ROS_DISTRO
+      echo "No ros_distro defined. Using default: '$ros_distro'"
+      if [ ! -d "/opt/ros/$ros_distro" ]; then
+        print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+  #             echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+  #             exit
+      fi
+      read -p "Press <ENTER> to continue or <CTRL>+C to exit."
+    else
+      return 2>/dev/null
     fi
-    read -p "Press <ENTER> to continue or <CTRL>+C to exit."
   fi
 
   if [ ! -d "/opt/ros/$ros_distro" ]; then
@@ -279,6 +285,8 @@ function check_ros_distro {
   if [[ $ros_distro == "foxy" ]]; then
     ros_version=2
   elif [[ $ros_distro == "galactic" ]]; then
+    ros_version=2
+  elif [[ $ros_distro == "humble" ]]; then
     ros_version=2
   elif [[ $ros_distro == "rolling" ]]; then
     ros_version=2

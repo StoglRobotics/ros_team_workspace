@@ -58,10 +58,14 @@ check_user_input () {
 setup_new_workspace () {
   ros_distro_base_workspace_source_path="/opt/ros/$ros_distro/setup.bash"
 
-  # TODO: Write this automatically from the user's definitions
-  echo "Please choose which workspace should be basis for yours:"
-  echo "(0) <Use current sourced workspace> (or if non sourced, source '${ros_distro_base_workspace_source_path}')"
-  read choice
+#   # TODO: Write this automatically from the user's definitions
+#   echo "Please choose which workspace should be basis for yours:"
+#   echo "(0) <Use current sourced workspace> (or if non sourced, source '${ros_distro_base_workspace_source_path}')"
+#   read choice
+
+  # TODO(destogl): This is only temporarily solution until we offer different base-workspaces support (above commented lines)
+  choice="0"
+  echo -e "${RTW_COLOR_NOTIFY_USER} The new workspace will base on currently sourced workspace or if none is sourced, '${ros_distro_base_workspace_source_path}' will be sourced."
 
   if [ -z "$choice" ]; then
     print_and_exit "No workspace is chosen!" "$usage"
@@ -114,7 +118,7 @@ setup_new_workspace () {
   fi
 
   mkdir -p ~/${ws_folder}/${ws_full_name}
-  cd ~/${ws_folder}/${ws_full_name} || print_and_exit "Could not change dir to workspace folder. Something went wrong."
+  cd ~/${ws_folder}/${ws_full_name} || { print_and_exit "Could not change dir to workspace folder. Something went wrong."; }
 
   if [ "$use_docker" = false ]; then # only build if not in docker, to avoide wrong dependencies
     if [[ $ros_version == 1 ]]; then
@@ -264,7 +268,6 @@ create_workspace_docker () {
     print_and_exit "For $docker_ros_distro_name does no RosTeamWorkspace branch exist."
   fi
 
-
   # setup Dockerfile bashrc and .ros_team_ws_rc
   # and copy needed files to workspace dir
   ws_docker_folder="${ws_folder}/.rtw_docker_defines"
@@ -301,7 +304,7 @@ create_workspace_docker () {
   echo "######################################################################################################################"
   sleep 2 # give user time to read above message before switching to docker container
 
-  create_docker_image "$docker_image_tag" "$ws_folder" "$chosen_ros_distro" "$docker_host_name"
+  create_docker_image "$docker_image_tag" "$ws_full_name" "$chosen_ros_distro" "$docker_host_name"
 }
 
 # needed for expanding the arguments
