@@ -27,7 +27,7 @@ ENV LC_ALL en_US.UTF-8
 RUN locale
 
 # Install basic utilities
-RUN apt-get -y update && apt-get -y install git nano sudo tmux tree vim
+RUN apt-get -y update && apt-get -y install git nano sudo tmux tree vim iputils-ping
 
 # install ROS2:foxy dependencies
 RUN apt-get install -y curl gnupg gnupg2 lsb-release software-properties-common && apt-add-repository universe
