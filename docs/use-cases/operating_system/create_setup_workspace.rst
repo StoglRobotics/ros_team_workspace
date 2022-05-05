@@ -29,12 +29,21 @@ Docker workspace
 
    setup-ros-workspace-docker ROS_DISTRO WS_FOLDER WS_PREFIX WS_SUFFIX. code-block:: bash
 
-Like the script ``setup-ros-workspace`` the ``setup-ros-workspace-docker`` creates a new local ROS workspace. Then a Ubuntu docker container gets built and the created workspace is mounted inside the docker container under the home directory.The first time a docker container is build can take quite a while. When the first build is finished you are directly connected as user inside the container. You can verify this by checking if your hostname has changed. To exit a container simply type the ``exit`` command.
-
-If you exited a container an want to reconnect as a user, you have to run the ``rtw_switch_to_docker`` command. However before executing this you have to source your workspace with ``_<workspace_alias_command>``. If you want to connect as a root user you can execute ``rtw_switch_to_docker_root``.
+Like the script ``setup-ros-workspace`` the ``setup-ros-workspace-docker`` creates a new local ROS workspace. Then a Ubuntu docker container gets built and the created workspace is mounted inside the docker container under the home directory. The first time a docker container is build can take quite a while. When the first build is finished you are directly connected as user inside the container. You can verify this by checking if your hostname has changed. To exit a container simply type the ``exit`` command.
 
 .. note::
   If you want to forward a xsession from docker (e.g. rviz2), you have to install xhost.
+
+Reconnect to a container
+""""""""""""""""""""""""""
+
+If you exited a container an want to reconnect as a user, you have to run the ``rtw_switch_to_docker`` command. However before executing this you have to source your workspace with ``_<workspace_alias_command>``. If you want to connect as a root user you can execute ``rtw_switch_to_docker_root``.
+
+Recreate a container
+""""""""""""""""""""""
+
+Supported ros versions
+^^^^^^^^^^^^^^^^^^^^^^^
 
 For the supported Ubuntu and ros version combinations have a look at the table below.
 
@@ -57,4 +66,4 @@ For the supported Ubuntu and ros version combinations have a look at the table b
      - X
 
 .. note::
-  For more general questions on the usage of docker and the limitations of RosTeamWS in interacting with docker have a look at our docker related docs.
+  For more general questions on the usage of docker and the limitations of RosTeamWS in interacting with docker have a look at our :ref:`docker related docs<docker>`.
