@@ -232,6 +232,69 @@ function print_and_exit {
   throw_error
 }
 
+function print_error {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "${TERMINAL_COLOR_RED}ERROR: ${message}${RAW_TERMINAL_COLOR_NC}"
+  fi
+}
+
+function print_warning {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "${TERMINAL_COLOR_YELLOW}WARNING: ${message}${RAW_TERMINAL_COLOR_NC}"
+  fi
+}
+
+function print_info {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "INFO: ${message}"
+  fi
+}
+
+function print_notifycation {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "${TERMINAL_COLOR_BLUE}NOTE: ${message}${TERMINAL_COLOR_NC}"
+  fi
+}
+
+function print_success {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "${TERMINAL_COLOR_GREEN}SUCCESS: ${message}${TERMINAL_COLOR_NC}"
+  fi
+}
+
+function print_usage {
+  RosTeamWS_setup_exports
+
+  usage=$1
+  message=$2
+  if [ -n "$usage" ]; then
+    print_notifycation "$usage"
+  fi
+  if [ -n "$message" ]; then
+    print_info "$message"
+  fi
+}
+
 function framework_default_paths {
   ros_distro=$1
 
