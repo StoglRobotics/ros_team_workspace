@@ -226,7 +226,7 @@ function print_and_exit {
 
   message=$1
   echo ""
-  echo -e "${TERMINAL_COLOR_RED}$message  !!Exiting...${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_RED}$message!!! Exiting...${TERMINAL_COLOR_NC}"
   if [ ! -z "$2" ]; then
     echo ""
     echo -e "${TERMINAL_COLOR_YELLOW}Usage: '$2'${TERMINAL_COLOR_NC}"
@@ -240,7 +240,11 @@ function framework_default_paths {
   ros_distro=$1
 
   FRAMEWORK_NAME="ros_team_workspace"
-  FRAMEWORK_BASE_PATH=${FRAMEWORK_BASE_PATH:=/opt/RosTeamWS}
+
+  # if we suppose a structure like
+  # /opt/RosTeamWS/ros_ws_<ros_distro>/src/ros_team_ws/...
+  # then FRAMEWORK_BASE_PATH should be /opt/RosTeamWS/
+  FRAMEWORK_BASE_PATH="$(RosTeamWS_script_own_dir)/../../../.."
   FRAMEWORK_PACKAGE_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro/src/$FRAMEWORK_NAME"
 
   if [ ! -d "$FRAMEWORK_PACKAGE_PATH" ]; then

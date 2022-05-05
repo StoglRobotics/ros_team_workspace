@@ -7,7 +7,7 @@ source $setup_ws_script_own_dir/docker/_RosTeamWs_Docker_Defines.bash
 
 check_user_input () {
   # ros distribution name will be set in ${ros_distro}
-  check_ros_distro $1
+  check_ros_distro "$1"
 
   ws_folder="$2"
   if [ -z "$2" ]; then
@@ -270,14 +270,14 @@ create_workspace_docker () {
 
   # setup Dockerfile bashrc and .ros_team_ws_rc
   # and copy needed files to workspace dir
-  ws_docker_folder="${ws_folder}/.rtw_docker_defines"
+  ws_docker_folder="${ws_folder}/${ws_full_name}/.rtw_docker_defines"
   mkdir -p "$ws_docker_folder"
 
   # setup .bashrc
   cp "$DOCKER_TEMPLATES/bashrc" "$ws_docker_folder/."
   # add the name of the workspace folder in docker, so that it can be inited in bashrc the first time used.
   local docker_ws_folder
-  docker_ws_folder="$ws_folder/${docker_ros_distro_name}"${TERMINAL_COLOR_NC}
+  docker_ws_folder="${ws_folder}/${ws_full_name}"
   sed -i "s|DUMMY_WS_FOLDER|${docker_ws_folder}|g" "$ws_docker_folder/bashrc"
   echo "" >> "$ws_docker_folder/bashrc"
   echo "$alias_name" >> "$ws_docker_folder/bashrc"
@@ -295,6 +295,12 @@ create_workspace_docker () {
   sed -i "s/ROS_DUMMY_VERSION/${chosen_ros_distro}/g" "$rtw_file"
   setup_ros_team_ws_file "$rtw_file" "$use_docker" "true"
 
+  # copy file for recreating docker
+  cp "$DOCKER_TEMPLATES/recreate_docker.sh" "$ws_docker_folder/."
+  sed -i "s/DUMMY_DOCKER_IMAGE_TAG/${docker_image_tag}/g" "$ws_docker_folder/recreate_docker.sh"
+  sed -i "s/DUMMY_DOCKER_HOSTNAME/${docker_host_name}/g" "$ws_docker_folder/recreate_docker.sh"
+  sed -i "s|DUMMY_WS_FOLDER|${docker_ws_folder}|g" "$ws_docker_folder/recreate_docker.sh"
+
   # now we are all set for building the container
   build_docker_container "$docker_image_tag" "$ws_docker_folder/Dockerfile" || { print_and_exit "Build of docker container failed."; }
 
@@ -304,9 +310,5 @@ create_workspace_docker () {
   echo "######################################################################################################################"
   sleep 2 # give user time to read above message before switching to docker container
 
-  create_docker_image "$docker_image_tag" "$ws_full_name" "$chosen_ros_distro" "$docker_host_name"
+  create_docker_image "$docker_image_tag" "${docker_ws_folder}" "$chosen_ros_distro" "$docker_host_name"
 }
-
-# needed for expanding the arguments
-# DO NOT REMOVE!
-"$@"
