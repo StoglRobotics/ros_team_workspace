@@ -53,3 +53,5 @@ The opinions and proposals stated here are merely related to the authors' experi
    getting_started/index.rst
    guidelines/index.rst
    use-cases/index.rst
+   docker/index.rst
+   faq/index.rst
