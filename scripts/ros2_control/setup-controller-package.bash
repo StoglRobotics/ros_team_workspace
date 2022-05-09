@@ -27,11 +27,13 @@ check_ros_distro ${ROS_DISTRO}
 
 FILE_NAME=$1
 if [ -z "$1" ]; then
-  print_and_exit "ERROR: You should provide the file name!" "$usage"
+  print_and_exit "You should provide the file name! Nothing to do 😯" "$usage"
 fi
 if [ -f src/$FILE_NAME.cpp ]; then
-  print_and_exit "ERROR:The file '$FILE_NAME' already exist!" "$usage"
+  print_and_exit "ERROR:The file '$FILE_NAME' already exist! 😱!" "$usage"
 fi
+
+echo ""  # Adds empty line
 
 CLASS_NAME=$2
 if [ -z "$2" ]; then
@@ -43,25 +45,27 @@ if [ -z "$2" ]; then
     s=${s#*"$delimiter"}
     CLASS_NAME="$CLASS_NAME${part^}"
   done
-  echo "ClassName guessed from the '$FILE_NAME': '$CLASS_NAME'. Is this correct? If not, provide it as the second parameter."
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}ClassName guessed from the '$FILE_NAME': '$CLASS_NAME'. Is this correct? If not, provide it as the second parameter.${TERMINAL_COLOR_NC}"
 fi
 
 PKG_NAME=$3
 if [ -z "$3" ]; then
   current=$(pwd)
   PKG_NAME=$(basename "$current")
-  echo "Package name guessed from the current path is '$PKG_NAME'. Is this correct? If not provide it as the third parameter."
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}Package name guessed from the current path is '$PKG_NAME'. Is this correct? If not provide it as the third parameter.${TERMINAL_COLOR_NC}"
 fi
+read
 
-echo "Which license-header do you want to use? [1]"
+echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Which license-header do you want to use? [1]"
 echo "(0) None"
-echo "(1) Apache 2.0 License"
-echo "(2) Propiatery"
+echo "(1) Apache-2.0"
+echo -n -e "(2) Propiatery${TERMINAL_COLOR_NC}"
 read choice
 choice=${choice:="1"}
 
 if [ "$choice" != 0 ]; then
-  read -p "Insert your company or personal name (copyright): " NAME_ON_LICENSE
+  echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Insert your company or personal name (copyright): ${TERMINAL_COLOR_NC}"
+  read NAME_ON_LICENSE
   NAME_ON_LICENSE=${NAME_ON_LICENSE=""}
   YEAR_ON_LICENSE=$(date +%Y)
 fi
@@ -75,13 +79,15 @@ case "$choice" in
   LICENSE_HEADER="$LICENSE_TEMPLATES/propriatery_company_cpp.txt"
 esac
 
-read -p "Is package already configured (is in there a working controller already)? (yes/no) [no] " package_configured
+echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Is package already configured (is in there a working controller already)? (yes/no) [no] ${TERMINAL_COLOR_NC}"
+read package_configured
 package_configured=${package_configured:="no"}
 
 echo ""
-echo "ATTENTION: Setting up ros2_control controller files with following parameters: file name '$FILE_NAME', class '$CLASS_NAME', package/namespace '$PKG_NAME'. Those will be placed in folder '`pwd`'."
+echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up ros2_control controller files with following parameters: file name '$FILE_NAME', class '$CLASS_NAME', package/namespace '$PKG_NAME'. Those will be placed in folder '`pwd`'.${TERMINAL_COLOR_NC}"
 echo ""
-read -p "If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct controller name."
+echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct controller name.${TERMINAL_COLOR_NC}"
+read
 
 # Add folders if deleted
 ADD_FOLDERS=("include/$PKG_NAME" "src" "test")
@@ -101,7 +107,7 @@ TEST_HPP="test/test_$FILE_NAME.hpp"
 
 # Copy files
 if [[ ! -f "$VC_H" ]]; then
-  cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/visibility_control.h $VC_H
+  cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/dummy_package_namespace/visibility_control.h $VC_H
 fi
 cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_pluginlib.xml >> $PLUGIN_XML
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/dummy_controller.hpp $CTRL_HPP
@@ -110,7 +116,7 @@ cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_load_dummy_controller.cpp $LOAD_TE
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.cpp $TEST_CPP
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.hpp $TEST_HPP
 
-echo "Template files copied."
+echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files copied.${TERMINAL_COLOR_NC}"
 
 # TODO(anyone): fuse this with hardware interface package creating.
 
@@ -139,8 +145,7 @@ FILES_TO_SED+=("$PLUGIN_XML")
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
-  sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
-  sed -i "s/TEMPLATES__ROS2_CONTROL__HARDWARE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard from hardware
+  sed -i "s/TEMPLATES__ROS2_CONTROL__VISIBILITY/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
   sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
   sed -i "s/dummy_controller/${FILE_NAME}/g" $SED_FILE # file name
   sed -i "s/DUMMY_CONTROLLER/${FILE_NAME^^}/g" $SED_FILE # file name for include guard
@@ -188,6 +193,7 @@ echo "  pluginlib" >> $TMP_FILE
 echo "  rclcpp" >> $TMP_FILE
 echo "  rclcpp_lifecycle" >> $TMP_FILE
 echo "  realtime_tools" >> $TMP_FILE
+echo "  std_srvs" >> $TMP_FILE
 echo ")" >> $TMP_FILE
 
 if [[ "$package_configured" == "no" ]]; then
@@ -270,6 +276,7 @@ if [[ "$package_configured" == "no" ]]; then
   echo "  rclcpp" >> $TMP_FILE
   echo "  rclcpp_lifecycle" >> $TMP_FILE
   echo "  realtime_tools" >> $TMP_FILE
+  echo "  std_srvs" >> $TMP_FILE
   echo ")" >> $TMP_FILE
 
 fi
@@ -281,7 +288,7 @@ tail -n +$TEST_LINE CMakeLists.txt | tail -n +$CUT_LINE >> $TMP_FILE
 mv $TMP_FILE CMakeLists.txt
 
 # CMakeLists.txt & package.xml: Add dependencies if they not exist
-DEP_PKGS=("realtime_tools" "rclcpp_lifecycle" "rclcpp" "pluginlib" "hardware_interface" "controller_interface" "control_msgs")
+DEP_PKGS=("std_srvs" "realtime_tools" "rclcpp_lifecycle" "rclcpp" "pluginlib" "hardware_interface" "controller_interface" "control_msgs")
 
 for DEP_PKG in "${DEP_PKGS[@]}"; do
 
@@ -339,7 +346,7 @@ if [ -f README.md ]; then
 
 fi
 
-echo "Template files are adjusted."
+echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files were adjusted.${TERMINAL_COLOR_NC}"
 
 git add .
 # git commit -m "RosTeamWS: ros2_control skeleton files for $ROBOT_NAME generated."
@@ -350,4 +357,4 @@ git add .
 compile_and_source_package $PKG_NAME "yes"
 
 echo ""
-echo "FINISHED: Your package is set and the tests should be finished without any errors. (linter errors possible!)"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: Your package is set and the tests should be finished without any errors. (linter errors possible!)${TERMINAL_COLOR_NC}"

@@ -20,7 +20,7 @@ DEFAULT_ROS_VERSION=2
 # TODO(denis): We have two example teams. On is working with industrial and other with mobile robots
 # TEAM_TEAM_NAMES=("Industrial" "Mobile")
 
-TEAM_LICENSE="Apache License 2.0"
+TEAM_LICENSE="Apache-2.0"
 
 TEAM_REPOSITORY_SERVER="https://github.com"
 

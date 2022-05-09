@@ -35,34 +35,31 @@
 // TODO(anyone): Replace with controller specific messages
 #include "control_msgs/msg/joint_controller_state.hpp"
 #include "control_msgs/msg/joint_jog.hpp"
+#include "std_srvs/srv/set_bool.hpp"
 
 // TODO(anyone): replace the state and command message types
 using ControllerStateMsg = control_msgs::msg::JointControllerState;
 using ControllerCommandMsg = control_msgs::msg::JointJog;
+using ControllerModeSrvType = std_srvs::srv::SetBool;
 
 namespace
 {
-constexpr auto NODE_SUCCESS =
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-constexpr auto NODE_ERROR =
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::ERROR;
-
-rclcpp::WaitResultKind wait_for(rclcpp::SubscriptionBase::SharedPtr subscription)
-{
-  rclcpp::WaitSet wait_set;
-  wait_set.add_subscription(subscription);
-  const auto timeout = std::chrono::seconds(10);
-  return wait_set.wait(timeout).kind();
-}
-
+constexpr auto NODE_SUCCESS = controller_interface::CallbackReturn::SUCCESS;
+constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 }  // namespace
+// namespace
 
 // subclassing and friending so we can access member variables
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
   FRIEND_TEST(DummyClassNameTest, joint_names_parameter_not_set);
+  FRIEND_TEST(DummyClassNameTest, state_joint_names_parameter_not_set);
   FRIEND_TEST(DummyClassNameTest, interface_parameter_not_set);
   FRIEND_TEST(DummyClassNameTest, all_parameters_set_configure_success);
+  FRIEND_TEST(DummyClassNameTest, activate_success);
+  FRIEND_TEST(DummyClassNameTest, reactivate_success);
+  FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
+  FRIEND_TEST(DummyClassNameTest, test_update_logic);
 
 public:
   CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override
@@ -70,7 +67,7 @@ public:
     auto ret = dummy_package_namespace::DummyClassName::on_configure(previous_state);
     // Only if on_configure is successful create subscription
     if (ret == CallbackReturn::SUCCESS) {
-      command_subscriber_wait_set_.add_subscription(command_subscriber_);
+      cmd_subscriber_wait_set_.add_subscription(cmd_subscriber_);
     }
     return ret;
   }
@@ -82,23 +79,33 @@ public:
    *
    * @return true if new ControllerCommandMsg msg was received, false if timeout.
    */
-  bool wait_for_commands(
-    rclcpp::Executor & executor,
+  bool wait_for_command(
+    rclcpp::Executor & executor, rclcpp::WaitSet & subscriber_wait_set,
     const std::chrono::milliseconds & timeout = std::chrono::milliseconds{500})
   {
-    bool success =
-      command_subscriber_wait_set_.wait(timeout).kind() == rclcpp::WaitResultKind::Ready;
+    bool success = subscriber_wait_set.wait(timeout).kind() == rclcpp::WaitResultKind::Ready;
     if (success) {
       executor.spin_some();
     }
     return success;
   }
 
+  bool wait_for_commands(
+    rclcpp::Executor & executor,
+    const std::chrono::milliseconds & timeout = std::chrono::milliseconds{500})
+  {
+    return wait_for_command(executor, cmd_subscriber_wait_set_, timeout);
+  }
+
+  // TODO(anyone): add implementation of any methods of your controller is needed
+
 private:
-  rclcpp::WaitSet command_subscriber_wait_set_;
+  rclcpp::WaitSet cmd_subscriber_wait_set_;
 };
 
-class DummyClassNameTest : public ::testing::Test
+// We are using template class here for easier reuse of Fixture in specializations of controllers
+template <typename CtrlType>
+class DummyClassNameFixture : public ::testing::Test
 {
 public:
   static void SetUpTestCase() { rclcpp::init(0, nullptr); }
@@ -106,11 +113,15 @@ public:
   void SetUp()
   {
     // initialize controller
-    controller_ = std::make_unique<TestableDummyClassName>();
+    controller_ = std::make_unique<CtrlType>();
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
     command_publisher_ = command_publisher_node_->create_publisher<ControllerCommandMsg>(
       "/test_dummy_package_namespace/commands", rclcpp::SystemDefaultsQoS());
+
+    service_caller_node_ = std::make_shared<rclcpp::Node>("service_caller");
+    slow_control_service_client_ = service_caller_node_->create_client<ControllerModeSrvType>(
+      "/test_dummy_package_namespace/set_slow_control_mode");
   }
 
   static void TearDownTestCase() { rclcpp::shutdown(); }
@@ -118,16 +129,16 @@ public:
   void TearDown() { controller_.reset(nullptr); }
 
 protected:
-  void SetUpController(bool set_parameters = true)
+  void SetUpController(
+    bool set_parameters = true, std::string controller_name = "test_dummy_package_namespace")
   {
-    const auto result = controller_->init("test_dummy_package_namespace");
-    ASSERT_EQ(result, controller_interface::return_type::OK);
+    ASSERT_EQ(controller_->init(controller_name), controller_interface::return_type::OK);
 
     std::vector<hardware_interface::LoanedCommandInterface> command_ifs;
     command_itfs_.reserve(joint_command_values_.size());
     command_ifs.reserve(joint_command_values_.size());
 
-    for (auto i = 0u; i < joint_command_values_.size(); ++i) {
+    for (size_t i = 0; i < joint_command_values_.size(); ++i) {
       command_itfs_.emplace_back(hardware_interface::CommandInterface(
         joint_names_[i], interface_name_, &joint_command_values_[i]));
       command_ifs.emplace_back(command_itfs_.back());
@@ -138,7 +149,7 @@ protected:
     state_itfs_.reserve(joint_state_values_.size());
     state_ifs.reserve(joint_state_values_.size());
 
-    for (auto i = 0u; i < joint_state_values_.size(); ++i) {
+    for (size_t i = 0; i < joint_state_values_.size(); ++i) {
       state_itfs_.emplace_back(hardware_interface::StateInterface(
         joint_names_[i], interface_name_, &joint_state_values_[i]));
       state_ifs.emplace_back(state_itfs_.back());
@@ -149,6 +160,7 @@ protected:
 
     if (set_parameters) {
       controller_->get_node()->set_parameter({"joints", joint_names_});
+      controller_->get_node()->set_parameter({"state_joints", state_joint_names_});
       controller_->get_node()->set_parameter({"interface_name", interface_name_});
     }
   }
@@ -162,19 +174,34 @@ protected:
       "/test_dummy_package_namespace/state", 10, subs_callback);
 
     // call update to publish the test value
-    rclcpp::Time node_time = controller_->get_node()->now();
-    rclcpp::Duration duration = rclcpp::Duration::from_nanoseconds(1000000);  // 1ms
-    ASSERT_EQ(controller_->update(node_time, duration), controller_interface::return_type::OK);
+    ASSERT_EQ(
+      controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+      controller_interface::return_type::OK);
 
-    // wait for message to be passed
-    ASSERT_EQ(wait_for(subscription), rclcpp::WaitResultKind::Ready);
+    // call update to publish the test value
+    // since update doesn't guarantee a published message, republish until received
+    int max_sub_check_loop_count = 5;  // max number of tries for pub/sub loop
+    rclcpp::WaitSet wait_set;          // block used to wait on message
+    wait_set.add_subscription(subscription);
+    while (max_sub_check_loop_count--) {
+      controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01));
+      // check if message has been received
+      if (wait_set.wait(std::chrono::milliseconds(2)).kind() == rclcpp::WaitResultKind::Ready) {
+        break;
+      }
+    }
+    ASSERT_GE(max_sub_check_loop_count, 0) << "Test was unable to publish a message through "
+                                              "controller/broadcaster update loop";
 
     // take message from subscription
     rclcpp::MessageInfo msg_info;
     ASSERT_TRUE(subscription->take(msg, msg_info));
   }
 
-  void publish_commands()
+  // TODO(anyone): add/remove arguments as it suites your command message type
+  void publish_commands(
+    const std::vector<double> & displacements = {0.45},
+    const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name) {
       size_t wait_count = 0;
@@ -193,11 +220,37 @@ protected:
 
     ControllerCommandMsg msg;
     msg.joint_names = joint_names_;
-    msg.displacements = {0.45};
-    msg.velocities = {0.0};
-    msg.duration = 1.25;
+    msg.displacements = displacements;
+    msg.velocities = velocities;
+    msg.duration = duration;
 
     command_publisher_->publish(msg);
+  }
+
+  std::shared_ptr<ControllerModeSrvType::Response> call_service(
+    const bool slow_control, rclcpp::Executor & executor)
+  {
+    auto request = std::make_shared<ControllerModeSrvType::Request>();
+    request->data = slow_control;
+
+    auto services = service_caller_node_->get_service_names_and_types();
+    std::cout << "Show all services for debugging" << std::endl;
+    for (auto it = services.begin(); it != services.end(); ++it) {
+      RCLCPP_INFO(
+        service_caller_node_->get_logger(), "Service name is '%s' with type '%s'",
+        it->first.c_str(), it->second[0].c_str());
+    }
+
+    bool wait_for_service_ret =
+      slow_control_service_client_->wait_for_service(std::chrono::milliseconds(500));
+    EXPECT_TRUE(wait_for_service_ret);
+    if (!wait_for_service_ret) {
+      throw std::runtime_error("Services is not available!");
+    }
+    auto result = slow_control_service_client_->async_send_request(request);
+    EXPECT_EQ(executor.spin_until_future_complete(result), rclcpp::FutureReturnCode::SUCCESS);
+
+    return result.get();
   }
 
 protected:
@@ -205,6 +258,7 @@ protected:
 
   // Controller-related parameters
   std::vector<std::string> joint_names_ = {"joint1"};
+  std::vector<std::string> state_joint_names_ = {"joint1state"};
   std::string interface_name_ = "my_interface";
   std::array<double, 1> joint_state_values_ = {1.1};
   std::array<double, 1> joint_command_values_ = {101.101};
@@ -216,24 +270,26 @@ protected:
   std::unique_ptr<TestableDummyClassName> controller_;
   rclcpp::Node::SharedPtr command_publisher_node_;
   rclcpp::Publisher<ControllerCommandMsg>::SharedPtr command_publisher_;
+  rclcpp::Node::SharedPtr service_caller_node_;
+  rclcpp::Client<ControllerModeSrvType>::SharedPtr slow_control_service_client_;
 };
 
-// From the tutorial: https://www.sandordargo.com/blog/2019/04/24/parameterized-testing-with-gtest
-class DummyClassNameTestParameterizedParameters
-: public DummyClassNameTest,
-  public ::testing::WithParamInterface<std::tuple<std::string, rclcpp::ParameterValue>>
-{
-public:
-  virtual void SetUp() { DummyClassNameTest::SetUp(); }
-
-  static void TearDownTestCase() { DummyClassNameTest::TearDownTestCase(); }
-
-protected:
-  void SetUpController(bool set_parameters = true)
-  {
-    DummyClassNameTest::SetUpController(set_parameters);
-    controller_->get_node()->set_parameter({std::get<0>(GetParam()), std::get<1>(GetParam())});
-  }
-};
+// // From the tutorial: https://www.sandordargo.com/blog/2019/04/24/parameterized-testing-with-gtest
+// class DummyClassNameTestParameterizedParameters
+// : public DummyClassNameFixture<TestableDummyClassName>,
+//   public ::testing::WithParamInterface<std::tuple<std::string, rclcpp::ParameterValue>>
+// {
+// public:
+//   virtual void SetUp() { DummyClassNameFixture::SetUp(); }
+//
+//   static void TearDownTestCase() { DummyClassNameFixture::TearDownTestCase(); }
+//
+// protected:
+//   void SetUpController(bool set_parameters = true)
+//   {
+//     DummyClassNameFixture::SetUpController(set_parameters);
+//     controller_->get_node()->set_parameter({std::get<0>(GetParam()), std::get<1>(GetParam())});
+//   }
+// };
 
 #endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_
