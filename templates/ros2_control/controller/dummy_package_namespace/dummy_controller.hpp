@@ -39,6 +39,12 @@ static constexpr size_t STATE_MY_ITFS = 0;
 // name constants for command interfaces
 static constexpr size_t CMD_MY_ITFS = 0;
 
+// TODO(anyone: xample setup for control mode (usually you will use some enums defined in messages)
+enum class control_mode_type : std::uint8_t {
+  FAST = 0,
+  SLOW = 1,
+};
+
 class DummyClassName : public controller_interface::ControllerInterface
 {
 public:
@@ -85,7 +91,7 @@ protected:
   using ControllerModeSrvType = std_srvs::srv::SetBool;
 
   rclcpp::Service<ControllerModeSrvType>::SharedPtr set_slow_control_mode_service_;
-  realtime_tools::RealtimeBuffer<bool> slow_control_mode_;
+  realtime_tools::RealtimeBuffer<control_mode_type> control_mode_;
 
   using ControllerStateMsg = control_msgs::msg::JointControllerState;
   using ControllerStatePublisher = realtime_tools::RealtimePublisher<ControllerStateMsg>;

@@ -16,6 +16,7 @@
 #define TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_
 
 #include <chrono>
+#include <limits>
 #include <memory>
 #include <string>
 #include <tuple>
@@ -59,7 +60,8 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, activate_success);
   FRIEND_TEST(DummyClassNameTest, reactivate_success);
   FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic);
+  FRIEND_TEST(DummyClassNameTest, test_update_logic_fast);
+  FRIEND_TEST(DummyClassNameTest, test_update_logic_slow);
 
 public:
   CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override
@@ -233,14 +235,6 @@ protected:
     auto request = std::make_shared<ControllerModeSrvType::Request>();
     request->data = slow_control;
 
-    auto services = service_caller_node_->get_service_names_and_types();
-    std::cout << "Show all services for debugging" << std::endl;
-    for (auto it = services.begin(); it != services.end(); ++it) {
-      RCLCPP_INFO(
-        service_caller_node_->get_logger(), "Service name is '%s' with type '%s'",
-        it->first.c_str(), it->second[0].c_str());
-    }
-
     bool wait_for_service_ret =
       slow_control_service_client_->wait_for_service(std::chrono::milliseconds(500));
     EXPECT_TRUE(wait_for_service_ret);
@@ -274,22 +268,22 @@ protected:
   rclcpp::Client<ControllerModeSrvType>::SharedPtr slow_control_service_client_;
 };
 
-// // From the tutorial: https://www.sandordargo.com/blog/2019/04/24/parameterized-testing-with-gtest
-// class DummyClassNameTestParameterizedParameters
-// : public DummyClassNameFixture<TestableDummyClassName>,
-//   public ::testing::WithParamInterface<std::tuple<std::string, rclcpp::ParameterValue>>
-// {
-// public:
-//   virtual void SetUp() { DummyClassNameFixture::SetUp(); }
-//
-//   static void TearDownTestCase() { DummyClassNameFixture::TearDownTestCase(); }
-//
-// protected:
-//   void SetUpController(bool set_parameters = true)
-//   {
-//     DummyClassNameFixture::SetUpController(set_parameters);
-//     controller_->get_node()->set_parameter({std::get<0>(GetParam()), std::get<1>(GetParam())});
-//   }
-// };
+// From the tutorial: https://www.sandordargo.com/blog/2019/04/24/parameterized-testing-with-gtest
+class DummyClassNameTestParameterizedParameters
+: public DummyClassNameFixture<TestableDummyClassName>,
+  public ::testing::WithParamInterface<std::tuple<std::string, rclcpp::ParameterValue>>
+{
+public:
+  virtual void SetUp() { DummyClassNameFixture::SetUp(); }
+
+  static void TearDownTestCase() { DummyClassNameFixture::TearDownTestCase(); }
+
+protected:
+  void SetUpController(bool set_parameters = true)
+  {
+    DummyClassNameFixture::SetUpController(set_parameters);
+    controller_->get_node()->set_parameter({std::get<0>(GetParam()), std::get<1>(GetParam())});
+  }
+};
 
 #endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_

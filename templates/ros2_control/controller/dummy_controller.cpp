@@ -44,6 +44,8 @@ DummyClassName::DummyClassName() : controller_interface::ControllerInterface() {
 
 controller_interface::CallbackReturn DummyClassName::on_init()
 {
+  control_mode_.initRT(control_mode_type::FAST);
+
   try {
     get_node()->declare_parameter<std::vector<std::string>>("joints", std::vector<std::string>({}));
     get_node()->declare_parameter<std::vector<std::string>>(
@@ -53,12 +55,6 @@ controller_interface::CallbackReturn DummyClassName::on_init()
     fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
     return controller_interface::CallbackReturn::ERROR;
   }
-
-  slow_control_mode_.initRT(false);
-
-  RCLCPP_ERROR(
-    get_node()->get_logger(), "Slow coontrol mode is '%s'.",
-    (slow_control_mode_.readFromRT() ? "true" : "false"));
 
   return controller_interface::CallbackReturn::SUCCESS;
 }
@@ -111,7 +107,11 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
     [&](
       const std::shared_ptr<ControllerModeSrvType::Request> request,
       std::shared_ptr<ControllerModeSrvType::Response> response) {
-      slow_control_mode_.writeFromNonRT(request->data);
+      if (request->data) {
+        control_mode_.writeFromNonRT(control_mode_type::SLOW);
+      } else {
+        control_mode_.writeFromNonRT(control_mode_type::FAST);
+      }
       response->success = true;
     };
 
@@ -203,7 +203,7 @@ controller_interface::return_type DummyClassName::update(
 
   for (size_t i = 0; i < command_interfaces_.size(); ++i) {
     if (!std::isnan((*current_cmd)->displacements[i])) {
-      if (slow_control_mode_.readFromRT()) {
+      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
         (*current_cmd)->displacements[i] /= 2;
       }
       command_interfaces_[i].set_value((*current_cmd)->displacements[i]);
