@@ -59,7 +59,8 @@ read
 echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Which license-header do you want to use? [1]"
 echo "(0) None"
 echo "(1) Apache-2.0"
-echo -n -e "(2) Propiatery${TERMINAL_COLOR_NC}"
+echo "(2) Propiatery"
+echo -n -e "${TERMINAL_COLOR_NC}"
 read choice
 choice=${choice:="1"}
 
@@ -83,8 +84,24 @@ echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Is package already configured (
 read package_configured
 package_configured=${package_configured:="no"}
 
+echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Do you want to setup a 'normal' or 'chainable' controller? [1]"
+echo "(1) normal (single-level control)"
+echo "(2) chainable"
+echo -n -e "${TERMINAL_COLOR_NC}"
+read choice
+choice=${choice:="1"}
+
+CONTROLLER_TYPE=""
+case "$choice" in
+"1")
+  CONTROLLER_TYPE="normal (single-level control)"
+  ;;
+"2")
+  CONTROLLER_TYPE="chainable"
+esac
+
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up ros2_control controller files with following parameters: file name '$FILE_NAME', class '$CLASS_NAME', package/namespace '$PKG_NAME'. Those will be placed in folder '`pwd`'.${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up ros2_control controller files with following parameters: file name '$FILE_NAME', class '$CLASS_NAME', package/namespace '$PKG_NAME', type '$CONTROLLER_TYPE'. Those will be placed in folder '`pwd`'.${TERMINAL_COLOR_NC}"
 echo ""
 echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct controller name.${TERMINAL_COLOR_NC}"
 read
@@ -109,12 +126,21 @@ TEST_HPP="test/test_$FILE_NAME.hpp"
 if [[ ! -f "$VC_H" ]]; then
   cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/dummy_package_namespace/visibility_control.h $VC_H
 fi
+
+if [[ "$CONTROLLER_TYPE" == "chainable" ]]; then
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/dummy_chainable_controller.hpp $CTRL_HPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_chainable_controller.cpp $CTRL_CPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_chainable_controller.cpp $TEST_CPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_chainable_controller.hpp $TEST_HPP
+else
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/dummy_controller.hpp $CTRL_HPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.cpp $CTRL_CPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.cpp $TEST_CPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.hpp $TEST_HPP
+fi
+
 cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_pluginlib.xml >> $PLUGIN_XML
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/dummy_controller.hpp $CTRL_HPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.cpp $CTRL_CPP
 cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_load_dummy_controller.cpp $LOAD_TEST_CPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.cpp $TEST_CPP
-cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.hpp $TEST_HPP
 
 echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files copied.${TERMINAL_COLOR_NC}"
 
@@ -148,7 +174,9 @@ for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/TEMPLATES__ROS2_CONTROL__VISIBILITY/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
   sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
   sed -i "s/dummy_controller/${FILE_NAME}/g" $SED_FILE # file name
+  sed -i "s/dummy_chainable_controller/${FILE_NAME}/g" $SED_FILE # file name
   sed -i "s/DUMMY_CONTROLLER/${FILE_NAME^^}/g" $SED_FILE # file name for include guard
+  sed -i "s/DUMMY_CHAINABLE_CONTROLLER/${FILE_NAME^^}/g" $SED_FILE # file name for include guard
   sed -i "s/DummyClassName/${CLASS_NAME}/g" $SED_FILE # class name
   sed -i "s/dummy_interface_type/${INTERFACE_TYPE}/g" $SED_FILE # interface type for includes
   sed -i "s/Dummy_Interface_Type/${INTERFACE_TYPE^}/g" $SED_FILE # Interface type in namespace resolution
