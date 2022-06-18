@@ -36,6 +36,19 @@ static constexpr rmw_qos_profile_t rmw_qos_profile_services_hist_keep_all = {
   RMW_QOS_POLICY_LIVELINESS_SYSTEM_DEFAULT,
   RMW_QOS_LIVELINESS_LEASE_DURATION_DEFAULT,
   false};
+
+using ControllerCommandMsg = dummy_package_namespace::DummyClassName::ControllerCommandMsg;
+
+// called from RT control loop
+void reset_controller_command_msg(
+  std::shared_ptr<ControllerCommandMsg> & msg, const std::vector<std::string> & joint_names)
+{
+  msg->joint_names = joint_names;
+  msg->displacements.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
+  msg->velocities.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
+  msg->duration = std::numeric_limits<double>::quiet_NaN();
+}
+
 }  // namespace
 
 namespace dummy_package_namespace
@@ -103,6 +116,10 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   cmd_subscriber_ = get_node()->create_subscription<ControllerCommandMsg>(
     "~/commands", rclcpp::SystemDefaultsQoS(), callback_cmd);
 
+  std::shared_ptr<ControllerCommandMsg> msg = std::make_shared<ControllerCommandMsg>();
+  reset_controller_command_msg(msg, joint_names_);
+  input_cmd_.writeFromNonRT(msg);
+
   auto set_slow_mode_service_callback =
     [&](
       const std::shared_ptr<ControllerModeSrvType::Request> request,
@@ -124,13 +141,6 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
     s_publisher_ =
       get_node()->create_publisher<ControllerStateMsg>("~/state", rclcpp::SystemDefaultsQoS());
     state_publisher_ = std::make_unique<ControllerStatePublisher>(s_publisher_);
-
-    // This fixes the "flaky"-tests issue where publisher is not ready,but we are expecting msg
-    // check discussion here: https://github.com/ros-controls/ros2_controllers/pull/327
-    while (!state_publisher_->trylock()) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
-    state_publisher_->unlock();
   } catch (const std::exception & e) {
     fprintf(
       stderr, "Exception thrown during publisher creation at configure stage with message : %s \n",
@@ -177,12 +187,7 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // Set default value in command
-  std::shared_ptr<ControllerCommandMsg> msg = std::make_shared<ControllerCommandMsg>();
-  msg->joint_names = joint_names_;
-  msg->displacements.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
-  msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
-  msg->duration = std::numeric_limits<double>::quiet_NaN();
-  input_cmd_.writeFromNonRT(msg);
+  reset_controller_command_msg(*(input_cmd_.readFromRT)(), joint_names_);
 
   return controller_interface::CallbackReturn::SUCCESS;
 }

@@ -76,24 +76,23 @@ public:
   controller_interface::return_type update(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
+  // TODO(anyone): replace the state and command message types
+  using ControllerCommandMsg = control_msgs::msg::JointJog;
+  using ControllerModeSrvType = std_srvs::srv::SetBool;
+  using ControllerStateMsg = control_msgs::msg::JointControllerState;
+
 protected:
   std::vector<std::string> joint_names_;
   std::vector<std::string> state_joint_names_;
   std::string interface_name_;
 
-  // TODO(anyone): replace the state and command message types
   // Command subscribers and Controller State publisher
-  using ControllerCommandMsg = control_msgs::msg::JointJog;
-
   rclcpp::Subscription<ControllerCommandMsg>::SharedPtr cmd_subscriber_ = nullptr;
   realtime_tools::RealtimeBuffer<std::shared_ptr<ControllerCommandMsg>> input_cmd_;
-
-  using ControllerModeSrvType = std_srvs::srv::SetBool;
 
   rclcpp::Service<ControllerModeSrvType>::SharedPtr set_slow_control_mode_service_;
   realtime_tools::RealtimeBuffer<control_mode_type> control_mode_;
 
-  using ControllerStateMsg = control_msgs::msg::JointControllerState;
   using ControllerStatePublisher = realtime_tools::RealtimePublisher<ControllerStateMsg>;
 
   rclcpp::Publisher<ControllerStateMsg>::SharedPtr s_publisher_;

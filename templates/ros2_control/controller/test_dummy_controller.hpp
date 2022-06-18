@@ -33,22 +33,16 @@
 #include "rclcpp/utilities.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 
-// TODO(anyone): Replace with controller specific messages
-#include "control_msgs/msg/joint_controller_state.hpp"
-#include "control_msgs/msg/joint_jog.hpp"
-#include "std_srvs/srv/set_bool.hpp"
-
 // TODO(anyone): replace the state and command message types
-using ControllerStateMsg = control_msgs::msg::JointControllerState;
-using ControllerCommandMsg = control_msgs::msg::JointJog;
-using ControllerModeSrvType = std_srvs::srv::SetBool;
+using ControllerStateMsg = dummy_package_namespace::DummyClassName::ControllerStateMsg;
+using ControllerCommandMsg = dummy_package_namespace::DummyClassName::ControllerCommandMsg;
+using ControllerModeSrvType = dummy_package_namespace::DummyClassName::ControllerModeSrvType;
 
 namespace
 {
 constexpr auto NODE_SUCCESS = controller_interface::CallbackReturn::SUCCESS;
 constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 }  // namespace
-// namespace
 
 // subclassing and friending so we can access member variables
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
@@ -64,7 +58,8 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, test_update_logic_slow);
 
 public:
-  CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override
+  controller_interface::CallbackReturn on_configure(
+    const rclcpp_lifecycle::State & previous_state) override
   {
     auto ret = dummy_package_namespace::DummyClassName::on_configure(previous_state);
     // Only if on_configure is successful create subscription
