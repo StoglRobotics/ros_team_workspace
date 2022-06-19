@@ -17,5 +17,6 @@ jobs:
     uses: ./.github/workflows/reusable-industrial-ci-with-cache.yml
     with:
       ros_distro: $ROS_DISTRO$
+      ros_repo: $ROS_REPO$
       upstream_workspace: $NAME$.$ROS_DISTRO$.repos
       ref_for_scheduled_build: $branch$

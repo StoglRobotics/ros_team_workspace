@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_CONTROLLER_HPP_
-#define TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_CONTROLLER_HPP_
+#ifndef TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_CHAINABLE_CONTROLLER_HPP_
+#define TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_CHAINABLE_CONTROLLER_HPP_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "controller_interface/controller_interface.hpp"
+#include "controller_interface/chainable_controller_interface.hpp"
 #include "dummy_package_namespace/visibility_control.h"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
@@ -45,7 +45,7 @@ enum class control_mode_type : std::uint8_t {
   SLOW = 1,
 };
 
-class DummyClassName : public controller_interface::ControllerInterface
+class DummyClassName : public controller_interface::ChainableControllerInterface
 {
 public:
   TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC
@@ -73,7 +73,10 @@ public:
     const rclcpp_lifecycle::State & previous_state) override;
 
   TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC
-  controller_interface::return_type update(
+  controller_interface::return_type update_reference_from_subscribers() override;
+
+  TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC
+  controller_interface::return_type update_and_write_commands(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
   // TODO(anyone): replace the state and command message types
@@ -97,8 +100,13 @@ protected:
 
   rclcpp::Publisher<ControllerStateMsg>::SharedPtr s_publisher_;
   std::unique_ptr<ControllerStatePublisher> state_publisher_;
+
+  // override methods from ChainableControllerInterface
+  std::vector<hardware_interface::CommandInterface> on_export_reference_interfaces() override;
+
+  bool on_set_chained_mode(bool chained_mode) override;
 };
 
 }  // namespace dummy_package_namespace
 
-#endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_CONTROLLER_HPP_
+#endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_CHAINABLE_CONTROLLER_HPP_

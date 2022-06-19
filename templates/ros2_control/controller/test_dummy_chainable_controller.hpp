@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_
-#define TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_
+#ifndef TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CHAINABLE_CONTROLLER_HPP_
+#define TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CHAINABLE_CONTROLLER_HPP_
 
 #include <chrono>
 #include <limits>
@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include "dummy_package_namespace/dummy_controller.hpp"
+#include "dummy_package_namespace/dummy_chainable_controller.hpp"
 #include "gmock/gmock.h"
 #include "hardware_interface/loaned_command_interface.hpp"
 #include "hardware_interface/loaned_state_interface.hpp"
@@ -43,6 +43,7 @@ namespace
 constexpr auto NODE_SUCCESS = controller_interface::CallbackReturn::SUCCESS;
 constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 }  // namespace
+// namespace
 
 // subclassing and friending so we can access member variables
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
@@ -56,6 +57,8 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_fast);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_slow);
+  FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_fast);
+  FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_slow);
 
 public:
   controller_interface::CallbackReturn on_configure(
@@ -67,6 +70,13 @@ public:
       cmd_subscriber_wait_set_.add_subscription(cmd_subscriber_);
     }
     return ret;
+  }
+
+  controller_interface::CallbackReturn on_activate(
+    const rclcpp_lifecycle::State & previous_state) override
+  {
+    auto ref_itfs = on_export_reference_interfaces();
+    return dummy_package_namespace::DummyClassName::on_activate(previous_state);
   }
 
   /**
@@ -281,4 +291,4 @@ protected:
   }
 };
 
-#endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_
+#endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CHAINABLE_CONTROLLER_HPP_

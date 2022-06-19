@@ -9,26 +9,28 @@ check_ros_distro ${ROS_DISTRO}
 
 PKG_NAME=$1
 if [ -z "$1" ]; then
-  print_and_exit "Package name is not defined. Nothing to do, exiting..." "$usage"
+  print_and_exit "Package name is not defined. Nothing to do 😯" "$usage"
 fi
 
 PKG_DESCRIPTION=$2
 if [ -z "$2" ]; then
-  print_and_exit "Package description is not defined. Nothing to do, exiting..." "$usage"
+  print_and_exit "Package description is not defined. Nothing to do 😯" "$usage"
 fi
 
 echo ""
-echo "Your path is `pwd`. Is this your workspace source folder?"
-read -p "If so press <ENTER> otherwise <CTRL>+C and start the script again from your source folder."
+echo -e "${TERMINAL_COLOR_USER_NOTICE}Your path is `pwd`. Is this your workspace source folder?${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If so press <ENTER> otherwise <CTRL>+C and start the script again from your source folder.${TERMINAL_COLOR_NC}"
+read
 
-read -p "What type of package you want to create? (0 - standard, 1 - metapackage, 2 - subpackage) [0]:" META
+echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}What type of package you want to create? (0 - standard, 1 - metapackage, 2 - subpackage) [0]:${TERMINAL_COLOR_NC}"
+read META
 META=${META:=0}
 
 CREATE_PARAMS=""
 
 case "$META" in
 "1")
-   echo "Meta-package '$PKG_NAME' will be created!"
+   echo -e "${TERMINAL_COLOR_USER_NOTICE}Meta-package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
     CREATE_PARAMS="--meta"
     mkdir $PKG_NAME
     cd $PKG_NAME
@@ -42,16 +44,17 @@ case "$META" in
    if [[ ! -d $META_NAME ]]; then
      echo "ERROR: metapackage with the name '$META_NAME' does not exist! Exiting..."
    fi
-   echo "Subpackage '$PKG_NAME' will be created in the metapackage '$META_NAME'!"
+   echo -e "${TERMINAL_COLOR_USER_NOTICE}Subpackage '$PKG_NAME' will be created in the metapackage '$META_NAME'!${TERMINAL_COLOR_NC}"
    cd $META_NAME
    # TODO: read licence of the meta-package
    ;;
 *)
-  echo "Package '$PKG_NAME' will be created!"
+  echo -e "${TERMINAL_COLOR_USER_NOTICE}Package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
 esac
 
 
-read -p "Do you want to enter name and email address of the maintainer? If not, data from git configuration will be used. (y/n) [n]: " choice
+echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Do you want to enter name and email address of the maintainer? If not, data from git configuration will be used. (y/n) [n]: ${TERMINAL_COLOR_NC}"
+read choice
 choice=${choice:="n"}
 
 case "$choice" in
@@ -73,7 +76,8 @@ case "$choice" in
 esac
 
 # License
-read -p "How do you want to licence your package? ['$TEAM_LICENSE']: " LICENSE
+echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}How do you want to licence your package? ['$TEAM_LICENSE']: ${TERMINAL_COLOR_NC}"
+read LICENSE
 LICENSE=${LICENSE:=$TEAM_LICENSE}
 
 if [[ $ros_version == 1 ]]; then
@@ -81,7 +85,8 @@ if [[ $ros_version == 1 ]]; then
 
 elif [[ $ros_version == 2 ]]; then
   # Build type
-  read -p "Please choose your package build type (1 - ament_cmake, 2 - ament_python, 3 - cmake) [1]:" choice
+  echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Please choose your package build type (1 - ament_cmake, 2 - ament_python, 3 - cmake) [1]:${TERMINAL_COLOR_NC}"
+  read choice
 
   case "$choice" in
   "2")
@@ -96,9 +101,9 @@ elif [[ $ros_version == 2 ]]; then
 fi
 
 echo ""
-echo "ATTENTION: Creating package '$PKG_NAME' in '`pwd`' with description '$PKG_DESCRIPTION', licence '$LICENSE', build type '$BUILD_TYPE' and maintainer '$MAINTAINER_NAME <$MAINTAINER_EMAIL>'"
-read -p "If correct press <ENTER>, otherwise <CTRL>+C and start the script again from your source folder."
-
+echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}ATTENTION: Creating package '$PKG_NAME' in '`pwd`' with description '$PKG_DESCRIPTION', licence '$LICENSE', build type '$BUILD_TYPE' and maintainer '$MAINTAINER_NAME <$MAINTAINER_EMAIL>'${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from your source folder.${TERMINAL_COLOR_NC}"
+read
 
 if [[ $ros_version == 1 ]]; then
   catkin_create_pkg $CREATE_PARAMS $PKG_NAME -V 0.0.1 -l "$LICENSE" -D "$PKG_DESCRIPTION"
@@ -121,8 +126,9 @@ elif [[ $ros_version == 2 ]]; then
   fi
 fi
 
-read -p "Do you want to setup/update repository with the new package configuration? (y/n) [y]: " choice
-choice=${choice:="y"}
+echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Do you want to setup/update repository with the new package configuration? (y/n) [n]: ${TERMINAL_COLOR_NC}"
+read choice
+choice=${choice:="n"}
 
 case "$choice" in
 "y")
@@ -187,5 +193,5 @@ case "$choice" in
   fi
   ;;
 "n")
-  echo "Repository configuration is _not_ updated!"
+  echo -e "${TERMINAL_COLOR_USER_NOTICE}Repository configuration is _not_ updated!${TERMINAL_COLOR_NC}"
 esac
