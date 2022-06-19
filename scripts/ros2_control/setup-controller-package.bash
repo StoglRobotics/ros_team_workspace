@@ -124,7 +124,7 @@ TEST_HPP="test/test_$FILE_NAME.hpp"
 
 # Copy files
 if [[ ! -f "$VC_H" ]]; then
-  cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/dummy_package_namespace/visibility_control.h $VC_H
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/visibility_control.h $VC_H
 fi
 
 if [[ "$CONTROLLER_TYPE" == "chainable" ]]; then
@@ -172,7 +172,6 @@ FILES_TO_SED+=("$PLUGIN_XML")
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
-  sed -i "s/TEMPLATES__ROS2_CONTROL__VISIBILITY/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
   sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
   sed -i "s/dummy_controller/${FILE_NAME}/g" $SED_FILE # file name
   sed -i "s/dummy_chainable_controller/${FILE_NAME}/g" $SED_FILE # file name

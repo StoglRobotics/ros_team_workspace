@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TEMPLATES__ROS2_CONTROL__VISIBILITY__VISIBILITY_CONTROL_H_
-#define TEMPLATES__ROS2_CONTROL__VISIBILITY__VISIBILITY_CONTROL_H_
+#ifndef TEMPLATES__ROS2_CONTROL__HARDWARE__DUMMY_PACKAGE_NAMESPACE__VISIBILITY_CONTROL_H_
+#define TEMPLATES__ROS2_CONTROL__HARDWARE__DUMMY_PACKAGE_NAMESPACE__VISIBILITY_CONTROL_H_
 
 // This logic was borrowed (then namespaced) from the examples on the gcc wiki:
 //     https://gcc.gnu.org/wiki/Visibility
@@ -46,4 +46,4 @@
 #define TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC_TYPE
 #endif
 
-#endif  // TEMPLATES__ROS2_CONTROL__VISIBILITY__VISIBILITY_CONTROL_H_
+#endif  // TEMPLATES__ROS2_CONTROL__HARDWARE__DUMMY_PACKAGE_NAMESPACE__VISIBILITY_CONTROL_H_

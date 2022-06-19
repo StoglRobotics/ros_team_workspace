@@ -21,7 +21,8 @@
 
 namespace dummy_package_namespace
 {
-CallbackReturn DummyClassName::on_init(const hardware_interface::HardwareInfo & info)
+hardware_interface::CallbackReturn DummyClassName::on_init(
+  const hardware_interface::HardwareInfo & info)
 {
   if (hardware_interface::Dummy_Interface_TypeInterface::on_init(info) != CallbackReturn::SUCCESS) {
     return CallbackReturn::ERROR;
@@ -58,28 +59,32 @@ std::vector<hardware_interface::CommandInterface> DummyClassName::export_command
   return command_interfaces;
 }
 
-CallbackReturn DummyClassName::on_activate(const rclcpp_lifecycle::State & /*previous_state*/)
+hardware_interface::CallbackReturn DummyClassName::on_activate(
+  const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // TODO(anyone): prepare the robot to receive commands
 
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn DummyClassName::on_deactivate(const rclcpp_lifecycle::State & /*previous_state*/)
+hardware_interface::CallbackReturn DummyClassName::on_deactivate(
+  const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // TODO(anyone): prepare the robot to stop receiving commands
 
   return CallbackReturn::SUCCESS;
 }
 
-hardware_interface::return_type DummyClassName::read()
+hardware_interface::return_type DummyClassName::read(
+  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
   // TODO(anyone): read robot states
 
   return hardware_interface::return_type::OK;
 }
 
-hardware_interface::return_type DummyClassName::write()
+hardware_interface::return_type DummyClassName::write(
+  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
   // TODO(anyone): write robot's commands'
 

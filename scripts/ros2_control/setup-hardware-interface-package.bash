@@ -27,11 +27,13 @@ check_ros_distro ${ROS_DISTRO}
 
 FILE_NAME=$1
 if [ -z "$1" ]; then
-  print_and_exit "ERROR: You should provide the file name!" "$usage"
+  print_and_exit "You should provide the file name! Nothing to do 😯" "$usage"
 fi
 if [ -f src/$FILE_NAME.cpp ]; then
-  print_and_exit "ERROR:The file '$FILE_NAME' already exist!" "$usage"
+  print_and_exit "ERROR:The file '$FILE_NAME' already exist! 😱!" "$usage"
 fi
+
+echo ""  # Adds empty line
 
 CLASS_NAME=$2
 if [ -z "$2" ]; then
@@ -43,41 +45,27 @@ if [ -z "$2" ]; then
     s=${s#*"$delimiter"}
     CLASS_NAME="$CLASS_NAME${part^}"
   done
-  echo "ClassName guessed from the '$FILE_NAME': '$CLASS_NAME'. Is this correct? If not provide it as the second parameter."
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}ClassName guessed from the '$FILE_NAME': '$CLASS_NAME'. Is this correct? If not provide it as the second parameter.${TERMINAL_COLOR_NC}"
 fi
 
 PKG_NAME=$3
 if [ -z "$3" ]; then
   current=`pwd`
   PKG_NAME=$(basename "$current")
-  echo "Package name guessed from the current path is '$PKG_NAME'. Is this correct? If not provide it as the third parameter."
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}Package name guessed from the current path is '$PKG_NAME'. Is this correct? If not provide it as the third parameter.${TERMINAL_COLOR_NC}"
 fi
 
-echo "Which type of ros2_control hardware interface you want to extend? [0]"
-echo "(0) system"
-echo "(1) sensor"
-echo "(2) actuator"
-read choice
-choice=${choice="0"}
-
-INTERFACE_TYPE="system"
-case "$choice" in
-"1")
-  INTERFACE_TYPE="sensor"
-  ;;
-"2")
-  INTERFACE_TYPE="actuator"
-esac
-
-echo "Which license-header do you want to use? [1]"
+echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Which license-header do you want to use? [1]"
 echo "(0) None"
 echo "(1) Apache 2.0 License"
 echo "(2) Propiatery"
+echo -n -e "${TERMINAL_COLOR_NC}"
 read choice
 choice=${choice:="1"}
 
 if [ "$choice" != 0 ]; then
-  read -p "Insert your company or personal name (copyright): " NAME_ON_LICENSE
+  echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Insert your company or personal name (copyright): ${TERMINAL_COLOR_NC}"
+  read NAME_ON_LICENSE
   NAME_ON_LICENSE=${NAME_ON_LICENSE=""}
   YEAR_ON_LICENSE=`date +%Y`
 fi
@@ -91,10 +79,28 @@ case "$choice" in
   LICENSE_HEADER="$LICENSE_TEMPLATES/propriatery_company_cpp.txt"
 esac
 
+echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Which type of ros2_control hardware interface you want to extend? [0]"
+echo "(0) system"
+echo "(1) sensor"
+echo "(2) actuator"
+echo -n -e "${TERMINAL_COLOR_NC}"
+read choice
+choice=${choice="0"}
+
+INTERFACE_TYPE="system"
+case "$choice" in
+"1")
+  INTERFACE_TYPE="sensor"
+  ;;
+"2")
+  INTERFACE_TYPE="actuator"
+esac
+
 echo ""
-echo "ATTENTION: Setting up ros2_control hardware interface files with following parameters: file name '$FILE_NAME', class '$CLASS_NAME', package/namespace '$PKG_NAME' for interface type '$INTERFACE_TYPE'. Those will be placed in folder '`pwd`'."
+echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up ros2_control hardware interface files with following parameters: file name '$FILE_NAME', class '$CLASS_NAME', package/namespace '$PKG_NAME' for interface type '$INTERFACE_TYPE'. Those will be placed in folder '`pwd`'.${TERMINAL_COLOR_NC}"
 echo ""
-read -p "If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name."
+echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name.${TERMINAL_COLOR_NC}"
+read
 
 # Add folders if deleted
 ADD_FOLDERS=("include/$PKG_NAME" "src" "test")
@@ -111,13 +117,15 @@ PLUGIN_XML="$PKG_NAME.xml"
 TEST_CPP="test/test_$FILE_NAME.cpp"
 
 # Copy files
-cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/dummy_package_namespace/visibility_control.h $VC_H
+if [[ ! -f "$VC_H" ]]; then
+  cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/dummy_package_namespace/visibility_control.h $VC_H
+fi
 cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/dummy_package_namespace/robot_hardware_interface.hpp $HW_ITF_HPP
 cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/robot_hardware_interface.cpp $HW_ITF_CPP
 cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/robot_pluginlib.xml $PLUGIN_XML
 cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/test_robot_hardware_interface.cpp $TEST_CPP
 
-echo "Template files copied."
+echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files copied.${TERMINAL_COLOR_NC}"
 
 # Add license header to the files
 # TODO: When Propiatery then add the following before ament_lint_auto_find_test_dependencies()
@@ -149,7 +157,6 @@ FILES_TO_SED+=("$PLUGIN_XML")
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/TEMPLATES__ROS2_CONTROL__HARDWARE__DUMMY_PACKAGE_NAMESPACE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
-  sed -i "s/TEMPLATES__ROS2_CONTROL__VISIBILITY/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
   sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
   sed -i "s/dummy_file_name/${FILE_NAME}/g" $SED_FILE # file name
   sed -i "s/ROBOT_HARDWARE_INTERFACE/${FILE_NAME^^}/g" $SED_FILE # file name for include guard
@@ -160,18 +167,18 @@ done
 
 # If type is "sensor" remove write and command_interfaces methods
 if [[ "$INTERFACE_TYPE" == "sensor" ]]; then
-  METHODS_TO_DELETE=("write()" "export_command_interfaces()")
+  METHODS_TO_DELETE=("write(" "export_command_interfaces()")
   # Clean HPP
   for DEL_METHOD in "${METHODS_TO_DELETE[@]}"; do
     line_nr=`grep -n "${DEL_METHOD}" $HW_ITF_HPP | awk -F ":" '{print $1;}'`
     let start_line=${line_nr}-1
-    let end_line=${line_nr}+1
+    let end_line=${line_nr}+2
     sed -i "${start_line},${end_line}d" $HW_ITF_HPP
   done
   # Clean CPP
-  line_nr=`grep -n "write()" $HW_ITF_CPP | awk -F ":" '{print $1;}'`
+  line_nr=`grep -n "::write(" $HW_ITF_CPP | awk -F ":" '{print $1;}'`
   let start_line=${line_nr}-1
-  let end_line=${line_nr}+5
+  let end_line=${line_nr}+6
   sed -i "${start_line},${end_line}d" $HW_ITF_CPP
 
   line_nr=`grep -n "export_command_interfaces()" $HW_ITF_CPP | awk -F ":" '{print $1;}'`
@@ -340,7 +347,7 @@ if [ -f README.md ]; then
 
 fi
 
-echo "Template files are adjusted."
+echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files were adjusted.${TERMINAL_COLOR_NC}"
 
 git add .
 # git commit -m "RosTeamWS: ros2_control skeleton files for $ROBOT_NAME generated."
@@ -349,4 +356,4 @@ git add .
 compile_and_source_package $PKG_NAME "yes"
 
 echo ""
-echo "FINISHED: Your package is set and the tests should be finished without any errors. (linter errors possible!)"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: Your package is set and the tests should be finished without any errors. (linter errors possible!)${TERMINAL_COLOR_NC}"

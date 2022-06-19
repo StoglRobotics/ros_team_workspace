@@ -14,6 +14,7 @@
 
 #include "test_dummy_chainable_controller.hpp"
 
+#include <limits>
 #include <memory>
 #include <string>
 #include <utility>
