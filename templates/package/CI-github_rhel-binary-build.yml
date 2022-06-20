@@ -1,5 +1,8 @@
 name: $Ros_distro$ RHEL Binary Build
 on:
+  workflow_dispatch:
+    branches:
+      - $branch$
   pull_request:
     branches:
       - $branch$
@@ -12,12 +15,12 @@ on:
 
 
 jobs:
-  $ROS_DISTRO$_rhel_binary:
+  $ros_distro$_rhel_binary:
     name: $Ros_distro$ RHEL binary build
     runs-on: ubuntu-latest
     env:
-      ROS_DISTRO: $ROS_DISTRO$
-    container: jaronl/ros:$ROS_DISTRO$-alma
+      ROS_DISTRO: $ros_distro$
+    container: jaronl/ros:$ros_distro$-alma
     steps:
       - uses: actions/checkout@v3
         with:

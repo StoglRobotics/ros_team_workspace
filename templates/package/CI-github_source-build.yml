@@ -1,5 +1,8 @@
 name: $Ros_distro$ Source Build
 on:
+  workflow_dispatch:
+    branches:
+      - $branch$
   push:
     branches:
       - $branch$
@@ -11,5 +14,5 @@ jobs:
   source:
     uses: ./.github/workflows/reusable-ros-tooling-source-build.yml
     with:
-      ros_distro: $ROS_DISTRO$
+      ros_distro: $ros_distro$
       ref: $branch$

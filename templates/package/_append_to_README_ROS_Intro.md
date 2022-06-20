@@ -6,16 +6,17 @@ If you are familiar with ROS2, here are the quick-and-dirty build instructions.
   ```
   cd $COLCON_WS
   git clone git@github.com:$NAMESPACE$/$NAME$.git src/$NAME$
-  vcs import src --input src/$NAME$/$NAME$.repos
+  vcs import src --input src/$NAME$/$NAME$.<ros-distro>.repos
   rosdep install --ignore-src --from-paths src -y -r
   colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release    # Faster and more efficient build type
+  cd ..
   ```
 If you end up with missing dependencies, install them using commands from [Setup ROS Workspace](#setup-ros-workspace) section.
 
 # How to use this Package and ROS Introduction
 
  - [Install and Build](#install-and-build)
-   * [Install ROS $Ros_distro$ and Development Tooling](#install-ros-$ROS_DISTRO$-and-development-tooling)
+   * [Install ROS $Ros_distro$ and Development Tooling](#install-ros-$ros_distro$-and-development-tooling)
    * [Setup ROS Workspace](#setup-ros-workspace)
    * [Configure and Build Workspace](#configure-and-build-workspace)
  - [Running Executables](#running-executables)
@@ -34,7 +35,7 @@ These instructions assume you are running Ubuntu 20.04:
    You can stop following along with the tutorial after you complete the section titled: [Environment setup](https://index.ros.org/doc/ros2/Installation/$Ros_distro$/Linux-Install-Debians/#environment-setup).
    Make sure you setup your environment with:
    ```
-   source /opt/ros/$ROS_DISTRO$/setup.bash
+   source /opt/ros/$ros_distro$/setup.bash
    ```
 
    > **NOTE:** You may want to add that line to your `~/.bashrc`
@@ -91,7 +92,7 @@ To configure and build workspace execute following commands:
   colcon build --symlink-install --mixin rel-with-deb-info compile-commands ccache
   ```
 
-## Running Executales
+## Running Executable
 
 See `README.md` files of the packages for information regarding running executables.
 
