@@ -2,10 +2,11 @@
 ## Build status
 
 
-
 ### Explanation of different build types
 
 **NOTE**: There are three build stages checking current and future compatibility of the package.
+
+[Detailed build status](.github/workflows/README.md)
 
 1. Binary builds - against released packages (main and testing) in ROS distributions. Shows that direct local build is possible.
 

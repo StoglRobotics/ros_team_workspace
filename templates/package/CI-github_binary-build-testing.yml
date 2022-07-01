@@ -1,0 +1,26 @@
+name: $Ros_distro$ Binary Build - testing
+# author: Denis Štogl <denis@stoglrobotics.de>
+# description: 'Build & test all dependencies from released (binary) packages.'
+
+on:
+  workflow_dispatch:
+    branches:
+      - $branch$
+  pull_request:
+    branches:
+      - $branch$
+  push:
+    branches:
+      - $branch$
+  schedule:
+    # Run every morning to detect flakiness and broken dependencies
+    - cron: '03 1 * * *'
+
+jobs:
+  binary:
+    uses: ./.github/workflows/reusable-industrial-ci-with-cache.yml
+    with:
+      ros_distro: $ros_distro$
+      ros_repo: testing
+      upstream_workspace: $NAME$-not-released.$ros_distro$.repos
+      ref_for_scheduled_build: $branch$
