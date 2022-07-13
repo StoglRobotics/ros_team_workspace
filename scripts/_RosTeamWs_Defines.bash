@@ -232,7 +232,7 @@ function print_and_exit {
     echo ""
     echo -e "${TERMINAL_COLOR_USER_NOTICE}Usage: '$2'${TERMINAL_COLOR_NC}"
   fi
-  echo -e "${TERMINAL_COLOR_BLUE}Error has happened. Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}Error has happened. Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
   read -p ""
   exit 1
 }
