@@ -29,12 +29,12 @@ RUN locale
 # Install basic utilities
 RUN apt-get -y update && apt-get -y install git nano sudo tmux tree vim iputils-ping
 
-# install ROS2:foxy dependencies
+# install ROS2:ROS_DUMMY_VERSION dependencies
 RUN apt-get install -y curl gnupg gnupg2 lsb-release software-properties-common && apt-add-repository universe
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o /usr/share/keyrings/ros-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
-# install ROS2:foxy and things needed for ros development, DEBIAN_FRONTEND is needed to ignore interactive keyboard layout setting while install
+# install ROS2:ROS_DUMMY_VERSION and things needed for ros development, DEBIAN_FRONTEND is needed to ignore interactive keyboard layout setting while install
 RUN apt-get update -y && DEBIAN_FRONTEND=noniteractive apt-get install -y ros-ROS_DUMMY_VERSION-desktop pip python3-colcon-common-extensions
 RUN pip install -U rosdep && \
     rosdep init
@@ -60,3 +60,4 @@ RUN mkdir -p ${home} && \
 
 #switch to user
 USER ${user}
+WORKDIR ${home}

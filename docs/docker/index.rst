@@ -36,7 +36,7 @@ You have to install docker which is dependent on the operating system you are us
 *   `Linux <https://docs.docker.com/engine/install/>`_: it depends.
 
 .. note::
-  However make sure your user is in the docker group. Check with: ``groups``. To add your user to the docker group run: ``sudo usermod -aG docker <username>``.
+  However make sure your user is in the docker group. Check with: ``groups`` command. To add your user to the docker group run: ``sudo usermod -aG docker <username>``.
 
 Usful commands
 """"""""""""""""

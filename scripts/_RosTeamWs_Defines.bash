@@ -60,6 +60,7 @@ function RosTeamWS_setup_exports {
   export TERMINAL_COLOR_USER_INPUT_DECISION=${TERMINAL_COLOR_PURPLE}
   export TERMINAL_COLOR_USER_CONFIRMATION=${TERMINAL_COLOR_BLUE}
   export RTW_COLOR_NOTIFY_USER=${TERMINAL_COLOR_YELLOW}
+  export RTW_COLOR_ERROR=${TERMINAL_COLOR_RED}
 }
 
 # TODO(denis): add this into setup.bash
@@ -226,7 +227,7 @@ function print_and_exit {
 
   message=$1
   echo ""
-  echo -e "${TERMINAL_COLOR_RED}$message!!! Exiting...${TERMINAL_COLOR_NC}"
+  echo -e "${RTW_COLOR_ERROR}$message!!! Exiting...${TERMINAL_COLOR_NC}"
   if [ ! -z "$2" ]; then
     echo ""
     echo -e "${TERMINAL_COLOR_YELLOW}Usage: '$2'${TERMINAL_COLOR_NC}"
