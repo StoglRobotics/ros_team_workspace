@@ -20,7 +20,7 @@ check_user_input () {
   # Todo Manuel make this more generic
   if [ "$use_docker" == true ]; then
     if [ "$ros_distro" == "rolling" ]; then
-      echo "$ros_distro is currently supported on multiple versions of Ubuntu. Which version of ubuntu would you like to choose:"
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}'$ros_distro' is currently supported on multiple versions of Ubuntu. Which version of ubuntu would you like to choose:"
       select ubuntu_version in Ubuntu_20_04 Ubuntu_22_04;
       do
         case "$ubuntu_version" in
@@ -36,6 +36,7 @@ check_user_input () {
                 ;;
         esac
       done
+      echo -n -e "${TERMINAL_COLOR_NC}"
     else
       ubuntu_version="ubuntu:20.04"
       ubuntu_version_tag="ubuntu_20_04"
@@ -104,7 +105,10 @@ setup_new_workspace () {
   fi
 
   # TODO: Add here output of the <current> WS
-  echo -e "\n${TERMINAL_COLOR_PURPLE}ATTENTION: Creating a new workspace in folder '${ws_folder}' for ROS '${ros_distro}' (ROS$ros_version) with suffix '${ros_ws_suffix}' (full path: '${ws_folder}/${ws_full_name}') using '${base_ws}' (${base_ws_path}) as base workspace. Press <ENTER> to continue...${TERMINAL_COLOR_NC}"
+  echo ""
+  echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Creating a new workspace in folder '${ws_folder}' for ROS '${ros_distro}' (ROS$ros_version) with suffix '${ros_ws_suffix}' (full path: '${ws_folder}/${ws_full_name}') using '${base_ws}' (${base_ws_path}) as base workspace.${TERMINAL_COLOR_NC}"
+  echo ""
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct controller name.${TERMINAL_COLOR_NC}"
   read
 
   # TODO(destogl): This part with base workspaces should be updated!!! - this is obsolete logic
@@ -233,8 +237,7 @@ create_workspace () {
   local is_docker_rtw_file=false
   update_config
 
-  echo "------------------------------------------------------"
-  echo "Finished creating new workspace: Please open a new terminal and execute '$alias_name'"
+  echo -e "${RTW_COLOR_NOTIFY_USER}Finished creating new workspace: Please open a new terminal and execute '$alias_name'${TERMINAL_COLOR_NC}"
 }
 
 create_workspace_docker () {
@@ -306,7 +309,7 @@ create_workspace_docker () {
 
   echo ""
   echo "######################################################################################################################"
-  echo "Finished creating new workspace with docker support: Going to switch to docker. Next time simply run '$alias_name'"
+  echo -e "${RTW_COLOR_NOTIFY_USER}Finished creating new workspace with docker support: Going to switch to docker. Next time simply run '$alias_name'${TERMINAL_COLOR_NC}"
   echo "######################################################################################################################"
   sleep 2 # give user time to read above message before switching to docker container
 

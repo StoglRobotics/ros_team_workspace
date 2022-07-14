@@ -9,6 +9,9 @@ ARG home
 # make bash default
 SHELL ["/bin/bash", "-c"]
 
+# upgrade to newest version
+RUN apt-get update -y && apt-get -y dist-upgrade
+
 # install locales
 RUN apt-get update -y && apt-get install -y locales
 
