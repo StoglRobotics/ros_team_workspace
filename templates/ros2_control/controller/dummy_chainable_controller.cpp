@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dummy_package_namespace/dummy_controller.hpp"
+#include "dummy_package_namespace/dummy_chainable_controller.hpp"
 
 #include <limits>
 #include <memory>
@@ -41,7 +41,7 @@ using ControllerCommandMsg = dummy_package_namespace::DummyClassName::Controller
 
 // called from RT control loop
 void reset_controller_command_msg(
-  std::shared_ptr<ControllerCommandMsg> & msg, const std::vector<std::string> & joint_names)
+  const std::shared_ptr<ControllerCommandMsg> & msg, const std::vector<std::string> & joint_names)
 {
   msg->joint_names = joint_names;
   msg->displacements.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
@@ -53,7 +53,7 @@ void reset_controller_command_msg(
 
 namespace dummy_package_namespace
 {
-DummyClassName::DummyClassName() : controller_interface::ControllerInterface() {}
+DummyClassName::DummyClassName() : controller_interface::ChainableControllerInterface() {}
 
 controller_interface::CallbackReturn DummyClassName::on_init()
 {
@@ -183,11 +183,32 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
   return state_interfaces_config;
 }
 
+std::vector<hardware_interface::CommandInterface> DummyClassName::on_export_reference_interfaces()
+{
+  reference_interfaces_.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
+
+  std::vector<hardware_interface::CommandInterface> reference_interfaces;
+  reference_interfaces.reserve(reference_interfaces_.size());
+
+  for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
+    reference_interfaces.push_back(hardware_interface::CommandInterface(
+      get_node()->get_name(), joint_names_[i] + "/" + interface_name_, &reference_interfaces_[i]));
+  }
+
+  return reference_interfaces;
+}
+
+bool DummyClassName::on_set_chained_mode(bool chained_mode)
+{
+  // Always accept switch to/from chained mode
+  return true || chained_mode;
+}
+
 controller_interface::CallbackReturn DummyClassName::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // Set default value in command
-  reset_controller_command_msg(*(input_cmd_.readFromRT)(), joint_names_);
+  reset_controller_command_msg(*(input_cmd_.readFromRT()), joint_names_);
 
   return controller_interface::CallbackReturn::SUCCESS;
 }
@@ -203,21 +224,35 @@ controller_interface::CallbackReturn DummyClassName::on_deactivate(
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-controller_interface::return_type DummyClassName::update(
-  const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
+controller_interface::return_type DummyClassName::update_reference_from_subscribers()
 {
   auto current_cmd = input_cmd_.readFromRT();
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
-  for (size_t i = 0; i < command_interfaces_.size(); ++i) {
+  for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
     if (!std::isnan((*current_cmd)->displacements[i])) {
-      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
-        (*current_cmd)->displacements[i] /= 2;
-      }
-      command_interfaces_[i].set_value((*current_cmd)->displacements[i]);
+      reference_interfaces_[i] = (*current_cmd)->displacements[i];
 
       (*current_cmd)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+    }
+  }
+  return controller_interface::return_type::OK;
+}
+
+controller_interface::return_type DummyClassName::update_and_write_commands(
+  const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
+{
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
+  // instead of a loop
+  for (size_t i = 0; i < command_interfaces_.size(); ++i) {
+    if (!std::isnan(reference_interfaces_[i])) {
+      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
+        reference_interfaces_[i] /= 2;
+      }
+      command_interfaces_[i].set_value(reference_interfaces_[i]);
+
+      reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
     }
   }
 
@@ -236,4 +271,4 @@ controller_interface::return_type DummyClassName::update(
 #include "pluginlib/class_list_macros.hpp"
 
 PLUGINLIB_EXPORT_CLASS(
-  dummy_package_namespace::DummyClassName, controller_interface::ControllerInterface)
+  dummy_package_namespace::DummyClassName, controller_interface::ChainableControllerInterface)

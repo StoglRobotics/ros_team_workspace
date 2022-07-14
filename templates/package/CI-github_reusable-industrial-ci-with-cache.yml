@@ -20,8 +20,8 @@ on:
         required: true
         type: string
       ros_repo:
-        description: 'ROS_REPO to run for industrial_ci. Possible values: "all", "main", "testing"'
-        default: 'all'
+        description: 'ROS_REPO to run for industrial_ci. Possible values: "main", "testing"'
+        default: 'main'
         required: false
         type: string
       os_code_name:
@@ -49,11 +49,7 @@ on:
 
 jobs:
   reusable_industrial_ci_with_cache:
-    name: ${{ matrix.ROS_REPO }} ${{ inputs.ros_distro }} ${{ inputs.os_code_name }}
-    strategy:
-      fail-fast: false
-      matrix:
-        ROS_REPO: [ main, testing ]
+    name: ${{ inputs.ros_distro }} ${{ inputs.ros_repo }} ${{ inputs.os_code_name }}
     runs-on: ubuntu-latest
     env:
       CCACHE_DIR: ${{ github.workspace }}/${{ inputs.ccache_dir }}
@@ -90,7 +86,7 @@ jobs:
         env:
           UPSTREAM_WORKSPACE: ${{ inputs.upstream_workspace }}
           ROS_DISTRO: ${{ inputs.ros_distro }}
-          ROS_REPO: ${{ matrix.ROS_REPO }}
+          ROS_REPO: ${{ inputs.ros_repo }}
           OS_CODE_NAME: ${{ inputs.os_code_name }}
           BEFORE_INSTALL_UPSTREAM_DEPENDENCIES: ${{ inputs.before_install_upstream_dependencies }}
       - name: prepare target_ws for cache

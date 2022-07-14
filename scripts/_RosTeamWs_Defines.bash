@@ -56,8 +56,11 @@ function RosTeamWS_setup_exports {
   export RAW_TERMINAL_COLOR_WHITE=$'\e[1;37m'
 
   ## Define semantics of each color
+  export TERMINAL_COLOR_USER_NOTICE=${TERMINAL_COLOR_YELLOW}
+  export TERMINAL_COLOR_USER_INPUT_DECISION=${TERMINAL_COLOR_PURPLE}
+  export TERMINAL_COLOR_USER_CONFIRMATION=${TERMINAL_COLOR_BLUE}
   export RTW_COLOR_NOTIFY_USER=${TERMINAL_COLOR_YELLOW}
-
+  export RTW_COLOR_ERROR=${TERMINAL_COLOR_RED}
 }
 
 # TODO(denis): add this into setup.bash
@@ -224,12 +227,12 @@ function print_and_exit {
 
   message=$1
   echo ""
-  echo -e "${TERMINAL_COLOR_RED}$message!!! Exiting...${TERMINAL_COLOR_NC}"
+  echo -e "${RTW_COLOR_ERROR}$message!!! Exiting...${TERMINAL_COLOR_NC}"
   if [ ! -z "$2" ]; then
     echo ""
-    echo -e "${TERMINAL_COLOR_YELLOW}Usage: '$2'${TERMINAL_COLOR_NC}"
+    echo -e "${TERMINAL_COLOR_USER_NOTICE}Usage: '$2'${TERMINAL_COLOR_NC}"
   fi
-  echo -e "${TERMINAL_COLOR_BLUE}Error has happened. Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}Error has happened. Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
   read -p ""
   exit 1
 }
@@ -254,8 +257,8 @@ function framework_default_paths {
   PACKAGE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/package"
   ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/robot_description"
   ROS2_CONTROL_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control"
-  ROS2_CONTROL_HW_ITF_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control/hardware"
-  ROS2_CONTROL_CONTROLLER_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control/controller"
+  ROS2_CONTROL_HW_ITF_TEMPLATES="$ROS2_CONTROL_TEMPLATES/hardware"
+  ROS2_CONTROL_CONTROLLER_TEMPLATES="$ROS2_CONTROL_TEMPLATES/controller"
   LICENSE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/licenses"
   DOCKER_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/docker"
 }
