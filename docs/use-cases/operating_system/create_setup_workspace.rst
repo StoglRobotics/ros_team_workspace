@@ -31,9 +31,6 @@ Docker workspace
 
 Like the script ``setup-ros-workspace`` the ``setup-ros-workspace-docker`` creates a new local ROS workspace. Then a Ubuntu docker container gets built and the created workspace is mounted inside the docker container under the home directory. The first time a docker container is build can take quite a while. When the first build is finished you are directly connected as user inside the container. You can verify this by checking if your hostname has changed. To exit a container simply type the ``exit`` command.
 
-.. note::
-  If you want to forward a xsession from docker (e.g. rviz2), you have to install xhost.
-
 Reconnect to a container
 """"""""""""""""""""""""""
 
