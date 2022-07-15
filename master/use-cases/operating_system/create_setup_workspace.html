@@ -102,7 +102,16 @@
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started/index.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../guidelines/index.html">Guidelines</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Use Cases</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Setup a new Workspace</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Setup a new Workspace</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#local-workspace">Local workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#docker-workspace">Docker workspace</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reconnect-to-a-container">Reconnect to a container</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#recreate-a-container">Recreate a container</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cli-overview">CLI overview</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../ros_packages/configure_repository.html">Configure Repository</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ros_packages/create_package.html">Create New Package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ros_packages/setup_robot_bringup_package.html">Setup robot bringup</a></li>
@@ -111,6 +120,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../ros2_control/setup_robot_hardware_interface.html">ros2_control: Setup robot’s hardware package</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../docker/index.html">Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQ</a></li>
 </ul>
 
             
@@ -184,7 +195,9 @@
             
   <section id="setup-a-new-workspace">
 <h1>Setup a new Workspace<a class="headerlink" href="#setup-a-new-workspace" title="Permalink to this headline"></a></h1>
-<p id="uc-setup-workspace">This use-case describes how to setup a new ROS workspace using scripts from the ROS Team Workspace (RosTeamWS) framework.</p>
+<p id="uc-setup-workspace">This use-case describes how to setup a new ROS workspace using scripts from the ROS Team Workspace (RosTeamWS) framework. Besides the creation of a local workspace, creation of a Ubuntu based docker container is supported. For more details have a look below in the <a class="reference internal" href="#docker-workspace">Docker workspace</a> section.</p>
+<section id="local-workspace">
+<h2>Local workspace<a class="headerlink" href="#local-workspace" title="Permalink to this headline"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">setup-ros-workspace</span></code> accepts ros distro name workspace suffix and workspace folder as parameters.
 All three parameters are optional.</p>
 <div class="literal-block-wrapper docutils container" id="setup-workspace">
@@ -196,6 +209,54 @@ All three parameters are optional.</p>
 <p>The script creates in the <code class="docutils literal notranslate"><span class="pre">$HOME/&lt;WS_FOLDER&gt;</span></code> a new ROS workspace with name <code class="docutils literal notranslate"><span class="pre">ros_ws_&lt;WS_PREFIX&gt;_&lt;ROS_DISTRO&gt;_&lt;WS_SUFFIX&gt;</span></code>.
 If you want to omit any of input parameters use <code class="docutils literal notranslate"><span class="pre">&quot;-&quot;</span></code> as argument.
 Default value for <code class="docutils literal notranslate"><span class="pre">&lt;WS_FOLDER&gt;</span></code> is “workspace”.</p>
+</section>
+<section id="docker-workspace">
+<span id="uc-setup-docker-workspace"></span><h2>Docker workspace<a class="headerlink" href="#docker-workspace" title="Permalink to this headline"></a></h2>
+<div class="literal-block-wrapper docutils container" id="setup-docker-workspace">
+<div class="code-block-caption"><span class="caption-text">How to setup a workspace inside a docker container.</span><a class="headerlink" href="#setup-docker-workspace" title="Permalink to this code"></a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace-docker ROS_DISTRO WS_FOLDER WS_PREFIX WS_SUFFIX.
+</pre></div>
+</div>
+</div>
+<p>Like the script <code class="docutils literal notranslate"><span class="pre">setup-ros-workspace</span></code> the <code class="docutils literal notranslate"><span class="pre">setup-ros-workspace-docker</span></code> creates a new local ROS workspace. Then a Ubuntu docker container gets built and the created workspace is mounted inside the docker container under the home directory. The first time a docker container is build can take quite a while. When the first build is finished you are directly connected as user inside the container. You can verify this by checking if your hostname has changed. To exit a container simply type the <code class="docutils literal notranslate"><span class="pre">exit</span></code> command.</p>
+<section id="reconnect-to-a-container">
+<h3>Reconnect to a container<a class="headerlink" href="#reconnect-to-a-container" title="Permalink to this headline"></a></h3>
+<p>If you exited a container an want to reconnect as a user, you have to run the <code class="docutils literal notranslate"><span class="pre">rtw_switch_to_docker</span></code> command. However before executing this you have to source your workspace with <code class="docutils literal notranslate"><span class="pre">_&lt;workspace_alias_command&gt;</span></code>. If you want to connect as a root user you can execute <code class="docutils literal notranslate"><span class="pre">rtw_switch_to_docker_root</span></code>.</p>
+</section>
+<section id="recreate-a-container">
+<h3>Recreate a container<a class="headerlink" href="#recreate-a-container" title="Permalink to this headline"></a></h3>
+<p>If you removed an image,  you can recreate it by switching into the <code class="docutils literal notranslate"><span class="pre">.rtw_docker_defines</span></code> folder inside your workspace and then executing the <code class="docutils literal notranslate"><span class="pre">.\build_docker_image</span></code> command. After the container is rebuilt, you can create it with <code class="docutils literal notranslate"><span class="pre">.\create_docker_container</span></code> command. Thereafter, you should be able to normally start, reconnect and stop the container.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more general questions on the usage of docker and the limitations of RosTeamWS in interacting with docker have a look at our <a class="reference internal" href="../../docker/index.html#docker-overview"><span class="std std-ref">docker related docs</span></a>.</p>
+</div>
+</section>
+<section id="cli-overview">
+<h3>CLI overview<a class="headerlink" href="#cli-overview" title="Permalink to this headline"></a></h3>
+<table class="colwidths-auto docutils align-default" id="id1">
+<caption><span class="caption-text">Overview of the cli</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>command</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p><code class="docutils literal notranslate"><span class="pre">setup-ros-workspace-docker</span></code></p></th>
+<td><p>Creates a new workspace and maps the workspace inside a docker container. You can then switch to docker using <code class="docutils literal notranslate"><span class="pre">rtw_switch_to_docker</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p><code class="docutils literal notranslate"><span class="pre">rtw_switch_to_docker</span></code></p></th>
+<td><p>Starts the docker container if it has been stopped and connects to the container as user.</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p><code class="docutils literal notranslate"><span class="pre">rtw_switch_to_docker_root</span></code></p></th>
+<td><p>Starts the docker container if it has been stopped and connects to the container as root-user.</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p><code class="docutils literal notranslate"><span class="pre">rtw_stop_docker</span></code></p></th>
+<td><p>Stops the docker container.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 </section>
 
 
