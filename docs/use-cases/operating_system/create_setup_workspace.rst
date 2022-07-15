@@ -42,7 +42,7 @@ If you exited a container an want to reconnect as a user, you have to run the ``
 Recreate a container
 """"""""""""""""""""""
 
-If you removed an image,  you can recreate it by switching into the ``.rtw_docker_defines`` folder inside your workspace and then executing the ``.\build_docker_container`` command. After the container is rebuilt, you can create it with ``.\create_docker_image`` command. Thereafter, you should be able to normally start, reconnect and stop the container.
+If you removed an image,  you can recreate it by switching into the ``.rtw_docker_defines`` folder inside your workspace and then executing the ``.\build_docker_image`` command. After the container is rebuilt, you can create it with ``.\create_docker_container`` command. Thereafter, you should be able to normally start, reconnect and stop the container.
 
 .. note::
   For more general questions on the usage of docker and the limitations of RosTeamWS in interacting with docker have a look at our :ref:`docker related docs<docker-overview>`.

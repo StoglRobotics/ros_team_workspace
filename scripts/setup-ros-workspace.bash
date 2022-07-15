@@ -305,7 +305,7 @@ create_workspace_docker () {
   sed -i "s|DUMMY_WS_FOLDER|${docker_ws_folder}|g" "$ws_docker_folder/recreate_docker.sh"
 
   # now we are all set for building the container
-  build_docker_container "$docker_image_tag" "$ws_docker_folder/Dockerfile" || { print_and_exit "Build of docker container failed."; }
+  build_docker_image "$docker_image_tag" "$ws_docker_folder/Dockerfile" || { print_and_exit "Build of docker container failed."; }
 
   echo ""
   echo "######################################################################################################################"
@@ -313,5 +313,5 @@ create_workspace_docker () {
   echo "######################################################################################################################"
   sleep 2 # give user time to read above message before switching to docker container
 
-  create_docker_image "$docker_image_tag" "${docker_ws_folder}" "$chosen_ros_distro" "$docker_host_name"
+  create_docker_container "$docker_image_tag" "${docker_ws_folder}" "$chosen_ros_distro" "$docker_host_name"
 }

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-build_docker_container () {
+build_docker_image () {
     docker build \
   --build-arg user=$USER \
   --build-arg uid=$UID \
@@ -22,7 +22,7 @@ build_docker_container () {
   -t DUMMY_DOCKER_IMAGE_TAG .
 }
 
-create_docker_image () {
+create_docker_container () {
   xhost +local:docker
   docker run \
   --net=host \
@@ -36,5 +36,5 @@ create_docker_image () {
   -it DUMMY_DOCKER_IMAGE_TAG /bin/bash
 }
 
-build_docker_container
-create_docker_image
+build_docker_image
+create_docker_container

@@ -24,7 +24,7 @@ declare -r -A ros_distro_to_rtw_branch=( ["foxy"]="foxy" ["galactic"]="master" [
 
 # $1 = name (tag) of the created docker image
 # $2 = Dockerfile which is used for creating the image
-build_docker_container () {
+build_docker_image () {
   if [ -z "$1" ]; then
     echo "No docker image tag specified. Can not create image."
     return 1
@@ -52,7 +52,7 @@ build_docker_container () {
   cd "$prev_pwd" || { print_and_exit "Build of docker container succeeded but changing back previous working directory failed."; }
 }
 
-create_docker_image () {
+create_docker_container() {
   if [ -z "$1" ]; then
     print_and_exit "No docker image (tag) specified. Can not instantiate image."
   fi
