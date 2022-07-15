@@ -211,6 +211,7 @@ html_theme_options = {
     "navigation_depth": -1,
     # Only display the logo image, do not display the project name at the top of the sidebar
     "logo_only": True,
+    "body_max_width": "none",
 }
 
 html_context = {
