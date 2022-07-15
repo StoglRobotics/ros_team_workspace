@@ -21,13 +21,16 @@ The script creates in the ``$HOME/<WS_FOLDER>`` a new ROS workspace with name ``
 If you want to omit any of input parameters use ``"-"`` as argument.
 Default value for ``<WS_FOLDER>`` is "workspace".
 
+.. _uc-setup-docker-workspace:
+
 Docker workspace
 ------------------
+
 .. code-block:: bash
    :caption: How to setup a workspace inside a docker container.
    :name: setup docker workspace
 
-   setup-ros-workspace-docker ROS_DISTRO WS_FOLDER WS_PREFIX WS_SUFFIX. code-block:: bash
+   setup-ros-workspace-docker ROS_DISTRO WS_FOLDER WS_PREFIX WS_SUFFIX.
 
 Like the script ``setup-ros-workspace`` the ``setup-ros-workspace-docker`` creates a new local ROS workspace. Then a Ubuntu docker container gets built and the created workspace is mounted inside the docker container under the home directory. The first time a docker container is build can take quite a while. When the first build is finished you are directly connected as user inside the container. You can verify this by checking if your hostname has changed. To exit a container simply type the ``exit`` command.
 
@@ -39,28 +42,26 @@ If you exited a container an want to reconnect as a user, you have to run the ``
 Recreate a container
 """"""""""""""""""""""
 
-Supported ros versions
-^^^^^^^^^^^^^^^^^^^^^^^
+If you removed an image,  you can recreate it by switching into the ``.rtw_docker_defines`` folder inside your workspace and then executing the ``.\build_docker_container`` command. After the container is rebuilt, you can create it with ``.\create_docker_image`` command. Thereafter, you should be able to normally start, reconnect and stop the container.
 
-For the supported Ubuntu and ros version combinations have a look at the table below.
+.. note::
+  For more general questions on the usage of docker and the limitations of RosTeamWS in interacting with docker have a look at our :ref:`docker related docs<docker-overview>`.
 
-.. list-table:: Supported Ubuntu and ros versions combinations are marked with an X.
+CLI overview
+"""""""""""""
+
+.. list-table:: Overview of the cli
    :widths: auto
    :header-rows: 1
    :stub-columns: 1
 
-   * - ros version
-     - ubuntu 20.04
-     - ubuntu 22.04
-   * - foxy
-     - X
-     -
-   * - galactic
-     - X
-     -
-   * - rolling
-     - X
-     - X
-
-.. note::
-  For more general questions on the usage of docker and the limitations of RosTeamWS in interacting with docker have a look at our :ref:`docker related docs<docker>`.
+   * - command
+     - description
+   * - ``setup-ros-workspace-docker``
+     - Creates a new workspace and maps the workspace inside a docker container. You can then switch to docker using ``rtw_switch_to_docker``.
+   * - ``rtw_switch_to_docker``
+     - Starts the docker container if it has been stopped and connects to the container as user.
+   * - ``rtw_switch_to_docker_root``
+     - Starts the docker container if it has been stopped and connects to the container as root-user.
+   * - ``rtw_stop_docker``
+     - Stops the docker container.
