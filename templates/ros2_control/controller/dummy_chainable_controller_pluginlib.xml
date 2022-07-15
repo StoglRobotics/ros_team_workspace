@@ -1,0 +1,8 @@
+<library path="dummy_package_namespace">
+  <class name="dummy_package_namespace/DummyClassName"
+         type="dummy_package_namespace::DummyClassName" base_class_type="controller_interface::ChainableControllerInterface">
+  <description>
+    DummyClassName ros2_control controller.
+  </description>
+  </class>
+</library>

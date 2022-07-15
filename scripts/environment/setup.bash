@@ -113,6 +113,10 @@ elif [[ $ros_version == 2 ]]; then
     print_and_exit "Neither '$WS_FOLDER_0', '$WS_FOLDER_1', '$WS_FOLDER_2' nor '$WS_FOLDER_3' exist. Can not find ROS workspace!"
   fi
 
+  if [ -n "$RosTeamWS_DOCKER_TAG" ] && [ "$RosTeamWS_DOCKER_TAG" != "-" ]; then
+    echo -e "${TERMINAL_COLOR_BLUE}RosTeamWS: The workspace uses docker container '$RosTeamWS_DOCKER_TAG'."
+  fi
+
   export ROS_WS=$WS_FOLDER
   FILE_TO_SOURCE="$WS_FOLDER/.ros_team_ws_workspace_rc"
   if [ -f "$FILE_TO_SOURCE" ]; then

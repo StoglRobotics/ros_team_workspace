@@ -75,6 +75,7 @@ pygments_style = "sphinx"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosectionlabel",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
@@ -211,6 +212,7 @@ html_theme_options = {
     "navigation_depth": -1,
     # Only display the logo image, do not display the project name at the top of the sidebar
     "logo_only": True,
+    "body_max_width": "none",
 }
 
 html_context = {

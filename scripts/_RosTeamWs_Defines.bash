@@ -55,6 +55,12 @@ function RosTeamWS_setup_exports {
   export RAW_TERMINAL_COLOR_LIGHT_GRAY=$'\e[0;37m'
   export RAW_TERMINAL_COLOR_WHITE=$'\e[1;37m'
 
+  ## Define semantics of each color
+  export TERMINAL_COLOR_USER_NOTICE=${TERMINAL_COLOR_YELLOW}
+  export TERMINAL_COLOR_USER_INPUT_DECISION=${TERMINAL_COLOR_PURPLE}
+  export TERMINAL_COLOR_USER_CONFIRMATION=${TERMINAL_COLOR_BLUE}
+  export RTW_COLOR_NOTIFY_USER=${TERMINAL_COLOR_YELLOW}
+  export RTW_COLOR_ERROR=${TERMINAL_COLOR_RED}
 }
 
 # TODO(denis): add this into setup.bash
@@ -221,15 +227,14 @@ function print_and_exit {
 
   message=$1
   echo ""
-  echo -e "${TERMINAL_COLOR_RED}$message${TERMINAL_COLOR_NC}"
+  echo -e "${RTW_COLOR_ERROR}$message${TERMINAL_COLOR_NC}"
   if [ ! -z "$2" ]; then
     echo ""
-    echo -e "${TERMINAL_COLOR_YELLOW}Usage: '$2'${TERMINAL_COLOR_NC}"
+    echo -e "${TERMINAL_COLOR_USER_NOTICE}Usage: '$2'${TERMINAL_COLOR_NC}"
   fi
-  echo -e "${TERMINAL_COLOR_BLUE}Error has happened. Exiting... Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}Error has happened. Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
   read -p ""
-  return 2>/dev/null || exit
-  throw_error
+  return 2>/dev/null || exit 1
 }
 
 function print_error {
@@ -299,7 +304,11 @@ function framework_default_paths {
   ros_distro=$1
 
   FRAMEWORK_NAME="ros_team_workspace"
-  FRAMEWORK_BASE_PATH=${FRAMEWORK_BASE_PATH:=/opt/RosTeamWS}
+
+  # if we suppose a structure like
+  # /opt/RosTeamWS/ros_ws_<ros_distro>/src/ros_team_ws/...
+  # then FRAMEWORK_BASE_PATH should be /opt/RosTeamWS/
+  FRAMEWORK_BASE_PATH="$(RosTeamWS_script_own_dir)/../../../.."
   FRAMEWORK_PACKAGE_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro/src/$FRAMEWORK_NAME"
 
   if [ ! -d "$FRAMEWORK_PACKAGE_PATH" ]; then
@@ -311,22 +320,27 @@ function framework_default_paths {
   PACKAGE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/package"
   ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/robot_description"
   ROS2_CONTROL_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control"
-  ROS2_CONTROL_HW_ITF_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control/hardware"
-  ROS2_CONTROL_CONTROLLER_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control/controller"
+  ROS2_CONTROL_HW_ITF_TEMPLATES="$ROS2_CONTROL_TEMPLATES/hardware"
+  ROS2_CONTROL_CONTROLLER_TEMPLATES="$ROS2_CONTROL_TEMPLATES/controller"
   LICENSE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/licenses"
+  DOCKER_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/docker"
 }
 
 function check_ros_distro {
   ros_distro=$1
   if [ -z "$1" ]; then
-    ros_distro=$DEFAULT_ROS_DISTRO
-    echo "No ros_distro defined. Using default: '$ros_distro'"
-    if [ ! -d "/opt/ros/$ros_distro" ]; then
-      print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-#             echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-#             exit
+    if [ -n "$DEFAULT_ROS_DISTRO" ]; then
+      ros_distro=$DEFAULT_ROS_DISTRO
+      echo "No ros_distro defined. Using default: '$ros_distro'"
+      if [ ! -d "/opt/ros/$ros_distro" ]; then
+        print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+  #             echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+  #             exit
+      fi
+      read -p "Press <ENTER> to continue or <CTRL>+C to exit."
+    else
+      return 2>/dev/null
     fi
-    read -p "Press <ENTER> to continue or <CTRL>+C to exit."
   fi
 
   if [ ! -d "/opt/ros/$ros_distro" ]; then
@@ -339,6 +353,8 @@ function check_ros_distro {
   if [[ $ros_distro == "foxy" ]]; then
     ros_version=2
   elif [[ $ros_distro == "galactic" ]]; then
+    ros_version=2
+  elif [[ $ros_distro == "humble" ]]; then
     ros_version=2
   elif [[ $ros_distro == "rolling" ]]; then
     ros_version=2
@@ -375,4 +391,4 @@ function compile_and_source_package {
 
 # END: Framework functions
 
-FRAMEWORK_MAIN_PATH="$(RosTeamWS_script_own_dir)/../"
+FRAMEWORK_MAIN_PATH="$(RosTeamWS_script_own_dir)/.."
