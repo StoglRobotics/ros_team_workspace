@@ -105,6 +105,10 @@ elif [[ $ros_version == 2 ]]; then
     print_and_exit "Neither '$WS_FOLDER_0', '$WS_FOLDER_1', '$WS_FOLDER_2' nor '$WS_FOLDER_3' exist. Can not find ROS workspace!"
   fi
 
+  if [ -n "$RosTeamWS_DOCKER_TAG" ] && [ "$RosTeamWS_DOCKER_TAG" != "-" ]; then
+    echo -e "${TERMINAL_COLOR_BLUE}RosTeamWS: The workspace uses docker container '$RosTeamWS_DOCKER_TAG'."
+  fi
+
   export ROS_WS=$WS_FOLDER
   # TODO: COLCON_WS is deprecated!!
   export COLCON_WS=$ROS_WS

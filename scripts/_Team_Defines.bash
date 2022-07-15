@@ -12,19 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-## BEGIN: Team specific definitions
-
-DEFAULT_ROS_DISTRO="rolling"
-DEFAULT_ROS_VERSION=2
+## BEGIN: definitions
 
 # TODO(denis): We have two example teams. On is working with industrial and other with mobile robots
 # TEAM_TEAM_NAMES=("Industrial" "Mobile")
-
-TEAM_LICENSE="Apache-2.0"
-
-TEAM_REPOSITORY_SERVER="https://github.com"
-
-TEAM_PRIVATE_CONFIG_PATH=""
 
 # Define a path to a repository with your internal assets and configurations
 TEAM_INTERNAL_ASSETS="/opt/RosTeamWS/assets/"
@@ -32,8 +23,9 @@ TEAM_INTERNAL_ASSETS="/opt/RosTeamWS/assets/"
 ## END: definitions
 
 # TODO(denis): implement here support for internal repos
-source $TEAM_INTERNAL_ASSETS/setup.bash
-
+if [ -f $TEAM_INTERNAL_ASSETS/setup.bash ]; then
+  source $TEAM_INTERNAL_ASSETS/setup.bash
+fi
 
 ## BEGIN: Framework definition adjustable by users
 # TBD
@@ -62,7 +54,6 @@ alias setup_ros2_aliases=RosTeamWS_setup_ros2_aliases
 
 # BEGIN: Define aliases for standard scripts
 # Change those to your custom ones you would like to use.
-
 alias create-new-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/create-new-package.bash
 
 alias setup-repository=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash
@@ -70,6 +61,11 @@ alias setup-repository=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash
 alias setup-repository-ci=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ci-config.bash
 
 alias setup-ros-workspace=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ros-workspace.bash
+
+setup-ros-workspace () {
+  source "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-ros-workspace.bash
+  create_workspace "$@"
+}
 
 alias setup-robot-bringup=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-robot-bringup.bash
 
