@@ -50,7 +50,7 @@ The opinions and proposals stated here are merely related to the authors' experi
 .. toctree::
    :hidden:
 
-   getting_started/index.rst
+   tutorials/index.rst
    guidelines/index.rst
    use-cases/index.rst
    docker/index.rst
