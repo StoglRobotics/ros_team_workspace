@@ -10,3 +10,4 @@ These tutorials will quickly get you using the ROS Team Workspace.
 
    quick-start.rst
    setting_up_rtw.rst
+   managing_multiple_workspaces.rst
