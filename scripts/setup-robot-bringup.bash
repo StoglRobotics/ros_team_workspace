@@ -53,7 +53,7 @@ read -p "If correct press <ENTER>, otherwise <CTRL>+C and start the script again
 RM_FOLDERS=("include" "src")
 
 for FOLDER in "${RM_FOLDERS[@]}"; do
-  if [ -d $FOLDER && ! "$(ls -A $FOLDER )" ]; then
+  if [[ -d $FOLDER && ! "$(ls -A $FOLDER )" ]]; then
     rm -r $FOLDER
   fi
 done
