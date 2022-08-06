@@ -18,7 +18,7 @@ Clone and source the RosTeamWorkspace
    source ros_team_workspace/setup.bash
 
 
-Use-case 1: Create new package in an existing workspace
+Create new package in an existing workspace
 --------------------------------------------------------
 For more details check :ref:`use-case description <uc-new-package>`.
 
@@ -32,7 +32,7 @@ For more details check :ref:`use-case description <uc-new-package>`.
    cd .. && colcon build --symlink-install  # to compile your newly created package
 
 
-Use-case 2: Create robot description package
+Create robot description package
 -------------------------------------------------
 For more details check :ref:`use-case description <uc-setup-robot-description>`.
 
@@ -44,7 +44,7 @@ For more details check :ref:`use-case description <uc-setup-robot-description>`.
    setup-robot-description <my_cool_robot_name> <package_name>
 
 
-Use-case 3: Create robot bringup package
+Create robot bringup package
 -----------------------------------------------
 For more details check :ref:`use-case description <uc-setup-robot-bringup>`.
 
@@ -56,7 +56,7 @@ For more details check :ref:`use-case description <uc-setup-robot-bringup>`.
    setup-robot-bringup <my_cool_robot_name> <package_name>
 
 
-Use-case 4: Setup  ros2_control control hardware
+Setup  ros2_control control hardware
 -------------------------------------------------
 For more details check :ref:`use-case description <uc-setup-ros2-control-hardware>`.
 
@@ -68,7 +68,7 @@ For more details check :ref:`use-case description <uc-setup-ros2-control-hardwar
    ros2_control_setup-hardware-interface-package <control_hardware_file_name>
 
 
-Use-case 5: Setup  ros2_control controller
+Setup  ros2_control controller
 -----------------------------------------------
 For more details check :ref:`use-case description <uc-setup-ros2-controller>`.
 
