@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>1. Quick start with RosTeamWorkspace &mdash; ROS Team Workspace Documentation: Galactic Aug 2022 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon-bg.png"/>
+  
+
+  
+  
+
+  
+    <link rel="canonical" href="https://stoglrobotics.github.io/ros_team_workspace/galactic//galactic/tutorials/quick-start.html" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2. Setting up RosTeamWorkspace" href="setting_up_rtw.html" />
+    <link rel="prev" title="Tutorials" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/galactic-small.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1. Quick start with RosTeamWorkspace</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#clone-and-source-the-rosteamworkspace">1.1. Clone and source the RosTeamWorkspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-new-package-in-an-existing-workspace">1.2. Create new package in an existing workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-robot-description-package">1.3. Create robot description package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-robot-bringup-package">1.4. Create robot bringup package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setup-ros2-control-control-hardware">1.5. Setup  ros2_control control hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setup-ros2-control-controller">1.6. Setup  ros2_control controller</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setting_up_rtw.html">2. Setting up RosTeamWorkspace</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guidelines/index.html">Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/index.html">Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker/index.html">Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ROS Team Workspace Documentation: Galactic</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Tutorials</a> &raquo;</li>
+        
+      <li><span class="section-number">1. </span>Quick start with RosTeamWorkspace</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            
+              <a href="https://github.com/StoglRobotics/ros_team_workspace/blob/master//docs/tutorials/quick-start.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="quick-start-with-rosteamworkspace">
+<h1><span class="section-number">1. </span>Quick start with RosTeamWorkspace<a class="headerlink" href="#quick-start-with-rosteamworkspace" title="Permalink to this headline"></a></h1>
+<p id="tutorial-quick-start">This tutorial show use of RosTeamWorkspace for very common use-cases that can be done without permanent changes to your environment.
+First you have to clone and source the workspace and then continue with the use-case you are interested in:</p>
+<div class="toctree-wrapper compound">
+</div>
+<section id="clone-and-source-the-rosteamworkspace">
+<h2><span class="section-number">1.1. </span>Clone and source the RosTeamWorkspace<a class="headerlink" href="#clone-and-source-the-rosteamworkspace" title="Permalink to this headline"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/StoglRobotics/ros_team_workspace.git
+<span class="nb">source</span> ros_team_workspace/setup.bash
+</pre></div>
+</div>
+</section>
+<section id="create-new-package-in-an-existing-workspace">
+<h2><span class="section-number">1.2. </span>Create new package in an existing workspace<a class="headerlink" href="#create-new-package-in-an-existing-workspace" title="Permalink to this headline"></a></h2>
+<p>For more details check <a class="reference internal" href="../use-cases/ros_packages/create_package.html#uc-new-package"><span class="std std-ref">use-case description</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
+<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;
+
+create-new-package &lt;my_new_package_name&gt; <span class="s2">&quot;Some cool description of the package.&quot;</span>  <span class="c1"># follow the instructions</span>
+
+<span class="nb">cd</span> .. <span class="o">&amp;&amp;</span> colcon build --symlink-install  <span class="c1"># to compile your newly created package</span>
+</pre></div>
+</div>
+</section>
+<section id="create-robot-description-package">
+<h2><span class="section-number">1.3. </span>Create robot description package<a class="headerlink" href="#create-robot-description-package" title="Permalink to this headline"></a></h2>
+<p>For more details check <a class="reference internal" href="../use-cases/ros_packages/setup_robot_description_package.html#uc-setup-robot-description"><span class="std std-ref">use-case description</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
+<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;/&lt;package_name&gt;
+
+setup-robot-description &lt;my_cool_robot_name&gt; &lt;package_name&gt;
+</pre></div>
+</div>
+</section>
+<section id="create-robot-bringup-package">
+<h2><span class="section-number">1.4. </span>Create robot bringup package<a class="headerlink" href="#create-robot-bringup-package" title="Permalink to this headline"></a></h2>
+<p>For more details check <a class="reference internal" href="../use-cases/ros_packages/setup_robot_bringup_package.html#uc-setup-robot-bringup"><span class="std std-ref">use-case description</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
+<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;/&lt;package_name&gt;
+
+setup-robot-bringup &lt;my_cool_robot_name&gt; &lt;package_name&gt;
+</pre></div>
+</div>
+</section>
+<section id="setup-ros2-control-control-hardware">
+<h2><span class="section-number">1.5. </span>Setup  ros2_control control hardware<a class="headerlink" href="#setup-ros2-control-control-hardware" title="Permalink to this headline"></a></h2>
+<p>For more details check <a class="reference internal" href="../use-cases/ros2_control/setup_robot_hardware_interface.html#uc-setup-ros2-control-hardware"><span class="std std-ref">use-case description</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
+<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;/&lt;package_name&gt;
+
+ros2_control_setup-hardware-interface-package &lt;control_hardware_file_name&gt;
+</pre></div>
+</div>
+</section>
+<section id="setup-ros2-control-controller">
+<h2><span class="section-number">1.6. </span>Setup  ros2_control controller<a class="headerlink" href="#setup-ros2-control-controller" title="Permalink to this headline"></a></h2>
+<p>For more details check <a class="reference internal" href="../use-cases/ros2_control/setup_controller.html#uc-setup-ros2-controller"><span class="std std-ref">use-case description</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
+<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;/&lt;package_name&gt;
+
+ros2_control_setup-controller-package &lt;controller_file_name&gt;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="setting_up_rtw.html" class="btn btn-neutral float-right" title="2. Setting up RosTeamWorkspace" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Stogl Robotics Consulting UG (haftungsbeschränkt).
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Other Versions</span>
+    v: master
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>ROS Team Workspace - Galactic and Rolling</dt>
+      <dd><a href="quick-start.html">Master (latest)</a></dd>
+    </dl>
+    <dl>
+      <dt>ROS Team Workspace - Foxy</dt>
+        <dd><a href="../../foxy/index.html">Foxy</a></dd>
+   </dl>
+  </div>
+</div>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
