@@ -16,7 +16,7 @@ source $script_own_dir/../_RosTeamWs_Docker_Defines.bash
 source $script_own_dir/../_Team_Defines.bash
 
 # ros distribution name will be set in $ros_distro
-check_ros_distro $1
+check_and_set_ros_distro_and_version $1
 
 ws_folder="$2"
 if [ "$2" == "-" ]; then
@@ -83,7 +83,7 @@ elif [[ $ros_version == 2 ]]; then
   setup_ros2_exports
   setup_ros2_aliases
 
-#   /opt/rti.com/rti_connext_dds-5.3.1/setenv_ros2rti.bash
+  #/opt/rti.com/rti_connext_dds-5.3.1/setenv_ros2rti.bash
   # export LANG=de_DE.UTF-8
   WS_FOLDER=""
   ## FIXME: 0-2 are deprecated

@@ -3,8 +3,9 @@ setup_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pw
 # Load RosTeamWS defines
 source $setup_script_own_dir/scripts/_RosTeamWs_Defines.bash
 
-# Set default paths
-framework_default_paths $DEFAULT_ROS_DISTRO
+# setup default versions and paths for rtw
+set_supported_versions
+set_framework_default_paths
 
 # Load Team defines
 source $setup_script_own_dir/scripts/_Team_Defines.bash

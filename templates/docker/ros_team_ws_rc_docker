@@ -2,9 +2,9 @@
 
 # This is used for docker, to include ros_team_workspace inside docker and auto source it.
 
-# RosTeamWS - main setup
-DEFAULT_ROS_DISTRO="ROS_DUMMY_VERSION"
-DEFAULT_ROS_VERSION=2
+# if you installed ros not under /opt/ros/<ros-distro>/ then you have to set the ALTERNATIVE_ROS_LOCATION
+# to point to your installation folder e.g. /home/user/my_installation_folder/foxy/
+ALTERNATIVE_ROS_LOCATION=""
 
 TEAM_LICENSE="Apache License 2.0"
 

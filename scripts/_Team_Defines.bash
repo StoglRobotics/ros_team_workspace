@@ -33,9 +33,6 @@ fi
 
 ## END: Framework definitions adjustable by users
 
-# Check ROS and Load base paths
-check_ros_distro $DEFAULT_ROS_DISTRO
-
 # BEGIN: Define aliases for standard internal functions
 
 alias setup_exports=RosTeamWS_setup_exports

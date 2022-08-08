@@ -25,7 +25,7 @@ usage="setup-robot-description.bash ROBOT_NAME [PKG_NAME]"
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 source $script_own_dir/_RosTeamWs_Defines.bash
-check_ros_distro ${ROS_DISTRO}
+check_ros_distr ${ROS_DISTRO}
 
 ROBOT_NAME=$1
 if [ -z "$1" ]; then
