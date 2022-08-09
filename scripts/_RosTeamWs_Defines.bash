@@ -283,9 +283,9 @@ function is_accepted_user_answer {
   local user_answer=$1
 
   if [[ " ${rtw_accepted_answers[*]} " =~ " ${user_answer} " ]]; then
-    echo true
+    return
   fi
-  echo false
+  false
 }
 
 function user_decision {
@@ -318,19 +318,21 @@ function set_framework_default_paths {
 }
 
 function is_valid_ros_distribution {
-  local ros_distribution=$1
+    local ros_distribution=$1
+    declare -a supported_ros_versions=("${!2}")
 
-  if [[ " ${rtw_supported_ros_distributions[*]} " =~ " ${ros_distribution} " ]]; then
-    echo true
+  if [[ " ${supported_ros_versions[*]} " =~ " ${ros_distribution} " ]]; then
+    return
   fi
-  echo false
+
+  false
 }
 
 function check_ros_distro {
   ros_distro=$1
 
   # check if the given distribution is a distribution supported by rtw
-  while ! $(is_valid_ros_distribution "$ros_distro");
+  while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@];
   do
       echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {$ros_distro} you chose is not supported by RosTeamWS. Please chose either of the following:${rtw_supported_ros_distributions[*]}"
       read ros_distro

@@ -21,7 +21,6 @@ usage='setup-ci-config.bash "repo_name" "repo_namespace"'
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 source $script_own_dir/../setup.bash
-# check_ros_distro
 
 repo_name=$1
 if [ -z "$1" ]; then

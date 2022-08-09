@@ -7,7 +7,7 @@ source $setup_ws_script_own_dir/docker/_RosTeamWs_Docker_Defines.bash
 
 check_user_input () {
   # ros distribution name will be set in ${ros_distro}
-  check_ros_distro "$1"
+  check_and_set_ros_distro_and_version "$1"
 
   ws_folder="$2"
   if [ -z "$2" ]; then
