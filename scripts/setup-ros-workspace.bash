@@ -2,8 +2,7 @@
 
 # Load Framework defines
 setup_ws_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
-source $setup_ws_script_own_dir/_RosTeamWs_Defines.bash
-source $setup_ws_script_own_dir/docker/_RosTeamWs_Docker_Defines.bash
+source $setup_ws_script_own_dir/../setup.bash
 
 check_user_input () {
   # ros distribution name will be set in ${ros_distro}

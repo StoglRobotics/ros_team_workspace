@@ -24,8 +24,8 @@ usage="setup-robot-description.bash ROBOT_NAME [PKG_NAME]"
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
-source $script_own_dir/_RosTeamWs_Defines.bash
-check_ros_distr ${ROS_DISTRO}
+source $script_own_dir/../setup.bash
+check_and_set_ros_distro_and_version ${ROS_DISTRO}
 
 ROBOT_NAME=$1
 if [ -z "$1" ]; then
@@ -62,15 +62,15 @@ mkdir -p $F_NAME
 ROBOT_URDF_XACRO="urdf/${ROBOT_NAME}.urdf.xacro"
 ROBOT_MACRO="urdf/${ROBOT_NAME}/${ROBOT_NAME}_macro.xacro"
 ROBOT_MACRO_ROS2_CONTROL="urdf/${ROBOT_NAME}/${ROBOT_NAME}_macro.ros2_control.xacro"
-cp -n $ROBOT_DESCRIPTION_TEMPLATES/common.xacro urdf/common.xacro
-cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot.urdf.xacro $ROBOT_URDF_XACRO
-cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot_macro.xacro $ROBOT_MACRO
-cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro $ROBOT_MACRO_ROS2_CONTROL
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/common.xacro" urdf/common.xacro
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot.urdf.xacro" $ROBOT_URDF_XACRO
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.xacro" $ROBOT_MACRO
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro" $ROBOT_MACRO_ROS2_CONTROL
 
 # Copy launch.py file for testing the description
 mkdir -p launch
 VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch.py"
-cp -n $ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.py $VIEW_ROBOT_LAUNCH
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.py" $VIEW_ROBOT_LAUNCH
 
 # Copy YAML files
 mkdir -p config
@@ -79,7 +79,7 @@ touch config/.gitkeep
 # Copy rviz files
 mkdir -p rviz
 ROBOT_RVIZ="rviz/${ROBOT_NAME}.rviz"
-cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot.rviz $ROBOT_RVIZ
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot.rviz" $ROBOT_RVIZ
 
 # sed all needed files
 FILES_TO_SED=($ROBOT_URDF_XACRO $ROBOT_MACRO $ROBOT_MACRO_ROS2_CONTROL $VIEW_ROBOT_LAUNCH)

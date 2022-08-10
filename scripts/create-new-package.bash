@@ -136,7 +136,7 @@ elif [[ $ros_version == 2 ]]; then
   ros2 pkg create --package-format 3 --description "$PKG_DESCRIPTION" --license "$LICENSE" --build-type "$BUILD_TYPE" --maintainer-email "$MAINTAINER_EMAIL" --maintainer-name "$MAINTAINER_NAME" $PKG_NAME
 
   ## Until it is corrected upstream
-  if [[ $META == 1 ]]; then
+  if [[ $META == 2 ]]; then
     cd $PKG_NAME
     rm -r include
     rm -r src
@@ -158,7 +158,7 @@ fi
 
 case "$choice" in
 "y")
-  if [[ $META != 2 ]]; then
+  if [[ $META != 3 ]]; then
 
     if [[ $ros_version == 1 ]]; then
       roscd $PKG_NAME
