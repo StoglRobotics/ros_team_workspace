@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# if you installed ros not under /opt/ros/<ros-distro>/ then you have to set the ALTERNATIVE_ROS_LOCATION
-# to point to your installation folder e.g. /home/user/my_installation_folder/foxy/
-ALTERNATIVE_ROS_LOCATION=""
+# if you did not install ros under /opt/ros/<ros-distro>/ then you have to set the ALTERNATIVE_ROS_<ROS_DISTRO>_LOCATION
+# to point to your installation folder e.g. ALTERNATIVE_ROS_ROLLING_LOCATION=/home/user/my_installation_folder/rolling/
+# For other ros versions simply add ALTERNATIVE_ROS_<ros-distro>_LOCATION e.g. ALTERNATIVE_ROS_FOXY_LOCATION
+ALTERNATIVE_ROS_ROLLING_LOCATION=""
 
 TEAM_LICENSE="Apache License 2.0"
 
@@ -10,6 +11,7 @@ TEAM_REPOSITORY_SERVER="https://github.com"
 
 TEAM_PRIVATE_CONFIG_PATH=""
 
+# set this to the location of RosTeamWorkspace
 source <PATH TO ros_team_workspace>/setup.bash
 
 # User specific setup / variables
@@ -96,7 +98,7 @@ function parse_ros_workspace {
   fi
 }
 
-export PS1="\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'[\t]\['"\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_vc_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
+#export PS1="\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'[\t]\['"\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_vc_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
 
 # END: Stogl Robotics custom setup for nice colors and showing ROS workspace
 

@@ -292,12 +292,12 @@ function user_decision {
   local question=$1
   user_answer=$2
 
-  echo "${question}[${rtw_accepted_answers[*]}]"
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${question}[${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
   read user_answer
 
   while ! $(is_accepted_user_answer "$user_answer");
   do
-    echo -e "${question} Please type one of the following: [${rtw_accepted_answers[*]}]"
+    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${question} Please type one of the following: [${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
     read user_answer
   done
 }
@@ -306,7 +306,8 @@ function set_framework_default_paths {
   FRAMEWORK_NAME="ros_team_workspace"
   FRAMEWORK_BASE_PATH="$(RosTeamWS_script_own_dir)/.."
 
-  RosTeamWS_FRAMEWORK_SCRIPTS_PATH="$FRAMEWORK_BASE_PATH/scripts/"
+  RosTeamWS_FRAMEWORK_SCRIPTS_PATH="$FRAMEWORK_BASE_PATH/scripts"
+  RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/os_configure"
   # Script-specific variables
   PACKAGE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/package"
   ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/robot_description"
@@ -339,7 +340,9 @@ function check_ros_distro {
   done
 
   if [ ! -d "/opt/ros/$ros_distro" ]; then
-    if [ ! -f "$ALTERNATIVE_ROS_LOCATION/setup.bash" ]; then
+    local upper_case=$(echo $ros_distro | tr '[:lower:]' '[:upper:]')
+    local alternative_ros_location=ALTERNATIVE_ROS_${upper_case}_LOCATION
+    if [ ! -f "${!alternative_ros_location}/setup.bash" ]; then
       print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
     else
       user_decision "Using ${ALTERNATIVE_ROS_LOCATION} for ${ros_distro}." user_answer

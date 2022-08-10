@@ -72,6 +72,9 @@ alias setup-robot-description=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-robot-desc
 alias ros2_control_setup-hardware-interface-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/ros2_control/setup-hardware-interface-package.bash
 alias ros2_control_setup-controller-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/ros2_control/setup-controller-package.bash
 
+# setup auto-sourcing
+alias setup-auto-sourcing=$RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH/setup_auto_sourcing.bash
+
 # Team General aliases and functions
 function generate_gif_from_video {
 
