@@ -335,7 +335,7 @@ function check_ros_distro {
   # check if the given distribution is a distribution supported by rtw
   while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@];
   do
-      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {$ros_distro} you chose is not supported by RosTeamWS. Please chose either of the following:${rtw_supported_ros_distributions[*]}"
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please chose either of the following:${rtw_supported_ros_distributions[*]}"
       read ros_distro
   done
 
@@ -382,8 +382,8 @@ function set_ros_version_for_distro {
 function check_and_set_ros_distro_and_version {
   ros_distro=$1
 
-  check_ros_distro ros_distro
-  set_ros_version_for_distro ros_distro
+  check_ros_distro "${ros_distro}"
+  set_ros_version_for_distro "${ros_distro}"
 }
 
 # first param is package name, second (yes/no) for executing tests

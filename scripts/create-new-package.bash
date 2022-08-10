@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-usage='create-new-package PKG_NAME PKG_DESCRIPTION'
+usage="create-new-package <PKG_NAME> <\"PKG_DESCRIPTION\">"
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 source $script_own_dir/../setup.bash
-check_and_set_ros_distro_and_version ${ROS_DISTRO}
+check_and_set_ros_distro_and_version "${ROS_DISTRO}"
 
 PKG_NAME=$1
 if [ -z "$1" ]; then
@@ -22,20 +22,36 @@ echo -e "${TERMINAL_COLOR_USER_NOTICE}Your path is `pwd`. Is this your workspace
 echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If so press <ENTER> otherwise <CTRL>+C and start the script again from your source folder.${TERMINAL_COLOR_NC}"
 read
 
-echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}What type of package you want to create? (0 - standard, 1 - metapackage, 2 - subpackage) [0]:${TERMINAL_COLOR_NC}"
-read META
-META=${META:=0}
+echo -n -e ""
+echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}What type of package you want to create? (1 - standard, 2 - metapackage, 3 - subpackage):${TERMINAL_COLOR_NC}"
+select META in standard metapackage subpackage;
+do
+  case "$META" in
+        standard)
+            META="1"
+            break
+          ;;
+        metapackage)
+            META="2"
+            break
+          ;;
+        subpackage)
+            META="3"
+            break
+          ;;
+  esac
+done
 
 CREATE_PARAMS=""
 
 case "$META" in
-"1")
+"2")
    echo -e "${TERMINAL_COLOR_USER_NOTICE}Meta-package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
     CREATE_PARAMS="--meta"
     mkdir $PKG_NAME
     cd $PKG_NAME
    ;;
-"2")
+"3")
    read -p "To create a subpackage, enter the name of metapackage: " META_NAME
    if [ -z "$META_NAME" ]; then
     echo "ERROR: You have to enter the name of metapackage! Exiting..."
@@ -52,10 +68,12 @@ case "$META" in
   echo -e "${TERMINAL_COLOR_USER_NOTICE}Package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
 esac
 
-
-echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Do you want to enter name and email address of the maintainer? If not, data from git configuration will be used. (y/n) [n]: ${TERMINAL_COLOR_NC}"
-read choice
-choice=${choice:="n"}
+user_decision "Do you want to enter name and email address of the maintainer? If not, data from git configuration will be used."
+if [[ " ${positive_answers[*]} " =~ " ${user_answer} " ]]; then
+  choice="y"
+else
+  choice="n"
+fi
 
 case "$choice" in
 "y")
@@ -76,7 +94,7 @@ case "$choice" in
 esac
 
 # License
-echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}How do you want to licence your package? ['$TEAM_LICENSE']: ${TERMINAL_COLOR_NC}"
+echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}How do you want to licence your package? Current team license standard:['$TEAM_LICENSE']: ${TERMINAL_COLOR_NC}"
 read LICENSE
 LICENSE=${LICENSE:=$TEAM_LICENSE}
 
@@ -85,19 +103,24 @@ if [[ $ros_version == 1 ]]; then
 
 elif [[ $ros_version == 2 ]]; then
   # Build type
-  echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Please choose your package build type (1 - ament_cmake, 2 - ament_python, 3 - cmake) [1]:${TERMINAL_COLOR_NC}"
-  read choice
-
-  case "$choice" in
-  "2")
-    BUILD_TYPE="ament_python"
-    ;;
-  "3")
-    BUILD_TYPE="cmake"
-    ;;
-  *)
-    BUILD_TYPE="ament_cmake"
-  esac
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Please choose your package build type (1 - ament_cmake, 2 - ament_python, 3 - cmake):${TERMINAL_COLOR_NC}"
+  select build_type in ament_cmake ament_python cmake;
+  do
+    case "$build_type" in
+          ament_cmake)
+              BUILD_TYPE="ament_cmake"
+              break
+            ;;
+          ament_python)
+              BUILD_TYPE="ament_python"
+              break
+            ;;
+          cmake)
+              BUILD_TYPE="cmake"
+              break
+            ;;
+    esac
+  done
 fi
 
 echo ""
@@ -126,9 +149,12 @@ elif [[ $ros_version == 2 ]]; then
   fi
 fi
 
-echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Do you want to setup/update repository with the new package configuration? (y/n) [n]: ${TERMINAL_COLOR_NC}"
-read choice
-choice=${choice:="n"}
+user_decision "Do you want to setup/update repository with the new package configuration?"
+if [[ " ${positive_answers[*]} " =~ " ${user_answer} " ]]; then
+  choice="y"
+else
+  choice="n"
+fi
 
 case "$choice" in
 "y")
