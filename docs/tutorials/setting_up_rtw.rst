@@ -25,7 +25,7 @@ That's all. You are now set to use RosTeamWS. If you want to add auto-sourcing y
    setup-auto-sourcing
 
 
-This is going to configure the RosTeamWorkspace permanently. If you want to revert those changes or prefer to do them by yourself simply follow the next few steps:
+This is going to configure the RosTeamWorkspace permanently. If you want to revert those changes or prefer to do them by yourself simply follow the next few steps.
 
 Manual auto-sourcing
 """""""""""""""""""""
