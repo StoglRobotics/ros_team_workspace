@@ -16,6 +16,7 @@ Clone and source the RosTeamWorkspace
 
    git clone https://github.com/StoglRobotics/ros_team_workspace.git
    source ros_team_workspace/setup.bash
+   setup-auto-sourcing  # Make RosTeamWorkspace automatically sourced when open a new terminal (The best experience)
 
 
 Create new package in an existing workspace
