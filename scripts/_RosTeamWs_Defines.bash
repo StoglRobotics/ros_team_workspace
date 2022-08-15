@@ -258,7 +258,7 @@ function colcon_remove {
 
 ## END: Default Framework Definitions
 
-# function which prints a notification in predefined color sceme
+# function which prints a notification in predefined color scheme
 # $1 - notification = The message which gets print to the commandline
 function notify_user {
   notification=$1
@@ -284,6 +284,10 @@ function print_and_exit {
   exit 1
 }
 
+# If the answer selected by user is in the ${rtw_accepted_answers} array
+# true is returned else false.
+#
+# $1 - user_answer = The ansewer given by the user.
 function is_accepted_user_answer {
   local user_answer=$1
 
@@ -293,6 +297,12 @@ function is_accepted_user_answer {
   false
 }
 
+# Let's the user decide what he wants to do. The decision (question) is repeated
+# till the user gives an accepted answer. Accepted answers are defined in ${rtw_accepted_answers}.
+# Answers can either be positive or negative.
+#
+# $1 - decision = The decision (question) the user has to decide about.
+# $2 - user_answer = The answer given by the user.
 function user_decision {
   local decision=$1
   user_answer=$2
