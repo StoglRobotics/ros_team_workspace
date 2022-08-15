@@ -22,21 +22,27 @@ if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
     print_and_exit "Aborting the setup of autosourcing. Exiting..."
 fi
 
-echo "Copying .ros_team_ws_rc to your home folder."
-
 rtw_file=".ros_team_ws_rc"
 rtw_file_location=~/"$rtw_file"
 template_location="$FRAMEWORK_BASE_PATH/templates/$rtw_file"
+echo "Copying ${rtw_file} to your home folder."
 if ! [ -f "$HOME/$rtw_file" ]; then
     cp "${template_location}" ~/.
+else
+    new_rtw_file_name="${rtw_file}.bkp-$(ls ${rtw_file}* | wc -l)"
+    echo ""
+    notify_user "${rtw_file} already exists. Moved it to ${new_rtw_file_name}."
+    mv "${rtw_file}" "${new_rtw_file_name}" || { echo "Error: Could not create a copy of already existing ${rtw_file}. Please rename this file and run script again."; return 1; }
+    cp "${template_location}" ~/.
 fi
+
 sed -i "s|source <PATH TO ros_team_workspace>/setup.bash|source $FRAMEWORK_BASE_PATH/setup.bash|g" "$rtw_file_location"
 sed -i "s|source <Path to ros_team_workspace>/scripts/configuration/terminal_coloring.bash|source $FRAMEWORK_BASE_PATH/scripts/configuration/terminal_coloring.bash|g" "$rtw_file_location"
 
 echo ""
-user_decision "Do you want to add add colored output to your shell? This will show the current git branch, ros workspace and time in terminal. If you are unsure you can test this later by uncommenting the \"export PS1=\" in the .ros_team_ws_rc file or rerun the setup-auto-sourcing command."
+user_decision "Do you want to add add colored output to your shell? This will show the current git branch, ros workspace and time in terminal. If you are unsure you can test this later by rerunning the script or uncommenting the \"source <PATH TO ros_team_workspace>/scripts/configuration/terminal_coloring.bash\" in the ${rtw_file} file."
 if [[ " ${positive_answers[*]} " =~ " ${user_answer} " ]]; then
-    echo "You can revert this by uncommenting the \"export PS1=\" line in the .ros_team_ws_rc file. Or rerun the setup script."
+    echo "You can revert this by rerunning the script or uncommenting the \"source <PATH TO ros_team_workspace>/scripts/configuration/terminal_coloring.bash\" line in the ${rtw_file} file."
     # uncomment line with export PS1
     # find line number
     export_ps1_line_number=$(grep -n "#.*source.*$FRAMEWORK_BASE_PATH/scripts/configuration/terminal_coloring.bash" $rtw_file_location | grep -Eo '^[^:]+')

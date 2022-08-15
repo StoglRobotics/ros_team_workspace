@@ -258,16 +258,21 @@ function colcon_remove {
 
 ## END: Default Framework Definitions
 
+# function which prints a notification in predefined color sceme
+# $1 - notification = The message which gets print to the commandline
+function notify_user {
+  notification=$1
+
+  echo -e "${RTW_COLOR_NOTIFY_USER}${notification}${TERMINAL_COLOR_NC}"
+}
 
 ## BEGIN: Framework functions
 # Parameters:
 # *message* - message to display
 # *usage* - command usage description
 function print_and_exit {
-  # Get color definitions
-  RosTeamWS_setup_exports
-
   message=$1
+
   echo ""
   echo -e "${RTW_COLOR_ERROR}$message!!! Exiting...${TERMINAL_COLOR_NC}"
   if [ ! -z "$2" ]; then
@@ -289,15 +294,15 @@ function is_accepted_user_answer {
 }
 
 function user_decision {
-  local question=$1
+  local decision=$1
   user_answer=$2
 
-  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${question}[${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}[${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
   read user_answer
 
   while ! $(is_accepted_user_answer "$user_answer");
   do
-    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${question} Please type one of the following: [${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision} Please type one of the following: [${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
     read user_answer
   done
 }
