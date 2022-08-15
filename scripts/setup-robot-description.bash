@@ -35,9 +35,12 @@ fi
 
 PKG_NAME=$2
 if [ -z "$2" ]; then
-  current=`pwd`
+  current=$(pwd)
   PKG_NAME=$(basename "$current")
-  echo "Package name guessed from the current path is '$PKG_NAME' is this correct? If not provide it as second parameter."
+  user_decision "Package name guessed from the current path is '$PKG_NAME' is this correct?"
+  if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
+    print_and_exit "Please provide the package name as second parameter."
+  fi
 fi
 
 echo ""

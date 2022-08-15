@@ -412,9 +412,22 @@ function compile_and_source_package {
     test="no"
   fi
 
-  bn=`basename "$PWD"`
-  path=$bn
-  cd $ROS_WS
+  if [ -z "$ROS_WS" ]; then
+    notify_user "Can not compile: No ROS_WS variable set. Trying to guess by sourced workspace."
+    sourced_ws_dirname=$(dirname "$COLCON_PREFIX_PATH")
+    if [ -z "$sourced_ws_dirname" ]; then
+      print_and_exit "Error no workspace sourced. Please source the workspace folder and compile manually."
+    fi
+
+    user_decision "Is \"${sourced_ws_dirname} the correct sourced workspace?"
+    if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
+      print_and_exit "Aborting. Not the correct workspace sourced. Please source the correct workspace folder and compile manually."
+    fi
+
+    cd "$sourced_ws_dirname" || { print_and_exit "Could not change directory to workspace:\"$sourced_ws_dirname\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
+  else
+    cd "$ROS_WS" || { print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
+  fi
 
   colcon_build_up_to $pkg_name
   source install/setup.bash
@@ -422,7 +435,6 @@ function compile_and_source_package {
     colcon_test_up_to $pkg_name
     colcon_test_results | grep $pkg_name
   fi
-#   cd $path
 }
 
 # END: Framework functions
