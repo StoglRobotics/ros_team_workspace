@@ -48,7 +48,7 @@ Docker
 ----------------
 .. _docker-nvidia-support-prerequisites_docker:
 
-Make sure docker is installed and it's working correctly. For instructions on how to install docker have a look :ref:`here<general-info-on-docker-installation>`.
+Make sure docker is installed and it's working correctly. For instructions on how to install docker have a look :ref:`here <general-info-on-docker-installation>`.
 
 Installation
 """"""""""""""""
@@ -82,7 +82,7 @@ Installation
    sudo systemctl restart docker
 
   At this point you can verify that everything works as intended by running:
-  
+
   .. code-block:: bash
 
    sudo docker run --rm --gpus all nvidia/cuda:11.0.3-base-ubuntu20.04 nvidia-smi
@@ -110,4 +110,44 @@ Installation
     |=============================================================================|
     +-----------------------------------------------------------------------------+
 
-2. Replace the
+2. Replace the the ``FROM ubuntu:<version>`` directive in your Dockerfile with the nvidia container of your needs. The following table gives you a quick overview:
+
+  .. list-table:: Examples for nvidia containers
+   :widths: auto
+   :header-rows: 1
+   :stub-columns: 1
+
+   * - Ubuntu version directive
+     - Nvidia docker replacement
+   * - Ubuntu:20.04
+     - nvidia/cuda:11.7.1-base-ubuntu20.04
+   * - Ubuntu:22.04
+     - nvidia/cuda:11.7.1-base-ubuntu22.04
+
+  A list of all available containers can be found `here <https://hub.docker.com/r/nvidia/cuda>`_. 
+
+3. Remove the existing docker container and image.
+
+  .. code-block:: bash
+
+   docker container rm <container-name>
+
+  .. code-block:: bash
+
+   docker image rm <image-name>
+
+4. Recreate your container.
+  Go inside the ``.rtw_docker_defines`` directory in your workspace folder and the execute:
+    
+  .. code-block:: bash
+
+   .\build_docker_image
+
+  to rebuild your container. After the rebuilt has finished you can recreate it with 
+
+  .. code-block:: bash
+
+   .\create_docker_container
+
+
+You now should have a docker container which exposes your nvidia drivers and can switch to your workspace with ``rtw_switch_to_docker``.
