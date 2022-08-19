@@ -166,10 +166,15 @@ setup_ros_team_ws_file() {
   alias_name=_${ws_full_name}
   fun_name="RosTeamWS_setup_${fun_name_suffix}"
 
-  cp "$ros_team_ws_file" "$ros_team_ws_file".bkp
-  # Comment out the old configuration if such exists - this is hard if using functions...
-  sed -i -e '/'"$fun_name"'/ s/^#*/OLD_/' "$ros_team_ws_file"
-  sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' "$ros_team_ws_file"
+  if [ -f "$ros_team_ws_file" ]; then
+    new_rtw_file_name="${ros_team_ws_file_name}.bkp-$(ls ${ros_team_ws_file}* | wc -l)"
+    echo ""
+    cp "$ros_team_ws_file" "$new_rtw_file_name"
+    notify_user "${ros_team_ws_file_name} already exists. Copied it to ${new_rtw_file_name}."
+    # Comment out the old configuration if such exists - this is hard if using functions...
+    sed -i -e '/'"$fun_name"'/ s/^#*/OLD_/' "$ros_team_ws_file"
+    sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' "$ros_team_ws_file"
+  fi
 
   if [ "$use_docker" = true ]; then
     docker_image_tag=$(sed "s/[\/]/-/g" <(echo "ros-team-ws_${ubuntu_version_tag}__${ws_folder}__${ws_full_name}"))
@@ -181,11 +186,10 @@ setup_ros_team_ws_file() {
 
   local docker_support="$use_docker"
   if [ "$is_docker_rtw_file" = true ]; then
-    source_path_rtw="  source /opt/RosTeamWS/ros_ws_$chosen_ros_distro/src/ros_team_workspace/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\""
     docker_support=false # don't use docker in docker
-  else
-    source_path_rtw="  source $FRAMEWORK_BASE_PATH/ros_ws_\"\$RosTeamWS_DISTRO\"/src/$FRAMEWORK_NAME/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\""
   fi
+
+  source_path_rtw="  source $FRAMEWORK_BASE_PATH/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\""
 
   echo "" >> "$ros_team_ws_file"
   echo "$fun_name () {" >> "$ros_team_ws_file"
@@ -205,12 +209,13 @@ setup_ros_team_ws_file() {
 
 update_config()
 {
-  local rtw_file=~/.ros_team_ws_rc
+  local ros_team_ws_file_name=".ros_team_ws_rc"
+  local ros_team_ws_file="$HOME/$ros_team_ws_file_name"
 
-  setup_ros_team_ws_file "$rtw_file" "$use_docker" "$is_docker_rtw_file"
+  setup_ros_team_ws_file "$ros_team_ws_file" "$use_docker" "$is_docker_rtw_file"
 
   # source new workspace
-  source "$rtw_file"
+  source "$ros_team_ws_file"
 
   # Update rosdep definitions
   rosdep update
@@ -236,7 +241,7 @@ create_workspace () {
   local is_docker_rtw_file=false
   update_config
 
-  echo -e "${RTW_COLOR_NOTIFY_USER}Finished creating new workspace: Please open a new terminal and execute '$alias_name'${TERMINAL_COLOR_NC}"
+  echo -e "${RTW_COLOR_NOTIFY_USER}Finished creating new workspace: Please open a new terminal and execute '$alias_name'${TERMINAL_COLOR_NC} (if you have setup auto sourcing). Otherwise you first have to source your ~/.ros_team_ws_rc file."
 }
 
 create_workspace_docker () {
