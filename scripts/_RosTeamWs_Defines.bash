@@ -15,12 +15,20 @@
 ## BEGIN: Default RosTeamWS Definitions
 
 # used for user decisions
-readonly positive_answers=("yes" "y")
-readonly negative_answers=("no")
-readonly rtw_accepted_answers=("${positive_answers[@]}" "${negative_answers[@]}")
+if [ -z "$positive_answers" ]; then
+  readonly positive_answers=("yes" "y")
+fi
+if [ -z "$negative_answers" ]; then
+  readonly negative_answers=("no")
+fi
+if [ -z "$rtw_accepted_answers" ]; then
+  readonly rtw_accepted_answers=("${positive_answers[@]}" "${negative_answers[@]}")
+fi
 
 # All the possible supported ros distributions supported by rtw
-readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "rolling")
+if [ -z "$rtw_supported_ros_distributions" ]; then
+  readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "rolling")
+fi
 
 # This needs to be set for every branch
 # Check the set_supported_versions functions below and update as fit.
