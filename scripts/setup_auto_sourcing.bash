@@ -29,10 +29,10 @@ echo "Copying ${rtw_file} to your home folder."
 if ! [ -f "$HOME/$rtw_file" ]; then
     cp "${template_location}" ~/.
 else
-    new_rtw_file_name="${rtw_file}.bkp-$(ls ${rtw_file}* | wc -l)"
+    new_rtw_file_name="${rtw_file}.bkp-$(ls ${rtw_file_location}* | wc -l)"
     echo ""
     notify_user "${rtw_file} already exists. Moved it to ${new_rtw_file_name}."
-    mv "${rtw_file}" "${new_rtw_file_name}" || { echo "Error: Could not create a copy of already existing ${rtw_file}. Please rename this file and run script again."; return 1; }
+    mv "${rtw_file_location}" "$HOME/${new_rtw_file_name}" || { echo "Error: Could not create a copy of already existing ${rtw_file}. Please rename this file and run script again."; return 1; }
     cp "${template_location}" ~/.
 fi
 
