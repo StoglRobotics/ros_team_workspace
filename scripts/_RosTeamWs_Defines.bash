@@ -16,7 +16,7 @@
 
 # used for user decisions
 if [ -z "$positive_answers" ]; then
-  readonly positive_answers=("yes" "y")
+  readonly positive_answers=("yes")
 fi
 if [ -z "$negative_answers" ]; then
   readonly negative_answers=("no")

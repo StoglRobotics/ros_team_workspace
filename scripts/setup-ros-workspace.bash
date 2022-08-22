@@ -174,6 +174,8 @@ setup_ros_team_ws_file() {
     # Comment out the old configuration if such exists - this is hard if using functions...
     sed -i -e '/'"$fun_name"'/ s/^#*/OLD_/' "$ros_team_ws_file"
     sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' "$ros_team_ws_file"
+  else
+    print_and_exit "No $ros_team_ws_file found! Please first setup auto sourcing with the \"setup-auto-sourcing\" command."
   fi
 
   if [ "$use_docker" = true ]; then
@@ -241,7 +243,7 @@ create_workspace () {
   local is_docker_rtw_file=false
   update_config
 
-  echo -e "${RTW_COLOR_NOTIFY_USER}Finished creating new workspace: Please open a new terminal and execute '$alias_name'${TERMINAL_COLOR_NC} (if you have setup auto sourcing). Otherwise you first have to source your ~/.ros_team_ws_rc file."
+  echo -e "${RTW_COLOR_NOTIFY_USER}Finished creating new workspace: Please open a new terminal and execute '$alias_name'${TERMINAL_COLOR_NC} (if you have setup auto sourcing)."
 }
 
 create_workspace_docker () {
