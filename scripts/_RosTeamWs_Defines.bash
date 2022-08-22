@@ -14,6 +14,56 @@
 
 ## BEGIN: Default RosTeamWS Definitions
 
+# used for user decisions
+if [ -z "$positive_answers" ]; then
+  readonly positive_answers=("yes")
+fi
+if [ -z "$negative_answers" ]; then
+  readonly negative_answers=("no")
+fi
+if [ -z "$rtw_accepted_answers" ]; then
+  readonly rtw_accepted_answers=("${positive_answers[@]}" "${negative_answers[@]}")
+fi
+
+# All the possible supported ros distributions supported by rtw
+if [ -z "$rtw_supported_ros_distributions" ]; then
+  readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "rolling")
+fi
+
+# This needs to be set for every branch
+# Check the set_supported_versions functions below and update as fit.
+RTW_BRANCH_ROS_DISTRO="rolling"
+
+# Based on the RTW_BRANCH_ROS_DISTRO the supported_ros_distributions and ros versions are set.
+# This limits the templates you can generate with this branch of the RosTeamWs framework.
+function set_supported_versions {
+  case $RTW_BRANCH_ROS_DISTRO in
+  noetic)
+    supported_ros_distributions=("noetic")
+    ros_version=1
+    ;;
+  foxy)
+    supported_ros_distributions=("foxy" "galactic")
+    ros_version=2
+    ;;
+  galactic)
+    supported_ros_distributions=("foxy" "galactic")
+    ros_version=2
+    ;;
+  humble)
+    supported_ros_distributions=("humble")
+    ros_version=2
+    ;;
+  rolling)
+    supported_ros_distributions=("rolling")
+    ros_version=2
+    ;;
+  *)
+    print_and_exit "FATAL: the RTW_BRANCH_ROS_DISTRO in the _RosTeamWs_Defines.bash is set to a not supported ros distribution. This should never happen. Please set to the correct branch name which can be either of:${rtw_supported_ros_distributions}."
+    ;;
+esac
+
+}
 function RosTeamWS_script_own_dir {
   echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 }
@@ -216,16 +266,21 @@ function colcon_remove {
 
 ## END: Default Framework Definitions
 
+# function which prints a notification in predefined color scheme
+# $1 - notification = The message which gets print to the commandline
+function notify_user {
+  notification=$1
+
+  echo -e "${RTW_COLOR_NOTIFY_USER}${notification}${TERMINAL_COLOR_NC}"
+}
 
 ## BEGIN: Framework functions
 # Parameters:
 # *message* - message to display
 # *usage* - command usage description
 function print_and_exit {
-  # Get color definitions
-  RosTeamWS_setup_exports
-
   message=$1
+
   echo ""
   echo -e "${RTW_COLOR_ERROR}$message!!! Exiting...${TERMINAL_COLOR_NC}"
   if [ ! -z "$2" ]; then
@@ -237,69 +292,121 @@ function print_and_exit {
   exit 1
 }
 
-function framework_default_paths {
-  ros_distro=$1
+# If the answer selected by user is in the ${rtw_accepted_answers} array
+# true is returned else false.
+#
+# $1 - user_answer = The ansewer given by the user.
+function is_accepted_user_answer {
+  local user_answer=$1
 
-  FRAMEWORK_NAME="ros_team_workspace"
-
-  # if we suppose a structure like
-  # /opt/RosTeamWS/ros_ws_<ros_distro>/src/ros_team_ws/...
-  # then FRAMEWORK_BASE_PATH should be /opt/RosTeamWS/
-  FRAMEWORK_BASE_PATH="$(RosTeamWS_script_own_dir)/../../../.."
-  FRAMEWORK_PACKAGE_PATH="$FRAMEWORK_BASE_PATH/ros_ws_$ros_distro/src/$FRAMEWORK_NAME"
-
-  if [ ! -d "$FRAMEWORK_PACKAGE_PATH" ]; then
-    FRAMEWORK_PACKAGE_PATH=$FRAMEWORK_MAIN_PATH
+  if [[ " ${rtw_accepted_answers[*]} " =~ " ${user_answer} " ]]; then
+    return
   fi
-  RosTeamWS_FRAMEWORK_SCRIPTS_PATH="$FRAMEWORK_PACKAGE_PATH/scripts/"
+  false
+}
 
+# Let's the user decide what he wants to do. The decision (question) is repeated
+# till the user gives an accepted answer. Accepted answers are defined in ${rtw_accepted_answers}.
+# Answers can either be positive or negative.
+#
+# $1 - decision = The decision (question) the user has to decide about.
+# $2 - user_answer = The answer given by the user.
+function user_decision {
+  local decision=$1
+  user_answer=$2
+
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}[${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+  read user_answer
+
+  while ! $(is_accepted_user_answer "$user_answer");
+  do
+    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision} Please type one of the following: [${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+    read user_answer
+  done
+}
+
+function set_framework_default_paths {
+  FRAMEWORK_NAME="ros_team_workspace"
+  FRAMEWORK_BASE_PATH="$(RosTeamWS_script_own_dir)/.."
+
+  RosTeamWS_FRAMEWORK_SCRIPTS_PATH="$FRAMEWORK_BASE_PATH/scripts"
+  RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/os_configure"
   # Script-specific variables
-  PACKAGE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/package"
-  ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/robot_description"
-  ROS2_CONTROL_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/ros2_control"
+  PACKAGE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/package"
+  ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/robot_description"
+  ROS2_CONTROL_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/ros2_control"
   ROS2_CONTROL_HW_ITF_TEMPLATES="$ROS2_CONTROL_TEMPLATES/hardware"
   ROS2_CONTROL_CONTROLLER_TEMPLATES="$ROS2_CONTROL_TEMPLATES/controller"
-  LICENSE_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/licenses"
-  DOCKER_TEMPLATES="$FRAMEWORK_PACKAGE_PATH/templates/docker"
+  LICENSE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/licenses"
+  DOCKER_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/docker"
+}
+
+function is_valid_ros_distribution {
+    local ros_distribution=$1
+    declare -a supported_ros_versions=("${!2}")
+
+  if [[ " ${supported_ros_versions[*]} " =~ " ${ros_distribution} " ]]; then
+    return
+  fi
+
+  false
 }
 
 function check_ros_distro {
   ros_distro=$1
-  if [ -z "$1" ]; then
-    if [ -n "$DEFAULT_ROS_DISTRO" ]; then
-      ros_distro=$DEFAULT_ROS_DISTRO
-      echo "No ros_distro defined. Using default: '$ros_distro'"
-      if [ ! -d "/opt/ros/$ros_distro" ]; then
-        print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-  #             echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-  #             exit
-      fi
-      read -p "Press <ENTER> to continue or <CTRL>+C to exit."
-    else
-      return 2>/dev/null
-    fi
-  fi
+
+  # check if the given distribution is a distribution supported by rtw
+  while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@];
+  do
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please chose either of the following:${rtw_supported_ros_distributions[*]}"
+      read ros_distro
+  done
 
   if [ ! -d "/opt/ros/$ros_distro" ]; then
-    print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-#         echo "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-#         exit
+    local upper_case=$(echo $ros_distro | tr '[:lower:]' '[:upper:]')
+    local alternative_ros_location=ALTERNATIVE_ROS_${upper_case}_LOCATION
+    if [ ! -f "${!alternative_ros_location}/setup.bash" ]; then
+      print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+    else
+      user_decision "Using ${ALTERNATIVE_ROS_LOCATION} for ${ros_distro}." user_answer
+      # check if the chosen ros-distro location is correct.
+      if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
+        print_and_exit "Please set your ALTERNATIVE_ROS_LOCATION to the correct location. Exiting..."
+      fi
+    fi
   fi
+}
 
-  ros_version=$DEFAULT_ROS_VERSION
-  if [[ $ros_distro == "foxy" ]]; then
-    ros_version=2
-  elif [[ $ros_distro == "galactic" ]]; then
-    ros_version=2
-  elif [[ $ros_distro == "humble" ]]; then
-    ros_version=2
-  elif [[ $ros_distro == "rolling" ]]; then
-    ros_version=2
-  elif [[ $ros_distro == "noetic" ]]; then
-    ros_version=1
-  fi
+function set_ros_version_for_distro {
+  local ros_distribution=$1
 
-  framework_default_paths $ros_distro
+  case $ros_distribution in
+    noetic)
+      ros_version=1
+      ;;
+    foxy)
+      ros_version=2
+      ;;
+    galactic)
+      ros_version=2
+      ;;
+    humble)
+      ros_version=2
+      ;;
+    rolling)
+      ros_version=2
+      ;;
+    *)
+      print_and_exit "FATAL: For the chosen ros distribution ${ros_distribution} does no ros version exist."
+      ;;
+  esac
+}
+
+function check_and_set_ros_distro_and_version {
+  ros_distro=$1
+
+  check_ros_distro "${ros_distro}"
+  set_ros_version_for_distro "${ros_distro}"
 }
 
 # first param is package name, second (yes/no) for executing tests
@@ -313,9 +420,22 @@ function compile_and_source_package {
     test="no"
   fi
 
-  bn=`basename "$PWD"`
-  path=$bn
-  cd $ROS_WS
+  if [ -z "$ROS_WS" ]; then
+    notify_user "Can not compile: No ROS_WS variable set. Trying to guess by sourced workspace."
+    sourced_ws_dirname=$(dirname "$COLCON_PREFIX_PATH")
+    if [ -z "$sourced_ws_dirname" ]; then
+      print_and_exit "Error no workspace sourced. Please source the workspace folder and compile manually."
+    fi
+
+    user_decision "Is \"${sourced_ws_dirname} the correct sourced workspace?"
+    if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
+      print_and_exit "Aborting. Not the correct workspace sourced. Please source the correct workspace folder and compile manually."
+    fi
+
+    cd "$sourced_ws_dirname" || { print_and_exit "Could not change directory to workspace:\"$sourced_ws_dirname\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
+  else
+    cd "$ROS_WS" || { print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
+  fi
 
   colcon_build_up_to $pkg_name
   source install/setup.bash
@@ -323,9 +443,6 @@ function compile_and_source_package {
     colcon_test_up_to $pkg_name
     colcon_test_results | grep $pkg_name
   fi
-#   cd $path
 }
 
 # END: Framework functions
-
-FRAMEWORK_MAIN_PATH="$(RosTeamWS_script_own_dir)/.."

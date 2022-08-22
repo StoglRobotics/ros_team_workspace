@@ -26,8 +26,8 @@ read -p "If so press <ENTER> otherwise <CTRL>+C and start the script again from 
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
-source $script_own_dir/_RosTeamWs_Defines.bash
-check_ros_distro ${ROS_DISTRO}
+source $script_own_dir/../setup.bash
+check_and_set_ros_distro_and_version ${ROS_DISTRO}
 
 PKG_NAME=$1
 if [ -z "$1" ]; then

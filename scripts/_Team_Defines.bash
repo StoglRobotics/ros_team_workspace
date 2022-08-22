@@ -33,9 +33,6 @@ fi
 
 ## END: Framework definitions adjustable by users
 
-# Check ROS and Load base paths
-check_ros_distro $DEFAULT_ROS_DISTRO
-
 # BEGIN: Define aliases for standard internal functions
 
 alias setup_exports=RosTeamWS_setup_exports
@@ -74,6 +71,9 @@ alias setup-robot-description=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-robot-desc
 # ros2_control
 alias ros2_control_setup-hardware-interface-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/ros2_control/setup-hardware-interface-package.bash
 alias ros2_control_setup-controller-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/ros2_control/setup-controller-package.bash
+
+# setup auto-sourcing
+alias setup-auto-sourcing=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup_auto_sourcing.bash
 
 # Team General aliases and functions
 function generate_gif_from_video {
