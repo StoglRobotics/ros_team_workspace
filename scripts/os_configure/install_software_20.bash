@@ -33,7 +33,8 @@ sudo apt update
 sudo apt -y install nala
 
 ### Useful tools
-sudo apt -y install vim ssh git trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight
+sudo apt -y install vim ssh git trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger
+
 # Dolphin Plugins
 sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
 
