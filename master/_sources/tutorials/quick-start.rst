@@ -16,6 +16,7 @@ Clone and source the RosTeamWorkspace
 
    git clone https://github.com/StoglRobotics/ros_team_workspace.git
    source ros_team_workspace/setup.bash
+   setup-auto-sourcing  # Make RosTeamWorkspace automatically sourced when open a new terminal (The best experience)
 
 
 Create new package in an existing workspace
@@ -27,7 +28,7 @@ For more details check :ref:`use-case description <uc-new-package>`.
    source <path to your ROS workspace>/install/setup.bash
    cd <src folder of your ROS workspace>
 
-   create-new-package <my_new_package_name> "Some cool description of the package."  # follow the instructions
+   create-new-package <my_new_package_name> <"Some cool description of the package.">  # follow the instructions and remember to set a license
 
    cd .. && colcon build --symlink-install  # to compile your newly created package
 

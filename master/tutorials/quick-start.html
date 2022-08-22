@@ -197,6 +197,7 @@ First you have to clone and source the workspace and then continue with the use-
 <h2><span class="section-number">1.1. </span>Clone and source the RosTeamWorkspace<a class="headerlink" href="#clone-and-source-the-rosteamworkspace" title="Permalink to this headline"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/StoglRobotics/ros_team_workspace.git
 <span class="nb">source</span> ros_team_workspace/setup.bash
+setup-auto-sourcing  <span class="c1"># Make RosTeamWorkspace automatically sourced when open a new terminal (The best experience)</span>
 </pre></div>
 </div>
 </section>
@@ -206,7 +207,7 @@ First you have to clone and source the workspace and then continue with the use-
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
 <span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;
 
-create-new-package &lt;my_new_package_name&gt; <span class="s2">&quot;Some cool description of the package.&quot;</span>  <span class="c1"># follow the instructions</span>
+create-new-package &lt;my_new_package_name&gt; &lt;<span class="s2">&quot;Some cool description of the package.&quot;</span>&gt;  <span class="c1"># follow the instructions and remember to set a license</span>
 
 <span class="nb">cd</span> .. <span class="o">&amp;&amp;</span> colcon build --symlink-install  <span class="c1"># to compile your newly created package</span>
 </pre></div>

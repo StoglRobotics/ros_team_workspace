@@ -3,6 +3,8 @@ Setting up RosTeamWorkspace
 ============================
 .. _tutorial-setting-up-rtw:
 
+Installation
+""""""""""""""""
 To start using RosTeamWS framework clone the repository to any location using:
 
 .. code-block:: bash
@@ -16,12 +18,19 @@ Source the ``setup.bash``` in the top folder of RosTeamWorkspace:
 
    source ros_team_workspace/setup.bash
 
+That's all. You are now set to use RosTeamWS. If you want to add auto-sourcing you can simply execute the following command:
 
-Execute the following to configure the RosTeamWorkspace permanently.
+.. code-block:: bash
 
-**ATTENTION**: The following will work only if RosTeamWorkspace is checked out in ``/opt/RosTeamWS/ros_ws_rolling/src/`` folder! We are working on fixing this. The progress can se followed in `this issue <https://github.com/StoglRobotics/ros_team_workspace/issues/51>`_.
+   setup-auto-sourcing
 
-Add auto-sourcing of configuration to your ``.bashrc`` file by adding following lines to its end using your favorite text editor (e.g., ``vim`` or ``nano``):
+
+This is going to configure the RosTeamWorkspace permanently. If you want to revert those changes or prefer to do them by yourself simply follow the next few steps.
+
+Manual auto-sourcing
+"""""""""""""""""""""
+
+Add auto-sourcing of configuration to your ``.bashrc`` file by adding the following lines to its end using your favorite text editor (e.g., ``vim`` or ``nano``):
 
 .. code-block:: bash
 
@@ -29,19 +38,22 @@ Add auto-sourcing of configuration to your ``.bashrc`` file by adding following 
        . ~/.ros_team_ws_rc
    fi
 
-Copy ``templates/.ros_team_ws_rc`` file to your home folder using
+Copy ``<PATH TO ros_team_workspace>/templates/.ros_team_ws_rc`` file to your home folder using
 
 .. code-block:: bash
 
-   cp ros_team_workspace/templates/.ros_team_ws_rc ~/
+   cp <PATH TO ros_team_workspace>/templates/.ros_team_ws_rc ~/
 
 
 and adjust the following values using your favorite text editor:
 
-- ``<PATH TO ros_team_workspace>`` - with a path to the framework folder
+- ``<PATH TO ros_team_workspace>`` - with the path to the framework folder
 
-Now you are ready to
+.. note::
+  If you have ros installed at another location than /opt/ros/<ros-distro> , please adjust the ALTERNATIVE_ROS_<ROS-DISTRO>_LOCATION variable in the ~/.ros_team_ws_rc to according location.
 
-- :ref:`setup your first workspace <uc-setup-workspace>`
-- :ref:`quick-start <tutorial-quick-start>`
-- or :ref:`other use-cases <uc-index>`.
+Now you are ready to:
+
+- :ref:`setup your first workspace <uc-setup-workspace>`,
+- :ref:`quick-start <tutorial-quick-start>`,
+- or check out one of the :ref:`use-cases <uc-index>`.

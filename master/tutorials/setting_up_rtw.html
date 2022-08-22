@@ -101,7 +101,11 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="quick-start.html">1. Quick start with RosTeamWorkspace</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">2. Setting up RosTeamWorkspace</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2. Setting up RosTeamWorkspace</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installation">2.1. Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manual-auto-sourcing">2.2. Manual auto-sourcing</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../guidelines/index.html">Guidelines</a></li>
@@ -181,7 +185,9 @@
             
   <section id="setting-up-rosteamworkspace">
 <h1><span class="section-number">2. </span>Setting up RosTeamWorkspace<a class="headerlink" href="#setting-up-rosteamworkspace" title="Permalink to this headline"></a></h1>
-<p id="tutorial-setting-up-rtw">To start using RosTeamWS framework clone the repository to any location using:</p>
+<section id="installation">
+<span id="tutorial-setting-up-rtw"></span><h2><span class="section-number">2.1. </span>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<p>To start using RosTeamWS framework clone the repository to any location using:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/StoglRobotics/ros_team_workspace.git
 </pre></div>
 </div>
@@ -189,28 +195,39 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> ros_team_workspace/setup.bash
 </pre></div>
 </div>
-<p>Execute the following to configure the RosTeamWorkspace permanently.</p>
-<p><strong>ATTENTION</strong>: The following will work only if RosTeamWorkspace is checked out in <code class="docutils literal notranslate"><span class="pre">/opt/RosTeamWS/ros_ws_rolling/src/</span></code> folder! We are working on fixing this. The progress can se followed in <a class="reference external" href="https://github.com/StoglRobotics/ros_team_workspace/issues/51">this issue</a>.</p>
-<p>Add auto-sourcing of configuration to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> file by adding following lines to its end using your favorite text editor (e.g., <code class="docutils literal notranslate"><span class="pre">vim</span></code> or <code class="docutils literal notranslate"><span class="pre">nano</span></code>):</p>
+<p>That’s all. You are now set to use RosTeamWS. If you want to add auto-sourcing you can simply execute the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-auto-sourcing
+</pre></div>
+</div>
+<p>This is going to configure the RosTeamWorkspace permanently. If you want to revert those changes or prefer to do them by yourself simply follow the next few steps.</p>
+</section>
+<section id="manual-auto-sourcing">
+<h2><span class="section-number">2.2. </span>Manual auto-sourcing<a class="headerlink" href="#manual-auto-sourcing" title="Permalink to this headline"></a></h2>
+<p>Add auto-sourcing of configuration to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> file by adding the following lines to its end using your favorite text editor (e.g., <code class="docutils literal notranslate"><span class="pre">vim</span></code> or <code class="docutils literal notranslate"><span class="pre">nano</span></code>):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="o">[</span> -f ~/.ros_team_ws_rc <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
     . ~/.ros_team_ws_rc
 <span class="k">fi</span>
 </pre></div>
 </div>
-<p>Copy <code class="docutils literal notranslate"><span class="pre">templates/.ros_team_ws_rc</span></code> file to your home folder using</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp ros_team_workspace/templates/.ros_team_ws_rc ~/
+<p>Copy <code class="docutils literal notranslate"><span class="pre">&lt;PATH</span> <span class="pre">TO</span> <span class="pre">ros_team_workspace&gt;/templates/.ros_team_ws_rc</span></code> file to your home folder using</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp &lt;PATH TO ros_team_workspace&gt;/templates/.ros_team_ws_rc ~/
 </pre></div>
 </div>
 <p>and adjust the following values using your favorite text editor:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;PATH</span> <span class="pre">TO</span> <span class="pre">ros_team_workspace&gt;</span></code> - with a path to the framework folder</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;PATH</span> <span class="pre">TO</span> <span class="pre">ros_team_workspace&gt;</span></code> - with the path to the framework folder</p></li>
 </ul>
-<p>Now you are ready to</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have ros installed at another location than /opt/ros/&lt;ros-distro&gt; , please adjust the ALTERNATIVE_ROS_&lt;ROS-DISTRO&gt;_LOCATION variable in the ~/.ros_team_ws_rc to according location.</p>
+</div>
+<p>Now you are ready to:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../use-cases/operating_system/create_setup_workspace.html#uc-setup-workspace"><span class="std std-ref">setup your first workspace</span></a></p></li>
-<li><p><a class="reference internal" href="quick-start.html#tutorial-quick-start"><span class="std std-ref">quick-start</span></a></p></li>
-<li><p>or <a class="reference internal" href="../use-cases/index.html#uc-index"><span class="std std-ref">other use-cases</span></a>.</p></li>
+<li><p><a class="reference internal" href="../use-cases/operating_system/create_setup_workspace.html#uc-setup-workspace"><span class="std std-ref">setup your first workspace</span></a>,</p></li>
+<li><p><a class="reference internal" href="quick-start.html#tutorial-quick-start"><span class="std std-ref">quick-start</span></a>,</p></li>
+<li><p>or check out one of the <a class="reference internal" href="../use-cases/index.html#uc-index"><span class="std std-ref">use-cases</span></a>.</p></li>
 </ul>
+</section>
 </section>
 
 
