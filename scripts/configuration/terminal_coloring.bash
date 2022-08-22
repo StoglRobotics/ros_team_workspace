@@ -55,7 +55,7 @@ export TERMINAL_BG_COLOR_WHITE='\e[1;47m'
 if [ -n "$SSH_CLIENT" ]; then text="-ssh-session"
 fi
 
-function parse_vc_branch_and_add_brackets {
+function parse_git_branch_and_add_brackets {
   gitbranch=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
 
   if [[ "$gitbranch" != '' ]]; then
@@ -85,6 +85,6 @@ function parse_ros_workspace {
   fi
 }
 
-export PS1="\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'[\t]\['"\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_vc_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
+export PS1="\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'[\t]\['"\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_git_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
 
 # END: Stogl Robotics custom setup for nice colors and showing ROS workspace

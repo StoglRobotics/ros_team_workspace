@@ -56,4 +56,4 @@ Now you are ready to:
 
 - :ref:`setup your first workspace <uc-setup-workspace>`,
 - :ref:`quick-start <tutorial-quick-start>`,
-- or check out one of our:ref:`other use-cases <uc-index>`.
+- or check out one of the :ref:`use-cases <uc-index>`.
