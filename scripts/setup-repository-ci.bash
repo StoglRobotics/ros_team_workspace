@@ -172,6 +172,8 @@ while true; do
   tail -n +$CUT_LINE README.md >> $TMP_FILE
   mv $TMP_FILE README.md
 
+  cat ${PACKAGE_TEMPLATES}/_append_to_README_build_status.md >> $TMP_FILE_2
+
   cat $TMP_FILE_2 >> .github/workflows/README.md
   rm $TMP_FILE_2
 
