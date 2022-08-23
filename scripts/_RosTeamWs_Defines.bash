@@ -327,7 +327,8 @@ function user_decision {
 
 function set_framework_default_paths {
   FRAMEWORK_NAME="ros_team_workspace"
-  FRAMEWORK_BASE_PATH="$(RosTeamWS_script_own_dir)/.."
+  # readlink prints resolved symbolic links or canonical file names -> the "dir/dir_2/.." becomes "dir"
+  FRAMEWORK_BASE_PATH="$(readlink -f "$(RosTeamWS_script_own_dir)"/..)"
 
   RosTeamWS_FRAMEWORK_SCRIPTS_PATH="$FRAMEWORK_BASE_PATH/scripts"
   RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/os_configure"

@@ -56,5 +56,5 @@ Now you are ready to:
 
 - :ref:`quick-start <tutorial-quick-start>`,
 - :ref:`setup your first workspace <uc-setup-workspace>`,
-- :ref:`check how to manage multiple workspaces <tutorial-managing-multiple-workspaces>`
+- check how to :ref:`manage multiple workspaces <tutorial-managing-multiple-workspaces>`,
 - or check out one of the :ref:`use-cases <uc-index>`.

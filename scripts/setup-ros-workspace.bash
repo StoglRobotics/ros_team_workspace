@@ -10,10 +10,10 @@ check_user_input () {
   check_and_set_ros_distro_and_version "$1"
 
   ws_folder="$2"
-  if [ -z "$2" ]; then
+  if [ -z "$2" ] || [[ "$ws_folder" == "-" ]]; then
     ws_folder="workspace"
-    echo "Using default '~/workspace' folder to setup ros workspace"
-  elif [ "$use_docker" == true ] && [[ "$2" == *"-"* ]]; then
+    echo "Using default:\"${ws_folder}\" as folder name to setup ros workspace"
+  elif [ "$use_docker" == true ] && [[ "$(basename "${ws_folder}")" == *"-"* ]]; then
     print_and_exit "Workspace names for docker cannot contain \"-\"."
   fi
 
@@ -104,9 +104,20 @@ setup_new_workspace () {
     ws_full_name=${ws_full_name}_${ros_ws_suffix}
   fi
 
+
+  # check if workspace which should be created is relative to $HOME workspace.
+  # If this is the case user probably wants home as base of workspace otherwise current pwd is used.
+  if [[ ${ws_folder} = ${HOME}/* ]]; then
+    # needs to be empty, since ws_folder contains path with $HOME
+    new_workspace_base_location=""
+  else
+    new_workspace_base_location="$(pwd)/"
+  fi
+  new_workspace_location=${new_workspace_base_location}${ws_folder}/${ws_full_name}
+
   # TODO: Add here output of the <current> WS
   echo ""
-  echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Creating a new workspace in folder '${ws_folder}' for ROS '${ros_distro}' (ROS$ros_version) with suffix '${ros_ws_suffix}' (full path: '${ws_folder}/${ws_full_name}') using '${base_ws}' (${base_ws_path}) as base workspace.${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Creating a new workspace in folder '${new_workspace_location}' for ROS '${ros_distro}' (ROS$ros_version) with suffix '${ros_ws_suffix}' (full path: '${ws_folder}/${ws_full_name}') using '${base_ws}' (${base_ws_path}) as base workspace.${TERMINAL_COLOR_NC}"
   echo ""
   echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct controller name.${TERMINAL_COLOR_NC}"
   read
@@ -121,8 +132,8 @@ setup_new_workspace () {
     fi
   fi
 
-  mkdir -p ~/${ws_folder}/${ws_full_name}
-  cd ~/${ws_folder}/${ws_full_name} || { print_and_exit "Could not change dir to workspace folder. Something went wrong."; }
+  mkdir -p "${new_workspace_location}" || { print_and_exit "Could not create new workspace folder \"${new_workspace_location}\" in ${new_workspace_base_location}. Something went wrong."; }
+  cd "${new_workspace_location}" || { print_and_exit "Could not change dir to workspace folder. Something went wrong."; }
 
   if [ "$use_docker" = false ]; then # only build if not in docker, to avoide wrong dependencies
     if [[ $ros_version == 1 ]]; then
@@ -136,8 +147,8 @@ setup_new_workspace () {
     fi
   fi
 
-  # Go to Home folder of the user
-  cd || print_and_exit "Could not change back to home dir. This should never happen..."
+  # Go back to where we started
+  cd "${new_workspace_base_location}" || print_and_exit "Could not change back to ${new_workspace_base_location} (working directory we created the new workspace in). This should never happen..."
 }
 
 setup_ros_team_ws_file() {

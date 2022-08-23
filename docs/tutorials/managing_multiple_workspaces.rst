@@ -1,18 +1,18 @@
 =============================
 Managing multiple workspaces
 =============================
-.. _tutorial-managing-multiple-workspaces
+.. _tutorial-managing-multiple-workspaces:
 
-Before learning how to manage multiple workspace with RosTeamWorkspace be sure that you have set it up using :ref:`previous tutorial <tutorial-setting-up-rtw>`.
+Before learning how to manage multiple workspace with RosTeamWorkspace be sure that you have set everything up as described in this :ref:`tutorial <tutorial-setting-up-rtw>`.
 
-Also be sure that you opened a new terminal after you set RosTeamWorkspace to be configured permanently.
+Also be sure that you opened a new terminal after you setup RosTeamWorkspace to be configured permanently.
 
 
 First setup a new workspace called ``ws_rolling_local`` inside a ``~/workspace`` folder.
 
 .. code-block:: bash
 
-   setup-ros-workspace rolling ~/workspace/ ws ros2c_demos
+   setup-ros-workspace rolling ~/workspace ws ros2c_demos
 
 When asked for confirmation just press <ENTER>.
 After a workspace is created open a new terminal and execute ``_ws_rolling_ros2c_demos`` alias for sourcing your new workspace.
