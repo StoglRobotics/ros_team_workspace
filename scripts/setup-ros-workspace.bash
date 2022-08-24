@@ -3,6 +3,7 @@
 # Load Framework defines
 setup_ws_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 source $setup_ws_script_own_dir/../setup.bash
+source $setup_ws_script_own_dir/docker/_RosTeamWs_Docker_Defines.bash
 
 check_user_input () {
   # ros distribution name will be set in ${ros_distro}
@@ -169,7 +170,7 @@ setup_ros_team_ws_file() {
   if [ -f "$ros_team_ws_file" ]; then
     new_rtw_file_name="${ros_team_ws_file_name}.bkp-$(ls ${ros_team_ws_file}* | wc -l)"
     echo ""
-    cp "$ros_team_ws_file" "$new_rtw_file_name"
+    cp "$ros_team_ws_file" "$HOME/$new_rtw_file_name"
     notify_user "${ros_team_ws_file_name} already exists. Copied it to ${new_rtw_file_name}."
     # Comment out the old configuration if such exists - this is hard if using functions...
     sed -i -e '/'"$fun_name"'/ s/^#*/OLD_/' "$ros_team_ws_file"
