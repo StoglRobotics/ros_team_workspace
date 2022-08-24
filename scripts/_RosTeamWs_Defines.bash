@@ -282,14 +282,77 @@ function print_and_exit {
   message=$1
 
   echo ""
-  echo -e "${RTW_COLOR_ERROR}$message!!! Exiting...${TERMINAL_COLOR_NC}"
+  echo -e "${RTW_COLOR_ERROR}$message${TERMINAL_COLOR_NC}"
   if [ ! -z "$2" ]; then
     echo ""
     echo -e "${TERMINAL_COLOR_USER_NOTICE}Usage: '$2'${TERMINAL_COLOR_NC}"
   fi
   echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}Error has happened. Press <CTRL> + C two times...${TERMINAL_COLOR_NC}"
   read -p ""
-  exit 1
+  return 2>/dev/null || exit 1
+}
+
+function print_error {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "${TERMINAL_COLOR_RED}ERROR: ${message}${RAW_TERMINAL_COLOR_NC}"
+  fi
+}
+
+function print_warning {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "${TERMINAL_COLOR_YELLOW}WARNING: ${message}${RAW_TERMINAL_COLOR_NC}"
+  fi
+}
+
+function print_info {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "INFO: ${message}"
+  fi
+}
+
+function print_notifycation {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "${TERMINAL_COLOR_BLUE}NOTE: ${message}${TERMINAL_COLOR_NC}"
+  fi
+}
+
+function print_success {
+  RosTeamWS_setup_exports
+
+  message=$1
+  if [ -n "$message" ]; then
+    echo ""
+    echo "${TERMINAL_COLOR_GREEN}SUCCESS: ${message}${TERMINAL_COLOR_NC}"
+  fi
+}
+
+function print_usage {
+  RosTeamWS_setup_exports
+
+  usage=$1
+  message=$2
+  if [ -n "$usage" ]; then
+    print_notifycation "$usage"
+  fi
+  if [ -n "$message" ]; then
+    print_info "$message"
+  fi
 }
 
 # If the answer selected by user is in the ${rtw_accepted_answers} array

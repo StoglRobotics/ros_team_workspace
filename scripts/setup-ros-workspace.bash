@@ -5,6 +5,16 @@ setup_ws_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null &&
 source $setup_ws_script_own_dir/../setup.bash
 source $setup_ws_script_own_dir/docker/_RosTeamWs_Docker_Defines.bash
 
+
+# TODO(destogl): can we somehow reuse this in each and every script: a function? or source?
+if [ -z "$1" ]; then
+  print_and_exit "No input parameters provided" "$usage"
+  return 2>/dev/null || exit
+elif [[ $1 == "--help" || $1 == "-h" ]]; then
+  print_and_exit "Here is the usage help for this script:" "$usage"
+  return 2>/dev/null || exit
+fi
+
 check_user_input () {
   # ros distribution name will be set in ${ros_distro}
   check_and_set_ros_distro_and_version "$1"

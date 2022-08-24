@@ -69,11 +69,19 @@ if [[ $ros_version == 1 ]]; then
     print_and_exit "'$WS_FOLDER_1' does not exist. Can not find ROS workspace!"
   fi
 
+  # TODO(destogl): update this as below and put into a function
+  export ROS_WS=$WS_FOLDER
+  FILE_TO_SOURCE="$WS_FOLDER/.ros_team_ws_workspace_rc"
+  if [ -f "$FILE_TO_SOURCE" ]; then
+    echo -e "${TERMINAL_COLOR_GRAY}Sourcing custom environment variables for the workspace from file: '$FILE_TO_SOURCE'${TERMINAL_COLOR_NC}"
+    source "$FILE_TO_SOURCE"
+  fi
+
   export ROS_WS=$WS_FOLDER
   source "$WS_FOLDER/devel/setup.bash"
 
   echo ""
-  echo "RosTeamWS: Sourced file: $WS_FOLDER/devel/setup.bash"
+  echo -e "${TERMINAL_COLOR_BLUE}RosTeamWS: Sourced file: $WS_FOLDER/devel/setup.bash${TERMINAL_COLOR_NC}"
 
 
 elif [[ $ros_version == 2 ]]; then
@@ -110,6 +118,12 @@ elif [[ $ros_version == 2 ]]; then
   fi
 
   export ROS_WS=$WS_FOLDER
+  FILE_TO_SOURCE="$WS_FOLDER/.ros_team_ws_workspace_rc"
+  if [ -f "$FILE_TO_SOURCE" ]; then
+    echo -e "${TERMINAL_COLOR_LIGHT_BLUE} sourcing custom environment variables for the workspace from file: '$FILE_TO_SOURCE'."
+    source "$FILE_TO_SOURCE"
+  fi
+
   # TODO: COLCON_WS is deprecated!!
   export COLCON_WS=$ROS_WS
   FILE_TO_SOURCE="$WS_FOLDER/install/setup.bash"
