@@ -20,7 +20,7 @@ source /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/setup.bash
 
 #export CYCLONEDDS_URI='<CycloneDDS><Domain><General><NetworkInterfaceAddress>ADD_HERE_INTERFACE_NAME</NetworkInterfaceAddress></General></Domain></CycloneDDS>'
 
-export ROS_DOMAIN_ID=46  # Set your Domain ID if you are in a network with multiple computers
+export ROS_DOMAIN_ID=42  # Set your Domain ID if you are in a network with multiple computers
 
 # Logging setup
 # export RCUTILS_LOGGING_CONFIG_FILE="/home/deniss/workspace/ros2_logging_config"

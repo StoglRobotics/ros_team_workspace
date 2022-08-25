@@ -58,7 +58,6 @@ RUN mkdir -p ${home} && \
   chmod 0440 "/etc/sudoers.d/${user}" && \
   usermod -aG sudo ${user} && \
   passwd -d ${user} && \
-  mkdir ${home}/workspace && \
   chown ${uid}:${gid} -R ${home}
 
 #switch to user
