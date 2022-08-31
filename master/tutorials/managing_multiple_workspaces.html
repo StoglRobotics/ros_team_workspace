@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>3. Managing multiple workspaces &mdash; ROS Team Workspace Documentation: Galactic Aug 2022 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon-bg.png"/>
+  
+
+  
+  
+
+  
+    <link rel="canonical" href="https://stoglrobotics.github.io/ros_team_workspace/galactic//galactic/tutorials/managing_multiple_workspaces.html" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Guidelines" href="../guidelines/index.html" />
+    <link rel="prev" title="2. Setting up RosTeamWorkspace" href="setting_up_rtw.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/galactic-small.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="quick-start.html">1. Quick start with RosTeamWorkspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setting_up_rtw.html">2. Setting up RosTeamWorkspace</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">3. Managing multiple workspaces</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guidelines/index.html">Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/index.html">Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker/index.html">Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ROS Team Workspace Documentation: Galactic</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Tutorials</a> &raquo;</li>
+        
+      <li><span class="section-number">3. </span>Managing multiple workspaces</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            
+              <a href="https://github.com/StoglRobotics/ros_team_workspace/blob/master//docs/tutorials/managing_multiple_workspaces.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="managing-multiple-workspaces">
+<h1><span class="section-number">3. </span>Managing multiple workspaces<a class="headerlink" href="#managing-multiple-workspaces" title="Permalink to this headline"></a></h1>
+<p id="tutorial-managing-multiple-workspaces">Before learning how to manage multiple workspace with RosTeamWorkspace be sure that you have set everything up as described in this <a class="reference internal" href="setting_up_rtw.html#tutorial-setting-up-rtw"><span class="std std-ref">tutorial</span></a>.</p>
+<p>Also be sure that you opened a new terminal after you setup RosTeamWorkspace to be configured permanently.</p>
+<p>First setup a new workspace called <code class="docutils literal notranslate"><span class="pre">ws_rolling_ros2c_demos</span></code> inside a <code class="docutils literal notranslate"><span class="pre">~/workspace</span></code> folder.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace ~/workspace/ws_rolling_ros2c_demos rolling
+</pre></div>
+</div>
+<p>When asked for confirmation just press &lt;ENTER&gt;.
+After a workspace is created open a new terminal and execute <code class="docutils literal notranslate"><span class="pre">_ws_rolling_ros2c_demos</span></code> alias for sourcing your new workspace. You can then switch to the new sourced workspace with <code class="docutils literal notranslate"><span class="pre">rosd</span></code>.
+Now you can use <span class="xref std std-ref">aliases</span> to interact with your workspace.
+Those can be used out of any folder you are in.</p>
+<p>Let’s now add a test package into your workspace.</p>
+<ol class="arabic simple">
+<li><p>Make sure your workspace is sourced by executing <code class="docutils literal notranslate"><span class="pre">_ws_rolling_ros2c_demos</span></code>. Then enter the source folder using <code class="docutils literal notranslate"><span class="pre">rosds</span></code> alias.</p></li>
+<li><p>Clone <code class="docutils literal notranslate"><span class="pre">ros2_control_demos</span></code> repository for testing either:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone git@github.com:ros-controls/ros2_control_demos.git <span class="c1"># SSH</span>
+<span class="c1"># or if no ssh key is setup:</span>
+git clone https://github.com/ros-controls/ros2_control_demos.git <span class="c1"># HTTPS</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Go to the base of your workspace:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosd
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Install dependencies to be sure we got everything:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep install --from-paths src -y -i -r
+</pre></div>
+</div>
+<p><strong>NOTE</strong>: if <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> command fails with a comment that binary packages can not be found by apt, try to update you rosdep index using <code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">update</span></code> command or even your package index using <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">update</span></code>.</p>
+<ol class="arabic simple" start="5">
+<li><p>You can then build your workspace using:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cb
+</pre></div>
+</div>
+<p>Everything should now have been built successfully!</p>
+<p>Next let’s add another workspace</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace ~/workspace/ws_rolling_gz_demos rolling
+</pre></div>
+</div>
+<p>Now repeat the above steps to and add <a class="reference external" href="https://github.com/ros-controls/gz_ros2_control">gz_ros2_control</a> repository for testing and execute a demo from there.</p>
+<p>Now each time you open a new terminal you can use either <code class="docutils literal notranslate"><span class="pre">_ws_rolling_ros2c_demos</span></code> or <code class="docutils literal notranslate"><span class="pre">_ws_rolling_gz_demos</span></code> to source needed workspace and use the same <span class="xref std std-ref">aliases</span> without constantly thinking about exact workspace/folder you are working in.</p>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../guidelines/index.html" class="btn btn-neutral float-right" title="Guidelines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="setting_up_rtw.html" class="btn btn-neutral float-left" title="2. Setting up RosTeamWorkspace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Stogl Robotics Consulting UG (haftungsbeschränkt).
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Other Versions</span>
+    v: master
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>ROS Team Workspace - Galactic and Rolling</dt>
+      <dd><a href="managing_multiple_workspaces.html">Master (latest)</a></dd>
+    </dl>
+    <dl>
+      <dt>ROS Team Workspace - Foxy</dt>
+        <dd><a href="../../foxy/index.html">Foxy</a></dd>
+   </dl>
+  </div>
+</div>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
