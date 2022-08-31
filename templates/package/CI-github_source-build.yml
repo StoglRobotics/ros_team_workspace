@@ -16,4 +16,4 @@ jobs:
     with:
       ros_distro: $ros_distro$
       ref: $branch$
-      ros2_repo_branch: $branch$-$ros_distro$
+      ros2_repo_branch: $branch$
