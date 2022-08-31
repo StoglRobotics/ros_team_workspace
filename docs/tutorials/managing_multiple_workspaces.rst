@@ -42,7 +42,7 @@ Let's now add a test package into your workspace.
 
     rosdep install --from-paths src -y -i -r
 
-**NOTE**: if `rosdep` command fails with a comment that binary packages can not be found by apt, try to update you rosdep index using `rosdep update` command or even your package index using `sudo apt update`.  
+**NOTE**: if ``rosdep`` command fails with a comment that binary packages can not be found by apt, try to update you rosdep index using ``rosdep update`` command or even your package index using ``sudo apt update``.
 
 5. You can then build your workspace using:
 
@@ -58,6 +58,6 @@ Next let's add another workspace
 
    setup-ros-workspace ~/workspace/ws_rolling_gz_demos rolling
 
-Now repeat the above steps to and add `gz_ros2_control <https://github.com/ros-controls/gz_ros2_control>`_ repository for testing and execute a demo from there. 
+Now repeat the above steps to and add `gz_ros2_control <https://github.com/ros-controls/gz_ros2_control>`_ repository for testing and execute a demo from there.
 
 Now each time you open a new terminal you can use either ``_ws_rolling_ros2c_demos`` or ``_ws_rolling_gz_demos`` to source needed workspace and use the same :ref:`aliases <uc-aliases>` without constantly thinking about exact workspace/folder you are working in.
