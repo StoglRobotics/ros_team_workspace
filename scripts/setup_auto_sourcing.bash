@@ -72,4 +72,4 @@ if ! ( grep -q '\..*\.ros_team_ws_rc' $bashrc_location || grep -q 'source.*\.ros
     echo "fi" >> $bashrc_location
 fi
 
-echo "Done! Please open a new terminal now."
+notify_user "Done! Please open a new terminal now."

@@ -73,7 +73,7 @@ create_docker_container() {
   fi
   local docker_host_name=$4
 
-  echo "Instantiating docker image '$docker_image_tag' and mapping workspace folder '$HOME/$ws_folder'."
+  echo "Instantiating docker image '$docker_image_tag' and mapping workspace folder to '$ws_folder'."
   echo "ros_team_ws is located under /opt/RosTeamWS/ros_ws_${RosTeamWS_DISTRO}/src/ros_team_workspace"
   xhost +local:docker
   docker run \
@@ -82,7 +82,7 @@ create_docker_container() {
   -e DISPLAY \
   --tmpfs /tmp \
   -v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
-  -v "$HOME/$ws_folder":"$HOME/$ws_folder":rw \
+  -v "$ws_folder":"$ws_folder":rw \
   -v "$HOME/.ssh":"$HOME/.ssh":ro \
   --name "$docker_image_tag"-instance \
   -it "$docker_image_tag" /bin/bash

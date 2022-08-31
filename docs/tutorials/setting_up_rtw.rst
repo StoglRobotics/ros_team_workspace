@@ -54,6 +54,7 @@ and adjust the following values using your favorite text editor:
 
 Now you are ready to:
 
-- :ref:`setup your first workspace <uc-setup-workspace>`,
 - :ref:`quick-start <tutorial-quick-start>`,
+- :ref:`setup your first workspace <uc-setup-workspace>`,
+- check how to :ref:`manage multiple workspaces <tutorial-managing-multiple-workspaces>`,
 - or check out one of the :ref:`use-cases <uc-index>`.

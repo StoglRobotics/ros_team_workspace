@@ -6,16 +6,19 @@ source $setup_ws_script_own_dir/../setup.bash
 source $setup_ws_script_own_dir/docker/_RosTeamWs_Docker_Defines.bash
 
 check_user_input () {
-  # ros distribution name will be set in ${ros_distro}
-  check_and_set_ros_distro_and_version "$1"
-
-  ws_folder="$2"
-  if [ -z "$2" ]; then
-    ws_folder="workspace"
-    echo "Using default '~/workspace' folder to setup ros workspace"
-  elif [ "$use_docker" == true ] && [[ "$2" == *"-"* ]]; then
+  ws_path="$1"
+  if [ -z "$ws_path" ] || [[ "$ws_path" == "-" ]]; then
+    ws_path="workspace"
+    notify_user "Using default:\"${ws_path}\" as folder name to setup ros workspace"
+  elif [ "$use_docker" == true ] && [[ "$(basename "${ws_path}")" == *"-"* ]]; then
     print_and_exit "Workspace names for docker cannot contain \"-\"."
   fi
+
+  # if user passes a path then the true new workspace name is only the basename of the passed path
+  ws_name=$(basename ${ws_path})
+
+  # ros distribution name will be set in ${ros_distro}
+  check_and_set_ros_distro_and_version "$2"
 
   # Todo Manuel make this more generic
   if [ "$use_docker" == true ]; then
@@ -41,18 +44,6 @@ check_user_input () {
       ubuntu_version="ubuntu:20.04"
       ubuntu_version_tag="ubuntu_20_04"
     fi
-  fi
-
-  ros_ws_prefix="$3"
-  if [ -z "$3" ]; then
-    ros_ws_prefix="-"
-    echo "No ros_ws_prefix used..."
-  fi
-
-  ros_ws_suffix="$4"
-  if [ -z "$4" ]; then
-    ros_ws_suffix="-"
-    echo "No ros_ws_suffix used..."
   fi
 }
 
@@ -94,19 +85,20 @@ setup_new_workspace () {
     base_ws_path="${ros_distro_base_workspace_source_path}"
   fi
 
-  # Form here the full name
-  ws_full_name=${ros_distro}
-
-  if [ "$ros_ws_prefix" != "-" ]; then
-    ws_full_name=${ros_ws_prefix}_${ws_full_name}
+  # Check if workspace which should be created is relative to $HOME workspace.
+  # If this is the case user probably wants home as base of workspace otherwise current pwd is used.
+  if [[ ${ws_path} = ${HOME}/* ]]; then
+    # needs to be empty, since ws_path contains path with $HOME, otherwise we create something like:
+    # $(pwd)/home/user/working_dir/new_workspace instead of /home/user/working_dir/new_workspace
+    new_workspace_base_location=""
+  else
+    new_workspace_base_location="$(pwd)/"
   fi
-  if [ "$ros_ws_suffix" != "-" ]; then
-    ws_full_name=${ws_full_name}_${ros_ws_suffix}
-  fi
+  new_workspace_location=${new_workspace_base_location}${ws_path}
 
   # TODO: Add here output of the <current> WS
   echo ""
-  echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Creating a new workspace in folder '${ws_folder}' for ROS '${ros_distro}' (ROS$ros_version) with suffix '${ros_ws_suffix}' (full path: '${ws_folder}/${ws_full_name}') using '${base_ws}' (${base_ws_path}) as base workspace.${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Creating a new workspace in folder \"${ws_path}\" for ROS \"${ros_distro}\" (ROS$ros_version) (full path: ${new_workspace_location}) using \"${base_ws}\" (${base_ws_path}) as base workspace.${TERMINAL_COLOR_NC}"
   echo ""
   echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct controller name.${TERMINAL_COLOR_NC}"
   read
@@ -121,8 +113,9 @@ setup_new_workspace () {
     fi
   fi
 
-  mkdir -p ~/${ws_folder}/${ws_full_name}
-  cd ~/${ws_folder}/${ws_full_name} || { print_and_exit "Could not change dir to workspace folder. Something went wrong."; }
+  mkdir -p "${new_workspace_location}" || { print_and_exit "Could not create new workspace folder \"${new_workspace_location}\" in ${new_workspace_base_location}. Something went wrong."; }
+  current_pwd=$(pwd)
+  cd "${new_workspace_location}" || { print_and_exit "Could not change dir to workspace folder. Something went wrong."; }
 
   if [ "$use_docker" = false ]; then # only build if not in docker, to avoide wrong dependencies
     if [[ $ros_version == 1 ]]; then
@@ -131,13 +124,13 @@ setup_new_workspace () {
       catkin build
     elif [[ $ros_version == 2 ]]; then
       mkdir src
-    #   cb
+      # cb
       colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
     fi
   fi
 
-  # Go to Home folder of the user
-  cd || print_and_exit "Could not change back to home dir. This should never happen..."
+  # Go back to where we started
+  cd "${current_pwd}" || print_and_exit "Could not change back to ${new_workspace_base_location} (working directory we created the new workspace in). This should never happen..."
 }
 
 setup_ros_team_ws_file() {
@@ -154,34 +147,35 @@ setup_ros_team_ws_file() {
   fi
   local is_docker_rtw_file=$3
 
-  # Create a function name
-  fun_name_suffix=${chosen_ros_distro}
+  # if user creates a workspace like new_folder/my_new_workspace
+  # alias should probably be _my_new_workspace instead of _new_folder/my_new_workspace
+  alias_name=_${ws_name}
+  fun_name="RosTeamWS_setup_${ws_name}"
 
-  if [ "$ros_ws_prefix" != "-" ]; then
-    fun_name_suffix=${fun_name_suffix}_${ros_ws_prefix}
-  fi
-  if [ "$ros_ws_suffix" != "-" ]; then
-    fun_name_suffix=${fun_name_suffix}_${ros_ws_suffix}
-  fi
-
-  alias_name=_${ws_full_name}
-  fun_name="RosTeamWS_setup_${fun_name_suffix}"
-
-  if [ -f "$ros_team_ws_file" ]; then
-    new_rtw_file_name="${ros_team_ws_file_name}.bkp-$(ls ${ros_team_ws_file}* | wc -l)"
-    echo ""
-    cp "$ros_team_ws_file" "$HOME/$new_rtw_file_name"
-    notify_user "${ros_team_ws_file_name} already exists. Copied it to ${new_rtw_file_name}."
-    # Comment out the old configuration if such exists - this is hard if using functions...
-    sed -i -e '/'"$fun_name"'/ s/^#*/OLD_/' "$ros_team_ws_file"
-    sed -i -e '/alias st_ros'"$ros_version=$fun_name"'/ s/^#*/#/' "$ros_team_ws_file"
-  else
-    print_and_exit "No $ros_team_ws_file found! Please first setup auto sourcing with the \"setup-auto-sourcing\" command."
+  if [ "$is_docker_rtw_file" = false ]; then
+    if [ -f "$ros_team_ws_file" ]; then
+      new_rtw_file_name="${ros_team_ws_file_name}.bkp-$(ls ${ros_team_ws_file}* | wc -l)"
+      echo ""
+      cp "$ros_team_ws_file" "$HOME/$new_rtw_file_name"
+      notify_user "${ros_team_ws_file_name} already exists. Copied it to ${new_rtw_file_name}."
+      # move fun_name to OLD_fun_name if exists
+      sed -i -e "s|$fun_name|OLD_${fun_name}|g" "$ros_team_ws_file"
+      # and alias_name to OLD_alias
+      sed -i -e "s|${alias_name}=OLD_${fun_name}|OLD_${alias_name}=OLD_${fun_name}|g" "$ros_team_ws_file"
+      # uncomment alias line
+      old_alias_line_number=$(grep -n "OLD_${alias_name}=OLD_${fun_name}" "$ros_team_ws_file" | grep -Eo '^[^:]+')
+      # uncomment
+      if ! [ -z "$old_alias_line_number" ]; then
+          sed -i "${old_alias_line_number},${old_alias_line_number}s|^|#|g" "$ros_team_ws_file"
+      fi
+    else
+      print_and_exit "No $ros_team_ws_file found! Please first setup auto sourcing with the \"setup-auto-sourcing\" command."
+    fi
   fi
 
   if [ "$use_docker" = true ]; then
-    docker_image_tag=$(sed "s/[\/]/-/g" <(echo "ros-team-ws_${ubuntu_version_tag}__${ws_folder}__${ws_full_name}"))
-    docker_host_name="rtw-${ws_full_name}-docker"
+    docker_image_tag=$(sed "s/[\/]/-/g" <(echo "ros-team-ws_${ubuntu_version_tag}__${ws_name}"))
+    docker_host_name="rtw-${ws_name}-docker"
   else
     docker_image_tag="-"
     docker_host_name="-"
@@ -190,19 +184,16 @@ setup_ros_team_ws_file() {
   local docker_support="$use_docker"
   if [ "$is_docker_rtw_file" = true ]; then
     docker_support=false # don't use docker in docker
-    source_path_rtw=" source /opt/RosTeamWS/ros_ws_$chosen_ros_distro/src/ros_team_workspace/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\""
+    source_path_rtw=" source /opt/RosTeamWS/ros_ws_$chosen_ros_distro/src/ros_team_workspace/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\""
   else
-    source_path_rtw="  source $FRAMEWORK_BASE_PATH/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\" \"\$RosTeamWS_WS_PREFIX\" \"\$RosTeamWS_WS_SUFFIX\""
+    source_path_rtw=" source $FRAMEWORK_BASE_PATH/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\""
   fi
 
   echo "" >> "$ros_team_ws_file"
   echo "$fun_name () {" >> "$ros_team_ws_file"
   echo "  RosTeamWS_BASE_WS=\"${base_ws}\"" >> "$ros_team_ws_file"
-
   echo "  RosTeamWS_DISTRO=\"${chosen_ros_distro}\"" >> "$ros_team_ws_file"
-  echo "  RosTeamWS_WS_FOLDER=\"${ws_folder}\"" >> "$ros_team_ws_file"
-  echo "  RosTeamWS_WS_PREFIX=\"${ros_ws_prefix}\"" >> "$ros_team_ws_file"
-  echo "  RosTeamWS_WS_SUFFIX=\"${ros_ws_suffix}\"" >> "$ros_team_ws_file"
+  echo "  RosTeamWS_WS_FOLDER=\"${new_workspace_location}\"" >> "$ros_team_ws_file"
   echo "  RosTeamWS_WS_DOCKER_SUPPORT=\"${docker_support}\"" >> "$ros_team_ws_file"
   echo "  RosTeamWS_DOCKER_TAG=\"${docker_image_tag}\"" >> "$ros_team_ws_file"
   echo "$source_path_rtw" >> "$ros_team_ws_file"
@@ -211,12 +202,12 @@ setup_ros_team_ws_file() {
 
 }
 
-update_config()
+source_and_update_ws()
 {
-  local ros_team_ws_file_name=".ros_team_ws_rc"
-  local ros_team_ws_file="$HOME/$ros_team_ws_file_name"
-
-  setup_ros_team_ws_file "$ros_team_ws_file" "$use_docker" "$is_docker_rtw_file"
+  if [ -z "$1" ]; then
+    print_and_exit "No ros_team_ws_file given."
+  fi
+  local ros_team_ws_file=$1
 
   # source new workspace
   source "$ros_team_ws_file"
@@ -235,7 +226,7 @@ setup_docker_files () {
 
 # workspace folder is relative to your home
 create_workspace () {
-  local usage="setup-ros-workspace.bash create_workspace ROS_DISTRO WS_FOLDER WS_PREFIX WS_SUFFIX"
+  local usage="setup-ros-workspace create_workspace WS_FOLDER ROS_DISTRO"
   local use_docker=false
 
   check_user_input "$@"
@@ -243,31 +234,25 @@ create_workspace () {
   setup_new_workspace
 
   local is_docker_rtw_file=false
-  update_config
+  local ros_team_ws_file_name=".ros_team_ws_rc"
+  local ros_team_ws_file="$HOME/$ros_team_ws_file_name"
+  setup_ros_team_ws_file "$ros_team_ws_file" "$use_docker" "$is_docker_rtw_file"
+  source_and_update_ws "$ros_team_ws_file"
 
   echo -e "${RTW_COLOR_NOTIFY_USER}Finished creating new workspace: Please open a new terminal and execute '$alias_name'${TERMINAL_COLOR_NC} (if you have setup auto sourcing)."
 }
 
 create_workspace_docker () {
-  local usage="setup-ros-workspace.bash create_workspace_docker ROS_DISTRO WS_FOLDER WS_PREFIX WS_SUFFIX"
+  local usage="setup-ros-workspace-docker WS_FOLDER ROS_DISTRO"
   local use_docker=true
 
   # create new workspace locally
   check_user_input "$@"
   local chosen_ros_distro=$ros_distro # need to store, ros_distro gets overwritten while creating workspace...
-  setup_new_workspace
-
-  # TODO(destogl): we should remove updating of configs if docker is used - can we do this already?
-  local is_docker_rtw_file=false
-  update_config
-
-  ############################################################################
-  # DOCKER PART: create corresponding docker image and map worksapce and rtw #
-  ############################################################################
-
-  # first get name for creating correct ros distro in docker
+  # check if selected chosen_ros_distro is supported, before we start creating a new workspace
   local docker_ros_distro_name
   if [[ -v "map_to_docker_ros_distro_name[$chosen_ros_distro]" ]];then
+    # first get name for creating correct ros distro in docker
     docker_ros_distro_name=${map_to_docker_ros_distro_name["$chosen_ros_distro"]}
   else
     print_and_exit "For $chosen_ros_distro does no docker container exist."
@@ -279,17 +264,29 @@ create_workspace_docker () {
     print_and_exit "For $docker_ros_distro_name does no RosTeamWorkspace branch exist."
   fi
 
+  # everything looks fine, now we can create a worksapce
+  setup_new_workspace
+
+  local is_docker_rtw_file=false
+  local ros_team_ws_file_name=".ros_team_ws_rc"
+  local ros_team_ws_file="$HOME/$ros_team_ws_file_name"
+  setup_ros_team_ws_file "$ros_team_ws_file" "$use_docker" "$is_docker_rtw_file"
+
+  ############################################################################
+  # DOCKER PART: create corresponding docker image and map worksapce and rtw #
+  ############################################################################
+
   # setup Dockerfile bashrc and .ros_team_ws_rc
   # and copy needed files to workspace dir
-  ws_docker_folder="${ws_folder}/${ws_full_name}/.rtw_docker_defines"
+  ws_docker_folder="${new_workspace_location}/.rtw_docker_defines"
   mkdir -p "$ws_docker_folder"
 
   # setup .bashrc
   cp "$DOCKER_TEMPLATES/bashrc" "$ws_docker_folder/."
   # add the name of the workspace folder in docker, so that it can be inited in bashrc the first time used.
-  local docker_ws_folder
-  docker_ws_folder="${ws_folder}/${ws_full_name}"
-  sed -i "s|DUMMY_WS_FOLDER|${docker_ws_folder}|g" "$ws_docker_folder/bashrc"
+  local docker_ws_path
+  docker_ws_path="${new_workspace_location}"
+  sed -i "s|DUMMY_WS_FOLDER|${docker_ws_path}|g" "$ws_docker_folder/bashrc"
   echo "" >> "$ws_docker_folder/bashrc"
   echo "$alias_name" >> "$ws_docker_folder/bashrc"
 
@@ -310,7 +307,7 @@ create_workspace_docker () {
   cp "$DOCKER_TEMPLATES/recreate_docker.sh" "$ws_docker_folder/."
   sed -i "s/DUMMY_DOCKER_IMAGE_TAG/${docker_image_tag}/g" "$ws_docker_folder/recreate_docker.sh"
   sed -i "s/DUMMY_DOCKER_HOSTNAME/${docker_host_name}/g" "$ws_docker_folder/recreate_docker.sh"
-  sed -i "s|DUMMY_WS_FOLDER|${docker_ws_folder}|g" "$ws_docker_folder/recreate_docker.sh"
+  sed -i "s|DUMMY_WS_FOLDER|${docker_ws_path}|g" "$ws_docker_folder/recreate_docker.sh"
 
   # now we are all set for building the container
   build_docker_image "$docker_image_tag" "$ws_docker_folder/Dockerfile" || { print_and_exit "Build of docker container failed."; }
@@ -321,5 +318,5 @@ create_workspace_docker () {
   echo "######################################################################################################################"
   sleep 2 # give user time to read above message before switching to docker container
 
-  create_docker_container "$docker_image_tag" "${docker_ws_folder}" "$chosen_ros_distro" "$docker_host_name"
+  create_docker_container "$docker_image_tag" "${docker_ws_path}" "$chosen_ros_distro" "$docker_host_name"
 }
