@@ -1,5 +1,22 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
+# Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # based on https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Development-Setup/
+script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+SCRIPT_PATH=$script_own_dir
+source "$SCRIPT_PATH"/../../setup.bash
 
 ROS_DISTRO=$1
 if [ -z "$1" ]
@@ -21,17 +38,7 @@ sudo apt -y install python3-vcstool
 
 sudo apt -y install ros-${ROS_DISTRO}-desktop
 
-# sudo apt install -y python3-pip
-# sudo pip3 install -U argcomplete
-# sudo pip3 install -U rosdep
-
-# echo "ROS1 - ROS2 bridge also gets installed"
-# echo "Press <ENTER> to continue..."
-# read  # probably to be removed later
-# sudo apt install -y ros-${ROS_DISTRO}-ros1-bridge
-
 sudo apt install -y python3-colcon-common-extensions #Install colcon for workspace creation
-
 
 sudo apt install ccache
 

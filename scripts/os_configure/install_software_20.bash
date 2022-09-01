@@ -1,23 +1,62 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
+# Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt)
 #
-# install_software_20.bash [computer_type:{office, robot, default:lab}]
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# install_software_20.bash [computer_type:{office, robot, default:basic}]
 
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 SCRIPT_PATH=$script_own_dir
+source "$SCRIPT_PATH"/../../setup.bash
+
+if [ -z "$supported_computer_types" ]; then
+  readonly supported_computer_types=("basic" "office" "robot")
+fi
 
 computer_type=$1
-if [ -z "$1" ]
-then
-  computer_type="lab"
-  echo "Computer type not provided using default $computer_type"
+# check if given computer_type is supported. If this is not the case, then inform user about supported types and
+# let user chose which typ he would like.
+if ! [[ " ${supported_computer_types[*]} " =~ " ${computer_type} " ]]; then
+  notify_user "The computer type ${computer_type} you have given is not supported."
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} Chose one of the following:"
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} basic    -TODO(Add description)normal standard pc. Basic utilities like: TODO are installed"
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} office   -TODO(Add description)pc used for "
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} robot    -TODO(Add description)"
+  select computer_type in basic office robot;
+  do
+    case "$computer_type" in
+          basic)
+              computer_type="basic"
+              break
+            ;;
+          office)
+              computer_type="office"
+              break
+            ;;
+          robot)
+              computer_type="robot"
+              break
+            ;;
+    esac
+  done
+  echo -n -e "${TERMINAL_COLOR_NC}"
 fi
 
 echo "Installing software for $computer_type computers. Press <ENTER> to continue."
 read
 
 ROS_VERSION=melodic
-ROS2_VERSION=foxy
+ROS2_VERSION=rolling
 
 # Core tools
 sudo apt update && sudo apt -y install curl gnupg2 lsb-release
@@ -33,32 +72,18 @@ sudo apt update
 sudo apt -y install nala
 
 ### Useful tools
-sudo apt -y install vim ssh git trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger
+sudo apt -y install vim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger
 
 # Dolphin Plugins
 sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
 
-if ([[ $computer_type != "robot" ]])
-then
-  sudo apt -y install recordmydesktop rdesktop gimp meshlab inkscape pdfposter unrar
-  sudo DEBIAN_FRONTEND=noninteractive apt -y install wireshark
-#   sudo apt -y install gvfs-bin gvfs-fuse gvfs-backends
-fi
-
-# Useful libraries
-sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
-
-if ([[ $computer_type != "robot" ]])
-then
-  # Latex
-  sudo apt -y install kile texlive-full texlive-lang-german kbibtex ktikz
-fi
-
 # Python tools
 sudo apt -y install python3-pip
 sudo pip3 install --upgrade pip
-sudo pip3 install virtualenv virtualenvwrapper notebook
+sudo pip3 install pre-commit virtualenv virtualenvwrapper notebook
 
+# Useful libraries
+sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
 
 # ROS Packages
 bash $SCRIPT_PATH/install_software_ros.bash $ROS_VERSION
@@ -69,23 +94,19 @@ bash $SCRIPT_PATH/install_software_ros2.bash $ROS2_VERSION
 sudo rosdep init
 rosdep update
 
-# if ([[ $computer_type == "lab" ]] || [[$computer_type == "robot" ]])
-# then
-#   bash $SCRIPT_PATH/configure_ROSTeamWS.bash $ROS_VERSION
-# fi
-#
-# if ([[ $computer_type == "robot" ]])
-# then
-#   bash $SCRIPT_PATH/configure_robots.bash $ROS_VERSION
-# fi
+if [[ $computer_type != "robot" ]]
+then
+  sudo apt -y install recordmydesktop rdesktop gimp meshlab inkscape pdfposter unrar
+  sudo DEBIAN_FRONTEND=noninteractive apt -y install wireshark
 
-if ([[ $computer_type == "office" ]])
+  # Latex
+  sudo apt -y install kile texlive-full texlive-lang-german kbibtex ktikz
+fi
+
+if [[ $computer_type == "office" ]]
 then
 
   sudo apt -y install pass
-
-#   sudo apt -y install redshift
-
 
   # Network manager
   sudo apt -y install network-manager-openvpn network-manager-vpnc network-manager-ssh network-manager-openconnect
@@ -96,10 +117,6 @@ then
   # Code optimization and profiling
   sudo apt -y install valgrind kcachegrind hotspot heaptrack-gui
   sudo apt -y install linux-tools-generic linux-cloud-tools-generic  # Kernel tools
-
-
-  # Datensicherung
-#   sudo apt -y install kup bup
 
   sudo apt -y install flac
 
@@ -144,7 +161,7 @@ then
   sudo apt -y install kontact korganizer kmail kjots kaddressbook kdepim*
 
   # Tools
-  sudo apt -y install  krdc
+  sudo apt -y install krdc
 
   # Notes-taking
   sudo add-apt-repository ppa:pbek/qownnotes
@@ -163,11 +180,6 @@ then
   sudo apt update
   sudo apt -y install gh
 
-  # Pre-commit
-  sudo pip3 install pre-commit
-
-  sudo apt -y install gitk
-
   # Docker
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
   echo \
@@ -176,14 +188,14 @@ then
   sudo apt update
   sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose
   sudo groupadd docker
-  sudo usermod -aG docker `whoami`
+  sudo usermod -aG docker "$(whoami)"
 
   # Tracing
   sudo apt-add-repository ppa:lttng/stable-2.12
   sudo apt update
   sudo apt -y install lttng-tools lttng-modules-dkms liblttng-ust-dev
   sudo apt -y install python3-babeltrace python3-lttng python3-lttngust
-  sudo usermod -aG tracing `whoami`
+  sudo usermod -aG tracing "$(whoami)"
 
   # Tuxedo repositories
   sudo sh -c 'echo "deb https://deb.tuxedocomputers.com/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/tuxedocomputers.list'
