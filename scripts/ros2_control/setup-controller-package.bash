@@ -118,10 +118,15 @@ done
 VC_H="include/$PKG_NAME/visibility_control.h"
 CTRL_HPP="include/$PKG_NAME/$FILE_NAME.hpp"
 CTRL_CPP="src/$FILE_NAME.cpp"
+CTRL_PARAMS_YAML="src/$FILE_NAME.yaml"
+CTRL_VALIDATE_PARAMS_HPP="include/$PKG_NAME/validate_${FILE_NAME}_parameters.hpp"
 PLUGIN_XML="$PKG_NAME.xml"
 LOAD_TEST_CPP="test/test_load_$FILE_NAME.cpp"
 TEST_CPP="test/test_$FILE_NAME.cpp"
+TEST_PRECEEDING_CPP="test/test_$FILE_NAME_preceeding.cpp"
 TEST_HPP="test/test_$FILE_NAME.hpp"
+TEST_PARAMS_YAML="test/${FILE_NAME}_params.yaml"
+TEST_PRECEEDING_PARAMS_YAML="test/${FILE_NAME}_preceeding_params.yaml"
 
 # Copy files
 if [[ ! -f "$VC_H" ]]; then
@@ -131,14 +136,23 @@ fi
 if [[ "$CONTROLLER_TYPE" == "chainable" ]]; then
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/dummy_chainable_controller.hpp $CTRL_HPP
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_chainable_controller.cpp $CTRL_CPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.yaml $CTRL_PARAMS_YAML
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/validate_dummy_controller_parameters.hpp $CTRL_VALIDATE_PARAMS_HPP
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_chainable_controller.cpp $TEST_CPP
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_chainable_controller.hpp $TEST_HPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_params.yaml $TEST_PARAMS_YAML
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_preceeding_params.yaml $TEST_PRECEEDING_PARAMS_YAML
   cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_chainable_controller_pluginlib.xml >> $PLUGIN_XML
 else
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/dummy_controller.hpp $CTRL_HPP
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.cpp $CTRL_CPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.yaml $CTRL_PARAMS_YAML
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/validate_dummy_controller_parameters.hpp $CTRL_VALIDATE_PARAMS_HPP
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.cpp $TEST_CPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller_preceeding.cpp $TEST_PRECEEDING_CPP
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_controller.hpp $TEST_HPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_params.yaml $TEST_PARAMS_YAML
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_preceeding_params.yaml $TEST_PRECEEDING_PARAMS_YAML
   cat $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_pluginlib.xml >> $PLUGIN_XML
 fi
 
@@ -149,7 +163,7 @@ echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files copied.${TERMINAL_COLOR_NC}
 # TODO(anyone): fuse this with hardware interface package creating.
 
 # Add license header to the files
-FILES_TO_LICENSE=("$CTRL_HPP" "$CTRL_CPP" "$LOAD_TEST_CPP" "$TEST_CPP" "$TEST_HPP")
+FILES_TO_LICENSE=("$CTRL_HPP" "$CTRL_CPP" "$LOAD_TEST_CPP" "$TEST_CPP" "$TEST_PRECEEDING_CPP" "$TEST_HPP")
 if [[ "$package_configured" == "no" ]]; then
   FILES_TO_LICENSE+=("$VC_H")
 fi
@@ -168,7 +182,7 @@ fi
 
 # sed all needed files
 FILES_TO_SED=("${FILES_TO_LICENSE[@]}")
-FILES_TO_SED+=("$PLUGIN_XML")
+FILES_TO_SED+=("$PLUGIN_XML" "$CTRL_PARAMS_YAML" "$TEST_PARAMS_YAML" "$TEST_PRECEEDING_PARAMS_YAML")
 # declare -p FILES_TO_SED
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
@@ -194,36 +208,55 @@ done
 TMP_FILE=".f_tmp"
 touch $TMP_FILE
 
+# manage dependencies here
+if [[ "$package_configured" == "no" ]]; then
+
+  # Add `THIS_PACKAGE_INCLUDE_DEPENDS` structure to simplify the rest of the file
+  TEST_LINE=`awk '$1 == "find_package(ament_cmake" { print NR }' CMakeLists.txt`  # get line before `ament_cmake` dependency
+  let CUT_LINE=$TEST_LINE-1
+  head -$CUT_LINE CMakeLists.txt >> $TMP_FILE
+
+  echo "set(THIS_PACKAGE_INCLUDE_DEPENDS" >> $TMP_FILE
+  echo "  control_msgs" >> $TMP_FILE
+  echo "  controller_interface" >> $TMP_FILE
+  echo "  hardware_interface" >> $TMP_FILE
+  echo "  pluginlib" >> $TMP_FILE
+  echo "  rclcpp" >> $TMP_FILE
+  echo "  rclcpp_lifecycle" >> $TMP_FILE
+  echo "  realtime_tools" >> $TMP_FILE
+  echo "  std_srvs" >> $TMP_FILE
+  echo ")" >> $TMP_FILE
+
+  echo "" >> $TMP_FILE
+  echo "find_package(ament_cmake REQUIRED)" >> $TMP_FILE
+  echo "find_package(generate_parameter_library REQUIRED)" >> $TMP_FILE
+  echo "foreach(Dependency IN ITEMS \${THIS_PACKAGE_INCLUDE_DEPENDS})" >> $TMP_FILE
+  echo "  find_package(\${Dependency} REQUIRED)" >> $TMP_FILE
+  echo "endforeach()" >> $TMP_FILE
+  echo "" >> $TMP_FILE
+fi
+
 # Get line with if(BUILD_TESTING)
 TEST_LINE=`awk '$1 == "if(BUILD_TESTING)" { print NR }' CMakeLists.txt`
 let CUT_LINE=$TEST_LINE-1
 head -$CUT_LINE CMakeLists.txt >> $TMP_FILE
 
-# Add Plugin library stuff inside
+# Add Plugin library related stuff
+echo "# Add ${FILE_NAME} library related compile commands" >> $TMP_FILE
+echo "generate_parameter_library(${FILE_NAME}_parameters" >> $TMP_FILE
+echo "  ${CTRL_PARAMS_YAML}" >> $TMP_FILE
+echo "  ${CTRL_VALIDATE_PARAMS_HPP}" >> $TMP_FILE
+echo ")" >> $TMP_FILE
+
 echo "add_library(" >> $TMP_FILE
 echo "  $FILE_NAME" >> $TMP_FILE
 echo "  SHARED" >> $TMP_FILE
 echo "  $CTRL_CPP" >> $TMP_FILE
 echo ")" >> $TMP_FILE
-
-echo "target_include_directories(" >> $TMP_FILE
-echo "  $FILE_NAME" >> $TMP_FILE
-echo "  PRIVATE" >> $TMP_FILE
-echo "  include" >> $TMP_FILE
-echo ")" >> $TMP_FILE
-
-# TODO(anyone): Add this dependencies in a loop
-echo "ament_target_dependencies(" >> $TMP_FILE
-echo "  $FILE_NAME" >> $TMP_FILE
-echo "  control_msgs" >> $TMP_FILE
-echo "  controller_interface" >> $TMP_FILE
-echo "  hardware_interface" >> $TMP_FILE
-echo "  pluginlib" >> $TMP_FILE
-echo "  rclcpp" >> $TMP_FILE
-echo "  rclcpp_lifecycle" >> $TMP_FILE
-echo "  realtime_tools" >> $TMP_FILE
-echo "  std_srvs" >> $TMP_FILE
-echo ")" >> $TMP_FILE
+echo "target_include_directories($FILE_NAME PRIVATE include)" >> $TMP_FILE
+echo "target_link_libraries($FILE_NAME ${FILE_NAME}_parameters)" >> $TMP_FILE
+echo "ament_target_dependencies($FILE_NAME \${THIS_PACKAGE_INCLUDE_DEPENDS})" >> $TMP_FILE
+echo "target_compile_definitions($FILE_NAME PRIVATE \"${FILE_NAME^^}_BUILDING_DLL\")" >> $TMP_FILE
 
 if [[ "$package_configured" == "no" ]]; then
 
@@ -248,7 +281,6 @@ if [[ "$package_configured" == "no" ]]; then
     echo "  DESTINATION include" >> $TMP_FILE
     echo ")" >> $TMP_FILE
   fi
-
 fi
 
 echo ""  >> $TMP_FILE
@@ -269,11 +301,22 @@ echo "  )" >> $TMP_FILE
 echo ""
 
 echo "" >> $TMP_FILE
-echo "  ament_add_gmock(test_$FILE_NAME $TEST_CPP)" >> $TMP_FILE
+echo "  add_rostest_with_parameters_gmock(test_$FILE_NAME $TEST_CPP \${CMAKE_CURRENT_SOURCE_DIR}/${TEST_PARAMS_YAML})" >> $TMP_FILE
 echo "  target_include_directories(test_$FILE_NAME PRIVATE include)" >> $TMP_FILE
 echo "  target_link_libraries(test_$FILE_NAME $FILE_NAME)" >> $TMP_FILE
 echo "  ament_target_dependencies(" >> $TMP_FILE
 echo "    test_$FILE_NAME" >> $TMP_FILE
+echo "    controller_interface" >> $TMP_FILE
+echo "    hardware_interface" >> $TMP_FILE
+echo "  )" >> $TMP_FILE
+echo ""
+
+echo "" >> $TMP_FILE
+echo "  add_rostest_with_parameters_gmock(test_${FILE_NAME}_preceeding $TEST_PRECEEDING_CPP \${CMAKE_CURRENT_SOURCE_DIR}/${TEST_PRECEEDING_PARAMS_YAML})" >> $TMP_FILE
+echo "  target_include_directories(test_${FILE_NAME}_preceeding PRIVATE include)" >> $TMP_FILE
+echo "  target_link_libraries(test_${FILE_NAME}_preceeding $FILE_NAME)" >> $TMP_FILE
+echo "  ament_target_dependencies(" >> $TMP_FILE
+echo "    test_${FILE_NAME}_preceeding" >> $TMP_FILE
 echo "    controller_interface" >> $TMP_FILE
 echo "    hardware_interface" >> $TMP_FILE
 echo "  )" >> $TMP_FILE
@@ -288,27 +331,14 @@ if [[ "$package_configured" == "no" ]]; then
   echo "ament_export_include_directories(" >> $TMP_FILE
   echo "  include" >> $TMP_FILE
   echo ")" >> $TMP_FILE
-
+  echo "ament_export_dependencies(" >> $TMP_FILE
+  echo "  ${THIS_PACKAGE_INCLUDE_DEPENDS}" >> $TMP_FILE
+  echo ")" >> $TMP_FILE
 fi
 
 echo "ament_export_libraries(" >> $TMP_FILE
 echo "  $FILE_NAME" >> $TMP_FILE
 echo ")" >> $TMP_FILE
-
-if [[ "$package_configured" == "no" ]]; then
-  # TODO(anyone): use this from a list so its the same as above
-  echo "ament_export_dependencies(" >> $TMP_FILE
-  echo "  control_msgs" >> $TMP_FILE
-  echo "  controller_interface" >> $TMP_FILE
-  echo "  hardware_interface" >> $TMP_FILE
-  echo "  pluginlib" >> $TMP_FILE
-  echo "  rclcpp" >> $TMP_FILE
-  echo "  rclcpp_lifecycle" >> $TMP_FILE
-  echo "  realtime_tools" >> $TMP_FILE
-  echo "  std_srvs" >> $TMP_FILE
-  echo ")" >> $TMP_FILE
-
-fi
 
 # Add last part
 let CUT_LINE=$END_TEST_LINE+1
@@ -316,28 +346,28 @@ tail -n +$TEST_LINE CMakeLists.txt | tail -n +$CUT_LINE >> $TMP_FILE
 
 mv $TMP_FILE CMakeLists.txt
 
-# CMakeLists.txt & package.xml: Add dependencies if they not exist
-DEP_PKGS=("std_srvs" "realtime_tools" "rclcpp_lifecycle" "rclcpp" "pluginlib" "hardware_interface" "controller_interface" "control_msgs")
 
-for DEP_PKG in "${DEP_PKGS[@]}"; do
+# manage dependencies in package.xml
+if [[ "$package_configured" == "no" ]]; then
 
-  # CMakeLists.txt
-  if `grep -q "find_package(${DEP_PKG} REQUIRED)" CMakeLists.txt`; then
-    echo "'$DEP_PKG' is already dependency in CMakeLists.txt"
-  else
-    append_to_string="find_package(ament_cmake REQUIRED)"
-    sed -i "s/$append_to_string/$append_to_string\\nfind_package(${DEP_PKG} REQUIRED)/g" CMakeLists.txt
-  fi
+  # append `generate_parameter_library` to the package.xml file
+  append_to_string="<buildtool_depend>ament_cmake<\/buildtool_depend>"
+  sed -i "s/$append_to_string/$append_to_string\\n\\n  <build_depend>generate_parameter_library<\/build_depend>/g" package.xml
 
-  # package.xml
-  if `grep -q "<depend>${DEP_PKG}</depend>" package.xml`; then
-    echo "'$DEP_PKG' is already listed in package.xml"
-  else
-    append_to_string="<buildtool_depend>ament_cmake<\/buildtool_depend>"
-    sed -i "s/$append_to_string/$append_to_string\\n\\n  <depend>${DEP_PKG}<\/depend>/g" package.xml
-  fi
+  # CMakeLists.txt & package.xml: Add dependencies if they not exist
+  DEP_PKGS=("std_srvs" "realtime_tools" "rclcpp_lifecycle" "rclcpp" "pluginlib" "hardware_interface" "controller_interface" "control_msgs")
 
-done
+  for DEP_PKG in "${DEP_PKGS[@]}"; do
+    # package.xml
+    if `grep -q "<depend>${DEP_PKG}</depend>" package.xml`; then
+      echo "'$DEP_PKG' is already listed in package.xml"
+    else
+      append_to_string="<build_depend>generate_parameter_library<\/build_depend>"
+      sed -i "s/$append_to_string/$append_to_string\\n\\n  <depend>${DEP_PKG}<\/depend>/g" package.xml
+    fi
+  done
+fi
+
 
 # CMakeLists.txt & package.xml: Add test dependencies if they not exist
 TEST_DEP_PKGS=("ros2_control_test_assets" "hardware_interface" "controller_manager" "ament_cmake_gmock")

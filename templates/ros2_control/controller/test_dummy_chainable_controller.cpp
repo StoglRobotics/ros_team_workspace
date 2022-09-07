@@ -50,69 +50,69 @@ TEST_F(DummyClassNameTest, joint_names_parameter_not_set)
 {
   SetUpController(false);
 
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
+  ASSERT_TRUE(controller_->params_.joints.empty());
+  ASSERT_TRUE(controller_->params_.state_joints.empty());
+  ASSERT_TRUE(controller_->params_.interface_name.empty());
 
   controller_->get_node()->set_parameter({"state_joints", state_joint_names_});
   controller_->get_node()->set_parameter({"interface_name", interface_name_});
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_ERROR);
 
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
+  ASSERT_TRUE(controller_->params_.joints.empty());
+  ASSERT_TRUE(controller_->params_.state_joints.empty());
+  ASSERT_TRUE(controller_->params_.interface_name.empty());
 }
 
 TEST_F(DummyClassNameTest, state_joint_names_parameter_not_set)
 {
   SetUpController(false);
 
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
+  ASSERT_TRUE(controller_->params_.joints.empty());
+  ASSERT_TRUE(controller_->params_.state_joints.empty());
+  ASSERT_TRUE(controller_->params_.interface_name.empty());
 
   controller_->get_node()->set_parameter({"joints", joint_names_});
   controller_->get_node()->set_parameter({"interface_name", interface_name_});
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_ERROR);
 
-  ASSERT_THAT(controller_->joint_names_, testing::ElementsAreArray(joint_names_));
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
+  ASSERT_THAT(controller_->params_.joints, testing::ElementsAreArray(joint_names_));
+  ASSERT_TRUE(controller_->params_.state_joints.empty());
+  ASSERT_TRUE(controller_->params_.interface_name.empty());
 }
 
 TEST_F(DummyClassNameTest, interface_parameter_not_set)
 {
   SetUpController(false);
 
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
+  ASSERT_TRUE(controller_->params_.joints.empty());
+  ASSERT_TRUE(controller_->params_.state_joints.empty());
+  ASSERT_TRUE(controller_->params_.interface_name.empty());
 
   controller_->get_node()->set_parameter({"joints", joint_names_});
   controller_->get_node()->set_parameter({"state_joints", state_joint_names_});
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_ERROR);
 
-  ASSERT_THAT(controller_->joint_names_, testing::ElementsAreArray(joint_names_));
-  ASSERT_THAT(controller_->state_joint_names_, testing::ElementsAreArray(state_joint_names_));
-  ASSERT_TRUE(controller_->interface_name_.empty());
+  ASSERT_THAT(controller_->params_.joints, testing::ElementsAreArray(joint_names_));
+  ASSERT_THAT(controller_->params_.state_joints, testing::ElementsAreArray(state_joint_names_));
+  ASSERT_TRUE(controller_->params_.interface_name.empty());
 }
 
 TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
 {
   SetUpController();
 
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
+  ASSERT_TRUE(controller_->params_.joints.empty());
+  ASSERT_TRUE(controller_->params_.state_joints.empty());
+  ASSERT_TRUE(controller_->params_.interface_name.empty());
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
-  ASSERT_THAT(controller_->joint_names_, testing::ElementsAreArray(joint_names_));
-  ASSERT_THAT(controller_->state_joint_names_, testing::ElementsAreArray(state_joint_names_));
-  ASSERT_EQ(controller_->interface_name_, interface_name_);
+  ASSERT_THAT(controller_->params_.joints, testing::ElementsAreArray(joint_names_));
+  ASSERT_THAT(controller_->params_.state_joints, testing::ElementsAreArray(state_joint_names_));
+  ASSERT_EQ(controller_->params_.interface_name, interface_name_);
 }
 
 TEST_F(DummyClassNameTest, check_exported_intefaces)
@@ -432,4 +432,13 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
   subscribe_and_get_messages(msg);
 
   ASSERT_EQ(msg.set_point, 0.45);
+}
+
+int main(int argc, char ** argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  rclcpp::init(argc, argv);
+  int result = RUN_ALL_TESTS();
+  rclcpp::shutdown();
+  return result;
 }

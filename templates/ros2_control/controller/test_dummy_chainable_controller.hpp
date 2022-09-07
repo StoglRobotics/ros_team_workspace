@@ -115,7 +115,7 @@ template <typename CtrlType>
 class DummyClassNameFixture : public ::testing::Test
 {
 public:
-  static void SetUpTestCase() { rclcpp::init(0, nullptr); }
+  static void SetUpTestCase() {}
 
   void SetUp()
   {
@@ -131,7 +131,7 @@ public:
       "/test_dummy_package_namespace/set_slow_control_mode");
   }
 
-  static void TearDownTestCase() { rclcpp::shutdown(); }
+  static void TearDownTestCase() {}
 
   void TearDown() { controller_.reset(nullptr); }
 

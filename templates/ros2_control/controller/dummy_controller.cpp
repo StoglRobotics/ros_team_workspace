@@ -60,12 +60,9 @@ controller_interface::CallbackReturn DummyClassName::on_init()
   control_mode_.initRT(control_mode_type::FAST);
 
   try {
-    get_node()->declare_parameter<std::vector<std::string>>("joints", std::vector<std::string>({}));
-    get_node()->declare_parameter<std::vector<std::string>>(
-      "state_joints", std::vector<std::string>({}));
-    get_node()->declare_parameter<std::string>("interface_name", "");
+    param_listener_ = std::make_shared<dummy_controller::ParamListener>(get_node());
   } catch (const std::exception & e) {
-    fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
+    fprintf(stderr, "Exception thrown during controller's init with message: %s \n", e.what());
     return controller_interface::CallbackReturn::ERROR;
   }
 
@@ -75,49 +72,30 @@ controller_interface::CallbackReturn DummyClassName::on_init()
 controller_interface::CallbackReturn DummyClassName::on_configure(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
-  auto error_if_empty = [&](const auto & parameter, const char * parameter_name) {
-    if (parameter.empty()) {
-      RCLCPP_ERROR(get_node()->get_logger(), "'%s' parameter was empty", parameter_name);
-      return true;
-    }
-    return false;
-  };
+  params_ = param_listener_->get_params();
 
-  auto get_string_array_param_and_error_if_empty =
-    [&](std::vector<std::string> & parameter, const char * parameter_name) {
-      parameter = get_node()->get_parameter(parameter_name).as_string_array();
-      return error_if_empty(parameter, parameter_name);
-    };
-
-  auto get_string_param_and_error_if_empty =
-    [&](std::string & parameter, const char * parameter_name) {
-      parameter = get_node()->get_parameter(parameter_name).as_string();
-      return error_if_empty(parameter, parameter_name);
-    };
-
-  if (
-    get_string_array_param_and_error_if_empty(joint_names_, "joints") ||
-    get_string_array_param_and_error_if_empty(state_joint_names_, "state_joints") ||
-    get_string_param_and_error_if_empty(interface_name_, "interface_name")) {
-    return controller_interface::CallbackReturn::ERROR;
+  if (!params_.state_joints.empty()) {
+    state_joints_ = params_.state_joints;
+  } else {
+    state_joints_ = params_.joints;
   }
 
   // Command Subscriber and callbacks
   auto callback_cmd = [&](const std::shared_ptr<ControllerCommandMsg> msg) -> void {
-    if (msg->joint_names.size() == joint_names_.size()) {
+    if (msg->joint_names.size() == params_.joints.size()) {
       input_cmd_.writeFromNonRT(msg);
     } else {
       RCLCPP_ERROR(
         get_node()->get_logger(),
         "Received %zu , but expected %zu joints in command. Ignoring message.",
-        msg->joint_names.size(), joint_names_.size());
+        msg->joint_names.size(), params_.joints.size());
     }
   };
   cmd_subscriber_ = get_node()->create_subscription<ControllerCommandMsg>(
     "~/commands", rclcpp::SystemDefaultsQoS(), callback_cmd);
 
   std::shared_ptr<ControllerCommandMsg> msg = std::make_shared<ControllerCommandMsg>();
-  reset_controller_command_msg(msg, joint_names_);
+  reset_controller_command_msg(msg, params_.joints);
   input_cmd_.writeFromNonRT(msg);
 
   auto set_slow_mode_service_callback =
@@ -150,7 +128,7 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 
   // TODO(anyone): Reserve memory in state publisher depending on the message type
   state_publisher_->lock();
-  state_publisher_->msg_.header.frame_id = joint_names_[0];
+  state_publisher_->msg_.header.frame_id = params_.joints[0];
   state_publisher_->unlock();
 
   RCLCPP_INFO(get_node()->get_logger(), "configure successful");
@@ -162,9 +140,9 @@ controller_interface::InterfaceConfiguration DummyClassName::command_interface_c
   controller_interface::InterfaceConfiguration command_interfaces_config;
   command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
 
-  command_interfaces_config.names.reserve(joint_names_.size());
-  for (const auto & joint : joint_names_) {
-    command_interfaces_config.names.push_back(joint + "/" + interface_name_);
+  command_interfaces_config.names.reserve(params_.joints.size());
+  for (const auto & joint : params_.joints) {
+    command_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
   }
 
   return command_interfaces_config;
@@ -175,9 +153,9 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
   controller_interface::InterfaceConfiguration state_interfaces_config;
   state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
 
-  state_interfaces_config.names.reserve(state_joint_names_.size());
-  for (const auto & joint : state_joint_names_) {
-    state_interfaces_config.names.push_back(joint + "/" + interface_name_);
+  state_interfaces_config.names.reserve(state_joints_.size());
+  for (const auto & joint : state_joints_) {
+    state_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
   }
 
   return state_interfaces_config;
@@ -186,8 +164,12 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
 controller_interface::CallbackReturn DummyClassName::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
+  // TODO(anyone): if you have to manage multiple interfaces that need to be sorted check
+  // `on_activate` method in `JointTrajectoryController` for examplary use of
+  // `controller_interface::get_ordered_interfaces` helper function
+
   // Set default value in command
-  reset_controller_command_msg(*(input_cmd_.readFromRT)(), joint_names_);
+  reset_controller_command_msg(*(input_cmd_.readFromRT)(), params_.joints);
 
   return controller_interface::CallbackReturn::SUCCESS;
 }
@@ -224,7 +206,6 @@ controller_interface::return_type DummyClassName::update(
   if (state_publisher_ && state_publisher_->trylock()) {
     state_publisher_->msg_.header.stamp = time;
     state_publisher_->msg_.set_point = command_interfaces_[CMD_MY_ITFS].get_value();
-
     state_publisher_->unlockAndPublish();
   }
 

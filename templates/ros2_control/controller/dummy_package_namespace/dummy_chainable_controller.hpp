@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "controller_interface/chainable_controller_interface.hpp"
+#include "dummy_controller_parameters.hpp"
 #include "dummy_package_namespace/visibility_control.h"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
@@ -85,9 +86,8 @@ public:
   using ControllerStateMsg = control_msgs::msg::JointControllerState;
 
 protected:
-  std::vector<std::string> joint_names_;
-  std::vector<std::string> state_joint_names_;
-  std::string interface_name_;
+  std::shared_ptr<dummy_controller::ParamListener> param_listener_;
+  dummy_controller::Params params_;
 
   // Command subscribers and Controller State publisher
   rclcpp::Subscription<ControllerCommandMsg>::SharedPtr cmd_subscriber_ = nullptr;

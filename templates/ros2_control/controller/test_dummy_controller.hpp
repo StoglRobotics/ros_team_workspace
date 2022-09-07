@@ -105,7 +105,7 @@ template <typename CtrlType>
 class DummyClassNameFixture : public ::testing::Test
 {
 public:
-  static void SetUpTestCase() { rclcpp::init(0, nullptr); }
+  static void SetUpTestCase() {}
 
   void SetUp()
   {
@@ -114,20 +114,19 @@ public:
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
     command_publisher_ = command_publisher_node_->create_publisher<ControllerCommandMsg>(
-      "/test_dummy_package_namespace/commands", rclcpp::SystemDefaultsQoS());
+      "/test_dummy_controller/commands", rclcpp::SystemDefaultsQoS());
 
     service_caller_node_ = std::make_shared<rclcpp::Node>("service_caller");
     slow_control_service_client_ = service_caller_node_->create_client<ControllerModeSrvType>(
-      "/test_dummy_package_namespace/set_slow_control_mode");
+      "/test_dummy_controller/set_slow_control_mode");
   }
 
-  static void TearDownTestCase() { rclcpp::shutdown(); }
+  static void TearDownTestCase() {}
 
   void TearDown() { controller_.reset(nullptr); }
 
 protected:
-  void SetUpController(
-    bool set_parameters = true, std::string controller_name = "test_dummy_package_namespace")
+  void SetUpController(std::string controller_name = "test_dummy_controller")
   {
     ASSERT_EQ(controller_->init(controller_name), controller_interface::return_type::OK);
 
@@ -154,12 +153,6 @@ protected:
     // TODO(anyone): Add other state interfaces, if any
 
     controller_->assign_interfaces(std::move(command_ifs), std::move(state_ifs));
-
-    if (set_parameters) {
-      controller_->get_node()->set_parameter({"joints", joint_names_});
-      controller_->get_node()->set_parameter({"state_joints", state_joint_names_});
-      controller_->get_node()->set_parameter({"interface_name", interface_name_});
-    }
   }
 
   void subscribe_and_get_messages(ControllerStateMsg & msg)
@@ -168,7 +161,7 @@ protected:
     rclcpp::Node test_subscription_node("test_subscription_node");
     auto subs_callback = [&](const ControllerStateMsg::SharedPtr) {};
     auto subscription = test_subscription_node.create_subscription<ControllerStateMsg>(
-      "/test_dummy_package_namespace/state", 10, subs_callback);
+      "/test_dummy_controller/state", 10, subs_callback);
 
     // call update to publish the test value
     ASSERT_EQ(
@@ -248,7 +241,7 @@ protected:
   // Controller-related parameters
   std::vector<std::string> joint_names_ = {"joint1"};
   std::vector<std::string> state_joint_names_ = {"joint1state"};
-  std::string interface_name_ = "my_interface";
+  std::string interface_name_ = "acceleration";
   std::array<double, 1> joint_state_values_ = {1.1};
   std::array<double, 1> joint_command_values_ = {101.101};
 
@@ -261,24 +254,6 @@ protected:
   rclcpp::Publisher<ControllerCommandMsg>::SharedPtr command_publisher_;
   rclcpp::Node::SharedPtr service_caller_node_;
   rclcpp::Client<ControllerModeSrvType>::SharedPtr slow_control_service_client_;
-};
-
-// From the tutorial: https://www.sandordargo.com/blog/2019/04/24/parameterized-testing-with-gtest
-class DummyClassNameTestParameterizedParameters
-: public DummyClassNameFixture<TestableDummyClassName>,
-  public ::testing::WithParamInterface<std::tuple<std::string, rclcpp::ParameterValue>>
-{
-public:
-  virtual void SetUp() { DummyClassNameFixture::SetUp(); }
-
-  static void TearDownTestCase() { DummyClassNameFixture::TearDownTestCase(); }
-
-protected:
-  void SetUpController(bool set_parameters = true)
-  {
-    DummyClassNameFixture::SetUpController(set_parameters);
-    controller_->get_node()->set_parameter({std::get<0>(GetParam()), std::get<1>(GetParam())});
-  }
 };
 
 #endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_
