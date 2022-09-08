@@ -47,9 +47,6 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 // subclassing and friending so we can access member variables
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
-  FRIEND_TEST(DummyClassNameTest, joint_names_parameter_not_set);
-  FRIEND_TEST(DummyClassNameTest, state_joint_names_parameter_not_set);
-  FRIEND_TEST(DummyClassNameTest, interface_parameter_not_set);
   FRIEND_TEST(DummyClassNameTest, all_parameters_set_configure_success);
   FRIEND_TEST(DummyClassNameTest, activate_success);
   FRIEND_TEST(DummyClassNameTest, reactivate_success);
@@ -126,7 +123,7 @@ public:
   void TearDown() { controller_.reset(nullptr); }
 
 protected:
-  void SetUpController(std::string controller_name = "test_dummy_controller")
+  void SetUpController(const std::string controller_name = "test_dummy_controller")
   {
     ASSERT_EQ(controller_->init(controller_name), controller_interface::return_type::OK);
 

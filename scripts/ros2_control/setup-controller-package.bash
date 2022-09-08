@@ -123,7 +123,7 @@ CTRL_VALIDATE_PARAMS_HPP="include/$PKG_NAME/validate_${FILE_NAME}_parameters.hpp
 PLUGIN_XML="$PKG_NAME.xml"
 LOAD_TEST_CPP="test/test_load_$FILE_NAME.cpp"
 TEST_CPP="test/test_$FILE_NAME.cpp"
-TEST_PRECEEDING_CPP="test/test_$FILE_NAME_preceeding.cpp"
+TEST_PRECEEDING_CPP="test/test_${FILE_NAME}_preceeding.cpp"
 TEST_HPP="test/test_$FILE_NAME.hpp"
 TEST_PARAMS_YAML="test/${FILE_NAME}_params.yaml"
 TEST_PRECEEDING_PARAMS_YAML="test/${FILE_NAME}_preceeding_params.yaml"
@@ -139,6 +139,7 @@ if [[ "$CONTROLLER_TYPE" == "chainable" ]]; then
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller.yaml $CTRL_PARAMS_YAML
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_package_namespace/validate_dummy_controller_parameters.hpp $CTRL_VALIDATE_PARAMS_HPP
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_chainable_controller.cpp $TEST_CPP
+  cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_chainable_controller_preceeding.cpp $TEST_PRECEEDING_CPP
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/test_dummy_chainable_controller.hpp $TEST_HPP
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_params.yaml $TEST_PARAMS_YAML
   cp -n $ROS2_CONTROL_CONTROLLER_TEMPLATES/dummy_controller_preceeding_params.yaml $TEST_PRECEEDING_PARAMS_YAML
@@ -409,8 +410,6 @@ echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files were adjusted.${TERMINAL_CO
 
 git add .
 # git commit -m "RosTeamWS: ros2_control skeleton files for $ROBOT_NAME generated."
-
-# ament_uncrustify --reformat
 
 # Compile and add new package the to the path
 compile_and_source_package $PKG_NAME "yes"

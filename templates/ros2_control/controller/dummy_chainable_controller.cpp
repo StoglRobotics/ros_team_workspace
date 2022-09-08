@@ -61,7 +61,6 @@ controller_interface::CallbackReturn DummyClassName::on_init()
 
   try {
     param_listener_ = std::make_shared<dummy_controller::ParamListener>(get_node());
-    params_ = param_listener_->get_params();
   } catch (const std::exception & e) {
     fprintf(stderr, "Exception thrown during controller's init with message: %s \n", e.what());
     return controller_interface::CallbackReturn::ERROR;
@@ -75,8 +74,10 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 {
   params_ = param_listener_->get_params();
 
-  if (params_.state_joints.empty()) {
-    params_.state_joints = params_.joints;
+  if (!params_.state_joints.empty()) {
+    state_joints_ = params_.state_joints;
+  } else {
+    state_joints_ = params_.joints;
   }
 
   // Command Subscriber and callbacks
@@ -152,8 +153,8 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
   controller_interface::InterfaceConfiguration state_interfaces_config;
   state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
 
-  state_interfaces_config.names.reserve(params_.state_joints.size());
-  for (const auto & joint : params_.state_joints) {
+  state_interfaces_config.names.reserve(state_joints_.size());
+  for (const auto & joint : state_joints_) {
     state_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
   }
 
@@ -162,15 +163,14 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
 
 std::vector<hardware_interface::CommandInterface> DummyClassName::on_export_reference_interfaces()
 {
-  reference_interfaces_.resize(
-    params_.state_joints.size(), std::numeric_limits<double>::quiet_NaN());
+  reference_interfaces_.resize(state_joints_.size(), std::numeric_limits<double>::quiet_NaN());
 
   std::vector<hardware_interface::CommandInterface> reference_interfaces;
   reference_interfaces.reserve(reference_interfaces_.size());
 
   for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
     reference_interfaces.push_back(hardware_interface::CommandInterface(
-      get_node()->get_name(), params_.state_joints[i] + "/" + params_.interface_name,
+      get_node()->get_name(), state_joints_[i] + "/" + params_.interface_name,
       &reference_interfaces_[i]));
   }
 
@@ -187,7 +187,7 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // Set default value in command
-  reset_controller_command_msg(*(input_cmd_.readFromRT()), params_.state_joints);
+  reset_controller_command_msg(*(input_cmd_.readFromRT()), state_joints_);
 
   return controller_interface::CallbackReturn::SUCCESS;
 }
