@@ -56,10 +56,10 @@ echo "Installing software for $computer_type computers. Press <ENTER> to continu
 read
 
 ROS_VERSION=melodic
-ROS2_VERSION=rolling
+ROS2_VERSIONS=( "galactc" "rolling" )
 
 # Core tools
-sudo apt update && sudo apt -y install curl gnupg2 lsb-release
+sudo apt update && sudo apt -y install ca-certificates curl gnupg2 lsb-release
 
 #KDE Backports
 sudo apt-add-repository -y ppa:kubuntu-ppa/backports
@@ -73,6 +73,26 @@ sudo apt -y install nala
 
 ### Useful tools
 sudo apt -y install vim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger
+
+# Development tools
+# gh - Github CLI
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+&& sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+&& sudo apt update \
+&& sudo apt install gh -y
+
+# Docker
+sudo apt-get update
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo groupadd docker
+sudo usermod -aG docker "$(whoami)"
 
 # Dolphin Plugins
 sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
@@ -89,7 +109,10 @@ sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
 bash $SCRIPT_PATH/install_software_ros.bash $ROS_VERSION
 
 # ROS2 Packages
-bash $SCRIPT_PATH/install_software_ros2.bash $ROS2_VERSION
+for ROS2_VERSION in "${ROS2_VERSIONS[@]}"
+do
+  bash $SCRIPT_PATH/install_software_ros2.bash $ROS2_VERSION
+done
 
 sudo rosdep init
 rosdep update
@@ -98,13 +121,13 @@ if [[ $computer_type != "robot" ]]
 then
   sudo apt -y install recordmydesktop rdesktop gimp meshlab inkscape pdfposter unrar
   sudo DEBIAN_FRONTEND=noninteractive apt -y install wireshark
-
-  # Latex
-  sudo apt -y install kile texlive-full texlive-lang-german kbibtex ktikz
 fi
 
 if [[ $computer_type == "office" ]]
 then
+
+  # Latex
+  sudo apt -y install kile texlive-full texlive-lang-german kbibtex ktikz
 
   sudo apt -y install pass
 
@@ -173,22 +196,6 @@ then
   sudo apt -y install language-pack-hr language-pack-hr-base language-pack-kde-hr aspell-hr hunspell-hr hyphen-hr
 
   ## Development Tools
-
-  # GitHub CLI
-  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-  sudo apt update
-  sudo apt -y install gh
-
-  # Docker
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-  echo \
-  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  sudo apt update
-  sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose
-  sudo groupadd docker
-  sudo usermod -aG docker "$(whoami)"
 
   # Tracing
   sudo apt-add-repository ppa:lttng/stable-2.12
