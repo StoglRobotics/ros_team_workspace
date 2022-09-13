@@ -79,7 +79,7 @@ curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo 
 && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
 && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
 && sudo apt update \
-&& sudo apt install gh -y
+&& sudo apt -y install gh
 
 # Docker
 sudo apt-get update
@@ -89,7 +89,7 @@ echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo groupadd docker
 sudo usermod -aG docker "$(whoami)"
 
@@ -109,6 +109,9 @@ for ROS2_VERSION in "${ROS2_VERSIONS[@]}"
 do
   bash $SCRIPT_PATH/install_software_ros2.bash $ROS2_VERSION
 done
+
+# Development
+sudo snap install --classic code
 
 sudo rosdep init
 rosdep update

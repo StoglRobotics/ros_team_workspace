@@ -38,9 +38,9 @@ sudo apt -y install python3-vcstool
 
 sudo apt -y install ros-${ROS_DISTRO}-desktop
 
-sudo apt install -y python3-colcon-common-extensions #Install colcon for workspace creation
+sudo apt -y install python3-colcon-common-extensions #Install colcon for workspace creation
 
-sudo apt install ccache
+sudo apt -y install ccache
 
 sudo apt install python3-colcon-mixin
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml

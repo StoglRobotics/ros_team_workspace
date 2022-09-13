@@ -43,7 +43,7 @@ sudo apt -y install ros-${ROS_DISTRO}-desktop-full ros-${ROS_DISTRO}-desktop ros
 
 # ROS: Useful tools
 sudo apt -y install python3-catkin-*
-sudo apt install python3-catkin-lint python3-pip
+sudo apt -y install python3-catkin-lint python3-pip
 sudo pip3 install osrf-pycommon
 sudo apt -y install python3-wstool
 sudo apt -y install python3-vcstool
