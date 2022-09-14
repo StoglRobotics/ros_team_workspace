@@ -1,0 +1,399 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Nvidia support for docker &mdash; ROS Team Workspace Documentation: Galactic Sep 2022 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/tabs.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon-bg.png"/>
+  
+
+  
+  
+
+  
+    <link rel="canonical" href="https://stoglrobotics.github.io/ros_team_workspace/galactic//galactic/docker/nvidia_docker/setup_nvidia_support.html" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Supported ros versions and operating systems" href="../supported_versions/supported_versions.html" />
+    <link rel="prev" title="Use Cases with docker support" href="../docker_use_cases/docker_use_cases.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html">
+          
+
+          
+            
+            <img src="../../_static/galactic-small.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guidelines/index.html">Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../use-cases/index.html">Use Cases</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Docker</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../general_information_docker/general_information_docker.html">General information on docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docker_use_cases/docker_use_cases.html">Use Cases with docker support</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Nvidia support for docker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nvidia-drivers">Nvidia drivers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#docker">Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../supported_versions/supported_versions.html">Supported ros versions and operating systems</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ROS Team Workspace Documentation: Galactic</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Docker</a> &raquo;</li>
+        
+      <li>Nvidia support for docker</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            
+              <a href="https://github.com/StoglRobotics/ros_team_workspace/blob/master//docs/docker/nvidia_docker/setup_nvidia_support.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="nvidia-support-for-docker">
+<h1>Nvidia support for docker<a class="headerlink" href="#nvidia-support-for-docker" title="Permalink to this headline"></a></h1>
+<p id="docker-nvidia-support-how-to">If you want to expose your nvidia driver into the docker container this is possible by using the <a class="reference external" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/overview.html">NVIDIA Container Toolkit</a>.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
+<p>Before we can install the NVIDIA Container Toolkit we have to install the nvidia drivers for our platform and install docker.</p>
+<section id="nvidia-drivers">
+<h3>Nvidia drivers<a class="headerlink" href="#nvidia-drivers" title="Permalink to this headline"></a></h3>
+<p>Make sure you have the NVIDIA drivers for your Linux distribution installed. This can either be done by using your package manager or you can download the <code class="docutils literal notranslate"><span class="pre">.run</span></code> installers from <a class="reference external" href="https://www.nvidia.com/Download/index.aspx?lang=en-us">NVIDIA Driver Downloads</a>.
+This depends on the operating system and package manager you are using so you have to look it up.
+You can then check your drivers by typing</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nvidia-smi <span class="c1"># NVIDIA System Management Interface program</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Which should print something like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+-----------------------------------------------------------------------------+
+| NVIDIA-SMI 515.48.07    Driver Version: 515.48.07    CUDA Version: 11.7     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  Off  | 00000000:01:00.0  On |                  N/A |
+| N/A   37C    P8    18W /  N/A |    550MiB /  8192MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|    0   N/A  N/A      1435      G   ...xorg-server-1.20.14/bin/X      288MiB |
+|    0   N/A  N/A      2516      G   ....0.2/bin/.firefox-wrapped      144MiB |
++-----------------------------------------------------------------------------+
+</pre></div>
+</div>
+</section>
+<section id="docker">
+<h3>Docker<a class="headerlink" href="#docker" title="Permalink to this headline"></a></h3>
+<p id="docker-nvidia-support-prerequisites-docker">Make sure docker is installed and it’s working correctly. For instructions on how to install docker have a look <a class="reference internal" href="../general_information_docker/general_information_docker.html#general-info-on-docker-installation"><span class="std std-ref">in general info on docker installation</span></a>.</p>
+</section>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<ol class="arabic">
+<li><p>You then have to install the NVIDIA Container Toolkit for docker as described <a class="reference external" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker">in official documentation</a>.
+For Ubuntu this can be done as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">distribution</span><span class="o">=</span><span class="k">$(</span>. /etc/os-release<span class="p">;</span><span class="nb">echo</span> <span class="nv">$ID$VERSION_ID</span><span class="k">)</span> <span class="se">\</span>
+   <span class="o">&amp;&amp;</span> curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey <span class="p">|</span> sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg <span class="se">\</span>
+   <span class="o">&amp;&amp;</span> curl -s -L https://nvidia.github.io/libnvidia-container/<span class="nv">$distribution</span>/libnvidia-container.list <span class="p">|</span> <span class="se">\</span>
+      sed <span class="s1">&#39;s#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g&#39;</span> <span class="p">|</span> <span class="se">\</span>
+      sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+</pre></div>
+</div>
+<p>You then have to update your package list to include the new added nvidia-docker2.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt-get update
+</pre></div>
+</div>
+<p>And install the the NVIDIA Container Toolkit:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt-get install -y nvidia-docker2
+</pre></div>
+</div>
+<p>After the installation finished, you need to restart the Docker daemon:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo service docker restart
+</pre></div>
+</div>
+<p>At this point you can verify that everything works as intended by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker run --rm --gpus all nvidia/cuda:11.7.1-base-ubuntu22.04 nvidia-smi
+</pre></div>
+</div>
+</li>
+</ol>
+<blockquote>
+<div><p><strong>NOTE</strong>: if you get an error executing above docker command make sure that you have <code class="docutils literal notranslate"><span class="pre">Nvidia</span> <span class="pre">Driver</span> <span class="pre">version</span> <span class="pre">515</span></code> or above installed!</p>
+<p>Which should print something like:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+-----------------------------------------------------------------------------+
+| NVIDIA-SMI 515.48.07    Driver Version: 515.48.07    CUDA Version: 11.7     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  Off  | 00000000:01:00.0  On |                  N/A |
+| N/A   37C    P8    18W /  N/A |    478MiB /  8192MiB |      3%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
++-----------------------------------------------------------------------------+
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic" start="2">
+<li><p>Replace the the <code class="docutils literal notranslate"><span class="pre">FROM</span> <span class="pre">ubuntu:&lt;version&gt;</span></code> directive in your Dockerfile with the nvidia container of your needs. The following table gives you a quick overview:</p>
+<table class="colwidths-auto docutils align-default" id="id1">
+<caption><span class="caption-text">Examples for nvidia containers</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>Ubuntu version directive</p></th>
+<th class="head"><p>Nvidia docker replacement</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>Ubuntu:20.04</p></th>
+<td><p>nvidia/cuda:11.7.1-base-ubuntu20.04</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>Ubuntu:22.04</p></th>
+<td><p>nvidia/cuda:11.7.1-base-ubuntu22.04</p></td>
+</tr>
+</tbody>
+</table>
+<p>A list of all available containers can be found <a class="reference external" href="https://hub.docker.com/r/nvidia/cuda">in the official documentation</a>.</p>
+</li>
+<li><p>Remove the existing docker container and image.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker container rm &lt;container-name&gt;
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker image rm &lt;image-name&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Recreate your container.
+Go inside the <code class="docutils literal notranslate"><span class="pre">.rtw_docker_defines</span></code> directory in your workspace folder and the execute:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.<span class="se">\b</span>uild_docker_image
+</pre></div>
+</div>
+<p>to rebuild your container. After the rebuilt has finished you can recreate it with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.<span class="se">\c</span>reate_docker_container
+</pre></div>
+</div>
+</li>
+</ol>
+<p>You now should have a docker container which exposes your nvidia drivers and can switch to your workspace with <code class="docutils literal notranslate"><span class="pre">rtw_switch_to_docker</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../supported_versions/supported_versions.html" class="btn btn-neutral float-right" title="Supported ros versions and operating systems" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../docker_use_cases/docker_use_cases.html" class="btn btn-neutral float-left" title="Use Cases with docker support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Stogl Robotics Consulting UG (haftungsbeschränkt).
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Other Versions</span>
+    v: master
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>ROS Team Workspace - Galactic and Rolling</dt>
+      <dd><a href="setup_nvidia_support.html">Master (latest)</a></dd>
+    </dl>
+    <dl>
+      <dt>ROS Team Workspace - Foxy</dt>
+        <dd><a href="../../../foxy/index.html">Foxy</a></dd>
+   </dl>
+  </div>
+</div>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

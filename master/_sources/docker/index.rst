@@ -11,6 +11,7 @@ RosTeamWS supports the usage of docker containers.
 
    general_information_docker/*
    docker_use_cases/*
+   nvidia_docker/*
    supported_versions/*
 
 .. note::
