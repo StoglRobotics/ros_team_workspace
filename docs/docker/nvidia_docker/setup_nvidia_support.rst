@@ -79,13 +79,14 @@ Installation
 
   .. code-block:: bash
 
-   sudo systemctl restart docker
+   sudo service docker restart
 
   At this point you can verify that everything works as intended by running:
 
   .. code-block:: bash
 
-   sudo docker run --rm --gpus all nvidia/cuda:11.0.3-base-ubuntu20.04 nvidia-smi
+   docker run --rm --gpus all nvidia/cuda:11.7.1-base-ubuntu22.04 nvidia-smi
+**NOTE**: if you get an error executing above docker command make sure that you have ``Nvidia Driver version 515`` or above installed!
 
   Which should print something like:
   
