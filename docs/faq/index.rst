@@ -12,7 +12,7 @@ If you want to forward a xsession from docker (e.g. rviz2), you have to install 
 
 How to use nvidia driver in docker
 """"""""""""""""""""""""""""""""""""
-We explain `here <docker-nvidia-support-how-to>`_ how to expose your nvidia drivers into the docker container.
+We explain :ref:`here <docker-nvidia-support-how-to>` how to expose your nvidia drivers into the docker container.
 
 
 sudo: unable to resolve host <hostname>: Name or service not known
