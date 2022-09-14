@@ -69,6 +69,7 @@ echo "deb http://deb.volian.org/volian/ scar main" | sudo tee /etc/apt/sources.l
 wget -qO - https://deb.volian.org/volian/scar.key | sudo tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg > /dev/null
 sudo apt update
 sudo apt -y install nala
+nala --install-completion bash
 
 # Dolphin Plugins
 sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
@@ -86,11 +87,8 @@ sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
 
 ## Development tools
 # gh - Github CLI
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-&& sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-&& sudo apt update \
-&& sudo apt -y install gh
+sudo snap install gh
+gh completion -s bash | tee "$HOME"/.local/share/bash-completion/completions/gh.bash > /dev/null
 
 # visual studio code
 sudo snap install --classic code
