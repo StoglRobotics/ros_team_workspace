@@ -61,7 +61,7 @@ ROS2_VERSIONS=( "galactc" "rolling" )
 # Core tools
 sudo apt update && sudo apt -y install ca-certificates curl gnupg2 lsb-release
 
-#KDE Backports
+# KDE Backports
 sudo apt-add-repository -y ppa:kubuntu-ppa/backports
 sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 
@@ -71,16 +71,30 @@ wget -qO - https://deb.volian.org/volian/scar.key | sudo tee /etc/apt/trusted.gp
 sudo apt update
 sudo apt -y install nala
 
-### Useful tools
+# Dolphin Plugins
+sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
+
+## Useful tools
 sudo apt -y install vim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger
 
-# Development tools
+# Python tools
+sudo apt -y install python3-pip
+sudo pip3 install --upgrade pip
+sudo pip3 install pre-commit virtualenv virtualenvwrapper notebook
+
+# Useful libraries
+sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
+
+## Development tools
 # gh - Github CLI
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
 && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
 && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
 && sudo apt update \
 && sudo apt -y  install gh
+
+# visual studio code
+sudo snap install --classic code
 
 # Docker
 sudo apt-get update
@@ -94,17 +108,6 @@ sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo groupadd docker
 sudo usermod -aG docker "$(whoami)"
 
-# Dolphin Plugins
-sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
-
-# Python tools
-sudo apt -y install python3-pip
-sudo pip3 install --upgrade pip
-sudo pip3 install pre-commit virtualenv virtualenvwrapper notebook
-
-# Useful libraries
-sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
-
 # ROS Packages
 bash $SCRIPT_PATH/install_software_ros.bash $ROS_VERSION
 
@@ -113,9 +116,6 @@ for ROS2_VERSION in "${ROS2_VERSIONS[@]}"
 do
   bash $SCRIPT_PATH/install_software_ros2.bash $ROS2_VERSION
 done
-
-# Development
-sudo snap install --classic code
 
 sudo rosdep init
 rosdep update
