@@ -348,6 +348,7 @@ function set_framework_default_paths {
   ROS2_CONTROL_CONTROLLER_TEMPLATES="$ROS2_CONTROL_TEMPLATES/controller"
   LICENSE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/licenses"
   DOCKER_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/docker"
+  OS_CONFIGURE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/os_configure"
 }
 
 function is_valid_ros_distribution {

@@ -1,0 +1,5 @@
+
+# add usful self_defined commands to this file
+if [ -f ~/.bash_commands ]; then
+    . ~/.bash_commands
+fi

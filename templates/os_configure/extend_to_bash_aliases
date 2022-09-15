@@ -1,0 +1,13 @@
+
+## open bash specific files
+alias 'open_bash'='vim ~/.bashrc'
+alias 'open_commands'='vim ~/.bash_commands'
+alias 'open_aliases'='vim ~/.bash_aliases'
+
+## sourcing
+alias 'source_bash'='source ~/.bashrc'
+#ros
+alias 'source_foxy'='source /opt/ros/foxy/setup.bash'
+alias 'source_galactic'='source /opt/ros/galactic/setup.bash'
+alias 'source_humble'='source /opt/ros/humble/setup.bash'
+alias 'source_rolling'='source /opt/ros/rolling/setup.bash'

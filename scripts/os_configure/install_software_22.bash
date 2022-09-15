@@ -75,10 +75,28 @@ nala --install-completion bash
 sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
 
 ## Useful tools
-sudo apt -y install vim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger
+sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger tree
 
 # Python tools
-sudo apt -y install python3-pip
+# Python tools
+sudo apt -y install python3-pip \
+  python3-colcon-common-extensions \
+  python3-flake8 \
+  python3-flake8-blind-except \
+  python3-flake8-builtins \
+  python3-flake8-class-newline \
+  python3-flake8-comprehensions \
+  python3-flake8-deprecated \
+  python3-flake8-docstrings \
+  python3-flake8-import-order \
+  python3-flake8-quotes \
+  python3-pytest \
+  python3-pytest-cov \
+  python3-pytest-repeat \
+  python3-pytest-rerunfailures \
+  python3-rosdep \
+  python3-setuptools \
+  python3-vcstool
 sudo pip3 install --upgrade pip
 sudo pip3 install  pre-commit virtualenv virtualenvwrapper notebook
 
@@ -113,6 +131,21 @@ done
 
 sudo rosdep init
 rosdep update
+
+# setup bash
+cat "$OS_CONFIGURE_TEMPLATES/extend_to_bashrc" >> "$HOME/.bashrc"
+cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_aliases" >> "$HOME/.bash_aliases"
+cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_commands" >> "$HOME/.bash_commands"
+
+# setup git
+commit_template_path="$HOME/.config/git"
+template_name="commit-template.txt"
+mkdir -p "$commit_template_path"
+cp "$OS_CONFIGURE_TEMPLATES/$template_name" "$commit_template_path/."
+git config --global core.editor "vim"
+git config --global commit.template "$commit_template_path/$template_name"
+
+########################## END BASIC SETUP ##########################
 
 if [[ "$computer_type" != "robot" ]]
 then
