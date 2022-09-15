@@ -29,9 +29,9 @@ computer_type=$1
 if ! [[ " ${supported_computer_types[*]} " =~ " ${computer_type} " ]]; then
   notify_user "The computer type ${computer_type} you have given is not supported."
   echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} Chose one of the following:"
-  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} basic    -TODO(Add description)normal standard pc. Basic utilities like: TODO are installed"
-  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} office   -TODO(Add description)pc used for "
-  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} robot    -TODO(Add description)"
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} basic    -Standard pc. Basic utilities like development utilities (git, vscode, ...) and some additional tools."
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} office   -Used for office pcs. Basic utilities, additional tools and office related stuff."
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} robot    -Used for robot platforms. Basic utilities like development utilities (git, vscode, ...)."
   select computer_type in basic office robot;
   do
     case "$computer_type" in
