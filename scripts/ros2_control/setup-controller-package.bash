@@ -164,7 +164,7 @@ echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files copied.${TERMINAL_COLOR_NC}
 # TODO(anyone): fuse this with hardware interface package creating.
 
 # Add license header to the files
-FILES_TO_LICENSE=("$CTRL_HPP" "$CTRL_CPP" "$LOAD_TEST_CPP" "$TEST_CPP" "$TEST_PRECEEDING_CPP" "$TEST_HPP")
+FILES_TO_LICENSE=("$CTRL_HPP" "$CTRL_CPP" "$CTRL_VALIDATE_PARAMS_HPP" "$LOAD_TEST_CPP" "$TEST_CPP" "$TEST_PRECEEDING_CPP" "$TEST_HPP")
 if [[ "$package_configured" == "no" ]]; then
   FILES_TO_LICENSE+=("$VC_H")
 fi

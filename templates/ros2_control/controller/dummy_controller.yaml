@@ -4,10 +4,10 @@ dummy_controller:
     default_value: [],
     description: "Specifies joints used by the controller. If state joints parameter is defined, then only command joints are defined with this parameter.",
     read_only: true,
-    #validation: {
-      #unique<>: null,
-      #not_empty<>: null,
-    #}
+    validation: {
+      unique<>: null,
+      not_empty<>: null,
+    }
   }
   state_joints: {
     type: string_array,

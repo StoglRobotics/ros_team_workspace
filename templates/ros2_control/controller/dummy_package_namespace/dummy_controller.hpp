@@ -40,7 +40,7 @@ static constexpr size_t STATE_MY_ITFS = 0;
 // name constants for command interfaces
 static constexpr size_t CMD_MY_ITFS = 0;
 
-// TODO(anyone: xample setup for control mode (usually you will use some enums defined in messages)
+// TODO(anyone: example setup for control mode (usually you will use some enums defined in messages)
 enum class control_mode_type : std::uint8_t {
   FAST = 0,
   SLOW = 1,
@@ -78,7 +78,7 @@ public:
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
   // TODO(anyone): replace the state and command message types
-  using ControllerCommandMsg = control_msgs::msg::JointJog;
+  using ControllerReferenceMsg = control_msgs::msg::JointJog;
   using ControllerModeSrvType = std_srvs::srv::SetBool;
   using ControllerStateMsg = control_msgs::msg::JointControllerState;
 
@@ -89,8 +89,8 @@ protected:
   std::vector<std::string> state_joints_;
 
   // Command subscribers and Controller State publisher
-  rclcpp::Subscription<ControllerCommandMsg>::SharedPtr cmd_subscriber_ = nullptr;
-  realtime_tools::RealtimeBuffer<std::shared_ptr<ControllerCommandMsg>> input_cmd_;
+  rclcpp::Subscription<ControllerReferenceMsg>::SharedPtr ref_subscriber_ = nullptr;
+  realtime_tools::RealtimeBuffer<std::shared_ptr<ControllerReferenceMsg>> input_ref_;
 
   rclcpp::Service<ControllerModeSrvType>::SharedPtr set_slow_control_mode_service_;
   realtime_tools::RealtimeBuffer<control_mode_type> control_mode_;
@@ -99,6 +99,11 @@ protected:
 
   rclcpp::Publisher<ControllerStateMsg>::SharedPtr s_publisher_;
   std::unique_ptr<ControllerStatePublisher> state_publisher_;
+
+private:
+  // callback for topic interface
+  TEMPLATES__ROS2_CONTROL__VISIBILITY_LOCAL
+  void reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg);
 };
 
 }  // namespace dummy_package_namespace

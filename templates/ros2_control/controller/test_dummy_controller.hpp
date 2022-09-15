@@ -35,7 +35,7 @@
 
 // TODO(anyone): replace the state and command message types
 using ControllerStateMsg = dummy_package_namespace::DummyClassName::ControllerStateMsg;
-using ControllerCommandMsg = dummy_package_namespace::DummyClassName::ControllerCommandMsg;
+using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::ControllerReferenceMsg;
 using ControllerModeSrvType = dummy_package_namespace::DummyClassName::ControllerModeSrvType;
 
 namespace
@@ -61,17 +61,17 @@ public:
     auto ret = dummy_package_namespace::DummyClassName::on_configure(previous_state);
     // Only if on_configure is successful create subscription
     if (ret == CallbackReturn::SUCCESS) {
-      cmd_subscriber_wait_set_.add_subscription(cmd_subscriber_);
+      ref_subscriber_wait_set_.add_subscription(ref_subscriber_);
     }
     return ret;
   }
 
   /**
-   * @brief wait_for_command blocks until a new ControllerCommandMsg is received.
+   * @brief wait_for_command blocks until a new ControllerReferenceMsg is received.
    * Requires that the executor is not spinned elsewhere between the
    *  message publication and the call to this function.
    *
-   * @return true if new ControllerCommandMsg msg was received, false if timeout.
+   * @return true if new ControllerReferenceMsg msg was received, false if timeout.
    */
   bool wait_for_command(
     rclcpp::Executor & executor, rclcpp::WaitSet & subscriber_wait_set,
@@ -88,13 +88,13 @@ public:
     rclcpp::Executor & executor,
     const std::chrono::milliseconds & timeout = std::chrono::milliseconds{500})
   {
-    return wait_for_command(executor, cmd_subscriber_wait_set_, timeout);
+    return wait_for_command(executor, ref_subscriber_wait_set_, timeout);
   }
 
   // TODO(anyone): add implementation of any methods of your controller is needed
 
 private:
-  rclcpp::WaitSet cmd_subscriber_wait_set_;
+  rclcpp::WaitSet ref_subscriber_wait_set_;
 };
 
 // We are using template class here for easier reuse of Fixture in specializations of controllers
@@ -110,7 +110,7 @@ public:
     controller_ = std::make_unique<CtrlType>();
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
-    command_publisher_ = command_publisher_node_->create_publisher<ControllerCommandMsg>(
+    command_publisher_ = command_publisher_node_->create_publisher<ControllerReferenceMsg>(
       "/test_dummy_controller/commands", rclcpp::SystemDefaultsQoS());
 
     service_caller_node_ = std::make_shared<rclcpp::Node>("service_caller");
@@ -205,7 +205,7 @@ protected:
 
     wait_for_topic(command_publisher_->get_topic_name());
 
-    ControllerCommandMsg msg;
+    ControllerReferenceMsg msg;
     msg.joint_names = joint_names_;
     msg.displacements = displacements;
     msg.velocities = velocities;
@@ -248,7 +248,7 @@ protected:
   // Test related parameters
   std::unique_ptr<TestableDummyClassName> controller_;
   rclcpp::Node::SharedPtr command_publisher_node_;
-  rclcpp::Publisher<ControllerCommandMsg>::SharedPtr command_publisher_;
+  rclcpp::Publisher<ControllerReferenceMsg>::SharedPtr command_publisher_;
   rclcpp::Node::SharedPtr service_caller_node_;
   rclcpp::Client<ControllerModeSrvType>::SharedPtr slow_control_service_client_;
 };

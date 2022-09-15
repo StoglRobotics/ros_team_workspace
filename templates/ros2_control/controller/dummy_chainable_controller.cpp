@@ -37,11 +37,11 @@ static constexpr rmw_qos_profile_t rmw_qos_profile_services_hist_keep_all = {
   RMW_QOS_LIVELINESS_LEASE_DURATION_DEFAULT,
   false};
 
-using ControllerCommandMsg = dummy_package_namespace::DummyClassName::ControllerCommandMsg;
+using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::ControllerReferenceMsg;
 
 // called from RT control loop
-void reset_controller_command_msg(
-  const std::shared_ptr<ControllerCommandMsg> & msg, const std::vector<std::string> & joint_names)
+void reset_controller_reference_msg(
+  const std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names)
 {
   msg->joint_names = joint_names;
   msg->displacements.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
@@ -80,23 +80,27 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
     state_joints_ = params_.joints;
   }
 
-  // Command Subscriber and callbacks
-  auto callback_cmd = [&](const std::shared_ptr<ControllerCommandMsg> msg) -> void {
-    if (msg->joint_names.size() == params_.joints.size()) {
-      input_cmd_.writeFromNonRT(msg);
-    } else {
-      RCLCPP_ERROR(
-        get_node()->get_logger(),
-        "Received %zu , but expected %zu joints in command. Ignoring message.",
-        msg->joint_names.size(), params_.joints.size());
-    }
-  };
-  cmd_subscriber_ = get_node()->create_subscription<ControllerCommandMsg>(
-    "~/commands", rclcpp::SystemDefaultsQoS(), callback_cmd);
+  if (params_.joints.size() != state_joints_.size()) {
+    RCLCPP_FATAL(
+      get_node()->get_logger(),
+      "Size of 'joints' (%d) and 'state_joints' (%d) parameters has to be the same!",
+      params_.joints.size(), state_joints_.size());
+    return CallbackReturn::FAILURE;
+  }
 
-  std::shared_ptr<ControllerCommandMsg> msg = std::make_shared<ControllerCommandMsg>();
-  reset_controller_command_msg(msg, params_.joints);
-  input_cmd_.writeFromNonRT(msg);
+  // topics QoS
+  auto subscribers_qos = rclcpp::SystemDefaultsQoS();
+  subscribers_qos.keep_last(1);
+  subscribers_qos.best_effort();
+
+  // Reference Subscriber
+  ref_subscriber_ = get_node()->create_subscription<ControllerReferenceMsg>(
+    "~/reference", subscribers_qos,
+    std::bind(&DummyClassName::reference_callback, this, std::placeholders::_1));
+
+  std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
+  reset_controller_reference_msg(msg, params_.joints);
+  input_ref_.writeFromNonRT(msg);
 
   auto set_slow_mode_service_callback =
     [&](
@@ -161,6 +165,18 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
   return state_interfaces_config;
 }
 
+void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
+{
+  if (msg->joint_names.size() == params_.joints.size()) {
+    input_ref_.writeFromNonRT(msg);
+  } else {
+    RCLCPP_ERROR(
+      get_node()->get_logger(),
+      "Received %zu , but expected %zu joints in command. Ignoring message.",
+      msg->joint_names.size(), params_.joints.size());
+  }
+}
+
 std::vector<hardware_interface::CommandInterface> DummyClassName::on_export_reference_interfaces()
 {
   reference_interfaces_.resize(state_joints_.size(), std::numeric_limits<double>::quiet_NaN());
@@ -187,7 +203,7 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // Set default value in command
-  reset_controller_command_msg(*(input_cmd_.readFromRT()), state_joints_);
+  reset_controller_reference_msg(*(input_ref_.readFromRT()), state_joints_);
 
   return controller_interface::CallbackReturn::SUCCESS;
 }
@@ -205,15 +221,15 @@ controller_interface::CallbackReturn DummyClassName::on_deactivate(
 
 controller_interface::return_type DummyClassName::update_reference_from_subscribers()
 {
-  auto current_cmd = input_cmd_.readFromRT();
+  auto current_ref = input_ref_.readFromRT();
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
-    if (!std::isnan((*current_cmd)->displacements[i])) {
-      reference_interfaces_[i] = (*current_cmd)->displacements[i];
+    if (!std::isnan((*current_ref)->displacements[i])) {
+      reference_interfaces_[i] = (*current_ref)->displacements[i];
 
-      (*current_cmd)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+      (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
     }
   }
   return controller_interface::return_type::OK;

@@ -71,7 +71,7 @@ TEST_F(DummyClassNameTest, activate_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   // check that the message is reset
-  auto msg = controller_->input_cmd_.readFromNonRT();
+  auto msg = controller_->input_ref_.readFromNonRT();
   EXPECT_EQ((*msg)->displacements.size(), joint_names_.size());
   for (const auto & cmd : (*msg)->displacements) {
     EXPECT_TRUE(std::isnan(cmd));
@@ -160,12 +160,12 @@ TEST_F(DummyClassNameTest, test_update_logic_fast)
 
   // set command statically
   static constexpr double TEST_DISPLACEMENT = 23.24;
-  std::shared_ptr<ControllerCommandMsg> msg = std::make_shared<ControllerCommandMsg>();
+  std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   msg->joint_names = joint_names_;
   msg->displacements.resize(joint_names_.size(), TEST_DISPLACEMENT);
   msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
   msg->duration = std::numeric_limits<double>::quiet_NaN();
-  controller_->input_cmd_.writeFromNonRT(msg);
+  controller_->input_ref_.writeFromNonRT(msg);
 
   ASSERT_EQ(
     controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
@@ -173,7 +173,7 @@ TEST_F(DummyClassNameTest, test_update_logic_fast)
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT);
-  EXPECT_TRUE(std::isnan((*(controller_->input_cmd_.readFromRT()))->displacements[0]));
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
 }
 
@@ -189,23 +189,23 @@ TEST_F(DummyClassNameTest, test_update_logic_slow)
 
   // set command statically
   static constexpr double TEST_DISPLACEMENT = 23.24;
-  std::shared_ptr<ControllerCommandMsg> msg = std::make_shared<ControllerCommandMsg>();
+  std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   // When slow mode is enabled command ends up being half of the value
   msg->joint_names = joint_names_;
   msg->displacements.resize(joint_names_.size(), TEST_DISPLACEMENT);
   msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
   msg->duration = std::numeric_limits<double>::quiet_NaN();
-  controller_->input_cmd_.writeFromNonRT(msg);
+  controller_->input_ref_.writeFromNonRT(msg);
   controller_->control_mode_.writeFromNonRT(control_mode_type::SLOW);
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::SLOW);
-  ASSERT_EQ((*(controller_->input_cmd_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
+  ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
     controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT / 2);
-  EXPECT_TRUE(std::isnan((*(controller_->input_cmd_.readFromRT()))->displacements[0]));
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
 }
 
 TEST_F(DummyClassNameTest, publish_status_success)
