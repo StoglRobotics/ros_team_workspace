@@ -3,6 +3,7 @@
 alias 'open_bash'='vim ~/.bashrc'
 alias 'open_commands'='vim ~/.bash_commands'
 alias 'open_aliases'='vim ~/.bash_aliases'
+alias 'open_rtw_file'='vim ~/.ros_team_ws_rc'
 
 ## sourcing
 alias 'source_bash'='source ~/.bashrc'
