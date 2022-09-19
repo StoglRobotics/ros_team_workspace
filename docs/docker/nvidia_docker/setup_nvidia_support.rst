@@ -181,6 +181,11 @@ If you get any error follow the next steps to be sure that the expected version 
 5. Now check again output of the ``ṅvidia-smi`` command
 
 
+Graphics card should be used in the ``Performance`` mode
+---------------------------------------------------------
+If you have only ``X`` in the output from ``nvidia-smi`` than make sure that the graphics card uses ``Performance Mode`` in ``PRIME profile`` section of "NVIDIA X Server Settings" application.
+
+
 ``nvidia-smi`` command inside docker container
 -----------------------------------------------
 Take a note that ``nvidia-smi`` command in the docker container is necessary test to see if docker has access to the graphic card, but it doesn't shows any applications that are using it.
