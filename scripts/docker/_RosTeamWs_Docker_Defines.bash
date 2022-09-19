@@ -47,7 +47,8 @@ build_docker_image () {
   --build-arg uid=$UID \
   --build-arg gid=$GROUPS \
   --build-arg home=$HOME \
-  -t "$docker_image_tag" . || { return 1; }
+  -t "$docker_image_tag" . \
+  -f "$docker_file_path" || { return 1; }
 
   cd "$prev_pwd" || { print_and_exit "Build of docker container succeeded but changing back previous working directory failed."; }
 }
@@ -73,14 +74,33 @@ create_docker_container() {
   fi
   local docker_host_name=$4
 
+  # BEGIN: Needed for Nvidia
+  local XAUTH=XAUTH=/tmp/${docker_image_tag}.docker.xauth
+  if [ ! -f $XAUTH ]
+  then
+    xauth_list=$(xauth nlist :0 | sed -e 's/^..../ffff/')
+    if [ ! -z "$xauth_list" ]
+    then
+      echo $xauth_list | xauth -f $XAUTH nmerge -
+    else
+      touch $XAUTH
+    fi
+    chmod a+r $XAUTH
+  fi
+  # END: Needed for Nvidia
+
   echo "Instantiating docker image '$docker_image_tag' and mapping workspace folder to '$ws_folder'."
   echo "ros_team_ws is located under /opt/RosTeamWS/ros_ws_${RosTeamWS_DISTRO}/src/ros_team_workspace"
   xhost +local:docker
   docker run \
   --net=host \
+  --gpus all \
   -h ${docker_host_name} \
   -e DISPLAY \
+  -e QT_X11_NO_MITSHM=1 \
+  -e XAUTHORITY=$XAUTH \
   --tmpfs /tmp \
+  -v "$XAUTH:$XAUTH" \
   -v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
   -v "$ws_folder":"$ws_folder":rw \
   -v "$HOME/.ssh":"$HOME/.ssh":ro \

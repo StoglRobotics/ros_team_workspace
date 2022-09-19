@@ -291,7 +291,26 @@ create_workspace_docker () {
   echo "$alias_name" >> "$ws_docker_folder/bashrc"
 
   # setup Dockerfile: set correct docker version
-  cp "$DOCKER_TEMPLATES/Dockerfile" "$ws_docker_folder/."
+  echo -e "Do you want to setup a 'standard' or 'nvidia-based' docker container? [1]"
+  echo "(1) standard"
+  echo "(2) nvidia-based"
+  echo -n -e ""
+  read choice
+  choice=${choice:="1"}
+
+  docker_file=""
+  case "$choice" in
+  "1")
+    docker_file="standard.dockerfile"
+    ;;
+  "2")
+    docker_file="nvidia.dockerfile"
+    echo "NOTE: Make sure that you have setup nvidia-drivers to support this!"
+    echo "To abort press <CTRL>+<C>, to continue press <ENTER>."
+    read
+  esac
+
+  cp "$DOCKER_TEMPLATES/$docker_file" "$ws_docker_folder/Dockerfile"
   sed -i "s/UBUNTU_DUMMY_VERSION/${ubuntu_version}/g" "$ws_docker_folder/Dockerfile"
   sed -i "s/ROS_DUMMY_VERSION/${docker_ros_distro_name}/g" "$ws_docker_folder/Dockerfile"
   sed -i "s/ROS_TEAM_WS_DUMMY_BRANCH/${rtw_branch_for_ros_distro}/g" "$ws_docker_folder/Dockerfile"
