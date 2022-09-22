@@ -15,13 +15,11 @@
 # limitations under the License.
 
 
-usage='setup-ci-config.bash "repo_name" "repo_namespace" ["first_package second_package ..."]'
-#
+usage='setup-repository-ci.bash "repo_name" "repo_namespace" ["first_package second_package ..."]'
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 source $script_own_dir/../setup.bash
-check_and_set_ros_distro_and_version ${ROS_DISTRO}
 
 repo_name=$1
 if [ -z "$1" ]; then
@@ -83,8 +81,10 @@ CI_DISTRIBUTION_FILES=(
   $CI_RHEL_BINARY_BUILD
 )
 
-read -p "${RAW_TERMINAL_COLOR_BROWN}Name of the default ROS distro?${RAW_TERMINAL_COLOR_NC} [default: rolling] " default_ros_distro
+read -p "${RAW_TERMINAL_COLOR_BROWN}Name of the default ROS distro? Supported distributions(${rtw_supported_ros_distributions[*]})${RAW_TERMINAL_COLOR_NC} [default: rolling] " default_ros_distro
 default_ros_distro=${default_ros_distro:="rolling"}
+check_and_set_ros_distro_and_version "$default_ros_distro"
+default_ros_distro=${ros_distro}
 read -p "${RAW_TERMINAL_COLOR_BROWN}Name of the repository default branch?${RAW_TERMINAL_COLOR_NC} [default: master]: " default_branch
 default_branch=${default_branch:="master"}
 
