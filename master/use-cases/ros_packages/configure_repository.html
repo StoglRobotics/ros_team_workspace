@@ -104,7 +104,14 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Use Cases</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../operating_system/create_setup_workspace.html">Setup a new Workspace</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Configure Repository</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#setup-repository-ci-configuration-github">Setup Repository CI configuration (GitHub)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setup-repository-ci-configuration-github">Setup Repository CI configuration (GitHub)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#details-about-ci-setup-and-created-workflows">Details about CI setup and created workflows</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#code-formatters-and-linters">Code formatters and linters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#building-packages">Building packages</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="create_package.html">Create New Package</a></li>
@@ -194,8 +201,8 @@
 <p><code class="docutils literal notranslate"><span class="pre">setup-repository-ci</span></code> script is used, accepting the package name and description as parameters.
 The script <strong>has to be executed</strong> from the <em>main</em> folder of your package.</p>
 <div class="literal-block-wrapper docutils container" id="setup-package-ci">
-<div class="code-block-caption"><span class="caption-text">Usage of script for setting up new packages.</span><a class="headerlink" href="#setup-package-ci" title="Permalink to this code"></a></div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-repository-ci <span class="s2">&quot;repo_name&quot;</span> <span class="s2">&quot;repo_namespace&quot;</span> <span class="o">[</span><span class="s2">&quot;first_package&quot;</span> <span class="s2">&quot;second_package&quot;</span> ...<span class="o">]</span>
+<div class="code-block-caption"><span class="caption-text">Usage of the script for setting up new packages.</span><a class="headerlink" href="#setup-package-ci" title="Permalink to this code"></a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-repository-ci <span class="s2">&quot;repo_name&quot;</span> <span class="s2">&quot;repo_namespace&quot;</span> <span class="o">[</span><span class="s2">&quot;first_package second_package ...&quot;</span><span class="o">]</span>
 </pre></div>
 </div>
 </div>
@@ -204,8 +211,37 @@ If you make any wrong decision or enter incorrect data, use &lt;CTRL&gt;+C keys 
 <p>The script can add setup for multiple ROS2 versions.
 Simply follow the output.</p>
 <p>After a setup is created, you should go through the files and check if they are correct.
-Then try to push this to a GitHub-repository and open a PR.
+Please remember that each workflow you would like to run on schedule has to be in the default branch of your repository.
+Then try to push new files to a GitHub-repository and open a PR.
 You should then already see new workflows active.</p>
+<section id="details-about-ci-setup-and-created-workflows">
+<h3>Details about CI setup and created workflows<a class="headerlink" href="#details-about-ci-setup-and-created-workflows" title="Permalink to this headline"></a></h3>
+<section id="code-formatters-and-linters">
+<h4>Code formatters and linters<a class="headerlink" href="#code-formatters-and-linters" title="Permalink to this headline"></a></h4>
+<p>For executing formatters <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> program is used and automatically setup.
+To use it in a cloned repositors (if there is <code class="docutils literal notranslate"><span class="pre">.pre-commit-conifg.yaml</span></code> file) execute once <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">install</span></code>.
+Clang-Format is used as the main code formatting program.</p>
+</section>
+<section id="building-packages">
+<h4>Building packages<a class="headerlink" href="#building-packages" title="Permalink to this headline"></a></h4>
+<p>This script creates three stages of build configuration for each ROS2 version.
+Each of those stages test different compatibility levels where users can experience issues with actively developed repositories and ensures future compatibility of the repository.
+In the following each stage is explained.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">binary</span></code></dt><dd><p>Building against released packages in a ROS distribution. The stage ensures that isolated build on a local machine and build-farm is possible. Unreleased dependencies can be defined in <code class="docutils literal notranslate"><span class="pre">.repos</span></code>-file with suffix <code class="docutils literal notranslate"><span class="pre">-not-released.&lt;ros-distro&gt;.repos</span></code>. This functionality is useful for new projects where packages are located in multiple repositories and when packages are released in a new ROS distribution (and you are not releasing regularly to <code class="docutils literal notranslate"><span class="pre">rolling</span></code>).
+The <code class="docutils literal notranslate"><span class="pre">binary</span></code> build has two workflows to build against <code class="docutils literal notranslate"><span class="pre">main</span></code> and <code class="docutils literal notranslate"><span class="pre">testing</span></code> ROS debian repositories. This is useful when for example API changes are done that involve multiple packages. Then it is expected that build against binary packages in the <code class="docutils literal notranslate"><span class="pre">main</span></code> repository fails, but if all the changes are released, building against <code class="docutils literal notranslate"><span class="pre">testing</span></code> repository has to work. Otherwise it means that the code has some regressions and cannot be synced to the <code class="docutils literal notranslate"><span class="pre">main</span></code> repositories (This is what is happening after maintainers from OpenRobotics announce a “Sync” or a ros distribution).
+Scheduled <code class="docutils literal notranslate"><span class="pre">binary</span></code> build warns you that your package is incompatible with released dependencies (<code class="docutils literal notranslate"><span class="pre">main</span></code>) or that a package is breaking changes that will be released (<code class="docutils literal notranslate"><span class="pre">testing</span></code>). The first case should actually never happen if you are using all three building stages.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">semi-binary</span></code></dt><dd><p>Building against released core packages in a ROS distribution, but the main dependencies are build from source. The dependencies are defined in <code class="docutils literal notranslate"><span class="pre">.repos</span></code>-file with suffix <code class="docutils literal notranslate"><span class="pre">.&lt;ros-distro&gt;.repos</span></code>. This functionality is useful during development process when you have to sync changes in multiple repositories which are not released yet. This is the stage which should never fail if you are keeping your code up to date. Scheduled <code class="docutils literal notranslate"><span class="pre">semi-binary</span></code> builds warn you that some important dependency has changed something in their code so you can prepare yourself better for the next release.
+There are two workflows building against <code class="docutils literal notranslate"><span class="pre">main</span></code> and <code class="docutils literal notranslate"><span class="pre">testing</span></code> ROS repositories with released packages.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">source</span></code></dt><dd><p>Core ROS packages are build from source. Expect the <code class="docutils literal notranslate"><span class="pre">.repos</span></code> files for ROS core it uses is the <code class="docutils literal notranslate"><span class="pre">.repos</span></code>-file with suffix <code class="docutils literal notranslate"><span class="pre">.&lt;ros-distro&gt;.repos</span></code> for the package-specific dependencies. This stage makes mostly sense when working with <code class="docutils literal notranslate"><span class="pre">rolling</span></code> since other distribution of ROS should be API stable once released. This stage helps to anticipate braking changes in the ROS API that will be relevant the mid-term future.</p>
+</dd>
+</dl>
+<p>For the better overview and to avoid confusion for users there are two different tables with the workflow overview.
+One in the README file showing only the <code class="docutils literal notranslate"><span class="pre">binary</span></code> and <code class="docutils literal notranslate"><span class="pre">semi-binary</span></code> builds against <code class="docutils literal notranslate"><span class="pre">main</span></code> ROS repository, and another in the <code class="docutils literal notranslate"><span class="pre">.github/workflows/README.md</span></code> that shows all the workflows.</p>
+</section>
+</section>
 </section>
 </section>
 
