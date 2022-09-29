@@ -10,10 +10,11 @@ ARG home
 SHELL ["/bin/bash", "-c"]
 
 # upgrade to newest version
-RUN apt-get update -y && apt-get -y dist-upgrade
+RUN apt-get update -y && apt-get install -y nala
+RUN nala upgrade --assume-yes
 
 # install locales
-RUN apt-get update -y && apt-get install -y locales
+RUN nala install -y locales nala
 
 # Configure user env
 ENV TZ=Europe/Berlin
@@ -33,15 +34,15 @@ ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPA
 RUN locale
 
 # Install basic utilities
-RUN apt-get -y update && apt-get -y install git nano sudo tmux tree vim iputils-ping bash-completion
+RUN nala update && nala install -y git nano sudo tmux tree vim iputils-ping wget bash-completion
 
 # install ROS2:ROS_DUMMY_VERSION dependencies
-RUN apt-get install -y curl gnupg gnupg2 lsb-release software-properties-common && apt-add-repository universe
+RUN nala install -y curl gnupg gnupg2 lsb-release software-properties-common && apt-add-repository universe
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o /usr/share/keyrings/ros-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
 # install ROS2:ROS_DUMMY_VERSION and things needed for ros development, DEBIAN_FRONTEND is needed to ignore interactive keyboard layout setting while install
-RUN apt-get update -y && DEBIAN_FRONTEND=noniteractive apt-get install -y ros-ROS_DUMMY_VERSION-desktop pip python3-colcon-common-extensions
+RUN nala update && DEBIAN_FRONTEND=noniteractive nala install -y ros-ROS_DUMMY_VERSION-desktop pip python3-colcon-common-extensions
 RUN pip install -U rosdep && \
     rosdep init
 

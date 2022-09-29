@@ -90,7 +90,6 @@ create_docker_container() {
   # END: Needed for Nvidia support
 
   echo "Instantiating docker image '$docker_image_tag' and mapping workspace folder to '$ws_folder'."
-  echo "ros_team_ws is located under /opt/RosTeamWS/ros_ws_${RosTeamWS_DISTRO}/src/ros_team_workspace"
   xhost +local:docker
   docker run \
   --net=host \
