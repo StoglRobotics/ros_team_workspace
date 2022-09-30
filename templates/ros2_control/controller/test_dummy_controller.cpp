@@ -35,6 +35,7 @@ TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
   ASSERT_TRUE(controller_->params_.joints.empty());
   ASSERT_TRUE(controller_->params_.state_joints.empty());
   ASSERT_TRUE(controller_->params_.interface_name.empty());
+  ASSERT_EQ(controller_->params_.reference_timeout, 0.0);
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
@@ -42,6 +43,7 @@ TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
   ASSERT_TRUE(controller_->params_.state_joints.empty());
   ASSERT_THAT(controller_->state_joints_, testing::ElementsAreArray(joint_names_));
   ASSERT_EQ(controller_->params_.interface_name, interface_name_);
+  ASSERT_EQ(controller_->params_.reference_timeout, 0.1);
 }
 
 TEST_F(DummyClassNameTest, check_exported_intefaces)
@@ -92,7 +94,8 @@ TEST_F(DummyClassNameTest, update_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(
+      rclcpp::Time(controller_->get_node()->now()), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 }
 
@@ -118,7 +121,7 @@ TEST_F(DummyClassNameTest, reactivate_success)
   ASSERT_TRUE(std::isnan(controller_->command_interfaces_[CMD_MY_ITFS].get_value()));
 
   ASSERT_EQ(
-    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 }
 
@@ -168,7 +171,7 @@ TEST_F(DummyClassNameTest, test_update_logic_fast)
   controller_->input_ref_.writeFromNonRT(msg);
 
   ASSERT_EQ(
-    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
@@ -201,7 +204,7 @@ TEST_F(DummyClassNameTest, test_update_logic_slow)
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::SLOW);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT / 2);
@@ -216,7 +219,7 @@ TEST_F(DummyClassNameTest, publish_status_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   ControllerStateMsg msg;
@@ -235,7 +238,7 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   ControllerStateMsg msg;
@@ -243,7 +246,7 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
 
   ASSERT_EQ(msg.set_point, 101.101);
 
-  publish_commands();
+  publish_commands(controller_->get_node()->now());
   ASSERT_TRUE(controller_->wait_for_commands(executor));
 
   ASSERT_EQ(
@@ -255,6 +258,28 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
   subscribe_and_get_messages(msg);
 
   ASSERT_EQ(msg.set_point, 0.45);
+}
+
+TEST_F(DummyClassNameTest, test_message_timeout)
+{
+  SetUpController();
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(controller_->get_node()->get_node_base_interface());
+
+  ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
+  ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
+
+  // try to set command with time before timeout - command is not updated
+  auto command = controller_->input_cmd_.readFromNonRT();
+  auto old_timestamp = (*command)->header.stamp;
+  EXPECT_TRUE(std::isnan((*current_cmd)->displacements[0]));
+  EXPECT_TRUE(std::isnan((*current_cmd)->velocities[0]));
+  EXPECT_TRUE(std::isnan((*current_cmd)->duration));
+  publish_commands(controller_->get_node()->now() - controller_->cmd_timeout_ - 0.1);
+  ASSERT_EQ(old_timestamp, (*(controller_->input_cmd_.readFromNonRT()))->header.stamp);
+  EXPECT_TRUE(std::isnan((*current_cmd)->displacements[0]));
+  EXPECT_TRUE(std::isnan((*current_cmd)->velocities[0]));
+  EXPECT_TRUE(std::isnan((*current_cmd)->duration));
 }
 
 int main(int argc, char ** argv)

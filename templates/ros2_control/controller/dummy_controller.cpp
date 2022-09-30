@@ -40,9 +40,11 @@ static constexpr rmw_qos_profile_t rmw_qos_profile_services_hist_keep_all = {
 using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::ControllerReferenceMsg;
 
 // called from RT control loop
-void reset_controller_reference_msg(
-  std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names)
+void reset_controller_command_msg(
+  std::shared_ptr<ControllerCommandMsg> & msg, const std::vector<std::string> & joint_names,
+  const std::shared_ptr<rclcpp::Node> & node)
 {
+  msg->header.stamp = node->now();
   msg->joint_names = joint_names;
   msg->displacements.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
   msg->velocities.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
@@ -94,6 +96,7 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   subscribers_qos.best_effort();
 
   // Reference Subscriber
+  ref_timeout_ = rclcpp::Duration::from_seconds(params_.reference_timeout);
   ref_subscriber_ = get_node()->create_subscription<ControllerReferenceMsg>(
     "~/reference", subscribers_qos,
     std::bind(&DummyClassName::reference_callback, this, std::placeholders::_1));
@@ -141,13 +144,27 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 
 void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
 {
+  // if no timestamp provided use current time for command timestamp
+  if (msg->header.stamp.sec == 0 && msg->header.stamp.nanosec == 0u) {
+    RCLCPP_WARN(
+      get_node()->get_logger(),
+      "Timestamp in header is missing, using current time as command timestamp.")
+    msg->header.stamp = get_node()->now();
+  }
   if (msg->joint_names.size() == params_.joints.size()) {
-    input_ref_.writeFromNonRT(msg);
+    if (msg->header.stamp < (get_node()->now() + ref_timeout_)) {
+      input_ref_.writeFromNonRT(msg);
+    } else {
+      RCLCPP_ERROR(
+        get_node()->get_logger(),
+        "Received message has timestamp %.10f older then allowed timeout at timestamp %.10f",
+        msg->joint_names.size(), params_.joints.size());
+    }
   } else {
     RCLCPP_ERROR(
       get_node()->get_logger(),
       "Received %zu , but expected %zu joints in command. Ignoring message.",
-      msg->joint_names.size(), params_.joints.size());
+      rclcpp::Time(msg->header.stamp).seconds(), get_node()->now().seconds());
   }
 }
 
@@ -205,16 +222,20 @@ controller_interface::return_type DummyClassName::update(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
   auto current_ref = input_ref_.readFromRT();
+  const auto age_of_last_command = time - (*current_cmd)->header.stamp;
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < command_interfaces_.size(); ++i) {
-    if (!std::isnan((*current_ref)->displacements[i])) {
-      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
-        (*current_ref)->displacements[i] /= 2;
+    // send message only if there is no timeout
+    if (age_of_last_command <= ref_timeout_) {
+      if (!std::isnan((*current_ref)->displacements[i])) {
+        if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
+          (*current_ref)->displacements[i] /= 2;
+        }
+        command_interfaces_[i].set_value((*current_ref)->displacements[i]);
       }
-      command_interfaces_[i].set_value((*current_ref)->displacements[i]);
-
+    } else {
       (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
     }
   }

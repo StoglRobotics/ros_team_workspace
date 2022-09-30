@@ -53,6 +53,7 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_fast);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_slow);
+  FRIEND_TEST(DummyClassNameTest, test_message_timeout);
 
 public:
   controller_interface::CallbackReturn on_configure(
@@ -150,6 +151,13 @@ protected:
     // TODO(anyone): Add other state interfaces, if any
 
     controller_->assign_interfaces(std::move(command_ifs), std::move(state_ifs));
+
+    //     if (set_parameters) {
+    //       controller_->get_node()->set_parameter({"joints", joint_names_});
+    //       controller_->get_node()->set_parameter({"state_joints", state_joint_names_});
+    //       controller_->get_node()->set_parameter({"interface_name", interface_name_});
+    //       controller_->get_node()->set_parameter({"refrence_timeout", ref_timeout_});
+    //     }
   }
 
   void subscribe_and_get_messages(ControllerStateMsg & msg)
@@ -187,7 +195,7 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const std::vector<double> & displacements = {0.45},
+    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name) {
@@ -206,6 +214,7 @@ protected:
     wait_for_topic(command_publisher_->get_topic_name());
 
     ControllerReferenceMsg msg;
+    msg.header.stamp = stamp;
     msg.joint_names = joint_names_;
     msg.displacements = displacements;
     msg.velocities = velocities;
@@ -244,6 +253,8 @@ protected:
 
   std::vector<hardware_interface::StateInterface> state_itfs_;
   std::vector<hardware_interface::CommandInterface> command_itfs_;
+
+  double ref_timeout_ = 0.2;
 
   // Test related parameters
   std::unique_ptr<TestableDummyClassName> controller_;

@@ -5,3 +5,5 @@ test_dummy_controller:
       - joint1
 
     interface_name: acceleration
+
+    command_timeout: 0.1
