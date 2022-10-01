@@ -110,6 +110,13 @@ gh completion -s bash | tee "$HOME"/.local/share/bash-completion/completions/gh.
 
 # visual studio code
 sudo snap install --classic code
+# install all plugins for visual studio code
+vs_code_plugin_file=$RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH/vs-code_plugins.txt
+while read extension; do
+  # ignore empty lines or lines starting with "#"
+  [[ $extension =~ ^#.* ]] || [ -z "$extension" ] && continue
+  code --install-extension "${extension}"
+done < "${vs_code_plugin_file}"
 
 # Docker
 sudo apt-get update
