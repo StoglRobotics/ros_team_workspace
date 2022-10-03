@@ -17,7 +17,7 @@
 
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 SCRIPT_PATH=$script_own_dir
-source "$SCRIPT_PATH"/../../setup.bash
+source "${SCRIPT_PATH}"/../../setup.bash
 
 if [ -z "$supported_computer_types" ]; then
   readonly supported_computer_types=("basic" "office" "robot")
@@ -58,12 +58,8 @@ read
 ROS_VERSION=melodic
 ROS2_VERSIONS=( "galactic" "rolling" )
 
-# Core tools
+### CORE TOOLS ###
 sudo apt update && sudo apt -y install ca-certificates curl gnupg2 lsb-release
-
-# KDE Backports
-sudo apt-add-repository -y ppa:kubuntu-ppa/backports
-sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 
 # Nala - better apt frontend
 echo "deb http://deb.volian.org/volian/ scar main" | sudo tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list
@@ -72,10 +68,7 @@ sudo apt update
 sudo apt -y install nala
 nala --install-completion bash
 
-# Dolphin Plugins
-sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
-
-## Useful tools
+### BASIC TOOLS ###
 sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger tree
 
 # Python tools
@@ -103,7 +96,7 @@ sudo pip3 install pre-commit virtualenv virtualenvwrapper notebook
 # Useful libraries
 sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
 
-## Development tools
+### DEVELOPMENT TOOLS ###
 # gh - Github CLI
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
 && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -137,6 +130,7 @@ sudo usermod -aG docker "$(whoami)"
 # VirtualBox
 sudo apt install virtualbox dkms virtualbox-guest-utils virtualbox-ext-pack
 
+## ROS
 # ROS Packages
 bash $SCRIPT_PATH/install_software_ros.bash $ROS_VERSION
 
@@ -162,28 +156,49 @@ cp "$OS_CONFIGURE_TEMPLATES/$template_name" "$commit_template_path/."
 git config --global core.editor "vim"
 git config --global commit.template "$commit_template_path/$template_name"
 
+### NONE DEVELOPMENT RELATED TOOLS ###
+
+# Dolphin Plugins
+sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
+
 # Nextcloud
 sudo apt -y install nextcloud-desktop
 
+### BACKPORTS ###
+# KDE Backports
+sudo apt-add-repository -y ppa:kubuntu-ppa/backports
+sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
+
 ########################## END BASIC SETUP ##########################
 
-if [[ $computer_type != "robot" ]]
+if [[ "${computer_type}" != "robot" ]]
 then
   sudo apt -y install recordmydesktop rdesktop gimp meshlab inkscape pdfposter unrar
-  sudo DEBIAN_FRONTEND=noninteractive apt -y install wireshark
 fi
 
-if [[ $computer_type == "office" ]]
+if [[ "${computer_type}" == "office" ]]
 then
 
+  ### CRYPTOPGRAPHY AND PASSWORD MANAGEMENT ###
+  # Cryptography
+  sudo apt -y install kleopatra scdaemon
+  #  Passwordmanager
   sudo apt -y install pass
 
+  ### NETWORKING ###
   # Network manager
   sudo apt -y install network-manager-openvpn network-manager-vpnc network-manager-ssh network-manager-openconnect
 
-  # Cryptography
-  sudo apt -y install kleopatra scdaemon
+  # Remote desktop
+  sudo apt -y install krdc
 
+  ##  Network monitoring and debugging
+  # Wireshark
+  sudo DEBIAN_FRONTEND=noninteractive apt -y install wireshark
+  # debugging
+  sudo apt install nethogs nload net-tools
+
+  ### ADDITIONAL DEVELOPMENT TOOLS ###
   # Code optimization and profiling
   sudo apt -y install valgrind kcachegrind hotspot heaptrack-gui
   sudo apt -y install linux-tools-generic linux-cloud-tools-generic  # Kernel tools
@@ -194,23 +209,6 @@ then
   sudo apt update
   sudo apt -y install freecad-daily spacenavd
 
-  # KDE-PIM
-  sudo apt -y install kontact korganizer kmail kjots kaddressbook kdepim*
-
-  # Tools
-  sudo apt -y install krdc
-
-  # Notes-taking
-  sudo add-apt-repository ppa:pbek/qownnotes
-  sudo apt update
-  sudo apt -y install qownnotes
-
-  # Language packs
-  sudo apt -y install language-pack-de language-pack-de-base language-pack-kde-de aspell-de hunspell-de-de hyphen-de wogerman
-  sudo apt -y install language-pack-hr language-pack-hr-base language-pack-kde-hr aspell-hr hunspell-hr hyphen-hr
-
-  ## Development Tools
-
   # Tracing
   sudo apt-add-repository ppa:lttng/stable-2.12
   sudo apt update
@@ -218,6 +216,22 @@ then
   sudo apt -y install python3-babeltrace python3-lttng python3-lttngust
   sudo usermod -aG tracing "$(whoami)"
 
+  ### MANAGE PERSONAL INFORMATION
+  # KDE-PIM
+  sudo apt -y install kontact korganizer kmail kjots kaddressbook kdepim*
+
+  ### OFFICE TOOLS ###
+  # Notes-taking
+  sudo add-apt-repository ppa:pbek/qownnotes
+  sudo apt update
+  sudo apt -y install qownnotes
+
+  ### LANGUAGES ###
+  # Language packs
+  sudo apt -y install language-pack-de language-pack-de-base language-pack-kde-de aspell-de hunspell-de-de hyphen-de wogerman
+  sudo apt -y install language-pack-hr language-pack-hr-base language-pack-kde-hr aspell-hr hunspell-hr hyphen-hr
+
+  ### TUXEDO ###
   # Tuxedo repositories
   sudo sh -c 'echo "deb https://deb.tuxedocomputers.com/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/tuxedocomputers.list'
   sudo sh -c 'echo "deb https://oibaf.tuxedocomputers.com/ubuntu $(lsb_release -sc) main" >> /etc/apt/sources.list.d/tuxedocomputers.list'
