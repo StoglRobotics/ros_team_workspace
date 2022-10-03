@@ -34,7 +34,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPA
 RUN locale
 
 # Install basic utilities
-RUN nala update && nala install -y git nano sudo tmux tree vim iputils-ping wget bash-completion
+RUN nala update && nala install -y git nano sudo tmux tree vim iputils-ping wget bash-completion pre-commit
 
 # install ROS2:ROS_DUMMY_VERSION dependencies
 RUN nala install -y curl gnupg gnupg2 lsb-release software-properties-common && apt-add-repository universe
