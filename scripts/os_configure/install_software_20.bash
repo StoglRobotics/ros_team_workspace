@@ -56,7 +56,7 @@ echo "Installing software for $computer_type computers. Press <ENTER> to continu
 read
 
 ROS_VERSION=melodic
-ROS2_VERSIONS=( "galactc" "rolling" )
+ROS2_VERSIONS=( "galactic" "rolling" )
 
 # Core tools
 sudo apt update && sudo apt -y install ca-certificates curl gnupg2 lsb-release
@@ -134,6 +134,9 @@ sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo groupadd docker
 sudo usermod -aG docker "$(whoami)"
 
+# VirtualBox
+sudo apt install virtualbox dkms virtualbox-guest-utils virtualbox-ext-pack
+
 # ROS Packages
 bash $SCRIPT_PATH/install_software_ros.bash $ROS_VERSION
 
@@ -159,6 +162,9 @@ cp "$OS_CONFIGURE_TEMPLATES/$template_name" "$commit_template_path/."
 git config --global core.editor "vim"
 git config --global commit.template "$commit_template_path/$template_name"
 
+# Nextcloud
+sudo apt -y install nextcloud-desktop
+
 ########################## END BASIC SETUP ##########################
 
 if [[ $computer_type != "robot" ]]
@@ -169,9 +175,6 @@ fi
 
 if [[ $computer_type == "office" ]]
 then
-
-  # Latex
-  sudo apt -y install kile texlive-full texlive-lang-german kbibtex ktikz
 
   sudo apt -y install pass
 
@@ -190,39 +193,6 @@ then
   sudo add-apt-repository -y ppa:freecad-maintainers/freecad-daily
   sudo apt update
   sudo apt -y install freecad-daily spacenavd
-
-  # Nextcloud
-  sudo apt -y install nextcloud-desktop
-
-  # VirtualBox
-  sudo sh -c 'echo "deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian $(lsb_release -sc) contrib" > /etc/apt/sources.list.d/virtualbox.list'
-  wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-  sudo apt update
-  sudo apt -y install virtualbox-6.1 dkms virtualbox-guest-utils virtualbox-ext-pack
-
-  ## Messgengers
-
-  # Telegram
-  sudo add-apt-repository ppa:atareao/telegram
-  sudo apt update
-  sudo apt -y install -f telegram
-
-  # Hamsket
-  sudo apt -y install libappindicator3-1
-  wget https://github.com/TheGoddessInari/hamsket/releases/download/0.6.2/hamsket_0.6.2_amd64.deb
-  sudo dpkg -i hamsket_0.6.2_amd64.deb
-  rm hamsket_0.6.2_amd64.deb
-
-  # Spotify
-  curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | sudo apt-key add -
-  echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
-  sudo apt update
-  sudo apt -y install spotify-client
-
-  # Noson
-  sudo add-apt-repository ppa:jlbarriere68/noson-app
-  sudo apt update
-  sudo apt -y install noson-app
 
   # KDE-PIM
   sudo apt -y install kontact korganizer kmail kjots kaddressbook kdepim*
@@ -260,7 +230,3 @@ then
 fi
 
 sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
-
-
-# Configs
-# Yakuake
