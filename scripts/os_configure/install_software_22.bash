@@ -65,7 +65,7 @@ sudo apt -y install nala
 nala --install-completion bash
 
 ### BASIC TOOLS ###
-sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger tree
+sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger tree pre-commit
 
 # Useful libraries
 sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
@@ -129,9 +129,12 @@ sudo apt -y install python3-pip \
   python3-pytest-rerunfailures \
   python3-rosdep \
   python3-setuptools \
-  python3-vcstool
-sudo pip3 install --upgrade pip
-sudo pip3 install  pre-commit virtualenv virtualenvwrapper notebook
+  python3-vcstool \
+  python3-pip \
+  python3-virtualenv \
+  python3-virtualenvwrapper \
+  python3-notebook \
+pip3 install --upgrade pip
 
 # setup bash
 cat "$OS_CONFIGURE_TEMPLATES/extend_to_bashrc" >> "$HOME/.bashrc"
