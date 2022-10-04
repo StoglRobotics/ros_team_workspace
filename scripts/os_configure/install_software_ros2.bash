@@ -50,7 +50,7 @@ colcon mixin update default
 sudo apt -y install ros-${ROS_DISTRO}-plotjuggler-ros
 
 # ros2_control
-sudo apt -y install ros-${ROS_DISTRO}-forward-command-controller ros-${ROS_DISTRO}-joint-state-controller ros-${ROS_DISTRO}-joint-trajectory-controller ros-${ROS_DISTRO}-xacro
+sudo apt -y install ros-${ROS_DISTRO}-forward-command-controller ros-${ROS_DISTRO}-joint-state-broadcaster ros-${ROS_DISTRO}-joint-trajectory-controller ros-${ROS_DISTRO}-xacro
 sudo apt -y install ros-${ROS_DISTRO}-ros2-control ros-${ROS_DISTRO}-ros2-controllers ros-${ROS_DISTRO}-gazebo-ros2-control ros-${ROS_DISTRO}-gz-ros2-control
 
 # MoveIt
