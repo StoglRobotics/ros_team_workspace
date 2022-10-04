@@ -53,8 +53,12 @@ Docker
 
 Make sure docker is installed and it's working correctly. For instructions on how to install docker have a look :ref:`in general info on docker installation <general-info-on-docker-installation>`.
 
-Installation
-""""""""""""""""
+How to setup a container with nvidia support
+""""""""""""""""""""""""""""""""""""""""""""""
+Install nvidia-docker
+----------------------
+**NOTE**: If you already have installed nvidia-docker, you can skip this and go right to the next section.
+
 1. You then have to install the NVIDIA Container Toolkit for docker as described `in official documentation <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker>`_.
    For Ubuntu this can be done as follows:
 
@@ -115,6 +119,13 @@ Installation
     |=============================================================================|
     +-----------------------------------------------------------------------------+
 
+Change the Dockerfile
+----------------------------------
+(1.) If you haven't done so already:
+   Create a new docker workspace with the :ref:`setup-ros-workspace-docker<uc-setup-docker-workspace>` command.
+
+   **NOTE**: If you set up a nvidia-docker container, you are finished at this point.
+
 2. Replace the the ``FROM ubuntu:<version>`` directive in your Dockerfile with the nvidia container of your needs. The following table gives you a quick overview:
 
    .. list-table:: Examples for nvidia containers
@@ -167,7 +178,10 @@ There you should see expected version of Nvidia driver.
 If you get any error follow the next steps to be sure that the expected version of driver is installed properly.
 
 1. Install required version of the driver using GUI for additional drivers in system's settings or ``ubuntu-drivers`` command.
-   Be careful when executing command if multiple devices are using custom drivers you can unintenntionaly install wrong driver for another device (you will know if this is relevant for you - but it is imprtant to note it.
+
+   .. note::
+      Be careful when executing command if multiple devices are using custom drivers you can unintenntionaly install wrong driver for another device (you will know if this is relevant for you - but it is imprtant to note it.)
+
 2. Delete all other nvidia driver's version and corresponding libraries - use ``purge`` command for it.
 3. Restart your computer.
 4. If you have issues with the graphics after restart do the following:

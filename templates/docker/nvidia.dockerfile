@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.7.1-base-ubuntu22.04
+FROM nvidia/cuda:11.7.1-base-UBUNTU_DUMMY_VERSION
 
 #Arguments maybe add defaults?
 ARG user

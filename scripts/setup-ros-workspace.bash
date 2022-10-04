@@ -5,6 +5,53 @@ setup_ws_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null &&
 source $setup_ws_script_own_dir/../setup.bash
 source $setup_ws_script_own_dir/docker/_RosTeamWs_Docker_Defines.bash
 
+# All the possible supported ros distributions supported by rtw
+if [ -z "$ros_distributions_20_04" ]; then
+  readonly ros_distributions_20_04=("foxy" "galactic")
+fi
+if [ -z "$ros_distributions_22_04" ]; then
+  readonly ros_distributions_22_04=("humble")
+fi
+if [ -z "$ros_distributions_20_and_22_04" ]; then
+  readonly ros_distributions_20_and_22_04=("rolling")
+fi
+
+ubuntu_20_04_version="ubuntu:20.04"
+ubuntu_20_04_tag="ubuntu_20_04"
+ubuntu_22_04_version="ubuntu:22.04"
+ubuntu_22_04_tag="ubuntu_22_04"
+
+select_normal_or_nvidia_docker() {
+  # setup Dockerfile: set correct docker version
+  echo -e "Do you want to setup a 'standard' or 'nvidia-based' docker container? [1]"
+  echo "(1) standard"
+  echo "(2) nvidia-based"
+  echo -n -e ""
+  read choice
+  choice=${choice:="1"}
+
+  docker_file=""
+  case "$choice" in
+  "1")
+    docker_file="standard.dockerfile"
+    ;;
+  "2")
+    # The version naming differs for nvidia-dockers e.g. instead of ubuntu:22.04->ubuntu22.04
+    if [[ "$ubuntu_version" == "${ubuntu_20_04_version}" ]]; then
+      ubuntu_version="ubuntu20.04"
+    elif [[ "$ubuntu_version" == "${ubuntu_22_04_version}" ]]; then
+      ubuntu_version="ubuntu22.04"
+    else
+      print_and_exit "Something went wrong. The Ubuntu version ${ubuntu_version} should be supported by nvidia but somehow it's not."
+    fi
+    ubuntu_version_tag=${ubuntu_version_tag}_nvidia
+    docker_file="nvidia.dockerfile"
+    notify_user "NOTE: Make sure that you have setup nvidia-drivers to support this!"
+    notify_user "To abort press <CTRL>+<C>, to continue press <ENTER>."
+    read
+  esac
+}
+
 check_user_input () {
   ws_path="$1"
   if [ -z "$ws_path" ] || [[ "$ws_path" == "-" ]]; then
@@ -20,29 +67,45 @@ check_user_input () {
   # ros distribution name will be set in ${ros_distro}
   check_and_set_ros_distro_and_version "$2"
 
-  # Todo Manuel make this more generic
   if [ "$use_docker" == true ]; then
-    if [ "$ros_distro" == "rolling" ]; then
+    # according to selected ros distro the ubuntu version is selected.
+    if [[ " ${ros_distributions_20_04[*]} " =~ " ${ros_distro} " ]]; then
+      ubuntu_version=${ubuntu_20_04_version}
+      ubuntu_version_tag=${ubuntu_20_04_tag}
+      user_decision "The ros distribution ${ros_distro} is currently only on ${ubuntu_version} supported! Continue?"
+      if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
+        print_and_exit "Aborting creation of new docker workspace. Exiting..."
+      fi
+      select_normal_or_nvidia_docker
+    elif [[ " ${ros_distributions_22_04[*]} " =~ " ${ros_distro} " ]]; then
+      ubuntu_version=${ubuntu_22_04_version}
+      ubuntu_version_tag=${ubuntu_22_04_tag}
+      user_decision "The ros distribution ${ros_distro} is currently only on ${ubuntu_version} supported! Continue?"
+      if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
+        print_and_exit "Aborting creation of new docker workspace. Exiting..."
+      fi
+      select_normal_or_nvidia_docker
+    elif [[ " ${ros_distributions_20_and_22_04[*]} " =~ " ${ros_distro} " ]]; then
       echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}'$ros_distro' is currently supported on multiple versions of Ubuntu. Which version of ubuntu would you like to choose:"
       select ubuntu_version in Ubuntu_20_04 Ubuntu_22_04;
       do
         case "$ubuntu_version" in
               Ubuntu_20_04)
-                  ubuntu_version="ubuntu:20.04"
-                  ubuntu_version_tag="ubuntu_20_04"
+                  ubuntu_version=${ubuntu_20_04_version}
+                  ubuntu_version_tag=${ubuntu_20_04_tag}
                   break
                 ;;
               Ubuntu_22_04)
-                  ubuntu_version="ubuntu:22.04"
-                  ubuntu_version_tag="ubuntu_22_04"
+                  ubuntu_version=${ubuntu_22_04_version}
+                  ubuntu_version_tag=${ubuntu_22_04_tag}
                   break
                 ;;
         esac
       done
       echo -n -e "${TERMINAL_COLOR_NC}"
+      select_normal_or_nvidia_docker
     else
-      ubuntu_version="ubuntu:20.04"
-      ubuntu_version_tag="ubuntu_20_04"
+      print_and_exit "The selected ros distribution ${ros_distro} is not supported for docker workspaces!"
     fi
   fi
 }
@@ -289,26 +352,6 @@ create_workspace_docker () {
   sed -i "s|DUMMY_WS_FOLDER|${docker_ws_path}|g" "$ws_docker_folder/bashrc"
   echo "" >> "$ws_docker_folder/bashrc"
   echo "$alias_name" >> "$ws_docker_folder/bashrc"
-
-  # setup Dockerfile: set correct docker version
-  echo -e "Do you want to setup a 'standard' or 'nvidia-based' docker container? [1]"
-  echo "(1) standard"
-  echo "(2) nvidia-based"
-  echo -n -e ""
-  read choice
-  choice=${choice:="1"}
-
-  docker_file=""
-  case "$choice" in
-  "1")
-    docker_file="standard.dockerfile"
-    ;;
-  "2")
-    docker_file="nvidia.dockerfile"
-    echo "NOTE: Make sure that you have setup nvidia-drivers to support this!"
-    echo "To abort press <CTRL>+<C>, to continue press <ENTER>."
-    read
-  esac
 
   cp "$DOCKER_TEMPLATES/$docker_file" "$ws_docker_folder/Dockerfile"
   sed -i "s/UBUNTU_DUMMY_VERSION/${ubuntu_version}/g" "$ws_docker_folder/Dockerfile"
