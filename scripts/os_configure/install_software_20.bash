@@ -254,4 +254,4 @@ sudo apt -y dist-upgrade
 sudo apt -y autoremove
 
 # log is created somehow
-trash "${OS_CONFIGURE_TEMPLATES}/log/"
+trash "${RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH}/log/"

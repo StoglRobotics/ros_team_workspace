@@ -209,8 +209,6 @@ then
   sudo apt -y install freecad-daily spacenavd
 
   # Tracing
-  sudo apt-add-repository ppa:lttng/stable-2.12
-  sudo apt update
   sudo apt -y install lttng-tools lttng-modules-dkms liblttng-ust-dev
   sudo apt -y install python3-babeltrace python3-lttng python3-lttngust
   sudo usermod -aG tracing "$(whoami)"
@@ -246,4 +244,4 @@ sudo apt update
 sudo apt -y dist-upgrade
 sudo apt -y autoremove
 # log is created somehow
-trash "${OS_CONFIGURE_TEMPLATES}/log/"
+trash "${RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH}/log/"
