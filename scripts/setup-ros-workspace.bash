@@ -65,7 +65,7 @@ check_user_input () {
   ws_name=$(basename ${ws_path})
 
   # ros distribution name will be set in ${ros_distro}
-  check_and_set_ros_distro_and_version "$2"
+  check_and_set_ros_distro_and_version "$2" "$use_docker"
 
   if [ "$use_docker" == true ]; then
     # according to selected ros distro the ubuntu version is selected.

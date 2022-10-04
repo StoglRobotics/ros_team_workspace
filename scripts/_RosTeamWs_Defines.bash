@@ -354,7 +354,12 @@ function is_valid_ros_distribution {
 }
 
 function check_ros_distro {
-  ros_distro=$1
+  if [ -z "$1" ]; then
+    ros_distro=$1
+  fi
+  if [ -z "$2" ]; then
+    use_docker=$2
+  fi
 
   # check if the given distribution is a distribution supported by rtw
   while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@];
@@ -363,16 +368,19 @@ function check_ros_distro {
       read ros_distro
   done
 
-  if [ ! -d "/opt/ros/$ros_distro" ]; then
-    local upper_case=$(echo $ros_distro | tr '[:lower:]' '[:upper:]')
-    local alternative_ros_location=ALTERNATIVE_ROS_${upper_case}_LOCATION
-    if [ ! -f "${!alternative_ros_location}/setup.bash" ]; then
-      print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-    else
-      user_decision "Using ${ALTERNATIVE_ROS_LOCATION} for ${ros_distro}." user_answer
-      # check if the chosen ros-distro location is correct.
-      if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
-        print_and_exit "Please set your ALTERNATIVE_ROS_LOCATION to the correct location. Exiting..."
+  # inside docker container we don't need to check if ros distro is present on system
+  if [ "${use_docker}" != "true" ]; then
+    if [ ! -d "/opt/ros/$ros_distro" ]; then
+      local upper_case=$(echo $ros_distro | tr '[:lower:]' '[:upper:]')
+      local alternative_ros_location=ALTERNATIVE_ROS_${upper_case}_LOCATION
+      if [ ! -f "${!alternative_ros_location}/setup.bash" ]; then
+        print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+      else
+        user_decision "Using ${ALTERNATIVE_ROS_LOCATION} for ${ros_distro}." user_answer
+        # check if the chosen ros-distro location is correct.
+        if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
+          print_and_exit "Please set your ALTERNATIVE_ROS_LOCATION to the correct location. Exiting..."
+        fi
       fi
     fi
   fi
@@ -404,9 +412,14 @@ function set_ros_version_for_distro {
 }
 
 function check_and_set_ros_distro_and_version {
-  ros_distro=$1
+  if [ -z "$1" ]; then
+    ros_distro=$1
+  fi
+  if [ -z "$2" ]; then
+    use_docker=$2
+  fi
 
-  check_ros_distro "${ros_distro}"
+  check_ros_distro "${ros_distro}" "${use_docker}"
   set_ros_version_for_distro "${ros_distro}"
 }
 
