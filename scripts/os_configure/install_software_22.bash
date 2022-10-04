@@ -58,7 +58,8 @@ read
 ROS2_VERSIONS=( "humble" "rolling" )
 
 ### CORE TOOLS ###
-sudo apt update && sudo apt -y install ca-certificates curl gnupg gnupg2 lsb-release
+sudo apt update
+sudo apt -y install ca-certificates curl gnupg gnupg2 lsb-release
 
 # Nala - better apt frontend
 sudo apt -y install nala
@@ -160,7 +161,9 @@ sudo apt -y install nextcloud-desktop
 ### BACKPORTS ###
 # KDE Backports
 sudo apt-add-repository -y ppa:kubuntu-ppa/backports
-sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
+sudo apt update
+sudo apt -y dist-upgrade
+sudo apt -y autoremove
 
 ########################## END BASIC SETUP ##########################
 
@@ -236,6 +239,8 @@ then
 
 fi
 
-sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
+sudo apt update
+sudo apt -y dist-upgrade
+sudo apt -y autoremove
 # log is created somehow
 trash "${OS_CONFIGURE_TEMPLATES}/log/"
