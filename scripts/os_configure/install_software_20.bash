@@ -59,7 +59,7 @@ ROS_VERSION=melodic
 ROS2_VERSIONS=( "galactic" "rolling" )
 
 ### CORE TOOLS ###
-sudo apt update && sudo apt -y install ca-certificates curl gnupg2 lsb-release
+sudo apt update && sudo apt -y install ca-certificates curl gnupg gnupg2 lsb-release
 
 # Nala - better apt frontend
 echo "deb http://deb.volian.org/volian/ scar main" | sudo tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list
@@ -70,28 +70,6 @@ nala --install-completion bash
 
 ### BASIC TOOLS ###
 sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger tree
-
-# Python tools
-sudo apt -y install python3-pip \
-  python3-colcon-common-extensions \
-  python3-flake8 \
-  python3-flake8-blind-except \
-  python3-flake8-builtins \
-  python3-flake8-class-newline \
-  python3-flake8-comprehensions \
-  python3-flake8-deprecated \
-  python3-flake8-docstrings \
-  python3-flake8-import-order \
-  python3-flake8-quotes \
-  python3-pytest \
-  python3-pytest-cov \
-  python3-pytest-repeat \
-  python3-pytest-rerunfailures \
-  python3-rosdep \
-  python3-setuptools \
-  python3-vcstool
-sudo pip3 install --upgrade pip
-sudo pip3 install pre-commit virtualenv virtualenvwrapper notebook
 
 # Useful libraries
 sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
@@ -143,6 +121,29 @@ done
 sudo rosdep init
 rosdep update
 
+# ! They need to come after ros installation !
+# Python tools
+sudo apt -y install python3-pip \
+  python3-colcon-common-extensions \
+  python3-flake8 \
+  python3-flake8-blind-except \
+  python3-flake8-builtins \
+  python3-flake8-class-newline \
+  python3-flake8-comprehensions \
+  python3-flake8-deprecated \
+  python3-flake8-docstrings \
+  python3-flake8-import-order \
+  python3-flake8-quotes \
+  python3-pytest \
+  python3-pytest-cov \
+  python3-pytest-repeat \
+  python3-pytest-rerunfailures \
+  python3-rosdep \
+  python3-setuptools \
+  python3-vcstool
+sudo pip3 install --upgrade pip
+sudo pip3 install  pre-commit virtualenv virtualenvwrapper notebook
+
 # setup bash
 cat "$OS_CONFIGURE_TEMPLATES/extend_to_bashrc" >> "$HOME/.bashrc"
 cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_aliases" >> "$HOME/.bash_aliases"
@@ -159,7 +160,7 @@ git config --global commit.template "$commit_template_path/$template_name"
 ### NONE DEVELOPMENT RELATED TOOLS ###
 
 # Dolphin Plugins
-sudo apt -y install kdesdk-kio-plugins kdesdk-scripts
+sudo apt -y install kdesdk-scripts
 
 # Nextcloud
 sudo apt -y install nextcloud-desktop
@@ -244,3 +245,6 @@ then
 fi
 
 sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
+
+# log is created somehow
+trash "${OS_CONFIGURE_TEMPLATES}/log/"
