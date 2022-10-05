@@ -13,7 +13,7 @@ You have to install docker which is dependent on the operating system you are us
 
 *   `Windows <https://docs.docker.com/desktop/windows/install/>`_
 *   `Mac <https://docs.docker.com/desktop/mac/install/>`_
-*   `Linux <https://docs.docker.com/engine/install/>`_: it depends.
+*   `Linux <https://docs.docker.com/desktop/install/linux-install/>`_: it depends.
 
 You can verify that you have docker successfully installed by running:
 
