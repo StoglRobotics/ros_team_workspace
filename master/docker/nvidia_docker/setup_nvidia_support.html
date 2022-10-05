@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Nvidia support for docker &mdash; ROS Team Workspace Documentation: Galactic Sep 2022 documentation</title>
+  <title>Nvidia support for docker &mdash; ROS Team Workspace Documentation: Galactic Oct 2022 documentation</title>
   
 
   
@@ -111,7 +111,18 @@
 <li class="toctree-l4"><a class="reference internal" href="#docker">Docker</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-setup-a-container-with-nvidia-support">How to setup a container with nvidia support</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#install-nvidia-docker">Install nvidia-docker</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#change-the-dockerfile">Change the Dockerfile</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#troubleshoting">Troubleshoting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#be-sure-that-graphics-card-driver-is-installed-properly">Be sure that graphics card driver is installed properly</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#graphics-card-should-be-used-in-the-performance-mode">Graphics card should be used in the <code class="docutils literal notranslate"><span class="pre">Performance</span></code> mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nvidia-smi-command-inside-docker-container"><code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> command inside docker container</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../supported_versions/supported_versions.html">Supported ros versions and operating systems</a></li>
@@ -195,6 +206,7 @@
 <section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
 <p>Before we can install the NVIDIA Container Toolkit we have to install the nvidia drivers for our platform and install docker.</p>
+<p><strong>NOTE</strong>: Check the end of the file for some tips about throubleshoting.</p>
 <section id="nvidia-drivers">
 <h3>Nvidia drivers<a class="headerlink" href="#nvidia-drivers" title="Permalink to this headline"></a></h3>
 <p>Make sure you have the NVIDIA drivers for your Linux distribution installed. This can either be done by using your package manager or you can download the <code class="docutils literal notranslate"><span class="pre">.run</span></code> installers from <a class="reference external" href="https://www.nvidia.com/Download/index.aspx?lang=en-us">NVIDIA Driver Downloads</a>.
@@ -234,8 +246,11 @@ You can then check your drivers by typing</p>
 <p id="docker-nvidia-support-prerequisites-docker">Make sure docker is installed and it’s working correctly. For instructions on how to install docker have a look <a class="reference internal" href="../general_information_docker/general_information_docker.html#general-info-on-docker-installation"><span class="std std-ref">in general info on docker installation</span></a>.</p>
 </section>
 </section>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<section id="how-to-setup-a-container-with-nvidia-support">
+<h2>How to setup a container with nvidia support<a class="headerlink" href="#how-to-setup-a-container-with-nvidia-support" title="Permalink to this headline"></a></h2>
+<section id="install-nvidia-docker">
+<h3>Install nvidia-docker<a class="headerlink" href="#install-nvidia-docker" title="Permalink to this headline"></a></h3>
+<p><strong>NOTE</strong>: If you already have installed nvidia-docker, you can skip this and go right to the next section.</p>
 <ol class="arabic">
 <li><p>You then have to install the NVIDIA Container Toolkit for docker as described <a class="reference external" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker">in official documentation</a>.
 For Ubuntu this can be done as follows:</p>
@@ -288,6 +303,14 @@ For Ubuntu this can be done as follows:</p>
 </pre></div>
 </div>
 </div></blockquote>
+</section>
+<section id="change-the-dockerfile">
+<h3>Change the Dockerfile<a class="headerlink" href="#change-the-dockerfile" title="Permalink to this headline"></a></h3>
+<dl>
+<dt>(1.) If you haven’t done so already:</dt><dd><p>Create a new docker workspace with the <a class="reference internal" href="../../use-cases/operating_system/create_setup_workspace.html#uc-setup-docker-workspace"><span class="std std-ref">setup-ros-workspace-docker</span></a> command.</p>
+<p><strong>NOTE</strong>: If you set up a nvidia-docker container, you are finished at this point.</p>
+</dd>
+</dl>
 <ol class="arabic" start="2">
 <li><p>Replace the the <code class="docutils literal notranslate"><span class="pre">FROM</span> <span class="pre">ubuntu:&lt;version&gt;</span></code> directive in your Dockerfile with the nvidia container of your needs. The following table gives you a quick overview:</p>
 <table class="colwidths-auto docutils align-default" id="id1">
@@ -328,6 +351,51 @@ Go inside the <code class="docutils literal notranslate"><span class="pre">.rtw_
 </li>
 </ol>
 <p>You now should have a docker container which exposes your nvidia drivers and can switch to your workspace with <code class="docutils literal notranslate"><span class="pre">rtw_switch_to_docker</span></code>.</p>
+</section>
+</section>
+<section id="troubleshoting">
+<h2>Troubleshoting<a class="headerlink" href="#troubleshoting" title="Permalink to this headline"></a></h2>
+<section id="be-sure-that-graphics-card-driver-is-installed-properly">
+<h3>Be sure that graphics card driver is installed properly<a class="headerlink" href="#be-sure-that-graphics-card-driver-is-installed-properly" title="Permalink to this headline"></a></h3>
+<p>Check if drivers and libraries are installed properly by executing <code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> after a fresh system start (Yes, you have to restart your computer!).
+There you should see expected version of Nvidia driver.
+If you get any error follow the next steps to be sure that the expected version of driver is installed properly.</p>
+<ol class="arabic">
+<li><p>Install required version of the driver using GUI for additional drivers in system’s settings or <code class="docutils literal notranslate"><span class="pre">ubuntu-drivers</span></code> command.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Be careful when executing command if multiple devices are using custom drivers you can unintenntionaly install wrong driver for another device (you will know if this is relevant for you - but it is imprtant to note it.)</p>
+</div>
+</li>
+<li><p>Delete all other nvidia driver’s version and corresponding libraries - use <code class="docutils literal notranslate"><span class="pre">purge</span></code> command for it.</p></li>
+<li><p>Restart your computer.</p></li>
+<li><p>If you have issues with the graphics after restart do the following:</p>
+<ol class="arabic simple">
+<li><p>Close your eyes and breathe slowely in and out at least once :)</p></li>
+<li><p>You probably didn’t install everything properly so the open-source <code class="docutils literal notranslate"><span class="pre">noveau</span></code> driver is used which is not adequate for this scenario.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">&lt;CTRL&gt;</span> <span class="pre">+</span> <span class="pre">&lt;ALT&gt;</span> <span class="pre">+</span> <span class="pre">&lt;F2-3-4...&gt;</span></code> keys to switch to a linux terminal.</p></li>
+<li><p>Login there and execute <code class="docutils literal notranslate"><span class="pre">ubuntu-drivers</span></code> command to install missing drivers.</p></li>
+<li><p>Now restart again and everything should work properly.</p></li>
+</ol>
+</li>
+<li><p>Now check again output of the <code class="docutils literal notranslate"><span class="pre">ṅvidia-smi</span></code> command</p></li>
+</ol>
+</section>
+<section id="graphics-card-should-be-used-in-the-performance-mode">
+<h3>Graphics card should be used in the <code class="docutils literal notranslate"><span class="pre">Performance</span></code> mode<a class="headerlink" href="#graphics-card-should-be-used-in-the-performance-mode" title="Permalink to this headline"></a></h3>
+<p>If you have only <code class="docutils literal notranslate"><span class="pre">X</span></code> in the output from <code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> than make sure that the graphics card uses <code class="docutils literal notranslate"><span class="pre">Performance</span> <span class="pre">Mode</span></code> in <code class="docutils literal notranslate"><span class="pre">PRIME</span> <span class="pre">profile</span></code> section of “NVIDIA X Server Settings” application.</p>
+</section>
+<section id="nvidia-smi-command-inside-docker-container">
+<h3><code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> command inside docker container<a class="headerlink" href="#nvidia-smi-command-inside-docker-container" title="Permalink to this headline"></a></h3>
+<p>Take a note that <code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> command in the docker container is necessary test to see if docker has access to the graphic card, but it doesn’t shows any applications that are using it.
+You can see on your host if a docker application is using graphic card and how much.</p>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>[Docker configuration for rviz using nvidia graphics card (by &#64;ruffsl)](<a class="reference external" href="https://gist.github.com/ruffsl/e7ca631a618ece3eb0be8e4bf168accb">https://gist.github.com/ruffsl/e7ca631a618ece3eb0be8e4bf168accb</a>)</p></li>
+</ul>
 </section>
 </section>
 
