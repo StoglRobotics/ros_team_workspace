@@ -87,7 +87,7 @@ for SED_FILE in "${FILES_TO_SED[@]}"; do
 done
 
 # package.xml: Add dependencies if they not exist
-DEP_PKGS=("xacro" "rviz2" "robot_state_publisher" "joint_trajectory_controller" "joint_state_controller" "forward_command_controller" "controller_manager" "$DESCR_PKG_NAME")
+DEP_PKGS=("xacro" "rviz2" "robot_state_publisher" "joint_trajectory_controller" "joint_state_broadcaster" "forward_command_controller" "controller_manager" "$DESCR_PKG_NAME")
 
 for DEP_PKG in "${DEP_PKGS[@]}"; do
   if `grep -q $DEP_PKG package.xml`; then

@@ -135,10 +135,10 @@ def generate_launch_description():
         arguments=["-d", rviz_config_file],
     )
 
-    joint_state_controller_spawner = Node(
+    joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner.py",
-        arguments=["joint_state_controller", "--controller-manager", "/controller_manager"],
+        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
     robot_controller_spawner = Node(
@@ -153,7 +153,7 @@ def generate_launch_description():
             control_node,
             robot_state_pub_node,
             rviz_node,
-            joint_state_controller_spawner,
+            joint_state_broadcaster_spawner,
             robot_controller_spawner,
         ]
     )
