@@ -354,10 +354,10 @@ function is_valid_ros_distribution {
 }
 
 function check_ros_distro {
-  if [ -z "$1" ]; then
-    ros_distro=$1
-  fi
+  ros_distro=$1
   if [ -z "$2" ]; then
+    use_docker="false"
+  else
     use_docker=$2
   fi
 
@@ -412,10 +412,10 @@ function set_ros_version_for_distro {
 }
 
 function check_and_set_ros_distro_and_version {
-  if [ -z "$1" ]; then
-    ros_distro=$1
-  fi
+  ros_distro=$1
   if [ -z "$2" ]; then
+    use_docker="false"
+  else
     use_docker=$2
   fi
 
