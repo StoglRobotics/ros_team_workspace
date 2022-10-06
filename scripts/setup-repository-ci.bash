@@ -202,6 +202,7 @@ formatting=${formatting:="no"}
 if  [[ "$formatting" == "yes" ]]; then
   cp -n ${PACKAGE_TEMPLATES}/.clang-format .
   cp -n ${PACKAGE_TEMPLATES}/.pre-commit-config.yaml .
+  touch ".codespell-ignore-words.txt"
   pre-commit install
   pre-commit autoupdate
 fi
