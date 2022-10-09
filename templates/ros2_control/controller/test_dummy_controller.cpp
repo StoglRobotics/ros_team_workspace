@@ -400,7 +400,7 @@ TEST_F(DummyClassNameTest, test_update_logic)
 }
 
 
-TEST_F(TestControllerSetupTest, test_ref_timeout_zero_for_update)
+TEST_F(DummyClassNameTest, test_ref_timeout_zero_for_update)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -433,7 +433,7 @@ TEST_F(TestControllerSetupTest, test_ref_timeout_zero_for_update)
   ASSERT_NE((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
 }
 
-TEST_F(TestControllerSetupTest, test_ref_timeout_zero_for_reference_callback)
+TEST_F(DummyClassNameTest, test_ref_timeout_zero_for_reference_callback)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;

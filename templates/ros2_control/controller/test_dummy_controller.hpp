@@ -48,11 +48,16 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
   FRIEND_TEST(DummyClassNameTest, all_parameters_set_configure_success);
+  FRIEND_TEST(DummyClassNameTest, check_exported_intefaces);
   FRIEND_TEST(DummyClassNameTest, activate_success);
+  FRIEND_TEST(DummyClassNameTest, update_success);
+  FRIEND_TEST(DummyClassNameTest, deactivate_success);
   FRIEND_TEST(DummyClassNameTest, reactivate_success);
   FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_fast);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_slow);
+  FRIEND_TEST(DummyClassNameTest, publish_status_success);
+  FRIEND_TEST(DummyClassNameTest, receive_message_and_publish_updated_status);
   FRIEND_TEST(DummyClassNameTest, test_message_timeout);
   FRIEND_TEST(DummyClassNameTest, test_message_wrong_num_joints);
   FRIEND_TEST(DummyClassNameTest, test_message_accepted);
