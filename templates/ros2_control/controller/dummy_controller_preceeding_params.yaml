@@ -8,4 +8,4 @@ test_dummy_controller:
     state_joints:
       - joint1state
 
-    command_timeout: 0.1
+    reference_timeout: 0.1

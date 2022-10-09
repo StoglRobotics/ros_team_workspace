@@ -6,4 +6,4 @@ test_dummy_controller:
 
     interface_name: acceleration
 
-    command_timeout: 0.1
+    reference_timeout: 0.1

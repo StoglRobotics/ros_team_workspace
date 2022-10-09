@@ -33,7 +33,7 @@ dummy_controller:
     type: double,
     default_value: 0.0,
     description: "Timeout for controller references after which they will be reset. This is especially useful for controllers that can cause unwanted and dangerous behaviour if reference is not reset, e.g., velocity controllers. If value is 0 the reference is reset after each run.",
-    validation: {
-      gt_eq<>: 0.0,
-    }
+#    validation: {
+#      gt_eq<>: 0.0,
+#    }
   }
