@@ -31,7 +31,7 @@ ENV LC_ALL en_US.UTF-8
 RUN locale
 
 # Install basic utilities
-RUN nala update && nala install -y git nano sudo tmux tree vim iputils-ping wget bash-completion pre-commit trash-cli gh 
+RUN nala update && nala install -y git nano sudo tmux tree vim iputils-ping wget bash-completion pre-commit trash-cli gh
 
 # install ROS2:ROS_DUMMY_VERSION dependencies
 RUN nala install -y curl gnupg gnupg2 lsb-release software-properties-common && apt-add-repository universe
