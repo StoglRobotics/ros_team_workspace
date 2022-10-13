@@ -75,8 +75,8 @@ sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen fing
 sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
 
 ### DEVELOPMENT TOOLS ###
-# gh - Github CLI
-sudo snap install gh
+# gh - Github CLI (it seems that gh needs to be install via apt to get access to .ssh keys)
+sudo apt -y install gh
 gh completion -s bash | tee "$HOME"/.local/share/bash-completion/completions/gh.bash > /dev/null
 
 # visual studio code
