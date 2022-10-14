@@ -55,8 +55,6 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, deactivate_success);
   FRIEND_TEST(DummyClassNameTest, reactivate_success);
   FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic_fast);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic_slow);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_fast);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_slow);
   FRIEND_TEST(DummyClassNameTest, publish_status_success);
@@ -183,7 +181,11 @@ protected:
 
     // call update to publish the test value
     ASSERT_EQ(
-      controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update_reference_from_subscribers(),
+    controller_interface::return_type::OK);
+    ASSERT_EQ(
+    controller_->update_and_write_commands(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
       controller_interface::return_type::OK);
 
     // call update to publish the test value
@@ -192,7 +194,9 @@ protected:
     rclcpp::WaitSet wait_set;          // block used to wait on message
     wait_set.add_subscription(subscription);
     while (max_sub_check_loop_count--) {
-      controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01));
+      controller_->update_reference_from_subscribers();
+      controller_->update_and_write_commands(
+        controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01));
       // check if message has been received
       if (wait_set.wait(std::chrono::milliseconds(2)).kind() == rclcpp::WaitResultKind::Ready) {
         break;
