@@ -49,13 +49,24 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
   FRIEND_TEST(DummyClassNameTest, all_parameters_set_configure_success);
+  FRIEND_TEST(DummyClassNameTest, check_exported_intefaces);
   FRIEND_TEST(DummyClassNameTest, activate_success);
+  FRIEND_TEST(DummyClassNameTest, update_success);
+  FRIEND_TEST(DummyClassNameTest, deactivate_success);
   FRIEND_TEST(DummyClassNameTest, reactivate_success);
   FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_fast);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_slow);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_fast);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_slow);
+  FRIEND_TEST(DummyClassNameTest, publish_status_success);
+  FRIEND_TEST(DummyClassNameTest, receive_message_and_publish_updated_status);
+  FRIEND_TEST(DummyClassNameTest, test_message_timeout);
+  FRIEND_TEST(DummyClassNameTest, test_message_wrong_num_joints);
+  FRIEND_TEST(DummyClassNameTest, test_message_accepted);
+  FRIEND_TEST(DummyClassNameTest, test_update_logic);
+  FRIEND_TEST(DummyClassNameTest, test_ref_timeout_zero_for_update);
+  FRIEND_TEST(DummyClassNameTest, test_ref_timeout_zero_for_reference_callback);
 
 public:
   controller_interface::CallbackReturn on_configure(
@@ -197,7 +208,7 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const std::vector<double> & displacements = {0.45},
+    const rclcpp::Time & stamp, const std::vector<std::string> & joint_names = {"joint1_test"}, const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name) {
@@ -216,7 +227,8 @@ protected:
     wait_for_topic(command_publisher_->get_topic_name());
 
     ControllerReferenceMsg msg;
-    msg.joint_names = joint_names_;
+    msg.header.stamp = stamp;
+    msg.joint_names = joint_names;
     msg.displacements = displacements;
     msg.velocities = velocities;
     msg.duration = duration;
@@ -254,6 +266,8 @@ protected:
 
   std::vector<hardware_interface::StateInterface> state_itfs_;
   std::vector<hardware_interface::CommandInterface> command_itfs_;
+
+  double ref_timeout_ = 0.2;
 
   // Test related parameters
   std::unique_ptr<TestableDummyClassName> controller_;

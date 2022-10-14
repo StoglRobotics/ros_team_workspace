@@ -41,7 +41,7 @@ using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::Controll
 
 // called from RT control loop
 void reset_controller_reference_msg(
-  std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names,
+  const std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names,
   const std::shared_ptr<rclcpp_lifecycle::LifecycleNode> & node)
 {
   msg->header.stamp = node->now();
@@ -218,6 +218,40 @@ controller_interface::CallbackReturn DummyClassName::on_deactivate(
     command_interfaces_[i].set_value(std::numeric_limits<double>::quiet_NaN());
   }
   return controller_interface::CallbackReturn::SUCCESS;
+}
+
+controller_interface::return_type DummyClassName::update(
+  const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
+{
+  auto current_ref = input_ref_.readFromRT();
+  const auto age_of_last_command = get_node()->now() - (*current_ref)->header.stamp;
+
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
+  // instead of a loop
+  for (size_t i = 0; i < command_interfaces_.size(); ++i) {
+    // send message only if there is no timeout
+    if (age_of_last_command <= ref_timeout_ || ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
+      if (!std::isnan((*current_ref)->displacements[i])) {
+        if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
+          (*current_ref)->displacements[i] /= 2;
+        }
+        command_interfaces_[i].set_value((*current_ref)->displacements[i]);
+        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)){
+          (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+        }
+      }
+    } else {
+      (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+    }
+  }
+
+  if (state_publisher_ && state_publisher_->trylock()) {
+    state_publisher_->msg_.header.stamp = time;
+    state_publisher_->msg_.set_point = command_interfaces_[CMD_MY_ITFS].get_value();
+    state_publisher_->unlockAndPublish();
+  }
+
+  return controller_interface::return_type::OK;
 }
 
 controller_interface::return_type DummyClassName::update(
