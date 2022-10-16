@@ -70,14 +70,15 @@ cp -n $ROS2_CONTROL_TEMPLATES/test_goal_publishers_config.yaml $ROBOT_FPC_PUB_YA
 
 # Copy launch files
 ROBOT_LAUNCH="launch/${ROBOT_NAME}.launch.py"
-TEST_PUB_LAUNCH="launch/test_forward_position_controller.launch.py"
-TEST_JTC_PUB_LAUNCH="launch/test_joint_trajectory_controller.launch.py"
+TEST_FWD_POS_CTRL_LAUNCH="launch/test_forward_position_controller.launch.py"
+TEST_JTC_LAUNCH="launch/test_joint_trajectory_controller.launch.py"
 cp -n $ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch.py ${ROBOT_LAUNCH}
-cp -n $ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch.py $TEST_PUB_LAUNCH
+cp -n $ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch.py $TEST_FWD_POS_CTRL_LAUNCH
+cp -n $ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch.py $TEST_JTC_LAUNCH
 
 
 # sed all needed files
-FILES_TO_SED=($ROBOT_LAUNCH $TEST_PUB_LAUNCH)
+FILES_TO_SED=($ROBOT_LAUNCH $TEST_FWD_POS_CTRL_LAUNCH $TEST_JTC_LAUNCH)
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
@@ -87,7 +88,7 @@ for SED_FILE in "${FILES_TO_SED[@]}"; do
 done
 
 # package.xml: Add dependencies if they not exist
-DEP_PKGS=("xacro" "rviz2" "robot_state_publisher" "joint_trajectory_controller" "joint_state_broadcaster" "forward_command_controller" "controller_manager" "$DESCR_PKG_NAME")
+DEP_PKGS=("xacro" "rviz2" "ros2_controllers_test_nodes" "robot_state_publisher" "joint_trajectory_controller" "joint_state_broadcaster" "forward_command_controller" "controller_manager" "$DESCR_PKG_NAME")
 
 for DEP_PKG in "${DEP_PKGS[@]}"; do
   if `grep -q $DEP_PKG package.xml`; then

@@ -3,7 +3,7 @@ controller_manager:
     update_rate: 100  # Hz
 
     joint_state_broadcaster:
-      type: joint_state_broadcaster/JointStateController
+      type: joint_state_broadcaster/JointStateBroadcaster
 
     forward_position_controller:              # delete entry if controller is not applicable
       type: forward_command_controller/ForwardCommandController
