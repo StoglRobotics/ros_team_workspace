@@ -62,9 +62,9 @@ The sections below describe their usage.
 ### Joint State Controller
 Joint state Controllers provides output of robot's internal states to `/joint_states` and `/dynamic_joint_states` ROS2-topics.
 
-In a new terminal with sourced ROS2 environment load, configure and start `joint_state_controller`:
+In a new terminal with sourced ROS2 environment load, configure and start `joint_state_broadcaster`:
   ```
-  ros2 control load_start_controller joint_state_controller
+  ros2 control load_start_controller joint_state_broadcaster
   ```
 Check if controller is loaded properly:
  ```
@@ -72,7 +72,7 @@ Check if controller is loaded properly:
  ```
 You should get similar response to:
  ```
- joint_state_controller[joint_state_controller/JointStateController] active
+ joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
  ```
 
 Now you should also see your robot represented correctly in the `rviz2`.
@@ -89,7 +89,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ```
    You should get the response:
    ```
-   joint_state_controller[joint_state_controller/JointStateController] active
+   joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
    forward_<controller_type>_controller[forward_command_controller/ForwardCommandController] inactive
    ```
 
@@ -103,7 +103,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ```
    You should get `active` in the response:
    ```
-   joint_state_controller[joint_state_controller/JointStateController] active
+   joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
    forward_<controller_type>_controller[forward_command_controller/ForwardCommandController] active
    ```
 
@@ -138,7 +138,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ```
    You should get `active` in the response:
    ```
-   joint_state_controller[joint_state_controller/JointStateController] active
+   joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
    forward_<controller_type>_controller[forward_command_controller/ForwardCommandController] inactive
    ```
 
@@ -152,7 +152,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ```
    You should get `active` in the response:
    ```
-   joint_state_controller[joint_state_controller/JointStateController] active
+   joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
    joint_trajectory_controller[joint_trajectory_controller/JointTrajectoryController] active
    ```
 

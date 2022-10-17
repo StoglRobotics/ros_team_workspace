@@ -82,7 +82,7 @@ These instructions assume you are running Ubuntu 20.04:
    Sometimes packages do not list all their dependencies so `rosdep` will not install everything.
    If you are getting missing dependency errors, try manually install the following packages:
    ```
-   sudo apt install ros2-foxy-forward_command_controller ros2-foxy-joint_state_controller ros2-foxy-joint_trajectory_controller ros2-foxy-xacro
+   sudo apt install ros2-foxy-forward_command_controller ros2-foxy-joint_state_broadcaster ros2-foxy-joint_trajectory_controller ros2-foxy-xacro
    ```
 
 ### Configure and Build Workspace:
