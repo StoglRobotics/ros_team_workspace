@@ -3,10 +3,12 @@
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
+    IncludeLaunchDescription,
     RegisterEventHandler,
     TimerAction,
 )
 from launch.event_handlers import OnProcessExit, OnProcessStart
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -56,21 +58,6 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument(
-            "use_mock_hardware",
-            default_value="true",
-            description="Start robot with fake hardware mirroring command to its states.",
-        )
-    )
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "mock_sensor_commands",
-            default_value="false",
-            description="Enable fake command interfaces for sensors used for simple simulations. \
-            Used only if 'use_mock_hardware' parameter is true.",
-        )
-    )
-    declared_arguments.append(
-        DeclareLaunchArgument(
             "robot_controller",
             default_value="forward_position_controller",
             choices=["forward_position_controller", "joint_trajectory_controller"],
@@ -84,9 +71,15 @@ def generate_launch_description():
     description_package = LaunchConfiguration("description_package")
     description_file = LaunchConfiguration("description_file")
     prefix = LaunchConfiguration("prefix")
-    use_mock_hardware = LaunchConfiguration("use_mock_hardware")
-    mock_sensor_commands = LaunchConfiguration("mock_sensor_commands")
     robot_controller = LaunchConfiguration("robot_controller")
+
+    robot_controllers = PathJoinSubstitution(
+        [FindPackageShare(runtime_config_package), "config", controllers_file]
+    )
+
+    rviz_config_file = PathJoinSubstitution(
+        [FindPackageShare(description_package), "rviz", "$ROBOT_NAME$.rviz"]
+    )
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -100,30 +93,21 @@ def generate_launch_description():
             "prefix:=",
             prefix,
             " ",
-            "use_mock_hardware:=",
-            use_mock_hardware,
+            "use_mock_hardware:=false",
             " ",
-            "mock_sensor_commands:=",
-            mock_sensor_commands,
+            "mock_sensor_commands:=false",
+            " ",
+            "sim_gazebo_classic:=false",
+            " ",
+            "sim_gazebo:=true",
+            " ",
+            "simulation_controllers:=",
+            robot_controllers,
             " ",
         ]
     )
-
     robot_description = {"robot_description": robot_description_content}
 
-    robot_controllers = PathJoinSubstitution(
-        [FindPackageShare(runtime_config_package), "config", controllers_file]
-    )
-    rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare(description_package), "rviz", "$ROBOT_NAME$.rviz"]
-    )
-
-    control_node = Node(
-        package="controller_manager",
-        executable="ros2_control_node",
-        output="both",
-        parameters=[robot_description, robot_controllers],
-    )
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -136,6 +120,23 @@ def generate_launch_description():
         name="rviz2",
         output="log",
         arguments=["-d", rviz_config_file],
+    )
+
+    # Gazebo nodes
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("ros_ign_gazebo"), "/launch", "/ign_gazebo.launch.py"]
+        ),
+        launch_arguments={"ign_args": " -r -v 3 empty.sdf"}.items(),
+    )
+
+    # Spawn robot
+    gazebo_spawn_robot = Node(
+        package="ros_ign_gazebo",
+        executable="create",
+        name="spawn_rrbot",
+        arguments=["-name", "$ROBOT_NAME$", "-topic", "robot_description"],
+        output="screen",
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -158,7 +159,7 @@ def generate_launch_description():
     # Delay loading and activation of `joint_state_broadcaster` after start of ros2_control_node
     delay_joint_state_broadcaster_spawner_after_ros2_control_node = RegisterEventHandler(
         event_handler=OnProcessStart(
-            target_action=control_node,
+            target_action=gazebo_spawn_robot,
             on_start=[
                 TimerAction(
                     period=3.0,
@@ -188,7 +189,8 @@ def generate_launch_description():
     return LaunchDescription(
         declared_arguments
         + [
-            control_node,
+            gazebo,
+            gazebo_spawn_robot,
             robot_state_pub_node,
             rviz_node,
             delay_joint_state_broadcaster_spawner_after_ros2_control_node,
