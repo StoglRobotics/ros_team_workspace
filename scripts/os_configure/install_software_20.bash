@@ -68,6 +68,10 @@ sudo apt update
 sudo apt -y install nala
 nala --install-completion bash
 
+# git stable upstream version
+sudo add-apt-repository -y ppa:git-core/ppa
+sudo apt update
+
 ### BASIC TOOLS ###
 sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger tree pre-commit
 

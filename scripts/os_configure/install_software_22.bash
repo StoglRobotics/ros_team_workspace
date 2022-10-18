@@ -68,6 +68,10 @@ sudo apt update
 sudo apt -y install nala
 nala --install-completion bash
 
+# git stable upstream version
+sudo add-apt-repository -y ppa:git-core/ppa
+sudo apt update
+
 ### BASIC TOOLS ###
 sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen finger ksshaskpass kompare filelight tldr thefuck ranger tree pre-commit
 
@@ -227,16 +231,6 @@ then
   # Language packs
   sudo apt -y install language-pack-de language-pack-de-base language-pack-kde-de aspell-de hunspell-de-de hyphen-de wogerman
   sudo apt -y install language-pack-hr language-pack-hr-base language-pack-kde-hr aspell-hr hunspell-hr hyphen-hr
-
-  ### TUXEDO ###
-  # Tuxedo repositories
-  sudo sh -c 'echo "deb https://deb.tuxedocomputers.com/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/tuxedocomputers.list'
-  sudo sh -c 'echo "deb https://oibaf.tuxedocomputers.com/ubuntu $(lsb_release -sc) main" >> /etc/apt/sources.list.d/tuxedocomputers.list'
-  sudo sh -c 'echo "deb https://graphics.tuxedocomputers.com/ubuntu $(lsb_release -sc) main" >> /etc/apt/sources.list.d/tuxedocomputers.list'
-  sudo sh -c 'echo "deb https://kernel.tuxedocomputers.com/ubuntu $(lsb_release -sc) main" >> /etc/apt/sources.list.d/tuxedocomputers.list'
-  wget -O - http://deb.tuxedocomputers.com/0x54840598.pub.asc | sudo apt-key add -
-  sudo apt update
-  sudo apt -y install tuxedo-tomte tuxedo-control-center tuxedo-*
 
 fi
 
