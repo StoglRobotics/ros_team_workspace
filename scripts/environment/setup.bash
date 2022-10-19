@@ -16,7 +16,8 @@ source $script_own_dir/../_RosTeamWs_Docker_Defines.bash
 source $script_own_dir/../_Team_Defines.bash
 
 # ros distribution name will be set in $ros_distro
-check_and_set_ros_distro_and_version $1
+# RosTeamWS_WS_DOCKER_SUPPORT variable is set in .ros_team_ws_rc file and only true if docker is supported
+check_and_set_ros_distro_and_version $1 $RosTeamWS_WS_DOCKER_SUPPORT
 
 ws_folder="$2"
 if [ "$2" == "-" ]; then
