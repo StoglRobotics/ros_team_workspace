@@ -181,7 +181,8 @@ protected:
 
     // call update to publish the test value
     ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
     ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -194,7 +195,8 @@ protected:
     rclcpp::WaitSet wait_set;          // block used to wait on message
     wait_set.add_subscription(subscription);
     while (max_sub_check_loop_count--) {
-      controller_->update_reference_from_subscribers();
+      controller_->update_reference_from_subscribers(
+        controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01));
       controller_->update_and_write_commands(
         controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01));
       // check if message has been received

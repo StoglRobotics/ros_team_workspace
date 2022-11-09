@@ -111,7 +111,8 @@ TEST_F(DummyClassNameTest, update_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -141,7 +142,8 @@ TEST_F(DummyClassNameTest, reactivate_success)
   ASSERT_TRUE(std::isnan(controller_->command_interfaces_[CMD_MY_ITFS].get_value()));
 
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -203,7 +205,8 @@ TEST_F(DummyClassNameTest, test_update_logic_chainable_fast)
   ASSERT_FALSE(age_of_last_command <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -230,7 +233,8 @@ TEST_F(DummyClassNameTest, test_update_logic_chainable_fast)
   ASSERT_TRUE(age_of_last_command_2 <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -276,7 +280,8 @@ TEST_F(DummyClassNameTest, test_update_logic_chainable_slow)
   ASSERT_FALSE(age_of_last_command <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -302,7 +307,8 @@ TEST_F(DummyClassNameTest, test_update_logic_chainable_slow)
   ASSERT_TRUE(age_of_last_command_2 <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -326,7 +332,8 @@ TEST_F(DummyClassNameTest, publish_status_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -349,7 +356,8 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -365,7 +373,8 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
   ASSERT_TRUE(controller_->wait_for_commands(executor));
 
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -490,7 +499,8 @@ TEST_F(DummyClassNameTest, test_update_logic)
   ASSERT_FALSE(age_of_last_command <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -512,7 +522,8 @@ TEST_F(DummyClassNameTest, test_update_logic)
   ASSERT_TRUE(age_of_last_command_2 <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(
@@ -551,7 +562,8 @@ TEST_F(DummyClassNameTest, test_ref_timeout_zero_for_update)
   
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update_reference_from_subscribers(),
+    controller_->update_reference_from_subscribers(
+      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   ASSERT_EQ(
     controller_->update_and_write_commands(

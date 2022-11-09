@@ -240,10 +240,11 @@ controller_interface::CallbackReturn DummyClassName::on_deactivate(
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-controller_interface::return_type DummyClassName::update_reference_from_subscribers()
+controller_interface::return_type DummyClassName::update_reference_from_subscribers(
+  const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
   auto current_ref = input_ref_.readFromRT();
-  const auto age_of_last_command = get_node()->now() - (*current_ref)->header.stamp;
+  const auto age_of_last_command = time - (*current_ref)->header.stamp;
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
@@ -270,7 +271,7 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
   auto current_ref = input_ref_.readFromRT();
-  const auto age_of_last_command = get_node()->now() - (*current_ref)->header.stamp;
+  const auto age_of_last_command = time - (*current_ref)->header.stamp;
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
