@@ -144,7 +144,6 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 
 void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
 {
-  const auto age_of_last_command = get_node()->now() - msg->header.stamp;
   // if no timestamp provided use current time for command timestamp
   if (msg->header.stamp.sec == 0 && msg->header.stamp.nanosec == 0u) {
     RCLCPP_WARN(
@@ -152,6 +151,7 @@ void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenc
       "Timestamp in header is missing, using current time as command timestamp.");
     msg->header.stamp = get_node()->now();
   }
+  const auto age_of_last_command = get_node()->now() - msg->header.stamp;
   if (msg->joint_names.size() == params_.joints.size()) {
     if (ref_timeout_ == rclcpp::Duration::from_seconds(0) || age_of_last_command <= ref_timeout_) {
     input_ref_.writeFromNonRT(msg);
