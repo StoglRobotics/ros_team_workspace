@@ -155,12 +155,15 @@ void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenc
   if (msg->joint_names.size() == params_.joints.size()) {
     if (ref_timeout_ == rclcpp::Duration::from_seconds(0) || age_of_last_command <= ref_timeout_) {
     input_ref_.writeFromNonRT(msg);
-  } else {
+    } else {
     RCLCPP_ERROR(
       get_node()->get_logger(),
-        "Received message has timestamp %.10f older then allowed timeout at timestamp %.10f",
-         rclcpp::Time(msg->header.stamp).seconds(), get_node()->now().seconds());
+      "Received message has timestamp %.10f older for %.10f which is more then allowed timeout "
+      "(%.4f).",
+      rclcpp::Time(msg->header.stamp).seconds(), age_of_last_command.seconds(),
+      ref_timeout_.seconds());
     }
+    
   } else {
     RCLCPP_ERROR(
       get_node()->get_logger(),
