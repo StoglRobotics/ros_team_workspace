@@ -50,6 +50,8 @@ select_normal_or_nvidia_docker() {
     notify_user "To abort press <CTRL>+<C>, to continue press <ENTER>."
     read
   esac
+
+
 }
 
 check_user_input () {
@@ -357,6 +359,25 @@ create_workspace_docker () {
   sed -i "s/UBUNTU_DUMMY_VERSION/${ubuntu_version}/g" "$ws_docker_folder/Dockerfile"
   sed -i "s/ROS_DUMMY_VERSION/${docker_ros_distro_name}/g" "$ws_docker_folder/Dockerfile"
   sed -i "s/ROS_TEAM_WS_DUMMY_BRANCH/${rtw_branch_for_ros_distro}/g" "$ws_docker_folder/Dockerfile"
+  if [[ "${ubuntu_version}" == *20.04* ]]; then
+    DOCKER_FILE="$ws_docker_folder/Dockerfile"
+    TMP_FILE="$ws_docker_folder/.tmp_Dockerfile"
+    mv $DOCKER_FILE "$TMP_FILE"
+    TEST_LINE=`awk '$1 == "#" && $2 == "install" && $3 == "nala" { print NR }' $TMP_FILE`  # get line before `# install nala and upgrade` dependency
+    let CUT_LINE=$TEST_LINE-0
+    head -$CUT_LINE $TMP_FILE > $DOCKER_FILE
+
+    echo "RUN apt update -y && apt install -y wget" >> $DOCKER_FILE
+    echo "RUN echo \"deb [arch=amd64,arm64,armhf] http://deb.volian.org/volian/ scar main\" | tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list" >> $DOCKER_FILE
+    echo "RUN wget -qO - https://deb.volian.org/volian/scar.key | tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg > /dev/null" >> $DOCKER_FILE
+    echo "RUN apt update -y && apt install -y nala-legacy" >> $DOCKER_FILE
+
+    # Add last part
+    let CUT_LINE=$TEST_LINE+2
+    tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
+
+    rm $TMP_FILE
+  fi
 
   # setup ros_team_ws
   cp "$DOCKER_TEMPLATES/ros_team_ws_rc_docker" "$ws_docker_folder/."
