@@ -7,7 +7,7 @@ source $setup_ws_script_own_dir/docker/_RosTeamWs_Docker_Defines.bash
 
 # All the possible supported ros distributions supported by rtw
 if [ -z "$ros_distributions_20_04" ]; then
-  readonly ros_distributions_20_04=("foxy" "galactic")
+  readonly ros_distributions_20_04=("noetic" "foxy" "galactic")
 fi
 if [ -z "$ros_distributions_22_04" ]; then
   readonly ros_distributions_22_04=("humble")
