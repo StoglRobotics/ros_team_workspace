@@ -362,6 +362,22 @@ create_workspace_docker () {
   if [[ "${ubuntu_version}" == *20.04* ]]; then
     DOCKER_FILE="$ws_docker_folder/Dockerfile"
     TMP_FILE="$ws_docker_folder/.tmp_Dockerfile"
+
+    # Add ROS 1 repositories
+    mv $DOCKER_FILE "$TMP_FILE"
+    TEST_LINE=`awk '$1 == "#" && $2 == "ROS2" && $3 == "repository" { print NR }' $TMP_FILE`  # get line before `# ROS2 repository`
+    let CUT_LINE=$TEST_LINE-1
+    head -$CUT_LINE $TMP_FILE > $DOCKER_FILE
+
+    echo "# ROS repository" >> $DOCKER_FILE
+    echo "RUN echo \"deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main\" | tee /etc/apt/sources.list.d/ros.list > /dev/null" >> $DOCKER_FILE
+    echo "" >> $DOCKER_FILE
+
+    # Add last part
+    let CUT_LINE=$TEST_LINE+0
+    tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
+
+    # Add repositories for Nala
     mv $DOCKER_FILE "$TMP_FILE"
     TEST_LINE=`awk '$1 == "#" && $2 == "install" && $3 == "nala" { print NR }' $TMP_FILE`  # get line before `# install nala and upgrade` dependency
     let CUT_LINE=$TEST_LINE-0
@@ -376,6 +392,7 @@ create_workspace_docker () {
     let CUT_LINE=$TEST_LINE+2
     tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
 
+    # Cleanup temp files
     rm $TMP_FILE
   fi
 
