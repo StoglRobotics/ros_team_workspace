@@ -40,7 +40,7 @@ build_docker_image () {
   prev_pwd=$(pwd)
   cd "$(dirname "$docker_file_path")" || { echo "Could not change directory to new workspace"; return 1; }
 
-  echo "Building docker image $docker_image_tag with docker file $docker_file_path. This can take a while..."
+  notify_user "Building docker image $docker_image_tag with docker file $docker_file_path. This can take a while..."
   sleep 1 # sleep a second, so that user can read above message
   docker build \
   --build-arg user=$USER \
@@ -89,7 +89,7 @@ create_docker_container() {
   fi
   # END: Needed for Nvidia support
 
-  echo "Instantiating docker image '$docker_image_tag' and mapping workspace folder to '$ws_folder'."
+  notify_user "Instantiating docker image '$docker_image_tag' and mapping workspace folder to '$ws_folder'."
   xhost +local:docker
   docker run \
   --net=host \
