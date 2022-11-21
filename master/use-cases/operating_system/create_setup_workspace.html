@@ -232,7 +232,7 @@ The script creates in <code class="docutils literal notranslate"><span class="pr
 </section>
 <section id="recreate-a-container">
 <h3>Recreate a container<a class="headerlink" href="#recreate-a-container" title="Permalink to this headline"></a></h3>
-<p>If you removed an image,  you can recreate it by switching into the <code class="docutils literal notranslate"><span class="pre">.rtw_docker_defines</span></code> folder inside your workspace and then executing the <code class="docutils literal notranslate"><span class="pre">.\build_docker_image</span></code> command. After the container is rebuilt, you can create it with <code class="docutils literal notranslate"><span class="pre">.\create_docker_container</span></code> command. Thereafter, you should be able to normally start, reconnect and stop the container.</p>
+<p>If you removed an image,  you can recreate it by switching into the <code class="docutils literal notranslate"><span class="pre">.rtw_docker_defines</span></code> folder inside your workspace and then executing the <code class="docutils literal notranslate"><span class="pre">./recreate_docker.sh</span></code> command. After the process is finished you should be able to normally start, reconnect and stop the container.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For more general questions on the usage of docker and the limitations of RosTeamWS in interacting with docker have a look at our <a class="reference internal" href="../../docker/index.html#docker-overview"><span class="std std-ref">docker related docs</span></a>.</p>
