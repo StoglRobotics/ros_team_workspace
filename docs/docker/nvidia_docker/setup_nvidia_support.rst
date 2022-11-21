@@ -157,14 +157,7 @@ Change the Dockerfile
 
    .. code-block:: bash
 
-      .\build_docker_image
-
-   to rebuild your container. After the rebuilt has finished you can recreate it with
-
-   .. code-block:: bash
-
-      .\create_docker_container
-
+      ./recreate_docker.sh
 
 You now should have a docker container which exposes your nvidia drivers and can switch to your workspace with ``rtw_switch_to_docker``.
 
