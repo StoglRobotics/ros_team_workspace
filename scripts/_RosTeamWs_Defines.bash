@@ -315,14 +315,23 @@ function user_decision {
   local decision=$1
   user_answer=$2
 
-  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}[${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}${TERMINAL_COLOR_NC} [${rtw_accepted_answers[*]}]"
   read user_answer
 
   while ! $(is_accepted_user_answer "$user_answer");
   do
-    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision} Please type one of the following: [${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}${TERMINAL_COLOR_NC} ${TERMINAL_COLOR_USER_NOTICE}Please type one of the following:${TERMINAL_COLOR_NC} [${rtw_accepted_answers[*]}]"
     read user_answer
   done
+}
+
+# function which prints a notification in predefined color scheme and wait for user confirmation
+# $1 - notification = The message which gets print to the commandline
+function user_confirmation {
+  notification=$1
+
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}${notification}${TERMINAL_COLOR_NC}"
+  read
 }
 
 function set_framework_default_paths {
