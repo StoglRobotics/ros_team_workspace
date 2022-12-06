@@ -35,6 +35,14 @@ hardware_interface::CallbackReturn DummyClassName::on_init(
   return CallbackReturn::SUCCESS;
 }
 
+hardware_interface::CallbackReturn DummyClassName::on_configure(
+  const rclcpp_lifecycle::State & /*previous_state*/)
+{
+  // TODO(anyone): prepare the robot to be ready for read calls and write calls of some interfaces
+
+  return CallbackReturn::SUCCESS;
+}
+
 std::vector<hardware_interface::StateInterface> DummyClassName::export_state_interfaces()
 {
   std::vector<hardware_interface::StateInterface> state_interfaces;
