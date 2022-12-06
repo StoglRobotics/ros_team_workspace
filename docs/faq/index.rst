@@ -7,7 +7,8 @@ On Docker
 
 How to forward a xsession
 """""""""""""""""""""""""""""
-If you want to forward a xsession from docker (e.g. rviz2), you have to install xhost. When executing the commands ``start_container`` the docker user is added to the X Server access list.
+If you want to forward a xsession from docker (e.g. rviz2), you have to install xhost.
+The forwarding is done automatically by adding docker user to the X Server access list when docker is created.
 
 
 How to use nvidia driver in docker

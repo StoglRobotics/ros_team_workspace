@@ -24,7 +24,7 @@ declare -r -A ros_distro_to_rtw_branch=( ["noetic"]="master" ["foxy"]="foxy" ["g
 
 # $1 = name (tag) of the created docker image
 # $2 = Dockerfile which is used for creating the image
-build_docker_image () {
+RTW_Docker_build_docker_image () {
   if [ -z "$1" ]; then
     echo "No docker image tag specified. Can not create image."
     return 1
@@ -53,7 +53,7 @@ build_docker_image () {
   cd "$prev_pwd" || { print_and_exit "Build of docker container succeeded but changing back previous working directory failed."; }
 }
 
-create_docker_container() {
+RTW_Docker_create_docker_container () {
   if [ -z "$1" ]; then
     print_and_exit "No docker image (tag) specified. Can not instantiate image."
   fi
@@ -107,77 +107,93 @@ create_docker_container() {
   -it "$docker_image_tag" /bin/bash
 }
 
-connect_user () {
+RTW_Docker_connect_user () {
   if [ -z "$1" ]; then
     print_and_exit "No container name given. Can not connect to instance."
   fi
   local container_instance_name
   container_instance_name=$1 # assigen separate https://github.com/koalaman/shellcheck/wiki/SC2155
 
-  echo "Connecting to container instance: $container_instance_name as user."
+  echo -e "${RTW_COLOR_NOTIFY_USER}Connecting to container instance as user:${TERMINAL_COLOR_NC} $container_instance_name"
   docker exec -u $USER -it "$container_instance_name" /bin/bash
 }
 
-connect_root_user () {
+RTW_Docker_connect_root_user () {
   if [ -z "$1" ]; then
     print_and_exit "No container name given. Can not connect to instance."
   fi
   local container_instance_name
   container_instance_name=$1 # assigen separate https://github.com/koalaman/shellcheck/wiki/SC2155
 
-  echo "Connecting to container instance: $container_instance_name as root-user."
+  echo -e "${RTW_COLOR_NOTIFY_USER}Connecting to container instance as root-user:${TERMINAL_COLOR_NC} $container_instance_name"
   docker exec -u root -it "$container_instance_name" /bin/bash
 }
 
-start_container () {
+RTW_Docker_start_container () {
   if [ -z "$1" ]; then
     print_and_exit "No container name given. Can not start dockerinstance."
   fi
   local container_instance_name
   container_instance_name=$1 # assigen separate https://github.com/koalaman/shellcheck/wiki/SC2155
 
-  echo "Starting container instance: $container_instance_name "
+  echo -e "${RTW_COLOR_NOTIFY_USER}Starting container instance:${TERMINAL_COLOR_NC} $container_instance_name "
   xhost +local:docker
   docker start "$container_instance_name"
 }
 
-stop_container () {
+RTW_Docker_stop_container () {
   if [ -z "$1" ]; then
     print_and_exit "No container name given. Can not stop dockerinstance."
   fi
   local container_instance_name
   container_instance_name=$1 # assigen separate https://github.com/koalaman/shellcheck/wiki/SC2155
 
-  echo "Stopping container instance: $container_instance_name "
+  echo -e "${RTW_COLOR_NOTIFY_USER}Stopping container instance:${TERMINAL_COLOR_NC} $container_instance_name"
   xhost -local:docker
   docker stop "$container_instance_name"
 }
 
-start_and_connect_user_to_docker () {
+RTW_Docker_start_and_connect_user_to_docker () {
   if [ -z "$1" ]; then
     print_and_exit "The given docker tag is empty, something went wrong. Does your current workspace contain a RosTeamWS_DOCKER_TAG in .ros_team_ws_rc ?"
   fi
   local container_instance_name="$1-instance"
 
-  start_container "$container_instance_name"
-  connect_user "$container_instance_name"
+  RTW_Docker_start_container "$container_instance_name"
+  RTW_Docker_connect_user "$container_instance_name"
 }
 
-start_and_connect_root_to_docker () {
+RTW_Docker_start_and_connect_root_to_docker () {
   if [ -z "$1" ]; then
     print_and_exit "The given docker tag is empty, something went wrong. Does your current workspace contain a RosTeamWS_DOCKER_TAG in .ros_team_ws_rc ?"
   fi
   local container_instance_name="$1-instance"
 
-  start_container "$container_instance_name"
-  connect_root_user "$container_instance_name"
+  RTW_Docker_start_container "$container_instance_name"
+  RTW_Docker_connect_root_user "$container_instance_name"
 }
 
-stop_docker_container () {
+RTW_Docker_stop_docker_container () {
   if [ -z "$1" ]; then
     print_and_exit "The given docker tag is empty, something went wrong. Does your current workspace contain a RosTeamWS_DOCKER_TAG in .ros_team_ws_rc ?"
   fi
   local container_instance_name="$1-instance"
 
-  stop_container "$container_instance_name"
+  RTW_Docker_stop_container "$container_instance_name"
+}
+
+RTW_Docker_clean_container_and_image () {
+  if [ -z "$1" ]; then
+    print_and_exit "The given docker tag is empty, something went wrong. Does your current workspace contain a RosTeamWS_DOCKER_TAG in .ros_team_ws_rc ?"
+  fi
+  local image_tag="$1"
+  local container_instance_name="$image_tag-instance"
+
+  RTW_Docker_stop_container "$container_instance_name"
+
+  echo -e "${RTW_COLOR_NOTIFY_USER}Removing container instance:${TERMINAL_COLOR_NC} $container_instance_name"
+  docker container rm "$container_instance_name"
+
+  echo -e "${RTW_COLOR_NOTIFY_USER}Removing image:${TERMINAL_COLOR_NC} $image_tag"
+  docker image rm "$image_tag"
 }
