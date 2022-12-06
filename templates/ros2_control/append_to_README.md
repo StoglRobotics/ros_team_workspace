@@ -27,11 +27,11 @@ The general package structure is the following:
 Consult the repository and [ros2_control documentation](https://ros-controls.github.io/control.ros.org/) for more details.
 
 
-## Testing the *fake* robot using ros2_control-framework
+## Testing the *mock* robot using ros2_control-framework
 
 **ATTENTION**: if the package is not build and sourced do this first
 
-1. Start robot's hardware and load controllers (default configuration starts fake hardware)
+1. Start robot's hardware and load controllers (default configuration starts mock hardware)
    ```
    ros2 launch $PKG_NAME$ $ROBOT_NAME$.launch.py
    ```
