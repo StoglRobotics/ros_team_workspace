@@ -186,7 +186,8 @@
 <h2>On Docker<a class="headerlink" href="#on-docker" title="Permalink to this headline"></a></h2>
 <section id="how-to-forward-a-xsession">
 <h3>How to forward a xsession<a class="headerlink" href="#how-to-forward-a-xsession" title="Permalink to this headline"></a></h3>
-<p>If you want to forward a xsession from docker (e.g. rviz2), you have to install xhost. When executing the commands <code class="docutils literal notranslate"><span class="pre">start_container</span></code> the docker user is added to the X Server access list.</p>
+<p>If you want to forward a xsession from docker (e.g. rviz2), you have to install xhost.
+The forwarding is done automatically by adding docker user to the X Server access list when docker is created.</p>
 </section>
 <section id="how-to-use-nvidia-driver-in-docker">
 <h3>How to use nvidia driver in docker<a class="headerlink" href="#how-to-use-nvidia-driver-in-docker" title="Permalink to this headline"></a></h3>
