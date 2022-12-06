@@ -25,5 +25,5 @@ jobs:
         distribution: rolling
         linter: ${{ matrix.linter }}
         arguments: ${{ matrix.arguments }}
-        # package-name:
-          # ros_team_workspace
+        package-name:
+          ros_team_workspace
