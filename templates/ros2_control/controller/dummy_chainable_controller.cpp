@@ -87,8 +87,7 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   if (params_.joints.size() != state_joints_.size()) {
     RCLCPP_FATAL(
       get_node()->get_logger(),
-      "Size of 'joints' (%d) and 'state_joints' (%d) parameters has "
-      "to be the same!",
+      "Size of 'joints' (%zu) and 'state_joints' (%zu) parameters has to be the same!",
       params_.joints.size(), state_joints_.size());
     return CallbackReturn::FAILURE;
   }
