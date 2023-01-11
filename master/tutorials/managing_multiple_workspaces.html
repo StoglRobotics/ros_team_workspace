@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>3. Managing multiple workspaces &mdash; ROS Team Workspace Documentation: Galactic Dec 2022 documentation</title>
+  <title>3. Managing multiple workspaces &mdash; ROS Team Workspace Documentation: Galactic Jan 2023 documentation</title>
   
 
   
@@ -185,7 +185,7 @@
 <p id="tutorial-managing-multiple-workspaces">Before learning how to manage multiple workspace with RosTeamWorkspace be sure that you have set everything up as described in this <a class="reference internal" href="setting_up_rtw.html#tutorial-setting-up-rtw"><span class="std std-ref">tutorial</span></a>.</p>
 <p>Also be sure that you opened a new terminal after you setup RosTeamWorkspace to be configured permanently.</p>
 <p>First setup a new workspace called <code class="docutils literal notranslate"><span class="pre">ws_rolling_ros2c_demos</span></code> inside a <code class="docutils literal notranslate"><span class="pre">~/workspace</span></code> folder.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace ~/workspace/ws_rolling_ros2c_demos rolling
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace<span class="w"> </span>~/workspace/ws_rolling_ros2c_demos<span class="w"> </span>rolling
 </pre></div>
 </div>
 <p>When asked for confirmation just press &lt;ENTER&gt;.
@@ -197,9 +197,9 @@ Those can be used out of any folder you are in.</p>
 <li><p>Make sure your workspace is sourced by executing <code class="docutils literal notranslate"><span class="pre">_ws_rolling_ros2c_demos</span></code>. Then enter the source folder using <code class="docutils literal notranslate"><span class="pre">rosds</span></code> alias.</p></li>
 <li><p>Clone <code class="docutils literal notranslate"><span class="pre">ros2_control_demos</span></code> repository for testing either:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone git@github.com:ros-controls/ros2_control_demos.git <span class="c1"># SSH</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:ros-controls/ros2_control_demos.git<span class="w"> </span><span class="c1"># SSH</span>
 <span class="c1"># or if no ssh key is setup:</span>
-git clone https://github.com/ros-controls/ros2_control_demos.git <span class="c1"># HTTPS</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ros-controls/ros2_control_demos.git<span class="w"> </span><span class="c1"># HTTPS</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
@@ -211,7 +211,7 @@ git clone https://github.com/ros-controls/ros2_control_demos.git <span class="c1
 <ol class="arabic simple" start="4">
 <li><p>Install dependencies to be sure we got everything:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep install --from-paths src -y -i -r
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>-y<span class="w"> </span>-i<span class="w"> </span>-r
 </pre></div>
 </div>
 <p><strong>NOTE</strong>: if <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> command fails with a comment that binary packages can not be found by apt, try to update you rosdep index using <code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">update</span></code> command or even your package index using <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">update</span></code>.</p>
@@ -223,7 +223,7 @@ git clone https://github.com/ros-controls/ros2_control_demos.git <span class="c1
 </div>
 <p>Everything should now have been built successfully!</p>
 <p>Next let’s add another workspace</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace ~/workspace/ws_rolling_gz_demos rolling
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace<span class="w"> </span>~/workspace/ws_rolling_gz_demos<span class="w"> </span>rolling
 </pre></div>
 </div>
 <p>Now repeat the above steps to and add <a class="reference external" href="https://github.com/ros-controls/gz_ros2_control">gz_ros2_control</a> repository for testing and execute a demo from there.</p>
@@ -244,7 +244,7 @@ git clone https://github.com/ros-controls/ros2_control_demos.git <span class="c1
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2022, Stogl Robotics Consulting UG (haftungsbeschränkt).
+        &#169; Copyright 2023, Stogl Robotics Consulting UG (haftungsbeschränkt).
 
     </p>
   </div>

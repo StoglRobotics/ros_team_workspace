@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Nvidia support for docker &mdash; ROS Team Workspace Documentation: Galactic Dec 2022 documentation</title>
+  <title>Nvidia support for docker &mdash; ROS Team Workspace Documentation: Galactic Jan 2023 documentation</title>
   
 
   
@@ -213,7 +213,7 @@
 This depends on the operating system and package manager you are using so you have to look it up.
 You can then check your drivers by typing</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nvidia-smi <span class="c1"># NVIDIA System Management Interface program</span>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nvidia-smi<span class="w"> </span><span class="c1"># NVIDIA System Management Interface program</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -254,27 +254,27 @@ You can then check your drivers by typing</p>
 <ol class="arabic">
 <li><p>You then have to install the NVIDIA Container Toolkit for docker as described <a class="reference external" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker">in official documentation</a>.
 For Ubuntu this can be done as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">distribution</span><span class="o">=</span><span class="k">$(</span>. /etc/os-release<span class="p">;</span><span class="nb">echo</span> <span class="nv">$ID$VERSION_ID</span><span class="k">)</span> <span class="se">\</span>
-   <span class="o">&amp;&amp;</span> curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey <span class="p">|</span> sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg <span class="se">\</span>
-   <span class="o">&amp;&amp;</span> curl -s -L https://nvidia.github.io/libnvidia-container/<span class="nv">$distribution</span>/libnvidia-container.list <span class="p">|</span> <span class="se">\</span>
-      sed <span class="s1">&#39;s#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g&#39;</span> <span class="p">|</span> <span class="se">\</span>
-      sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">distribution</span><span class="o">=</span><span class="k">$(</span>.<span class="w"> </span>/etc/os-release<span class="p">;</span><span class="nb">echo</span><span class="w"> </span><span class="nv">$ID$VERSION_ID</span><span class="k">)</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://nvidia.github.io/libnvidia-container/gpgkey<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span>-o<span class="w"> </span>/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>-L<span class="w"> </span>https://nvidia.github.io/libnvidia-container/<span class="nv">$distribution</span>/libnvidia-container.list<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>sed<span class="w"> </span><span class="s1">&#39;s#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/sources.list.d/nvidia-container-toolkit.list
 </pre></div>
 </div>
 <p>You then have to update your package list to include the new added nvidia-docker2.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt-get update
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
 </pre></div>
 </div>
 <p>And install the the NVIDIA Container Toolkit:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt-get install -y nvidia-docker2
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>nvidia-docker2
 </pre></div>
 </div>
 <p>After the installation finished, you need to restart the Docker daemon:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo service docker restart
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>service<span class="w"> </span>docker<span class="w"> </span>restart
 </pre></div>
 </div>
 <p>At this point you can verify that everything works as intended by running:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker run --rm --gpus all nvidia/cuda:11.7.1-base-ubuntu22.04 nvidia-smi
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--gpus<span class="w"> </span>all<span class="w"> </span>nvidia/cuda:11.7.1-base-ubuntu22.04<span class="w"> </span>nvidia-smi
 </pre></div>
 </div>
 </li>
@@ -332,10 +332,10 @@ For Ubuntu this can be done as follows:</p>
 <p>A list of all available containers can be found <a class="reference external" href="https://hub.docker.com/r/nvidia/cuda">in the official documentation</a>.</p>
 </li>
 <li><p>Remove the existing docker container and image.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker container rm &lt;container-name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>container<span class="w"> </span>rm<span class="w"> </span>&lt;container-name&gt;
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker image rm &lt;image-name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>image<span class="w"> </span>rm<span class="w"> </span>&lt;image-name&gt;
 </pre></div>
 </div>
 </li>
@@ -409,7 +409,7 @@ You can see on your host if a docker application is using graphic card and how m
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2022, Stogl Robotics Consulting UG (haftungsbeschränkt).
+        &#169; Copyright 2023, Stogl Robotics Consulting UG (haftungsbeschränkt).
 
     </p>
   </div>

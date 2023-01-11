@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>1. Quick start with RosTeamWorkspace &mdash; ROS Team Workspace Documentation: Galactic Dec 2022 documentation</title>
+  <title>1. Quick start with RosTeamWorkspace &mdash; ROS Team Workspace Documentation: Galactic Jan 2023 documentation</title>
   
 
   
@@ -196,61 +196,61 @@ First you have to clone and source the workspace and then continue with the use-
 </div>
 <section id="clone-and-source-the-rosteamworkspace">
 <h2><span class="section-number">1.1. </span>Clone and source the RosTeamWorkspace<a class="headerlink" href="#clone-and-source-the-rosteamworkspace" title="Permalink to this headline"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/StoglRobotics/ros_team_workspace.git
-<span class="nb">source</span> ros_team_workspace/setup.bash
-setup-auto-sourcing  <span class="c1"># Make RosTeamWorkspace automatically sourced when open a new terminal (The best experience)</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/StoglRobotics/ros_team_workspace.git
+<span class="nb">source</span><span class="w"> </span>ros_team_workspace/setup.bash
+setup-auto-sourcing<span class="w">  </span><span class="c1"># Make RosTeamWorkspace automatically sourced when open a new terminal (The best experience)</span>
 </pre></div>
 </div>
 </section>
 <section id="create-new-package-in-an-existing-workspace">
 <h2><span class="section-number">1.2. </span>Create new package in an existing workspace<a class="headerlink" href="#create-new-package-in-an-existing-workspace" title="Permalink to this headline"></a></h2>
 <p>For more details check <a class="reference internal" href="../use-cases/ros_packages/create_package.html#uc-new-package"><span class="std std-ref">use-case description</span></a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
-<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>&lt;path<span class="w"> </span>to<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;/install/setup.bash
+<span class="nb">cd</span><span class="w"> </span>&lt;src<span class="w"> </span>folder<span class="w"> </span>of<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;
 
-create-new-package &lt;my_new_package_name&gt; &lt;<span class="s2">&quot;Some cool description of the package.&quot;</span>&gt;  <span class="c1"># follow the instructions and remember to set a license</span>
+create-new-package<span class="w"> </span>&lt;my_new_package_name&gt;<span class="w"> </span>&lt;<span class="s2">&quot;Some cool description of the package.&quot;</span>&gt;<span class="w">  </span><span class="c1"># follow the instructions and remember to set a license</span>
 
-<span class="nb">cd</span> .. <span class="o">&amp;&amp;</span> colcon build --symlink-install  <span class="c1"># to compile your newly created package</span>
+<span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w">  </span><span class="c1"># to compile your newly created package</span>
 </pre></div>
 </div>
 </section>
 <section id="create-robot-description-package">
 <h2><span class="section-number">1.3. </span>Create robot description package<a class="headerlink" href="#create-robot-description-package" title="Permalink to this headline"></a></h2>
 <p>For more details check <a class="reference internal" href="../use-cases/ros_packages/setup_robot_description_package.html#uc-setup-robot-description"><span class="std std-ref">use-case description</span></a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
-<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;/&lt;package_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>&lt;path<span class="w"> </span>to<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;/install/setup.bash
+<span class="nb">cd</span><span class="w"> </span>&lt;src<span class="w"> </span>folder<span class="w"> </span>of<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;/&lt;package_name&gt;
 
-setup-robot-description &lt;my_cool_robot_name&gt; &lt;package_name&gt;
+setup-robot-description<span class="w"> </span>&lt;my_cool_robot_name&gt;<span class="w"> </span>&lt;package_name&gt;
 </pre></div>
 </div>
 </section>
 <section id="create-robot-bringup-package">
 <h2><span class="section-number">1.4. </span>Create robot bringup package<a class="headerlink" href="#create-robot-bringup-package" title="Permalink to this headline"></a></h2>
 <p>For more details check <a class="reference internal" href="../use-cases/ros_packages/setup_robot_bringup_package.html#uc-setup-robot-bringup"><span class="std std-ref">use-case description</span></a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
-<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;/&lt;package_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>&lt;path<span class="w"> </span>to<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;/install/setup.bash
+<span class="nb">cd</span><span class="w"> </span>&lt;src<span class="w"> </span>folder<span class="w"> </span>of<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;/&lt;package_name&gt;
 
-setup-robot-bringup &lt;my_cool_robot_name&gt; &lt;package_name&gt;
+setup-robot-bringup<span class="w"> </span>&lt;my_cool_robot_name&gt;<span class="w"> </span>&lt;package_name&gt;
 </pre></div>
 </div>
 </section>
 <section id="setup-ros2-control-control-hardware">
 <h2><span class="section-number">1.5. </span>Setup  ros2_control control hardware<a class="headerlink" href="#setup-ros2-control-control-hardware" title="Permalink to this headline"></a></h2>
 <p>For more details check <a class="reference internal" href="../use-cases/ros2_control/setup_robot_hardware_interface.html#uc-setup-ros2-control-hardware"><span class="std std-ref">use-case description</span></a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
-<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;/&lt;package_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>&lt;path<span class="w"> </span>to<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;/install/setup.bash
+<span class="nb">cd</span><span class="w"> </span>&lt;src<span class="w"> </span>folder<span class="w"> </span>of<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;/&lt;package_name&gt;
 
-ros2_control_setup-hardware-interface-package &lt;control_hardware_file_name&gt;
+ros2_control_setup-hardware-interface-package<span class="w"> </span>&lt;control_hardware_file_name&gt;
 </pre></div>
 </div>
 </section>
 <section id="setup-ros2-control-controller">
 <h2><span class="section-number">1.6. </span>Setup  ros2_control controller<a class="headerlink" href="#setup-ros2-control-controller" title="Permalink to this headline"></a></h2>
 <p>For more details check <a class="reference internal" href="../use-cases/ros2_control/setup_controller.html#uc-setup-ros2-controller"><span class="std std-ref">use-case description</span></a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> &lt;path to your ROS workspace&gt;/install/setup.bash
-<span class="nb">cd</span> &lt;src folder of your ROS workspace&gt;/&lt;package_name&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>&lt;path<span class="w"> </span>to<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;/install/setup.bash
+<span class="nb">cd</span><span class="w"> </span>&lt;src<span class="w"> </span>folder<span class="w"> </span>of<span class="w"> </span>your<span class="w"> </span>ROS<span class="w"> </span>workspace&gt;/&lt;package_name&gt;
 
-ros2_control_setup-controller-package &lt;controller_file_name&gt;
+ros2_control_setup-controller-package<span class="w"> </span>&lt;controller_file_name&gt;
 </pre></div>
 </div>
 </section>
@@ -270,7 +270,7 @@ ros2_control_setup-controller-package &lt;controller_file_name&gt;
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2022, Stogl Robotics Consulting UG (haftungsbeschränkt).
+        &#169; Copyright 2023, Stogl Robotics Consulting UG (haftungsbeschränkt).
 
     </p>
   </div>

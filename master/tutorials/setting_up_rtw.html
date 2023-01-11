@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>2. Setting up RosTeamWorkspace &mdash; ROS Team Workspace Documentation: Galactic Dec 2022 documentation</title>
+  <title>2. Setting up RosTeamWorkspace &mdash; ROS Team Workspace Documentation: Galactic Jan 2023 documentation</title>
   
 
   
@@ -189,11 +189,11 @@
 <section id="installation">
 <span id="tutorial-setting-up-rtw"></span><h2><span class="section-number">2.1. </span>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
 <p>To start using RosTeamWS framework clone the repository to any location using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/StoglRobotics/ros_team_workspace.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/StoglRobotics/ros_team_workspace.git
 </pre></div>
 </div>
 <p>Source the <code class="docutils literal notranslate"><span class="pre">setup.bash`</span></code> in the top folder of RosTeamWorkspace:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> ros_team_workspace/setup.bash
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>ros_team_workspace/setup.bash
 </pre></div>
 </div>
 <p>That’s all. You are now set to use RosTeamWS. If you want to add auto-sourcing you can simply execute the following command:</p>
@@ -205,13 +205,13 @@
 <section id="manual-auto-sourcing">
 <h2><span class="section-number">2.2. </span>Manual auto-sourcing<a class="headerlink" href="#manual-auto-sourcing" title="Permalink to this headline"></a></h2>
 <p>Add auto-sourcing of configuration to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> file by adding the following lines to its end using your favorite text editor (e.g., <code class="docutils literal notranslate"><span class="pre">vim</span></code> or <code class="docutils literal notranslate"><span class="pre">nano</span></code>):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="o">[</span> -f ~/.ros_team_ws_rc <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-    . ~/.ros_team_ws_rc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-f<span class="w"> </span>~/.ros_team_ws_rc<span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>.<span class="w"> </span>~/.ros_team_ws_rc
 <span class="k">fi</span>
 </pre></div>
 </div>
 <p>Copy <code class="docutils literal notranslate"><span class="pre">&lt;PATH</span> <span class="pre">TO</span> <span class="pre">ros_team_workspace&gt;/templates/.ros_team_ws_rc</span></code> file to your home folder using</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp &lt;PATH TO ros_team_workspace&gt;/templates/.ros_team_ws_rc ~/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>&lt;PATH<span class="w"> </span>TO<span class="w"> </span>ros_team_workspace&gt;/templates/.ros_team_ws_rc<span class="w"> </span>~/
 </pre></div>
 </div>
 <p>and adjust the following values using your favorite text editor:</p>
@@ -246,7 +246,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2022, Stogl Robotics Consulting UG (haftungsbeschränkt).
+        &#169; Copyright 2023, Stogl Robotics Consulting UG (haftungsbeschränkt).
 
     </p>
   </div>
