@@ -7,7 +7,8 @@
                use_mock_hardware:=^|false
                mock_sensor_commands:=^|false
                sim_gazebo_classic:=^|false
-               sim_gazebo:=^|false"
+               sim_gazebo:=^|false
+               simulation_controllers"
                >
 
     <ros2_control name="${name}" type="system">
@@ -121,7 +122,7 @@
       </gazebo>
       <gazebo>
         <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-          <parameters>$(arg simulation_controllers)</parameters>
+          <parameters>${simulation_controllers}</parameters>
         </plugin>
       </gazebo>
     </xacro:if>
@@ -132,8 +133,8 @@
       </gazebo>
       <gazebo>
         <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
-          <parameters>$(arg simulation_controllers)</parameters>
-          <controller_manager_node_name>$(arg prefix)controller_manager</controller_manager_node_name>
+          <parameters>${simulation_controllers}</parameters>
+          <controller_manager_node_name>${prefix}controller_manager</controller_manager_node_name>
         </plugin>
       </gazebo>
     </xacro:if>
