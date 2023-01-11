@@ -50,7 +50,7 @@ RTW_WS_create_docker_container_instance () {
   xhost +local:docker
   docker run \
   --net=host \
-  --gpus all \
+  $([ $(ls -la /dev | grep nvidia | wc -l) "!=" "0" ] && echo "--gpus all") \
   -h ${docker_host_name} \
   -e DISPLAY \
   -e QT_X11_NO_MITSHM=1 \
