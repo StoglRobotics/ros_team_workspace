@@ -28,6 +28,7 @@
     use_mock_hardware="$(arg use_mock_hardware)"
     mock_sensor_commands="$(arg mock_sensor_commands)"
     sim_gazebo_classic="$(arg sim_gazebo_classic)"
-    sim_gazebo="$(arg sim_gazebo)"/>
+    sim_gazebo="$(arg sim_gazebo)"
+    simulation_controllers:="$(arg simulation_controllers)" />
 
 </robot>
