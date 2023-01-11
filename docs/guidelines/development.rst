@@ -1,37 +1,61 @@
-============================
-Recommendation for developments
-============================
+=======================
+Development Guidelines
+=======================
+.. _guidelines-development:
 
-This documents proposes guidelines for developers, which increases their work efficiency and synergy within the development team. 
-**NOTE**: All the proposal here are the resuls of authors' personal experiences. Saying that, if you don't like some of it, you are free to change what you want and need (and hopefully propose it as PR).
+This documents proposes development guidelines to increase work efficiency and synergy within the rest of the team.
 
-
-How to use pre-commit :
-""""""""""""""""""""""""""""""""""""
-
-1. Install pre-commit using the following command;
-
-   pip install pre-commit
-
-2. from the root directory of the repository run the following command;
-   
-   pre-commit install
-
-3. add a pre-commit configuration file named .pre-commit-config.yaml, if not already existing in the root directory of the repository. If collaborating in a team contact your team head to access the .pre-commit-config.yaml file that is common for ally our team members;
+**NOTE**: All the proposal here are the results of authors' personal experiences. Saying that, if you have any idea to make them better you are very wellcome to create a PR.
 
 
-4.  to update the configuration file run the following command;
+1. Use *pre-commit* for formatting and linting
+===============================================
 
-   pre-commit autoupdate
+``pre-commit`` is a program that adds hooks into ``git`` so when you commit something actions can be automatically executed.
+There are many different possibility with ``pre-commit`` but it is mostly used for integrating code linters and formatters to always commit clean code.
 
-5. manually run following command of pre-commit to check status of all hooks;
+Getting started with *pre-commit*
+------------------------------------
 
-   pre-commit run -a
+First install it to you computer using:
 
-6. for your information, the following command is automatically run after every commit you make;
+   .. code-block:: bash
 
-   pre-commit install
-
-Hence expect the status of hooks on the terminal after every commit
+      pip install pre-commit
 
 
+and than tell ``git`` that you are using it by executing the following in each repository:
+
+   .. code-block:: bash
+
+      pre-commit install
+
+This will execute ``pre-commit`` on every commit you make and prevent it from doing it if some checks fail.
+If you really need to ignore check in the commit, you can add ``-n`` flag to the ``git commit`` command and they will be skipped.
+
+
+**NOTE**: If your repository does not uses ``pre-commit`` yet, it is very easy to add it by creating a configuration file ``.pre-commit-config.yaml`` in the top level of your repository (there where ``.git`` folder is).
+If you don't know where to start with *pre-commit* configuration in your ROS project, simply copy our template from `templates/package/.pre-commit-config.yaml <https://github.com/StoglRobotics/ros_team_workspace/blob/master/templates/package/.pre-commit-config.yaml>`_.
+
+
+Useful commands and options
+----------------------------
+
+* Update all the hooks in the configuration
+
+  .. code-block:: bash
+
+     pre-commit autoupdate
+
+
+* Manually run and check status of all *pre-commit* hooks:
+
+  .. code-block:: bash
+
+     pre-commit run -a
+
+* Remove *pre-commit*-hooks from automatic execution:
+
+  .. code-block:: bash
+
+     pre-commit uninstall
