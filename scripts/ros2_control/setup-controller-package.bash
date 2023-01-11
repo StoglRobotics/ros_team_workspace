@@ -188,6 +188,7 @@ FILES_TO_SED+=("$PLUGIN_XML" "$CTRL_PARAMS_YAML" "$TEST_PARAMS_YAML" "$TEST_PREC
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
+  sed -i "s/TEMPLATES__ROS2_CONTROL__VISIBILITY/${PKG_NAME^^}__VISIBILITY/g" $SED_FILE # visibility defines
   sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
   sed -i "s/dummy_controller/${FILE_NAME}/g" $SED_FILE # file name
   sed -i "s/dummy_chainable_controller/${FILE_NAME}/g" $SED_FILE # file name
@@ -240,7 +241,6 @@ fi
 # Get line with if(BUILD_TESTING)
 TEST_LINE=`awk '$1 == "if(BUILD_TESTING)" { print NR }' CMakeLists.txt`
 let CUT_LINE=$TEST_LINE-1
-head -$CUT_LINE CMakeLists.txt >> $TMP_FILE
 
 # Add Plugin library related stuff
 echo "# Add ${FILE_NAME} library related compile commands" >> $TMP_FILE
@@ -254,7 +254,9 @@ echo "  $FILE_NAME" >> $TMP_FILE
 echo "  SHARED" >> $TMP_FILE
 echo "  $CTRL_CPP" >> $TMP_FILE
 echo ")" >> $TMP_FILE
-echo "target_include_directories($FILE_NAME PRIVATE include)" >> $TMP_FILE
+echo "target_include_directories($FILE_NAME PUBLIC" >> $TMP_FILE
+echo '  "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"' >> $TMP_FILE
+echo '  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")' >> $TMP_FILE
 echo "target_link_libraries($FILE_NAME ${FILE_NAME}_parameters)" >> $TMP_FILE
 echo "ament_target_dependencies($FILE_NAME \${THIS_PACKAGE_INCLUDE_DEPENDS})" >> $TMP_FILE
 echo "target_compile_definitions($FILE_NAME PRIVATE \"${FILE_NAME^^}_BUILDING_DLL\")" >> $TMP_FILE
@@ -279,7 +281,7 @@ if [[ "$package_configured" == "no" ]]; then
     echo "" >> $TMP_FILE
     echo "install(" >> $TMP_FILE
     echo "  DIRECTORY include/" >> $TMP_FILE
-    echo "  DESTINATION include" >> $TMP_FILE
+    echo '  DESTINATION include/${PROJECT_NAME}' >> $TMP_FILE
     echo ")" >> $TMP_FILE
   fi
 fi
@@ -333,7 +335,7 @@ if [[ "$package_configured" == "no" ]]; then
   echo "  include" >> $TMP_FILE
   echo ")" >> $TMP_FILE
   echo "ament_export_dependencies(" >> $TMP_FILE
-  echo "  ${THIS_PACKAGE_INCLUDE_DEPENDS}" >> $TMP_FILE
+  echo '  ${THIS_PACKAGE_INCLUDE_DEPENDS}' >> $TMP_FILE
   echo ")" >> $TMP_FILE
 fi
 
