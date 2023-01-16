@@ -18,8 +18,8 @@ Overview
 Code Changes and Pull Request Submissions
 ==========================================
 
-To make a change of the existing code base Pull Request (GitHub) or Merge Request (GitLab) are used.
-This section describe in short process with valuable tips to make your and reviewers' life easier.
+To make a change of the existing code base, Pull Request (GitHub) or Merge Request (GitLab) are used.
+This section describes in short process with valuable tips to make your and reviewers' life easier.
 
 #. Check with the team if it is usual to submit a PR/MR from a fork or directly into target repository.
    This usually depends on the team size and organization.
@@ -44,13 +44,13 @@ This section describe in short process with valuable tips to make your and revie
 
       In *Stogl Robotics* we are always *squashing* commits, i.e., one future or one bug fix is one commit in the default branch. The commit message is edited before merging.
 
-#. Explain in the PR/MR description what you code is doing and why.
+#. Explain in the PR/MR description what your code is doing and why.
 
 #. When you are finished with development and want to submit code for the review - consider the following tips:
 
    - **Always** run *pre-commit* formaters;
    - Review your code **first by yourself** before asking someone else;
-   - Make sure there **are not** commended code blocks or if they have to be there add explanation why;
+   - Make sure there **are not** commented code blocks or if they have to be there add explanation why;
    - Resolve all TODOs or add concrete questions about them either in the code or in review comments so that other people know this is open for discussion;
    - By iterating on the review adjust **all parts** of the code with the same or similar patterns even if you get a comment about those only in one place - reviewers usually don't like to repeat themselves on each iteration of the same issue - if you are not sure about something, ask;
    - Ask yourself: *Would I like to review this code?*.
