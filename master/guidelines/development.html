@@ -103,7 +103,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Guidelines</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Development Guidelines</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#use-pre-commit-for-formatting-and-linting">1. Use <em>pre-commit</em> for formatting and linting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-changes-and-pull-request-submissions">Code Changes and Pull Request Submissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-pre-commit-for-formatting-and-linting">Use <em>pre-commit</em> for formatting and linting</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#getting-started-with-pre-commit">Getting started with <em>pre-commit</em></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#useful-commands-and-options">Useful commands and options</a></li>
 </ul>
@@ -191,8 +193,59 @@
 <h1>Development Guidelines<a class="headerlink" href="#development-guidelines" title="Permalink to this headline"></a></h1>
 <p id="guidelines-development">This documents proposes development guidelines to increase work efficiency and synergy within the rest of the team.</p>
 <p><strong>NOTE</strong>: All the proposal here are the results of authors’ personal experiences. Saying that, if you have any idea to make them better you are very wellcome to create a PR.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#">Making changes to the code-base by submitting a Pull Request</a></p></li>
+<li><p><a class="reference external" href="#use-pre-commit-for-formatting-and-linting">Using *pre-commit*</a></p></li>
+</ol>
+</section>
+<section id="code-changes-and-pull-request-submissions">
+<h2>Code Changes and Pull Request Submissions<a class="headerlink" href="#code-changes-and-pull-request-submissions" title="Permalink to this headline"></a></h2>
+<p>To make a change of the existing code base, Pull Request (GitHub) or Merge Request (GitLab) are used.
+This section describes in short process with valuable tips to make your and reviewers’ life easier.</p>
+<ol class="arabic">
+<li><p>Check with the team if it is usual to submit a PR/MR from a fork or directly into target repository.
+This usually depends on the team size and organization.
+When working with public repositories you always need to create a fork.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In <em>Stogl Robotics</em> we have the organization called <a class="reference external" href="https://github.com/StoglRobotics-forks">StoglRobotics-forks</a> where all forks of public repositories live and are accessible for writing by all team members.
+This simplify collaboration inside the team - there is no need for individual access grants when using forks under your user.
+<strong>Always</strong> check if there is already a fork in <em>StoglRobotics-forks</em> organization and if not create it.</p>
+</div>
+</li>
+<li><p>Start development always from the up-to date state of the repositories default branch (usually called <em>master</em> or <em>main</em> - for simplicity we call it <em>master</em> here).
+Take into account that master branch of your fork is usually not up to date with the upstream repository.
+Therefore be careful about that and use the opportunity to sync <em>master</em> branch of the fork to the state of the <em>master</em> branch of the upstream repository.</p></li>
+<li><p><strong>Always</strong> create a new branch for each feature or bug fix. Don’t submit PRs from <em>master</em> branch.</p></li>
+<li><p><strong>Before</strong> starting development check how the branch will be merged, using <em>merge commit</em> or <em>squash</em> method.
+If <em>merge commit</em> is used make sure that each of your commits is clean and named properly since they will become part of the repository’s history.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In <em>Stogl Robotics</em> we are always <em>squashing</em> commits, i.e., one future or one bug fix is one commit in the default branch. The commit message is edited before merging.</p>
+</div>
+</li>
+<li><p>Explain in the PR/MR description what your code is doing and why.</p></li>
+<li><p>When you are finished with development and want to submit code for the review - consider the following tips:</p>
+<ul class="simple">
+<li><p><strong>Always</strong> run <em>pre-commit</em> formaters;</p></li>
+<li><p>Review your code <strong>first by yourself</strong> before asking someone else;</p></li>
+<li><p>Make sure there <strong>are not</strong> commented code blocks or if they have to be there add explanation why;</p></li>
+<li><p>Resolve all TODOs or add concrete questions about them either in the code or in review comments so that other people know this is open for discussion;</p></li>
+<li><p>By iterating on the review adjust <strong>all parts</strong> of the code with the same or similar patterns even if you get a comment about those only in one place - reviewers usually don’t like to repeat themselves on each iteration of the same issue - if you are not sure about something, ask;</p></li>
+<li><p>Ask yourself: <em>Would I like to review this code?</em>.</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The reviews are done by other people and show respect toward their time. Reviewer’s task is <strong>not to clean</strong> the code behind you.
+Many people get very angry if you provide messy code, usually so much that you have to wait for weeks to get your code reviewed again.</p>
+</div>
+</li>
+</ol>
+</section>
 <section id="use-pre-commit-for-formatting-and-linting">
-<h2>1. Use <em>pre-commit</em> for formatting and linting<a class="headerlink" href="#use-pre-commit-for-formatting-and-linting" title="Permalink to this headline"></a></h2>
+<h2>Use <em>pre-commit</em> for formatting and linting<a class="headerlink" href="#use-pre-commit-for-formatting-and-linting" title="Permalink to this headline"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> is a program that adds hooks into <code class="docutils literal notranslate"><span class="pre">git</span></code> so when you commit something actions can be automatically executed.
 There are many different possibility with <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> but it is mostly used for integrating code linters and formatters to always commit clean code.</p>
 <section id="getting-started-with-pre-commit">
