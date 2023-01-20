@@ -181,7 +181,7 @@ epub_exclude_files = ["search.html"]
 # Output file base name for HTML help builder.
 htmlhelp_basename = "ROSTeamWorkspacedoc"
 
-html_baseurl = "https://stoglrobotics.github.io/ros_team_workspace/" + ros_distro + "/"
+html_baseurl = "https://rtw.stoglrobotics.de/" + ros_distro + "/"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
