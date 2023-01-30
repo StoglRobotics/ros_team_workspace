@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt)
 // (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -275,9 +275,15 @@ DummyClassName::update_reference_from_subscribers(
               std::numeric_limits<double>::quiet_NaN();
         }
       }
-    } else {
-      (*current_ref)->displacements[i] =
+    } else 
+    {
+      if (!std::isnan((*current_ref)->displacements[i]))
+      {
+        reference_interfaces_[i] = 0.0;
+
+        (*current_ref)->displacements[i] =
           std::numeric_limits<double>::quiet_NaN();
+      }
     }
   }
   return controller_interface::return_type::OK;
@@ -292,9 +298,8 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
   // `CMD_MY_ITFS`, instead of a loop
   for (size_t i = 0; i < command_interfaces_.size(); ++i) {
     // send message only if there is no timeout
-    if (age_of_last_command <= ref_timeout_ ||
-        ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
-      if (!std::isnan(reference_interfaces_[i])) {
+      if (!std::isnan(reference_interfaces_[i])) 
+      {
         if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
           reference_interfaces_[i] /= 2;
         }
@@ -303,9 +308,10 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
           reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
         }
       }
-    } else {
-      reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
-    }
+      else 
+      {
+        command_interfaces_[i].set_value(0.0);
+      }
   }
 
   if (state_publisher_ && state_publisher_->trylock()) {
@@ -315,6 +321,11 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
     state_publisher_->unlockAndPublish();
   }
 
+  for (size_t i = 0; i < reference_interfaces_.size(); ++i) 
+  {
+    reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
+
+  }
   return controller_interface::return_type::OK;
 }
 
