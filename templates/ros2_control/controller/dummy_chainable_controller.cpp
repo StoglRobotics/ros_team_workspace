@@ -304,9 +304,7 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
           reference_interfaces_[i] /= 2;
         }
         command_interfaces_[i].set_value(reference_interfaces_[i]);
-        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
-          reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
-        }
+
       }
       else 
       {
