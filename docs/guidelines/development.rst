@@ -35,7 +35,7 @@ This section describes in short process with valuable tips to make your and revi
    Take into account that master branch of your fork is usually not up to date with the upstream repository.
    Therefore be careful about that and use the opportunity to sync *master* branch of the fork to the state of the *master* branch of the upstream repository.
 
-#. **Always** create a new branch for each feature or bug fix. Don't submit PRs from *master* branch.
+#. **Always** create a new branch for each feature or bug fix. NEVER make multiple changes on a same feature branch. One feature / change == one branch. Don't submit PRs from *master* branch.
 
 #. **Before** starting development check how the branch will be merged, using *merge commit* or *squash* method.
    If *merge commit* is used make sure that each of your commits is clean and named properly since they will become part of the repository's history.
