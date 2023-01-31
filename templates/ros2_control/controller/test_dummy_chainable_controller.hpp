@@ -55,14 +55,15 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, deactivate_success);
   FRIEND_TEST(DummyClassNameTest, reactivate_success);
   FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_fast);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_slow);
+  FRIEND_TEST(DummyClassNameTest, test_update_logic_not_chainable_mode_fast);
+  FRIEND_TEST(DummyClassNameTest, test_update_logic_not_chainable_mode_slow);
   FRIEND_TEST(DummyClassNameTest, publish_status_success);
   FRIEND_TEST(DummyClassNameTest, receive_message_and_publish_updated_status);
-  FRIEND_TEST(DummyClassNameTest, test_message_timeout);
+  FRIEND_TEST(DummyClassNameTest, test_sending_too_old_message);
+  FRIEND_TEST(DummyClassNameTest, test_time_stamp_zero);
   FRIEND_TEST(DummyClassNameTest, test_message_wrong_num_joints);
   FRIEND_TEST(DummyClassNameTest, test_message_accepted);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic);
+  FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_mode);
   FRIEND_TEST(DummyClassNameTest, test_ref_timeout_zero_for_update);
   FRIEND_TEST(DummyClassNameTest, test_ref_timeout_zero_for_reference_callback);
 
