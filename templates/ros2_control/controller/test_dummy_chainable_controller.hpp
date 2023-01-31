@@ -48,24 +48,24 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 // subclassing and friending so we can access member variables
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
-  FRIEND_TEST(DummyClassNameTest, all_parameters_set_configure_success);
-  FRIEND_TEST(DummyClassNameTest, check_exported_intefaces);
-  FRIEND_TEST(DummyClassNameTest, activate_success);
-  FRIEND_TEST(DummyClassNameTest, update_success);
-  FRIEND_TEST(DummyClassNameTest, deactivate_success);
-  FRIEND_TEST(DummyClassNameTest, reactivate_success);
-  FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
+  FRIEND_TEST(DummyClassNameTest, when_all_parameters_are_set_expect_them_in_storage);
+  FRIEND_TEST(DummyClassNameTest, when_exported_all_interfaces_expect_them_in_storage);
+  FRIEND_TEST(DummyClassNameTest, when_activated_expect_reference_msg_reset);
+  FRIEND_TEST(DummyClassNameTest, when_update_successful_expect_return_type_success);
+  FRIEND_TEST(DummyClassNameTest, when_deactivated_expect_return_type_success);
+  FRIEND_TEST(DummyClassNameTest, when_reactivated_expect_reference_msg_reset);
+  FRIEND_TEST(DummyClassNameTest, when_setting_slow_mode_service_expect_same_in_storage);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_not_chainable_mode_fast);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_not_chainable_mode_slow);
-  FRIEND_TEST(DummyClassNameTest, publish_status_success);
-  FRIEND_TEST(DummyClassNameTest, receive_message_and_publish_updated_status);
-  FRIEND_TEST(DummyClassNameTest, test_sending_too_old_message);
-  FRIEND_TEST(DummyClassNameTest, test_time_stamp_zero);
-  FRIEND_TEST(DummyClassNameTest, test_message_wrong_num_joints);
-  FRIEND_TEST(DummyClassNameTest, test_message_accepted);
+  FRIEND_TEST(DummyClassNameTest, when_published_success_expect_in_storage);
+  FRIEND_TEST(DummyClassNameTest, when_subscribed_msg_received_publish_succeeded_expect_value_in_storage);
+  FRIEND_TEST(DummyClassNameTest, when_sending_too_old_message_expect_nan_in_reference_msg);
+  FRIEND_TEST(DummyClassNameTest, when_time_stamp_zero_expect_setting_to_current);
+  FRIEND_TEST(DummyClassNameTest, when_set_msg_wrong_num_joints_expect_inequality_with_storage);
+  FRIEND_TEST(DummyClassNameTest, when_message_accepted_expect_reference_msg_in_rt_buffer);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_mode);
   FRIEND_TEST(DummyClassNameTest, test_ref_timeout_zero_for_update);
-  FRIEND_TEST(DummyClassNameTest, test_ref_timeout_zero_for_reference_callback);
+  FRIEND_TEST(DummyClassNameTest, when_ref_timeout_zero_for_reference_callback_expect_reference_msg_in_rt_buffer);
 
 public:
   controller_interface::CallbackReturn on_configure(

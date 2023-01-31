@@ -32,7 +32,7 @@ class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 
 // when_all_parameters_are_set_expect_them_in_storage
 
-TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
+TEST_F(DummyClassNameTest, when_all_parameters_are_set_expect_them_in_storage)
 {
   SetUpController();
 
@@ -51,7 +51,7 @@ TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
 }
 
 // when all command, state and reference interfaces are exported then expect them in storage
-TEST_F(DummyClassNameTest, check_exported_intefaces)
+TEST_F(DummyClassNameTest, when_exported_all_interfaces_expect_them_in_storage)
 {
   SetUpController();
 
@@ -83,7 +83,7 @@ TEST_F(DummyClassNameTest, check_exported_intefaces)
 }
 
 // when calling activate() expect resetting of the controller reference msg
-TEST_F(DummyClassNameTest, activate_success)
+TEST_F(DummyClassNameTest, when_activated_expect_reference_msg_reset)
 {
   SetUpController();
 
@@ -110,7 +110,7 @@ TEST_F(DummyClassNameTest, activate_success)
 }
 
 // when calling update methods expect return type are a success
-TEST_F(DummyClassNameTest, update_success)
+TEST_F(DummyClassNameTest, when_update_successful_expect_return_type_success)
 {
   SetUpController();
 
@@ -128,7 +128,7 @@ TEST_F(DummyClassNameTest, update_success)
 }
 
 // when controller lifecycle methods expect return type is a success
-TEST_F(DummyClassNameTest, deactivate_success)
+TEST_F(DummyClassNameTest, when_deactivated_expect_return_type_success)
 {
   SetUpController();
 
@@ -140,7 +140,7 @@ TEST_F(DummyClassNameTest, deactivate_success)
 // when calling on_activate, on_deactivate and on_activate methods consecutively 
 // expect resetting of reference msg, nan values in command_interfaces and 
 // resetting of reference msg respectively
-TEST_F(DummyClassNameTest, reactivate_success)
+TEST_F(DummyClassNameTest, when_reactivated_expect_reference_msg_reset)
 {
   SetUpController();
 
@@ -163,7 +163,7 @@ TEST_F(DummyClassNameTest, reactivate_success)
 }
 
 // when set slow mode service expect the same in storage
-TEST_F(DummyClassNameTest, test_setting_slow_mode_service)
+TEST_F(DummyClassNameTest, when_setting_slow_mode_service_expect_same_in_storage)
 {
   SetUpController();
 
@@ -349,7 +349,7 @@ TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_slow)
 }
 
 // when controller state published expect state value in storage
-TEST_F(DummyClassNameTest, publish_status_success)
+TEST_F(DummyClassNameTest, when_published_success_expect_in_storage)
 {
   SetUpController();
 
@@ -372,7 +372,7 @@ TEST_F(DummyClassNameTest, publish_status_success)
 }
 
 // when msg subscribed and published expect value in storage
-TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
+TEST_F(DummyClassNameTest, when_subscribed_msg_received_publish_succeeded_expect_value_in_storage)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -415,7 +415,7 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
 }
 
 // when too old msg is sent expect nan values in reference msg
-TEST_F(DummyClassNameTest, test_sending_too_old_message)
+TEST_F(DummyClassNameTest, when_sending_too_old_message_expect_nan_in_reference_msg)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -442,7 +442,7 @@ TEST_F(DummyClassNameTest, test_sending_too_old_message)
 }
 
 // when time stamp is zero expect that time stamp is set to current time stamp
-TEST_F(DummyClassNameTest, test_time_stamp_zero)
+TEST_F(DummyClassNameTest, when_time_stamp_zero_expect_setting_to_current)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -476,7 +476,7 @@ TEST_F(DummyClassNameTest, test_time_stamp_zero)
 
 
 // when assigned wrong num of joints then expect in-equality between set values and storage
-TEST_F(DummyClassNameTest, test_message_wrong_num_joints)
+TEST_F(DummyClassNameTest, when_set_msg_wrong_num_joints_expect_inequality_with_storage)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -502,7 +502,7 @@ TEST_F(DummyClassNameTest, test_message_wrong_num_joints)
 }
 
 // when age_of_last_command < ref_timeout expect reference msg is accepted and is in rt buffer
-TEST_F(DummyClassNameTest, test_message_accepted)
+TEST_F(DummyClassNameTest, when_message_accepted_expect_reference_msg_in_rt_buffer)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -626,7 +626,7 @@ TEST_F(DummyClassNameTest, test_ref_timeout_zero_for_update)
 
 // when ref_timeout = 0 expect reference_callback() writes reference_msg to rt buffer
 // from nonrt thread
-TEST_F(DummyClassNameTest, test_ref_timeout_zero_for_reference_callback)
+TEST_F(DummyClassNameTest, when_ref_timeout_zero_for_reference_callback_expect_reference_msg_in_rt_buffer)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
