@@ -172,6 +172,8 @@ void DummyClassName::reference_callback(
                    "(%.4f).",
                    rclcpp::Time(msg->header.stamp).seconds(),
                    age_of_last_command.seconds(), ref_timeout_.seconds());
+      reset_controller_reference_msg(msg, get_node());
+
     }
 
   } else {
