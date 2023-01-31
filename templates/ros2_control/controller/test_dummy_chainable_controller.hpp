@@ -58,14 +58,17 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, test_update_logic_not_chainable_mode_fast);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_not_chainable_mode_slow);
   FRIEND_TEST(DummyClassNameTest, when_published_success_expect_in_storage);
-  FRIEND_TEST(DummyClassNameTest, when_subscribed_msg_received_publish_succeeded_expect_value_in_storage);
+  FRIEND_TEST(
+    DummyClassNameTest, when_subscribed_msg_received_publish_succeeded_expect_value_in_storage);
   FRIEND_TEST(DummyClassNameTest, when_sending_too_old_message_expect_nan_in_reference_msg);
   FRIEND_TEST(DummyClassNameTest, when_time_stamp_zero_expect_setting_to_current);
   FRIEND_TEST(DummyClassNameTest, when_set_msg_wrong_num_joints_expect_inequality_with_storage);
   FRIEND_TEST(DummyClassNameTest, when_message_accepted_expect_reference_msg_in_rt_buffer);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_mode);
   FRIEND_TEST(DummyClassNameTest, test_ref_timeout_zero_for_update);
-  FRIEND_TEST(DummyClassNameTest, when_ref_timeout_zero_for_reference_callback_expect_reference_msg_in_rt_buffer);
+  FRIEND_TEST(
+    DummyClassNameTest,
+    when_ref_timeout_zero_for_reference_callback_expect_reference_msg_in_rt_buffer);
 
 public:
   controller_interface::CallbackReturn on_configure(
@@ -182,12 +185,12 @@ protected:
 
     // call update to publish the test value
     ASSERT_EQ(
-    controller_->update_reference_from_subscribers(
-      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
-    controller_interface::return_type::OK);
+      controller_->update_reference_from_subscribers(
+        controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
+      controller_interface::return_type::OK);
     ASSERT_EQ(
-    controller_->update_and_write_commands(
-      controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
+      controller_->update_and_write_commands(
+        controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
       controller_interface::return_type::OK);
 
     // call update to publish the test value
@@ -215,7 +218,8 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const rclcpp::Time & stamp, const std::vector<std::string> & joint_names = {"joint1_test"}, const std::vector<double> & displacements = {0.45},
+    const rclcpp::Time & stamp, const std::vector<std::string> & joint_names = {"joint1_test"},
+    const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name) {

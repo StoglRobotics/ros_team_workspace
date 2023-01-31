@@ -20,11 +20,10 @@
 #include <utility>
 #include <vector>
 
-using dummy_package_namespace::NR_CMD_ITFS;
 using dummy_package_namespace::control_mode_type;
-using dummy_package_namespace::NR_STATE_ITFS;
+using dummy_package_namespace::NR_CMD_ITFS;
 using dummy_package_namespace::NR_REF_ITFS;
-
+using dummy_package_namespace::NR_STATE_ITFS;
 
 class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
@@ -137,8 +136,8 @@ TEST_F(DummyClassNameTest, when_deactivated_expect_return_type_success)
   ASSERT_EQ(controller_->on_deactivate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 }
 
-// when calling on_activate, on_deactivate and on_activate methods consecutively 
-// expect resetting of reference msg, nan values in command_interfaces and 
+// when calling on_activate, on_deactivate and on_activate methods consecutively
+// expect resetting of reference msg, nan values in command_interfaces and
 // resetting of reference msg respectively
 TEST_F(DummyClassNameTest, when_reactivated_expect_reference_msg_reset)
 {
@@ -189,14 +188,14 @@ TEST_F(DummyClassNameTest, when_setting_slow_mode_service_expect_same_in_storage
   ASSERT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
 }
 
-// when not in chainable mode,set to FAST mode service and 
+// when not in chainable mode,set to FAST mode service and
 // age_of_last_command > reference_timeout expect
 // command_interfaces are set to 0.0 and reference_interfaces set to nan
 // followed by
 // when not in chainable mode and age_of_last_command < reference_timeout expect
 // command_interfaces are calculated to non-nan and reference_interfaces set to nan
 TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_fast)
-{// 1. age<ref_timeout 2.age>ref_timeout
+{  // 1. age<ref_timeout 2.age>ref_timeout
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(controller_->get_node()->get_node_base_interface());
@@ -211,13 +210,15 @@ TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_fast)
   static constexpr double TEST_DISPLACEMENT = 23.24;
   joint_command_values_[0] = 111;
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
-  msg->header.stamp = controller_->get_node()->now() - controller_->ref_timeout_ - rclcpp::Duration::from_seconds(0.1);
+  msg->header.stamp = controller_->get_node()->now() - controller_->ref_timeout_ -
+                      rclcpp::Duration::from_seconds(0.1);
   msg->joint_names = joint_names_;
   msg->displacements.resize(joint_names_.size(), TEST_DISPLACEMENT);
   msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
   msg->duration = std::numeric_limits<double>::quiet_NaN();
   controller_->input_ref_.writeFromNonRT(msg);
-  const auto age_of_last_command = controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
+  const auto age_of_last_command =
+    controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
 
   ASSERT_FALSE(age_of_last_command <= controller_->ref_timeout_);
@@ -245,7 +246,8 @@ TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_fast)
   msg_2->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
   msg_2->duration = std::numeric_limits<double>::quiet_NaN();
   controller_->input_ref_.writeFromNonRT(msg_2);
-  const auto age_of_last_command_2 = controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
+  const auto age_of_last_command_2 =
+    controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
 
   ASSERT_TRUE(age_of_last_command_2 <= controller_->ref_timeout_);
@@ -260,7 +262,7 @@ TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_fast)
     controller_interface::return_type::OK);
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
-  EXPECT_EQ(joint_command_values_[0], TEST_DISPLACEMENT);//exact value
+  EXPECT_EQ(joint_command_values_[0], TEST_DISPLACEMENT);  //exact value
   EXPECT_NE(joint_command_values_[0], 111);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   for (const auto & interface : controller_->reference_interfaces_) {
@@ -268,14 +270,14 @@ TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_fast)
   }
 }
 
-// when not in chainable mode,set to SLOW mode service and 
+// when not in chainable mode,set to SLOW mode service and
 // age_of_last_command > reference_timeout expect
 // command_interfaces are set to 0.0 and reference_interfaces set to nan
 // followed by
 // when not in chainable mode and age_of_last_command < reference_timeout expect
 // command_interfaces are calculated to non-nan and reference_interfaces set to nan
 TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_slow)
-{// 1. age<ref_timeout 2.age>ref_timeout
+{  // 1. age<ref_timeout 2.age>ref_timeout
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(controller_->get_node()->get_node_base_interface());
@@ -290,13 +292,15 @@ TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_slow)
   static constexpr double TEST_DISPLACEMENT = 23.24;
   joint_command_values_[0] = 111;
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
-  msg->header.stamp = controller_->get_node()->now() - controller_->ref_timeout_ - rclcpp::Duration::from_seconds(0.1);
+  msg->header.stamp = controller_->get_node()->now() - controller_->ref_timeout_ -
+                      rclcpp::Duration::from_seconds(0.1);
   msg->joint_names = joint_names_;
   msg->displacements.resize(joint_names_.size(), TEST_DISPLACEMENT);
   msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
   msg->duration = std::numeric_limits<double>::quiet_NaN();
   controller_->input_ref_.writeFromNonRT(msg);
-  const auto age_of_last_command = controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
+  const auto age_of_last_command =
+    controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
   controller_->control_mode_.writeFromNonRT(control_mode_type::SLOW);
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::SLOW);
@@ -326,7 +330,8 @@ TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_slow)
   msg_2->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
   msg_2->duration = std::numeric_limits<double>::quiet_NaN();
   controller_->input_ref_.writeFromNonRT(msg_2);
-  const auto age_of_last_command_2 = controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
+  const auto age_of_last_command_2 =
+    controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
   //age_of_last_command_2 < ref_timeout_
   ASSERT_TRUE(age_of_last_command_2 <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
@@ -340,9 +345,9 @@ TEST_F(DummyClassNameTest, test_update_logic_not_chainable_mode_slow)
     controller_interface::return_type::OK);
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::SLOW);
-  EXPECT_EQ(joint_command_values_[0], TEST_DISPLACEMENT/4);//exact value
+  EXPECT_EQ(joint_command_values_[0], TEST_DISPLACEMENT / 4);  //exact value
   EXPECT_NE(joint_command_values_[0], 111);
-  ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT/2);
+  ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT / 2);
   for (const auto & interface : controller_->reference_interfaces_) {
     EXPECT_TRUE(std::isnan(interface));
   }
@@ -389,7 +394,7 @@ TEST_F(DummyClassNameTest, when_subscribed_msg_received_publish_succeeded_expect
     controller_->update_and_write_commands(
       controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
-//here
+  //here
   ControllerStateMsg msg;
   subscribe_and_get_messages(msg);
 
@@ -406,7 +411,7 @@ TEST_F(DummyClassNameTest, when_subscribed_msg_received_publish_succeeded_expect
     controller_->update_and_write_commands(
       controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
-//here
+  //here
   EXPECT_EQ(joint_command_values_[NR_CMD_ITFS], 0.45);
 
   subscribe_and_get_messages(msg);
@@ -453,12 +458,10 @@ TEST_F(DummyClassNameTest, when_time_stamp_zero_expect_setting_to_current)
 
   auto reference = controller_->input_ref_.readFromNonRT();
   auto old_timestamp = (*reference)->header.stamp;
-  for (size_t i = 0; i < joint_names_.size(); ++i)
-  {
+  for (size_t i = 0; i < joint_names_.size(); ++i) {
     EXPECT_TRUE(std::isnan((*reference)->displacements[i]));
   }
-  for (size_t i = 0; i < joint_names_.size(); ++i)
-  {
+  for (size_t i = 0; i < joint_names_.size(); ++i) {
     EXPECT_TRUE(std::isnan((*reference)->velocities[i]));
   }
 
@@ -473,7 +476,6 @@ TEST_F(DummyClassNameTest, when_time_stamp_zero_expect_setting_to_current)
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->velocities[0], 0.0);
   EXPECT_NE((*(controller_->input_ref_.readFromNonRT()))->header.stamp.sec, 0.0);
 }
-
 
 // when assigned wrong num of joints then expect in-equality between set values and storage
 TEST_F(DummyClassNameTest, when_set_msg_wrong_num_joints_expect_inequality_with_storage)
@@ -492,7 +494,7 @@ TEST_F(DummyClassNameTest, when_set_msg_wrong_num_joints_expect_inequality_with_
   EXPECT_TRUE(std::isnan((*reference)->displacements[0]));
   EXPECT_TRUE(std::isnan((*reference)->velocities[0]));
   EXPECT_TRUE(std::isnan((*reference)->duration));
-  publish_commands(controller_->get_node()->now(), {"joint1","joint2"});
+  publish_commands(controller_->get_node()->now(), {"joint1", "joint2"});
   ASSERT_TRUE(controller_->wait_for_commands(executor));
   EXPECT_NE((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), joint_names_.size());
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], joint_names_[0]);
@@ -528,7 +530,6 @@ TEST_F(DummyClassNameTest, when_message_accepted_expect_reference_msg_in_rt_buff
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->displacements[0], 0.45);
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->velocities[0], 0.0);
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->duration, 1.25);
-
 }
 
 // when in chainable mode and age_of_last_command < reference_timeout expect
@@ -546,16 +547,14 @@ TEST_F(DummyClassNameTest, test_update_logic_chainable_mode)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_TRUE(controller_->is_in_chained_mode());
 
-  for (const auto & interface : controller_->reference_interfaces_)
-  {
+  for (const auto & interface : controller_->reference_interfaces_) {
     EXPECT_TRUE(std::isnan(interface));
   }
 
   // set command statically
   joint_command_values_[0] = 111;
 
-  for (size_t i = 0; i < controller_->reference_interfaces_.size(); ++i)
-  {
+  for (size_t i = 0; i < controller_->reference_interfaces_.size(); ++i) {
     controller_->reference_interfaces_[0] = 1.5;
   }
 
@@ -573,12 +572,10 @@ TEST_F(DummyClassNameTest, test_update_logic_chainable_mode)
   EXPECT_NE(joint_command_values_[0], 111);
   // logic is command_interfaces_[i] = reference_interfaces_[i];
   EXPECT_EQ(joint_command_values_[0], 1.5);
-  for (const auto & interface : controller_->reference_interfaces_)
-  {
+  for (const auto & interface : controller_->reference_interfaces_) {
     EXPECT_TRUE(std::isnan(interface));
   }
-  for (size_t i = 0; i < controller_->command_interfaces_.size(); ++i)
-  {
+  for (size_t i = 0; i < controller_->command_interfaces_.size(); ++i) {
     EXPECT_EQ(controller_->command_interfaces_[i].get_value(), 1.5);
   }
 }
@@ -599,7 +596,7 @@ TEST_F(DummyClassNameTest, test_ref_timeout_zero_for_update)
 
   // set command statically
   static constexpr double TEST_DISPLACEMENT = 23.24;
-  controller_->ref_timeout_= rclcpp::Duration::from_seconds(0.0);
+  controller_->ref_timeout_ = rclcpp::Duration::from_seconds(0.0);
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   msg->header.stamp = controller_->get_node()->now() - rclcpp::Duration::from_seconds(0.0);
   msg->joint_names = joint_names_;
@@ -607,8 +604,9 @@ TEST_F(DummyClassNameTest, test_ref_timeout_zero_for_update)
   msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
   msg->duration = std::numeric_limits<double>::quiet_NaN();
   controller_->input_ref_.writeFromNonRT(msg);
-  const auto age_of_last_command = controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
-  
+  const auto age_of_last_command =
+    controller_->get_node()->now() - (*(controller_->input_ref_.readFromNonRT()))->header.stamp;
+
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
     controller_->update_reference_from_subscribers(
@@ -626,7 +624,9 @@ TEST_F(DummyClassNameTest, test_ref_timeout_zero_for_update)
 
 // when ref_timeout = 0 expect reference_callback() writes reference_msg to rt buffer
 // from nonrt thread
-TEST_F(DummyClassNameTest, when_ref_timeout_zero_for_reference_callback_expect_reference_msg_in_rt_buffer)
+TEST_F(
+  DummyClassNameTest,
+  when_ref_timeout_zero_for_reference_callback_expect_reference_msg_in_rt_buffer)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -641,7 +641,7 @@ TEST_F(DummyClassNameTest, when_ref_timeout_zero_for_reference_callback_expect_r
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->velocities[0]));
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->duration));
-  controller_->ref_timeout_= rclcpp::Duration::from_seconds(0.0);  
+  controller_->ref_timeout_ = rclcpp::Duration::from_seconds(0.0);
   //reference_callback() is called implicitly when publish_commands() is called.
   publish_commands(controller_->get_node()->now());
   ASSERT_TRUE(controller_->wait_for_commands(executor));
@@ -654,7 +654,6 @@ TEST_F(DummyClassNameTest, when_ref_timeout_zero_for_reference_callback_expect_r
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->velocities[0], 0.0);
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->duration, 1.25);
 }
-
 
 int main(int argc, char ** argv)
 {

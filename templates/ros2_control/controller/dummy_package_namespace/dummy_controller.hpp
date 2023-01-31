@@ -111,4 +111,3 @@ private:
 }  // namespace dummy_package_namespace
 
 #endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_CONTROLLER_HPP_
-

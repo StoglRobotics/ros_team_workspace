@@ -159,14 +159,13 @@ void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenc
       RCLCPP_ERROR(
         get_node()->get_logger(),
         "Received message has timestamp %.10f older then allowed timeout at timestamp %.10f",
-         rclcpp::Time(msg->header.stamp).seconds(), get_node()->now().seconds());
+        rclcpp::Time(msg->header.stamp).seconds(), get_node()->now().seconds());
     }
   } else {
     RCLCPP_ERROR(
       get_node()->get_logger(),
       "Received %zu , but expected %zu joints in command. Ignoring message.",
       msg->joint_names.size(), params_.joints.size());
-        
   }
 }
 
@@ -236,7 +235,7 @@ controller_interface::return_type DummyClassName::update(
           (*current_ref)->displacements[i] /= 2;
         }
         command_interfaces_[i].set_value((*current_ref)->displacements[i]);
-        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)){
+        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
           (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
         }
       }
@@ -270,7 +269,7 @@ controller_interface::return_type DummyClassName::update(
           (*current_ref)->displacements[i] /= 2;
         }
         command_interfaces_[i].set_value((*current_ref)->displacements[i]);
-        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)){
+        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
           (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
         }
       }
