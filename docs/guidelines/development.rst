@@ -113,3 +113,9 @@ Useful commands and options
   .. code-block:: bash
 
      pre-commit uninstall
+     
+* Skip *pre-commit*-hooks for a specific commit
+
+  .. code-block:: bash
+  
+  git commit -m 'your commit message' --no-verify
