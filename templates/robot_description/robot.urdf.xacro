@@ -29,6 +29,6 @@
     mock_sensor_commands="$(arg mock_sensor_commands)"
     sim_gazebo_classic="$(arg sim_gazebo_classic)"
     sim_gazebo="$(arg sim_gazebo)"
-    simulation_controllers:="$(arg simulation_controllers)" />
+    simulation_controllers="$(arg simulation_controllers)" />
 
 </robot>
