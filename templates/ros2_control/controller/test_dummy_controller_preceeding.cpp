@@ -28,7 +28,7 @@ class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
 };
 
-TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
+TEST_F(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set)
 {
   SetUpController();
 
@@ -44,7 +44,7 @@ TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
   ASSERT_EQ(controller_->params_.interface_name, interface_name_);
 }
 
-TEST_F(DummyClassNameTest, check_exported_intefaces)
+TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces)
 {
   SetUpController();
 

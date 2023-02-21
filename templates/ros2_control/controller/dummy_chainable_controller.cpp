@@ -148,6 +148,32 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
+controller_interface::InterfaceConfiguration DummyClassName::command_interface_configuration() const
+{
+  controller_interface::InterfaceConfiguration command_interfaces_config;
+  command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
+
+  command_interfaces_config.names.reserve(params_.joints.size());
+  for (const auto & joint : params_.joints) {
+    command_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
+  }
+
+  return command_interfaces_config;
+}
+
+controller_interface::InterfaceConfiguration DummyClassName::state_interface_configuration() const
+{
+  controller_interface::InterfaceConfiguration state_interfaces_config;
+  state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
+
+  state_interfaces_config.names.reserve(state_joints_.size());
+  for (const auto & joint : state_joints_) {
+    state_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
+  }
+
+  return state_interfaces_config;
+}
+
 void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
 {
   // if no timestamp provided use current time for command timestamp
@@ -179,32 +205,6 @@ void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenc
       "Received %zu , but expected %zu joints in command. Ignoring message.",
       msg->joint_names.size(), params_.joints.size());
   }
-}
-
-controller_interface::InterfaceConfiguration DummyClassName::command_interface_configuration() const
-{
-  controller_interface::InterfaceConfiguration command_interfaces_config;
-  command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-
-  command_interfaces_config.names.reserve(params_.joints.size());
-  for (const auto & joint : params_.joints) {
-    command_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
-  }
-
-  return command_interfaces_config;
-}
-
-controller_interface::InterfaceConfiguration DummyClassName::state_interface_configuration() const
-{
-  controller_interface::InterfaceConfiguration state_interfaces_config;
-  state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-
-  state_interfaces_config.names.reserve(state_joints_.size());
-  for (const auto & joint : state_joints_) {
-    state_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
-  }
-
-  return state_interfaces_config;
 }
 
 std::vector<hardware_interface::CommandInterface> DummyClassName::on_export_reference_interfaces()
