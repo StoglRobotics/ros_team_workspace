@@ -35,10 +35,13 @@
 namespace dummy_package_namespace
 {
 // name constants for state interfaces
-static constexpr size_t STATE_MY_ITFS = 0;
+static constexpr size_t NR_STATE_ITFS = 0;
 
 // name constants for command interfaces
-static constexpr size_t CMD_MY_ITFS = 0;
+static constexpr size_t NR_CMD_ITFS = 0;
+
+// name constants for reference interfaces
+static constexpr size_t NR_REF_ITFS = 0;
 
 // TODO(anyone: example setup for control mode (usually you will use some enums defined in messages)
 enum class control_mode_type : std::uint8_t {
@@ -89,7 +92,11 @@ protected:
   std::shared_ptr<dummy_controller::ParamListener> param_listener_;
   dummy_controller::Params params_;
 
-  std::vector<std::string> state_joints_;
+  std::vector<std::string> state_joint_names;
+  
+  // Names of the references, ex: high level vel commands from MoveIt, Nav2, etc.
+  // used for preceding controller
+  std::vector<std::string> reference_names_;
 
   // Command subscribers and Controller State publisher
   rclcpp::Subscription<ControllerReferenceMsg>::SharedPtr ref_subscriber_ = nullptr;
