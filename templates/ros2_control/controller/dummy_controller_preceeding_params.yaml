@@ -1,9 +1,9 @@
 test_dummy_controller:
   ros__parameters:
-    joints:
+    command_joint_names:
       - joint1
 
     interface_name: acceleration
 
-    state_joints:
+    state_joint_names:
       - joint1state
