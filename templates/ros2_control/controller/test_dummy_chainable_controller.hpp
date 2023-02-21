@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,14 +48,16 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 // subclassing and friending so we can access member variables
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
-  FRIEND_TEST(DummyClassNameTest, all_parameters_set_configure_success);
-  FRIEND_TEST(DummyClassNameTest, activate_success);
-  FRIEND_TEST(DummyClassNameTest, reactivate_success);
-  FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic_fast);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic_slow);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_fast);
-  FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_slow);
+  FRIEND_TEST(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set);
+  FRIEND_TEST(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces);
+  FRIEND_TEST(DummyClassNameTest, when_controller_is_activated_expect_reference_reset);
+  FRIEND_TEST(DummyClassNameTest, when_controller_active_and_update_called_expect_success);
+  FRIEND_TEST(DummyClassNameTest, when_active_controller_is_deactivated_expect_success);
+  FRIEND_TEST(DummyClassNameTest, when_controller_is_reactivated_expect_cmd_itfs_not_set_and_update_success);
+  FRIEND_TEST(DummyClassNameTest, when_update_is_called_expect_status_message);
+  FRIEND_TEST(DummyClassNameTest, when_reference_msg_has_timestamp_zero_expect_reference_set_and_timestamp_set_to_current_time);
+  FRIEND_TEST(DummyClassNameTest, when_message_has_valid_timestamp_expect_reference_set);
+  FRIEND_TEST(DummyClassNameTest, when_controller_in_chainable_mode_expect_receiving_commands_from_reference_interfaces_directly);
 
 public:
   controller_interface::CallbackReturn on_configure(
@@ -121,7 +123,7 @@ public:
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
     command_publisher_ = command_publisher_node_->create_publisher<ControllerReferenceMsg>(
-      "/test_dummy_controller/commands", rclcpp::SystemDefaultsQoS());
+      "/test_dummy_controller/reference", rclcpp::SystemDefaultsQoS());
 
     service_caller_node_ = std::make_shared<rclcpp::Node>("service_caller");
     slow_control_service_client_ = service_caller_node_->create_client<ControllerModeSrvType>(
@@ -143,7 +145,7 @@ protected:
 
     for (size_t i = 0; i < joint_command_values_.size(); ++i) {
       command_itfs_.emplace_back(hardware_interface::CommandInterface(
-        joint_names_[i], interface_name_, &joint_command_values_[i]));
+        command_joint_names_[i], interface_name_, &joint_command_values_[i]));
       command_ifs.emplace_back(command_itfs_.back());
     }
     // TODO(anyone): Add other command interfaces, if any
@@ -154,7 +156,7 @@ protected:
 
     for (size_t i = 0; i < joint_state_values_.size(); ++i) {
       state_itfs_.emplace_back(hardware_interface::StateInterface(
-        joint_names_[i], interface_name_, &joint_state_values_[i]));
+        command_joint_names_[i], interface_name_, &joint_state_values_[i]));
       state_ifs.emplace_back(state_itfs_.back());
     }
     // TODO(anyone): Add other state interfaces, if any
@@ -216,7 +218,7 @@ protected:
     wait_for_topic(command_publisher_->get_topic_name());
 
     ControllerReferenceMsg msg;
-    msg.joint_names = joint_names_;
+    msg.joint_names = command_joint_names_;
     msg.displacements = displacements;
     msg.velocities = velocities;
     msg.duration = duration;
@@ -246,7 +248,7 @@ protected:
   // TODO(anyone): adjust the members as needed
 
   // Controller-related parameters
-  std::vector<std::string> joint_names_ = {"joint1"};
+  std::vector<std::string> command_joint_names_ = {"joint1"};
   std::vector<std::string> state_joint_names_ = {"joint1state"};
   std::string interface_name_ = "acceleration";
   std::array<double, 1> joint_state_values_ = {1.1};
