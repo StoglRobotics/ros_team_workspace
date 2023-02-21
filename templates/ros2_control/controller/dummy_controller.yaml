@@ -1,5 +1,5 @@
 dummy_controller:
-  joints: {
+  command_joint_names: {
     type: string_array,
     default_value: [],
     description: "Specifies joints used by the controller. If state joints parameter is defined, then only command joints are defined with this parameter.",
@@ -9,7 +9,7 @@ dummy_controller:
       not_empty<>: null,
     }
   }
-  state_joints: {
+  state_joint_names: {
     type: string_array,
     default_value: [],
     description: "(optional) Specifies joints for reading states. This parameter is only relevant when state joints are different then command joint, i.e., when a following controller is used.",
@@ -28,4 +28,13 @@ dummy_controller:
       one_of<>: [["position", "velocity", "acceleration", "effort",]],
       forbidden_interface_name_prefix: null
     }
+  }
+  reference_names: {
+    type: string_array,
+    default_value: [],
+    description: " Names of the references, ex: high level vel commands from MoveIt, Nav2, etc. 
+    Note: reference_names is intended to use in special cases only where reference names are not obvious.
+    For example 2D mobile robot with references linear_x, linear_y and angular_z is obvious case,
+    a custom robot that has custom references for the controller. A BETTER EXAMPLE HAS TO BE INCLUDED",
+    read_only: true,
   }
