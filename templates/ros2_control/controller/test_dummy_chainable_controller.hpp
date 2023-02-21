@@ -55,9 +55,14 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, when_active_controller_is_deactivated_expect_success);
   FRIEND_TEST(DummyClassNameTest, when_controller_is_reactivated_expect_cmd_itfs_not_set_and_update_success);
   FRIEND_TEST(DummyClassNameTest, when_update_is_called_expect_status_message);
+  FRIEND_TEST(DummyClassNameTest, when_controller_is_configured_and_activated_properly_expect_correct_setting_of_mode_service);
+  FRIEND_TEST(DummyClassNameTest, when_reference_msg_received_expect_updated_commands_and_status_message);
+  FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_fast_expect_update_logic_for_fast_mode);
+  FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for_slow_mode);
+  FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces_directly_with_fast_mode_logic_effect);
+  FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces_directly_with_slow_mode_logic_effect);
   FRIEND_TEST(DummyClassNameTest, when_reference_msg_has_timestamp_zero_expect_reference_set_and_timestamp_set_to_current_time);
   FRIEND_TEST(DummyClassNameTest, when_message_has_valid_timestamp_expect_reference_set);
-  FRIEND_TEST(DummyClassNameTest, when_controller_in_chainable_mode_expect_receiving_commands_from_reference_interfaces_directly);
 
 public:
   controller_interface::CallbackReturn on_configure(
@@ -164,17 +169,17 @@ protected:
     controller_->assign_interfaces(std::move(command_ifs), std::move(state_ifs));
   }
 
-  void subscribe_and_get_messages(ControllerStateMsg & msg)
+  void subscribe_to_controller_status_execute_update_and_get_messages(ControllerStateMsg & msg)
   {
     // create a new subscriber
     rclcpp::Node test_subscription_node("test_subscription_node");
     auto subs_callback = [&](const ControllerStateMsg::SharedPtr) {};
     auto subscription = test_subscription_node.create_subscription<ControllerStateMsg>(
-      "/test_dummy_controller/state", 10, subs_callback);
+      "/test_dummy_controller/controller_state", 10, subs_callback);
 
     // call update to publish the test value
     ASSERT_EQ(
-      controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+      controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
       controller_interface::return_type::OK);
 
     // call update to publish the test value
@@ -182,8 +187,9 @@ protected:
     int max_sub_check_loop_count = 5;  // max number of tries for pub/sub loop
     rclcpp::WaitSet wait_set;          // block used to wait on message
     wait_set.add_subscription(subscription);
-    while (max_sub_check_loop_count--) {
-      controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01));
+    while (max_sub_check_loop_count--)
+    {
+      controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01));
       // check if message has been received
       if (wait_set.wait(std::chrono::milliseconds(2)).kind() == rclcpp::WaitResultKind::Ready) {
         break;
@@ -199,6 +205,7 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
+    const rclcpp::Time & stamp,
     const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
@@ -218,6 +225,7 @@ protected:
     wait_for_topic(command_publisher_->get_topic_name());
 
     ControllerReferenceMsg msg;
+    msg.header.stamp = stamp;
     msg.joint_names = command_joint_names_;
     msg.displacements = displacements;
     msg.velocities = velocities;
@@ -248,12 +256,15 @@ protected:
   // TODO(anyone): adjust the members as needed
 
   // Controller-related parameters
+  std::vector<std::string> reference_interface_names = {
+    "linear/x/velocity", "linear/y/velocity", "angular/z/velocity"};
   std::vector<std::string> command_joint_names_ = {"joint1"};
   std::vector<std::string> state_joint_names_ = {"joint1state"};
   std::string interface_name_ = "acceleration";
   std::array<double, 1> joint_state_values_ = {1.1};
   std::array<double, 1> joint_command_values_ = {101.101};
-
+  // set command statically
+  static constexpr double TEST_DISPLACEMENT = 23.24;
   std::vector<hardware_interface::StateInterface> state_itfs_;
   std::vector<hardware_interface::CommandInterface> command_itfs_;
 
