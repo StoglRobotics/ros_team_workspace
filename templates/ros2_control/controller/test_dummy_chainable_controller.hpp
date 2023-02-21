@@ -279,6 +279,7 @@ protected:
   std::vector<hardware_interface::CommandInterface> command_itfs_;
 
   double ref_timeout_ = 0.2;
+  static constexpr double TEST_DISPLACEMENT = 23.24;
 
   // Test related parameters
   std::unique_ptr<TestableDummyClassName> controller_;
