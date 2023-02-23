@@ -69,7 +69,7 @@ TEST_F(DummyClassNameTest, when_reference_msg_is_too_old_expect_unset_reference)
 
   auto reference = *(controller_->input_ref_.readFromNonRT());
   auto old_timestamp = reference->header.stamp;
-  EXPECT_TRUE(std::isnan(reference->displacements));
+  EXPECT_TRUE(std::isnan(reference->displacements[0]));
 
   // reference_callback() is implicitly called when publish_commands() is called
   // reference_msg is published with provided time stamp when publish_commands( time_stamp)
@@ -79,7 +79,7 @@ TEST_F(DummyClassNameTest, when_reference_msg_is_too_old_expect_unset_reference)
     rclcpp::Duration::from_seconds(0.1));
   ASSERT_TRUE(controller_->wait_for_commands(executor));
   ASSERT_EQ(old_timestamp, (*(controller_->input_ref_.readFromNonRT()))->header.stamp);
-  EXPECT_TRUE(std::isnan((reference)->displacements));
+  EXPECT_TRUE(std::isnan(reference->displacements[0]));
 
 }
 
@@ -107,7 +107,7 @@ TEST_F(
   }
 
   // set command statically
-  joint_command_values_[1] = TEST_DISPLACEMENT;
+  joint_command_values_[0] = TEST_DISPLACEMENT;
 
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
 
@@ -204,7 +204,7 @@ TEST_F(
     controller_interface::return_type::OK);
 
   EXPECT_FALSE(std::isnan(joint_command_values_[0]));
-  ASSERT_NE((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);ss
+  ASSERT_NE((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
 
   EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT);
   ASSERT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
