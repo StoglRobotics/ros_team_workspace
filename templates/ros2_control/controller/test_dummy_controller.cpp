@@ -20,8 +20,8 @@
 #include <utility>
 #include <vector>
 
-using dummy_package_namespace::NR_CMD_ITFS;
 using dummy_package_namespace::control_mode_type;
+using dummy_package_namespace::NR_CMD_ITFS;
 using dummy_package_namespace::NR_STATE_ITFS;
 
 class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
@@ -396,7 +396,7 @@ TEST_F(DummyClassNameTest, test_update_logic)
     controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
-  EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT);  //exact value
+  EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT);  // exact value
   EXPECT_NE(joint_command_values_[NR_STATE_ITFS], 111);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
 }

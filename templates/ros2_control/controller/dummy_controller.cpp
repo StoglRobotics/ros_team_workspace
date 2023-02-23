@@ -259,7 +259,6 @@ controller_interface::return_type DummyClassName::update(
   return controller_interface::return_type::OK;
 }
 
-
 }  // namespace dummy_package_namespace
 
 #include "pluginlib/class_list_macros.hpp"

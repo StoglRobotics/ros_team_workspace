@@ -83,9 +83,7 @@ TEST_F(DummyClassNameTest, when_reference_msg_is_too_old_expect_unset_reference)
 // when not in chainable mode and ref_msg_timedout expect
 // command_interfaces are set to 0.0 and when ref_msg is not timedout expect
 // command_interfaces are set to valid command values
-TEST_F(
-  DummyClassNameTest,
-  when_ref_msg_old_expect_cmnd_itfs_set_to_zero_otherwise_to_valid_cmnds)
+TEST_F(DummyClassNameTest, when_ref_msg_old_expect_cmnd_itfs_set_to_zero_otherwise_to_valid_cmnds)
 {
   // 1. age>ref_timeout 2. age<ref_timeout
   SetUpController();
@@ -98,8 +96,7 @@ TEST_F(
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_FALSE(controller_->is_in_chained_mode());
 
-  for (const auto & interface : controller_->reference_interfaces_)
-  {
+  for (const auto & interface : controller_->reference_interfaces_) {
     EXPECT_TRUE(std::isnan(interface));
   }
 
@@ -125,12 +122,10 @@ TEST_F(
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[0], 0.0);
-  for (const auto & interface : controller_->reference_interfaces_)
-  {
+  for (const auto & interface : controller_->reference_interfaces_) {
     EXPECT_TRUE(std::isnan(interface));
   }
-  for (size_t i = 0; i < controller_->command_interfaces_.size(); ++i)
-  {
+  for (size_t i = 0; i < controller_->command_interfaces_.size(); ++i) {
     EXPECT_EQ(controller_->command_interfaces_[i].get_value(), 0.0);
   }
 
@@ -152,22 +147,18 @@ TEST_F(
     controller_interface::return_type::OK);
   EXPECT_EQ(joint_command_values_[0], TEST_DISPLACEMENT);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
-  for (const auto & interface : controller_->reference_interfaces_)
-  {
+  for (const auto & interface : controller_->reference_interfaces_) {
     EXPECT_TRUE(std::isnan(interface));
   }
 
-  for (size_t i = 0; i < controller_->command_interfaces_.size(); ++i)
-  {
+  for (size_t i = 0; i < controller_->command_interfaces_.size(); ++i) {
     EXPECT_EQ(controller_->command_interfaces_[i].get_value(), TEST_DISPLACEMENT);
   }
 }
 
 // when ref_timeout = 0 expect reference_msg is accepted only once and command_interfaces
 // are calculated to valid values and reference_interfaces are unset
-TEST_F(
-  DummyClassNameTest,
-  when_reference_timeout_is_zero_expect_reference_msg_being_used_only_once)
+TEST_F(DummyClassNameTest, when_reference_timeout_is_zero_expect_reference_msg_being_used_only_once)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -216,7 +207,7 @@ TEST_F(
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->velocities[0]));
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->duration));
   controller_->ref_timeout_ = rclcpp::Duration::from_seconds(0.0);
-  //reference_callback() is called implicitly when publish_commands() is called.
+  // reference_callback() is called implicitly when publish_commands() is called.
   publish_commands(controller_->get_node()->now());
   ASSERT_TRUE(controller_->wait_for_commands(executor));
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), joint_names_.size());

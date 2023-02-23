@@ -52,11 +52,14 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces);
   FRIEND_TEST(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_reset);
   FRIEND_TEST(DummyClassNameTest, when_reference_msg_is_too_old_expect_unset_reference);
-  FRIEND_TEST(DummyClassNameTest, when_ref_msg_old_expect_cmnd_itfs_set_to_zero_otherwise_to_valid_cmnds);
-  FRIEND_TEST(DummyClassNameTest, when_reference_timeout_is_zero_expect_reference_msg_being_used_only_once);
-  FRIEND_TEST(DummyClassNameTest, when_ref_timeout_zero_for_reference_callback_expect_reference_msg_being_used_only_once);
+  FRIEND_TEST(
+    DummyClassNameTest, when_ref_msg_old_expect_cmnd_itfs_set_to_zero_otherwise_to_valid_cmnds);
+  FRIEND_TEST(
+    DummyClassNameTest, when_reference_timeout_is_zero_expect_reference_msg_being_used_only_once);
+  FRIEND_TEST(
+    DummyClassNameTest,
+    when_ref_timeout_zero_for_reference_callback_expect_reference_msg_being_used_only_once);
   FRIEND_TEST(DummyClassNameTest, when_loading_controller_expect_no_exception);
-
 
 public:
   controller_interface::CallbackReturn on_configure(
