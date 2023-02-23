@@ -7,7 +7,8 @@
                use_mock_hardware:=^|false
                mock_sensor_commands:=^|false
                sim_gazebo_classic:=^|false
-               sim_gazebo:=^|false"
+               sim_gazebo:=^|false
+               simulation_controllers"
                >
 
     <ros2_control name="${name}" type="system">
@@ -114,6 +115,29 @@
         <param name="max_tz">15</param>
       </sensor>
     </ros2_control>
+
+    <xacro:if value="$(arg sim_gazebo_classic)">
+      <!-- Gazebo plugins -->
+      <gazebo reference="world">
+      </gazebo>
+      <gazebo>
+        <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+          <parameters>${simulation_controllers}</parameters>
+        </plugin>
+      </gazebo>
+    </xacro:if>
+
+    <xacro:if value="$(arg sim_gazebo)">
+      <!-- Gazebo plugins -->
+      <gazebo reference="world">
+      </gazebo>
+      <gazebo>
+        <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+          <parameters>${simulation_controllers}</parameters>
+          <controller_manager_node_name>${prefix}controller_manager</controller_manager_node_name>
+        </plugin>
+      </gazebo>
+    </xacro:if>
 
   </xacro:macro>
 </robot>

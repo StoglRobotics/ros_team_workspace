@@ -315,14 +315,23 @@ function user_decision {
   local decision=$1
   user_answer=$2
 
-  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}[${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}${TERMINAL_COLOR_NC} [${rtw_accepted_answers[*]}]"
   read user_answer
 
   while ! $(is_accepted_user_answer "$user_answer");
   do
-    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision} Please type one of the following: [${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}${TERMINAL_COLOR_NC} ${TERMINAL_COLOR_USER_NOTICE}Please type one of the following:${TERMINAL_COLOR_NC} [${rtw_accepted_answers[*]}]"
     read user_answer
   done
+}
+
+# function which prints a notification in predefined color scheme and wait for user confirmation
+# $1 - notification = The message which gets print to the commandline
+function user_confirmation {
+  notification=$1
+
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}${notification}${TERMINAL_COLOR_NC}"
+  read
 }
 
 function set_framework_default_paths {
@@ -374,14 +383,14 @@ function check_ros_distro {
       local upper_case=$(echo $ros_distro | tr '[:lower:]' '[:upper:]')
       local alternative_ros_location=ALTERNATIVE_ROS_${upper_case}_LOCATION
       if [ ! -f "${!alternative_ros_location}/setup.bash" ]; then
-        notify_user "You are possibly trying to run unsupported ROS distro ('$ros_distro') for your version of Ubuntu. Please set ${alternative_ros_location} variable, e.g., 'export ${alternative_ros_location}=/opt/ros/rolling/setup.bash'. The best is to add that line somewhere at the beginning of the '~/.ros_team_ws_rc' file."
+        notify_user "You are possibly trying to run unsupported ROS distro ('$ros_distro') for your version of Ubuntu. Please set ${alternative_ros_location} variable, e.g., 'export ${alternative_ros_location}=/opt/ros/rolling'. The best is to add that line somewhere at the beginning of the '~/.ros_team_ws_rc' file."
 
         print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
       else
-        user_decision "Using ${alternative_ros_location} for ${ros_distro}." user_answer
+        user_decision "Using ${!alternative_ros_location} for ${ros_distro}." user_answer
         # check if the chosen ros-distro location is correct.
         if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
-          print_and_exit "Please set your ALTERNATIVE_ROS_LOCATION to the correct location. Exiting..."
+          print_and_exit "Please set ${alternative_ros_location} to the correct location. Exiting..."
         fi
       fi
     fi

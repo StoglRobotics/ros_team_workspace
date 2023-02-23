@@ -25,7 +25,7 @@ rtw_switch_to_docker () {
   fi
 
   source "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/docker/_RosTeamWs_Docker_Defines.bash
-  start_and_connect_user_to_docker "$RosTeamWS_DOCKER_TAG"
+  RTW_Docker_start_and_connect_user_to_docker "$RosTeamWS_DOCKER_TAG"
 }
 
 rtw_switch_to_docker_root () {
@@ -34,14 +34,29 @@ rtw_switch_to_docker_root () {
   fi
 
   source "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/docker/_RosTeamWs_Docker_Defines.bash
-  start_and_connect_root_to_docker "$RosTeamWS_DOCKER_TAG"
+  RTW_Docker_start_and_connect_root_to_docker "$RosTeamWS_DOCKER_TAG"
 }
 
-rtw_stop_docker () {
+rtw_docker_stop () {
   if [ -z "$RosTeamWS_WS_DOCKER_SUPPORT" ] || [ "$RosTeamWS_WS_DOCKER_SUPPORT" == false ]; then
     print_and_exit "It seems your current workspace does not support docker. If it should, did you activate it by executing _\"<ws_alias>\"?"
   fi
 
   source "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/docker/_RosTeamWs_Docker_Defines.bash
-  stop_docker_container "$RosTeamWS_DOCKER_TAG"
+  RTW_Docker_stop_docker_container "$RosTeamWS_DOCKER_TAG"
+}
+
+rtw_stop_docker () {
+  notify_user "Command 'rtw_stop_docker' is deprecated in favor of 'rtw_docker_stop'. Please use this in the future."
+
+  rtw_docker_stop
+}
+
+rtw_docker_clean_container_and_image () {
+  if [ -z "$RosTeamWS_WS_DOCKER_SUPPORT" ] || [ "$RosTeamWS_WS_DOCKER_SUPPORT" == false ]; then
+    print_and_exit "It seems your current workspace does not support docker. If it should, did you activate it by executing _\"<ws_alias>\"?"
+  fi
+
+  source "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/docker/_RosTeamWs_Docker_Defines.bash
+  RTW_Docker_clean_container_and_image "$RosTeamWS_DOCKER_TAG"
 }

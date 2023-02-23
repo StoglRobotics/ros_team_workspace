@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-build_docker_image () {
+RTW_WS_build_docker_container_image () {
 
   local docker_image_tag=DUMMY_DOCKER_IMAGE_TAG
 
@@ -25,7 +25,7 @@ build_docker_image () {
   -t "$docker_image_tag" .
 }
 
-create_docker_container () {
+RTW_WS_create_docker_container_instance () {
 
   local docker_host_name=DUMMY_DOCKER_HOSTNAME
   local docker_image_tag=DUMMY_DOCKER_IMAGE_TAG
@@ -46,11 +46,11 @@ create_docker_container () {
   fi
   # END: Needed for Nvidia support
 
-  echo "Instantiating docker image '$docker_image_tag' and mapping workspace folder to '$ws_folder'."
+  notify_user "Instantiating docker image '$docker_image_tag' and mapping workspace folder to '$ws_folder'."
   xhost +local:docker
   docker run \
   --net=host \
-  --gpus all \
+  $([ $(ls -la /dev | grep nvidia | wc -l) "!=" "0" ] && echo "--gpus all") \
   -h ${docker_host_name} \
   -e DISPLAY \
   -e QT_X11_NO_MITSHM=1 \
@@ -64,5 +64,5 @@ create_docker_container () {
   -it "$docker_image_tag" /bin/bash
 }
 
-build_docker_image
-create_docker_container
+RTW_WS_build_docker_container_image
+RTW_WS_create_docker_container_instance
