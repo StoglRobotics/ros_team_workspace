@@ -100,9 +100,7 @@ TEST_F(DummyClassNameTest, when_ref_msg_old_expect_cmnd_itfs_set_to_zero_otherwi
     EXPECT_TRUE(std::isnan(interface));
   }
 
-  // set command statically
   joint_command_values_[0] = TEST_DISPLACEMENT;
-
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   msg->header.stamp = controller_->get_node()->now() - controller_->ref_timeout_ -
                       rclcpp::Duration::from_seconds(0.1);
@@ -166,9 +164,7 @@ TEST_F(DummyClassNameTest, when_reference_timeout_is_zero_expect_reference_msg_b
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
-  // set command statically
   joint_command_values_[0] = TEST_DISPLACEMENT;
-
   controller_->ref_timeout_ = rclcpp::Duration::from_seconds(0.0);
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   msg->header.stamp = controller_->get_node()->now() - rclcpp::Duration::from_seconds(0.0);

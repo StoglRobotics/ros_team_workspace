@@ -270,6 +270,8 @@ protected:
   std::vector<hardware_interface::CommandInterface> command_itfs_;
 
   double ref_timeout_ = 0.2;
+  
+  // set command statically
   static constexpr double TEST_DISPLACEMENT = 23.24;
 
   // Test related parameters
