@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@ using dummy_package_namespace::NR_STATE_ITFS;
 class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
 };
-
-
 
 // when assigned wrong num of joints then expect in-equality between set values and storage
 TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_reset)
@@ -80,7 +78,6 @@ TEST_F(DummyClassNameTest, when_reference_msg_is_too_old_expect_unset_reference)
   ASSERT_TRUE(controller_->wait_for_commands(executor));
   ASSERT_EQ(old_timestamp, (*(controller_->input_ref_.readFromNonRT()))->header.stamp);
   EXPECT_TRUE(std::isnan(reference->displacements[0]));
-
 }
 
 // when not in chainable mode and ref_msg_timedout expect
@@ -110,7 +107,6 @@ TEST_F(
   joint_command_values_[0] = TEST_DISPLACEMENT;
 
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
-
   msg->header.stamp = controller_->get_node()->now() - controller_->ref_timeout_ -
                       rclcpp::Duration::from_seconds(0.1);
   msg->joint_names = joint_names_;
@@ -154,9 +150,6 @@ TEST_F(
   ASSERT_EQ(
     controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
-
-  EXPECT_NE(joint_command_values_[0], 111);
-
   EXPECT_EQ(joint_command_values_[0], TEST_DISPLACEMENT);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   for (const auto & interface : controller_->reference_interfaces_)
@@ -187,7 +180,6 @@ TEST_F(
 
   controller_->ref_timeout_ = rclcpp::Duration::from_seconds(0.0);
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
-
   msg->header.stamp = controller_->get_node()->now() - rclcpp::Duration::from_seconds(0.0);
   msg->joint_names = joint_names_;
   msg->displacements.resize(joint_names_.size(), TEST_DISPLACEMENT);
@@ -202,10 +194,8 @@ TEST_F(
   ASSERT_EQ(
     controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
-
   EXPECT_FALSE(std::isnan(joint_command_values_[0]));
   ASSERT_NE((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
-
   EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT);
   ASSERT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
 }

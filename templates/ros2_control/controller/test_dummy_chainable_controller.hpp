@@ -48,7 +48,6 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 // subclassing and friending so we can access member variables
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
-  FRIEND_TEST(DummyClassNameTest, when_all_parameters_are_set_expect_them_in_storage);
   FRIEND_TEST(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set);
   FRIEND_TEST(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces);
   FRIEND_TEST(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_reset);
