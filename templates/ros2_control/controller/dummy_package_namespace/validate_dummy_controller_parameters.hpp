@@ -28,7 +28,7 @@ tl::expected<void, std::string> forbidden_interface_name_prefix(rclcpp::Paramete
   auto const & interface_name = parameter.as_string();
 
   if (interface_name.rfind("blup_", 0) == 0) {
-    return return tl::make_unexpected("'interface_name' parameter can not start with 'blup_'");
+    return tl::make_unexpected("'interface_name' parameter can not start with 'blup_'");
   }
 
   return {};
