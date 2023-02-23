@@ -205,7 +205,7 @@ void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenc
         "(%.4f).",
         rclcpp::Time(msg->header.stamp).seconds(), age_of_last_command.seconds(),
         ref_timeout_.seconds());
-      reset_controller_reference_msg(msg, get_node());
+      reset_controller_reference_msg(msg, params_.joints, get_node());
     }
 
   } else {
