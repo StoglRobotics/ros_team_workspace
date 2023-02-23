@@ -19,3 +19,7 @@ We explain :ref:`here <docker-nvidia-support-how-to>` how to expose your nvidia 
 sudo: unable to resolve host <hostname>: Name or service not known
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Problem using sudo: If you encounter following message trying to use sudo: ``sudo: unable to resolve host <hostname>: Name or service not known``. You have to add ``127.0.0.1 <hostname>`` to the ``/etc/hosts`` file inside the container. However, using sudo should work fine without adding it.
+
+Docker and ROS1: Can not start my roscore.
+""""""""""""""""""""""""""""""""""""""""""
+If you try to start your roscore inside the docker container with ``roscore``-command and get the following error message: ``RLException: Unable to contact my own server at [http://<hostname>:<port>]``. You have to add ``127.0.0.1 <hostname>`` to the ``/etc/hosts`` file inside the container.
