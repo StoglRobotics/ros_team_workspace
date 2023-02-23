@@ -249,7 +249,7 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
 controller_interface::CallbackReturn DummyClassName::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `NR_CMD_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < command_interfaces_.size(); ++i) {
     command_interfaces_[i].set_value(std::numeric_limits<double>::quiet_NaN());
@@ -264,7 +264,7 @@ DummyClassName::update_reference_from_subscribers(
   const auto age_of_last_command = time - (*current_ref)->header.stamp;
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g.,
-  // `CMD_MY_ITFS`, instead of a loop
+  // `NR_CMD_ITFS`, instead of a loop
   for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
     // send message only if there is no timeout
     if (age_of_last_command <= ref_timeout_ ||
@@ -295,7 +295,7 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
   const auto age_of_last_command = time - (*current_ref)->header.stamp;
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g.,
-  // `CMD_MY_ITFS`, instead of a loop
+  // `NR_CMD_ITFS`, instead of a loop
   for (size_t i = 0; i < command_interfaces_.size(); ++i) {
     // send message only if there is no timeout
     if (age_of_last_command <= ref_timeout_ ||
@@ -317,7 +317,7 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
   if (state_publisher_ && state_publisher_->trylock()) {
     state_publisher_->msg_.header.stamp = time;
     state_publisher_->msg_.set_point =
-        command_interfaces_[CMD_MY_ITFS].get_value();
+        command_interfaces_[NR_CMD_ITFS].get_value();
     state_publisher_->unlockAndPublish();
   }
 
