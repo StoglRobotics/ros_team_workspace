@@ -26,9 +26,7 @@ namespace
 {  // utility
 
 // TODO(destogl): remove this when merged upstream
-// Changed services history QoS to keep all so we don't lose any client service
-//
-// calls
+// Changed services history QoS to keep all so we don't lose any client service calls
 static constexpr rmw_qos_profile_t rmw_qos_profile_services_hist_keep_all = {
   RMW_QOS_POLICY_HISTORY_KEEP_ALL,
   1,  // message queue depth
@@ -131,16 +129,12 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
     state_publisher_ = std::make_unique<ControllerStatePublisher>(s_publisher_);
   } catch (const std::exception & e) {
     fprintf(
-      stderr,
-      "Exception thrown during publisher creation at configure stage "
-      "with message : %s \n",
+      stderr, "Exception thrown during publisher creation at configure stage with message : %s \n",
       e.what());
     return controller_interface::CallbackReturn::ERROR;
   }
 
-  // TODO(anyone): Reserve memory in state publisher depending on the message
-  //
-  // type
+  // TODO(anyone): Reserve memory in state publisher depending on the message type
   state_publisher_->lock();
   state_publisher_->msg_.header.frame_id = params_.joints[0];
   state_publisher_->unlock();
@@ -199,7 +193,6 @@ void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenc
         ref_timeout_.seconds());
       reset_controller_reference_msg(msg, params_.joints, get_node());
     }
-
   } else {
     RCLCPP_ERROR(
       get_node()->get_logger(),

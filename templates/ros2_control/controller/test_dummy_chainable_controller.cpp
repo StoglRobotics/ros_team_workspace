@@ -87,7 +87,6 @@ TEST_F(DummyClassNameTest, when_ref_msg_old_expect_cmnd_itfs_set_to_zero_otherwi
 {
   // 1. age>ref_timeout 2. age<ref_timeout
   SetUpController();
-
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(controller_->get_node()->get_node_base_interface());
 
