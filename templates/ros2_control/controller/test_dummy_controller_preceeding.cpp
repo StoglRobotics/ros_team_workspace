@@ -20,9 +20,9 @@
 #include <utility>
 #include <vector>
 
-using dummy_package_namespace::CMD_MY_ITFS;
+using dummy_package_namespace::NR_CMD_ITFS;
 using dummy_package_namespace::control_mode_type;
-using dummy_package_namespace::STATE_MY_ITFS;
+using dummy_package_namespace::NR_STATE_ITFS;
 
 class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
