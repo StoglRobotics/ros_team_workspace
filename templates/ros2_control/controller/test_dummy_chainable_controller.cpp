@@ -372,7 +372,6 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_chainable_and_slow_expect_re
   publish_commands(controller_->get_node()->now(),TEST_DISPLACEMENT);
   ASSERT_TRUE(controller_->wait_for_commands(executor));
 
-
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::SLOW);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
@@ -442,7 +441,6 @@ TEST_F(DummyClassNameTest, when_message_has_valid_timestamp_expect_reference_set
   ASSERT_TRUE(controller_->wait_for_commands(executor));
   EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements));
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->displacements, 0.45);
-
 }
 
 

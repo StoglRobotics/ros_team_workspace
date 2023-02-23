@@ -146,7 +146,7 @@ controller_interface::InterfaceConfiguration DummyClassName::command_interface_c
   controller_interface::InterfaceConfiguration command_interfaces_config;
   command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
 
-  command_interfaces_config.names.reserve(params_.command_joint_names.size());
+command_interfaces_config.names.reserve(params_.command_joint_names.size());
   for (const auto & joint : params_.command_joint_names) {
     command_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
   }

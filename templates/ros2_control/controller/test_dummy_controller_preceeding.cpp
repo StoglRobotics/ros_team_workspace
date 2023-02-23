@@ -25,7 +25,6 @@ using dummy_package_namespace::NR_REF_ITFS;
 using dummy_package_namespace::NR_STATE_ITFS;
 using dummy_package_namespace::control_mode_type;
 
-
 class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
 };
