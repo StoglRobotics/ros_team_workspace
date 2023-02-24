@@ -324,7 +324,7 @@ TEST_F(
   // reference_callback() is implicitly called when publish_commands() is called
   // reference_msg is published with provided time stamp when publish_commands( time_stamp)
   // is called
-  publish_commands(controller_->get_node()->now(), TEST_DISPLACEMENT);
+  publish_commands(controller_->get_node()->now(), {TEST_DISPLACEMENT});
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
@@ -370,7 +370,7 @@ TEST_F(
   // reference_callback() is implicitly called when publish_commands() is called
   // reference_msg is published with provided time stamp when publish_commands( time_stamp)
   // is called
-  publish_commands(controller_->get_node()->now(), TEST_DISPLACEMENT);
+  publish_commands(controller_->get_node()->now(), {TEST_DISPLACEMENT});
   ASSERT_TRUE(controller_->wait_for_commands(executor));
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::SLOW);
