@@ -41,8 +41,9 @@ using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::Controll
 
 // called from RT control loop
 void reset_controller_reference_msg(
-  const std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names
-  const std::shared_ptr<rclcpp_lifecycle::LifecycleNode> & node)
+  const std::shared_ptr<ControllerReferenceMsg> & msg,
+  const std::vector<std::string> & joint_names const
+    std::shared_ptr<rclcpp_lifecycle::LifecycleNode> & node)
 {
   msg->header.stamp = node->now();
   msg->joint_names = joint_names;
@@ -85,7 +86,8 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   if (params_.command_joint_names.size() != state_joint_names_.size()) {
     RCLCPP_FATAL(
       get_node()->get_logger(),
-      "Size of 'command_joint_names' (%d) and 'state_joint_names' (%d) parameters has to be the same!",
+      "Size of 'command_joint_names' (%d) and 'state_joint_names' (%d) parameters has to be the "
+      "same!",
       params_.command_joint_names.size(), state_joint_names_.size());
     return CallbackReturn::FAILURE;
   }
@@ -122,8 +124,8 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 
   try {
     // State publisher
-    s_publisher_ =
-      get_node()->create_publisher<ControllerStateMsg>("~/controller_state", rclcpp::SystemDefaultsQoS());
+    s_publisher_ = get_node()->create_publisher<ControllerStateMsg>(
+      "~/controller_state", rclcpp::SystemDefaultsQoS());
     state_publisher_ = std::make_unique<ControllerStatePublisher>(s_publisher_);
   } catch (const std::exception & e) {
     fprintf(
@@ -170,8 +172,7 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
 void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
 {
   // if no timestamp provided use current time for command timestamp
-    if (msg->header.stamp.sec == 0 && msg->header.stamp.nanosec == 0u)
-  {
+  if (msg->header.stamp.sec == 0 && msg->header.stamp.nanosec == 0u) {
     RCLCPP_WARN(
       get_node()->get_logger(),
       "Timestamp in header is missing, using current time as command "
@@ -195,13 +196,12 @@ std::vector<hardware_interface::CommandInterface> DummyClassName::on_export_refe
   std::vector<hardware_interface::CommandInterface> reference_interfaces;
   reference_interfaces.reserve(reference_interfaces_.size());
 
-    std::vector<std::string> reference_interface_names = {
+  std::vector<std::string> reference_interface_names = {
     "linear/x/velocity", "linear/y/velocity", "angular/z/velocity"};
 
   for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
     reference_interfaces.push_back(hardware_interface::CommandInterface(
-      get_node()->get_name(), reference_interface_names[i],
-      &reference_interfaces_[i]));
+      get_node()->get_name(), reference_interface_names[i], &reference_interfaces_[i]));
   }
 
   return reference_interfaces;
@@ -225,7 +225,7 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
 controller_interface::CallbackReturn DummyClassName::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `NR_CMD_ITFS`,
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < NR_CMD_ITFS; ++i) {
     command_interfaces_[i].set_value(std::numeric_limits<double>::quiet_NaN());
@@ -237,7 +237,7 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
 {
   auto current_ref = input_ref_.readFromRT();
 
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `NR_CMD_ITFS`,
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < NR_REF_ITFS; ++i) {
     if (!std::isnan((*current_ref)->displacements[i])) {
@@ -252,7 +252,7 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
 controller_interface::return_type DummyClassName::update_and_write_commands(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `NR_CMD_ITFS`,
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < NR_CMD_ITFS; ++i) {
     if (!std::isnan(reference_interfaces_[i])) {
@@ -262,9 +262,7 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
       command_interfaces_[i].set_value(reference_interfaces_[i]);
 
       reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
-    }
-    else
-    {
+    } else {
       command_interfaces_[i].set_value(0.0);
     }
   }
