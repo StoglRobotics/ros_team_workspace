@@ -53,15 +53,25 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, when_controller_is_activated_expect_reference_reset);
   FRIEND_TEST(DummyClassNameTest, when_controller_active_and_update_called_expect_success);
   FRIEND_TEST(DummyClassNameTest, when_active_controller_is_deactivated_expect_success);
-  FRIEND_TEST(DummyClassNameTest, when_controller_is_reactivated_expect_cmd_itfs_not_set_and_update_success);
+  FRIEND_TEST(
+    DummyClassNameTest, when_controller_is_reactivated_expect_cmd_itfs_not_set_and_update_success);
   FRIEND_TEST(DummyClassNameTest, when_update_is_called_expect_status_message);
-  FRIEND_TEST(DummyClassNameTest, when_controller_is_configured_and_activated_properly_expect_correct_setting_of_mode_service);
-  FRIEND_TEST(DummyClassNameTest, when_reference_msg_received_expect_updated_commands_and_status_message);
+  FRIEND_TEST(
+    DummyClassNameTest,
+    when_controller_is_configured_and_activated_properly_expect_correct_setting_of_mode_service);
+  FRIEND_TEST(
+    DummyClassNameTest, when_reference_msg_received_expect_updated_commands_and_status_message);
   FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_fast_expect_update_logic_for_fast_mode);
   FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for_slow_mode);
-  FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces_directly_with_fast_mode_logic_effect);
-  FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces_directly_with_slow_mode_logic_effect);
-  FRIEND_TEST(DummyClassNameTest, when_reference_msg_has_timestamp_zero_expect_reference_set_and_timestamp_set_to_current_time);
+  FRIEND_TEST(
+    DummyClassNameTest,
+    when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces_directly_with_fast_mode_logic_effect);
+  FRIEND_TEST(
+    DummyClassNameTest,
+    when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces_directly_with_slow_mode_logic_effect);
+  FRIEND_TEST(
+    DummyClassNameTest,
+    when_reference_msg_has_timestamp_zero_expect_reference_set_and_timestamp_set_to_current_time);
   FRIEND_TEST(DummyClassNameTest, when_message_has_valid_timestamp_expect_reference_set);
   FRIEND_TEST(DummyClassNameTest, when_loading_controller_expect_no_exception);
 
@@ -188,8 +198,7 @@ protected:
     int max_sub_check_loop_count = 5;  // max number of tries for pub/sub loop
     rclcpp::WaitSet wait_set;          // block used to wait on message
     wait_set.add_subscription(subscription);
-    while (max_sub_check_loop_count--)
-    {
+    while (max_sub_check_loop_count--) {
       controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01));
       // check if message has been received
       if (wait_set.wait(std::chrono::milliseconds(2)).kind() == rclcpp::WaitResultKind::Ready) {
@@ -206,8 +215,7 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const rclcpp::Time & stamp,
-    const std::vector<double> & displacements = {0.45},
+    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name) {

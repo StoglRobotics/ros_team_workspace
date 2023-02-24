@@ -41,8 +41,7 @@ using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::Controll
 
 // called from RT control loop
 void reset_controller_reference_msg(
-  const std::shared_ptr<ControllerReferenceMsg> & msg,
-  const std::vector<std::string> & joint_names, 
+  const std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names,
   const std::shared_ptr<rclcpp_lifecycle::LifecycleNode> & node)
 {
   msg->header.stamp = node->now();
@@ -148,7 +147,7 @@ controller_interface::InterfaceConfiguration DummyClassName::command_interface_c
   controller_interface::InterfaceConfiguration command_interfaces_config;
   command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
 
-command_interfaces_config.names.reserve(params_.command_joint_names.size());
+  command_interfaces_config.names.reserve(params_.command_joint_names.size());
   for (const auto & joint : params_.command_joint_names) {
     command_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
   }

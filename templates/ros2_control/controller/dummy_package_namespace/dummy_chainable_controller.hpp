@@ -93,7 +93,7 @@ protected:
   dummy_controller::Params params_;
 
   std::vector<std::string> state_joint_names_;
-  
+
   // Names of the references, ex: high level vel commands from MoveIt, Nav2, etc.
   // used for preceding controller
   std::vector<std::string> reference_names_;

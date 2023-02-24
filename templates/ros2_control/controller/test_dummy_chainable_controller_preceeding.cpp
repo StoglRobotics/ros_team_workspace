@@ -20,8 +20,8 @@
 #include <utility>
 #include <vector>
 
-using dummy_package_namespace::NR_CMD_ITFS;
 using dummy_package_namespace::control_mode_type;
+using dummy_package_namespace::NR_CMD_ITFS;
 using dummy_package_namespace::NR_STATE_ITFS;
 
 class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
@@ -38,8 +38,10 @@ TEST_F(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_s
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
-  ASSERT_THAT(controller_->params_.command_joint_names, testing::ElementsAreArray(command_joint_names_));
-  ASSERT_THAT(controller_->params_.state_joint_names, testing::ElementsAreArray(state_joint_names_));
+  ASSERT_THAT(
+    controller_->params_.command_joint_names, testing::ElementsAreArray(command_joint_names_));
+  ASSERT_THAT(
+    controller_->params_.state_joint_names, testing::ElementsAreArray(state_joint_names_));
   ASSERT_THAT(controller_->state_joint_names_, testing::ElementsAreArray(state_joint_names_));
   ASSERT_EQ(controller_->params_.interface_name, interface_name_);
 }
