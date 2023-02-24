@@ -65,10 +65,12 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for_slow_mode);
   FRIEND_TEST(
     DummyClassNameTest,
-    when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces_directly_with_fast_mode_logic_effect);
+    when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces
+      _directly_with_fast_mode_logic_effect);
   FRIEND_TEST(
     DummyClassNameTest,
-    when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces_directly_with_slow_mode_logic_effect);
+    when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces
+      _directly_with_slow_mode_logic_effect);
   FRIEND_TEST(
     DummyClassNameTest,
     when_reference_msg_has_timestamp_zero_expect_reference_set_and_timestamp_set_to_current_time);

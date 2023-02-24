@@ -301,7 +301,8 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for
 
 TEST_F(
   DummyClassNameTest,
-  when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces_directly_with_fast_mode_logic_effect)
+  when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces
+    _directly_with_fast_mode_logic_effect)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -347,7 +348,8 @@ TEST_F(
 
 TEST_F(
   DummyClassNameTest,
-  when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces_directly_with_slow_mode_logic_effect)
+  when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces
+    _directly_with_slow_mode_logic_effect)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
