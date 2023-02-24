@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,31 +20,31 @@
 #include <utility>
 #include <vector>
 
-using dummy_package_namespace::CMD_MY_ITFS;
+using dummy_package_namespace::NR_CMD_ITFS;
 using dummy_package_namespace::control_mode_type;
-using dummy_package_namespace::STATE_MY_ITFS;
+using dummy_package_namespace::NR_STATE_ITFS;
 
 class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
 };
 
-TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
+TEST_F(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set)
 {
   SetUpController();
 
-  ASSERT_TRUE(controller_->params_.joints.empty());
-  ASSERT_TRUE(controller_->params_.state_joints.empty());
+  ASSERT_TRUE(controller_->params_.command_joint_names.empty());
+  ASSERT_TRUE(controller_->params_.state_joint_names.empty());
   ASSERT_TRUE(controller_->params_.interface_name.empty());
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
-  ASSERT_THAT(controller_->params_.joints, testing::ElementsAreArray(joint_names_));
-  ASSERT_THAT(controller_->params_.state_joints, testing::ElementsAreArray(state_joint_names_));
-  ASSERT_THAT(controller_->state_joints_, testing::ElementsAreArray(state_joint_names_));
+  ASSERT_THAT(controller_->params_.command_joint_names, testing::ElementsAreArray(command_joint_names_));
+  ASSERT_THAT(controller_->params_.state_joint_names, testing::ElementsAreArray(state_joint_names_));
+  ASSERT_THAT(controller_->state_joint_names_, testing::ElementsAreArray(state_joint_names_));
   ASSERT_EQ(controller_->params_.interface_name, interface_name_);
 }
 
-TEST_F(DummyClassNameTest, check_exported_intefaces)
+TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces)
 {
   SetUpController();
 
@@ -53,7 +53,7 @@ TEST_F(DummyClassNameTest, check_exported_intefaces)
   auto command_intefaces = controller_->command_interface_configuration();
   ASSERT_EQ(command_intefaces.names.size(), joint_command_values_.size());
   for (size_t i = 0; i < command_intefaces.names.size(); ++i) {
-    EXPECT_EQ(command_intefaces.names[i], joint_names_[i] + "/" + interface_name_);
+    EXPECT_EQ(command_intefaces.names[i], command_joint_names_[i] + "/" + interface_name_);
   }
 
   auto state_intefaces = controller_->state_interface_configuration();
@@ -64,8 +64,8 @@ TEST_F(DummyClassNameTest, check_exported_intefaces)
 
   // check ref itfs
   auto reference_interfaces = controller_->export_reference_interfaces();
-  ASSERT_EQ(reference_interfaces.size(), joint_names_.size());
-  for (size_t i = 0; i < joint_names_.size(); ++i) {
+  ASSERT_EQ(reference_interfaces.size(), command_joint_names_.size());
+  for (size_t i = 0; i < command_joint_names_.size(); ++i) {
     const std::string ref_itf_name = std::string(controller_->get_node()->get_name()) + "/" +
                                      state_joint_names_[i] + "/" + interface_name_;
     EXPECT_EQ(reference_interfaces[i].get_name(), ref_itf_name);

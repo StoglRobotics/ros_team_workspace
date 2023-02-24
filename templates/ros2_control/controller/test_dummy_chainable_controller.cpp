@@ -43,7 +43,7 @@ TEST_F(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_s
 
   ASSERT_THAT(controller_->params_.command_joint_names, testing::ElementsAreArray(command_joint_names_));
   ASSERT_TRUE(controller_->params_.state_joint_names.empty());
-  ASSERT_THAT(controller_->state_joint_names_, testing::ElementsAreArray(command_joint_names_));
+  ASSERT_THAT(controller_->state_joint_names_, testing::ElementsAreArray(state_joint_names_));
   ASSERT_EQ(controller_->params_.interface_name, interface_name_);
 }
 
@@ -382,7 +382,7 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_chainable_and_slow_expect_re
   EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT * 2);
   // message is not touched in chained mode
   EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
-  EXPECT_EQ(controller_->reference_interfaces_.size(), joint_names_.size());
+  EXPECT_EQ(controller_->reference_interfaces_.size(), command_joint_names_.size());
   for (const auto & interface : controller_->reference_interfaces_) {
     EXPECT_TRUE(std::isnan(interface));
   }
@@ -402,7 +402,7 @@ TEST_F(
 
   auto reference = controller_->input_ref_.readFromNonRT();
   auto old_timestamp = (*reference)->header.stamp;
-  EXPECT_TRUE(std::isnan((*reference)->displacements));
+  EXPECT_TRUE(std::isnan((*reference)->displacements[0]));
 
 
   // reference_callback() is implicitly called when publish_commands() is called
@@ -412,8 +412,8 @@ TEST_F(
 
   ASSERT_TRUE(controller_->wait_for_commands(executor));
   ASSERT_EQ(old_timestamp.sec, (*(controller_->input_ref_.readFromNonRT()))->header.stamp.sec);
-  EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements));
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->displacements, 0.45);
+  EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->displacements[0], 0.45);
 
   EXPECT_NE((*(controller_->input_ref_.readFromNonRT()))->header.stamp.sec, 0.0);
 }
@@ -431,7 +431,7 @@ TEST_F(DummyClassNameTest, when_message_has_valid_timestamp_expect_reference_set
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   auto reference = controller_->input_ref_.readFromNonRT();
-  EXPECT_TRUE(std::isnan((*reference)->displacements));
+  EXPECT_TRUE(std::isnan((*reference)->displacements[0]));
 
   // reference_callback() is implicitly called when publish_commands() is called
   // reference_msg is published with provided time stamp when publish_commands( time_stamp)
@@ -439,8 +439,8 @@ TEST_F(DummyClassNameTest, when_message_has_valid_timestamp_expect_reference_set
   publish_commands(controller_->get_node()->now());
 
   ASSERT_TRUE(controller_->wait_for_commands(executor));
-  EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements));
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->displacements, 0.45);
+  EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->displacements[0], 0.45);
 }
 
 

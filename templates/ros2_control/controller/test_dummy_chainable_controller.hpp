@@ -63,6 +63,7 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces_directly_with_slow_mode_logic_effect);
   FRIEND_TEST(DummyClassNameTest, when_reference_msg_has_timestamp_zero_expect_reference_set_and_timestamp_set_to_current_time);
   FRIEND_TEST(DummyClassNameTest, when_message_has_valid_timestamp_expect_reference_set);
+  FRIEND_TEST(DummyClassNameTest, when_loading_controller_expect_no_exception);
 
 public:
   controller_interface::CallbackReturn on_configure(

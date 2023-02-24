@@ -92,7 +92,7 @@ protected:
   std::shared_ptr<dummy_controller::ParamListener> param_listener_;
   dummy_controller::Params params_;
 
-  std::vector<std::string> state_joint_names;
+  std::vector<std::string> state_joint_names_;
   
   // Names of the references, ex: high level vel commands from MoveIt, Nav2, etc.
   // used for preceding controller
