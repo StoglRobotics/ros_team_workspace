@@ -78,7 +78,7 @@ maintainer_info_options=("$maintainer_info_user_input_option")
 global_git_name=`git config --global user.name`
 global_git_email=`git config --global user.email`
 if [ -n "$global_git_name" ] && [ -n "$global_git_email" ]; then
-  maintainer_info_global_git_option="global git: $global_git_name, $global_git_email"
+  maintainer_info_global_git_option="global git: $global_git_name <$global_git_email>"
   maintainer_info_options+=("$maintainer_info_global_git_option")
 fi
 
@@ -87,7 +87,7 @@ if [[ -d ".git" ]]; then
   local_git_name=`git config user.name`
   local_git_email=`git config user.email`
   if [ -n "$local_git_name" ] && [ -n "$local_git_email" ]; then
-    maintainer_info_local_git_option="local git: $local_git_name, $local_git_email"
+    maintainer_info_local_git_option="local git: $local_git_name <$local_git_email>"
     maintainer_info_options+=("$maintainer_info_local_git_option")
   fi
 fi
