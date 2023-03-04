@@ -47,6 +47,9 @@ CREATE_PARAMS=""
 case "$META" in
 "2")
    echo -e "${TERMINAL_COLOR_USER_NOTICE}Meta-package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
+    if [[ -d "$PKG_NAME" ]]; then
+      print_and_exit "ERROR: Directory '$PKG_NAME' already exists. Nothing to do 😯" "$usage"
+    fi
     CREATE_PARAMS="--meta"
     mkdir $PKG_NAME
     cd $PKG_NAME
@@ -54,11 +57,10 @@ case "$META" in
 "3")
    read -p "To create a subpackage, enter the name of metapackage: " META_NAME
    if [ -z "$META_NAME" ]; then
-    echo "ERROR: You have to enter the name of metapackage! Exiting..."
-    exit;
+     print_and_exit "ERROR: You have to enter the name of metapackage! Exiting..." "$usage"
    fi
    if [[ ! -d $META_NAME ]]; then
-     echo "ERROR: metapackage with the name '$META_NAME' does not exist! Exiting..."
+     print_and_exit "ERROR: metapackage with the name '$META_NAME' does not exist! Exiting..." "$usage"
    fi
    echo -e "${TERMINAL_COLOR_USER_NOTICE}Subpackage '$PKG_NAME' will be created in the metapackage '$META_NAME'!${TERMINAL_COLOR_NC}"
    cd $META_NAME
@@ -68,30 +70,77 @@ case "$META" in
   echo -e "${TERMINAL_COLOR_USER_NOTICE}Package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
 esac
 
-user_decision "Do you want to enter name and email address of the maintainer? If not, data from git configuration will be used."
-if [[ " ${positive_answers[*]} " =~ " ${user_answer} " ]]; then
-  choice="y"
-else
-  choice="n"
+
+# MAINTAINER_NAME and MAINTAINER_EMAIL options for a multiple choice
+maintainer_info_user_input_option="user input"
+maintainer_info_options=("$maintainer_info_user_input_option")
+
+global_git_name=`git config --global user.name`
+global_git_email=`git config --global user.email`
+if [ -n "$global_git_name" ] && [ -n "$global_git_email" ]; then
+  maintainer_info_global_git_option="global git: $global_git_name <$global_git_email>"
+  maintainer_info_options+=("$maintainer_info_global_git_option")
 fi
 
-case "$choice" in
-"y")
-  read -p "Enter the maintainer's name: " MAINTAINER_NAME
-  read -p "Enter the maintainer's email address: " MAINTAINER_EMAIL
-  ;;
-"n")
-  MAINTAINER_NAME=`git config user.name`
-  MAINTAINER_EMAIL=`git config user.email`
-  if [[ ! -d ".git" ]]; then
-    cd ..
-    git init >> /dev/null # init git to get data from git command
-    MAINTAINER_NAME=`git config user.name`
-    MAINTAINER_EMAIL=`git config user.email`
-    rm -r .git/
-    cd - >> /dev/null
+local_git_name=""; local_git_email=""
+if [[ -d ".git" ]]; then
+  local_git_name=`git config user.name`
+  local_git_email=`git config user.email`
+  if [ -n "$local_git_name" ] && [ -n "$local_git_email" ]; then
+    maintainer_info_local_git_option="local git: $local_git_name <$local_git_email>"
+    maintainer_info_options+=("$maintainer_info_local_git_option")
   fi
-esac
+fi
+
+function get_maintainer_name_from_input() {
+  read -p "Enter the maintainer's name: " name
+  while [[ -z $name ]]; do
+      read -p "Name cannot be empty, please enter your name: " name
+  done
+  echo "$name"
+}
+
+function get_maintainer_email_from_input() {
+  read -p "Enter the maintainer's email address: " email
+  while [[ ! $email =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$ ]]; do
+      if [[ -z $email ]]; then
+          read -p "Email cannot be empty, please enter your email: " email
+      else
+          read -p "Invalid email format, please enter a valid email: " email
+      fi
+  done
+  echo "$email"
+}
+
+# If there is only user input option ask for maintainer info directly
+if [[ -z "$maintainer_info_global_git_option" && -z "$maintainer_info_local_git_option" ]]; then
+  echo "No local or global git name and email found"
+  MAINTAINER_NAME=$(get_maintainer_name_from_input)
+  MAINTAINER_EMAIL=$(get_maintainer_email_from_input)
+else
+  select maintainer_info_option in "${maintainer_info_options[@]}";
+  do
+    case "$maintainer_info_option" in
+          "$maintainer_info_user_input_option")
+              MAINTAINER_NAME=$(get_maintainer_name_from_input)
+              MAINTAINER_EMAIL=$(get_maintainer_email_from_input)
+              break
+            ;;
+          "$maintainer_info_global_git_option")
+              MAINTAINER_NAME=$global_git_name
+              MAINTAINER_EMAIL=$global_git_email
+              break
+            ;;
+          "$maintainer_info_local_git_option")
+              MAINTAINER_NAME=$local_git_name
+              MAINTAINER_EMAIL=$local_git_email
+              break
+            ;;
+    esac
+  done
+fi
+echo -e "${TERMINAL_COLOR_USER_NOTICE}The name '$MAINTAINER_NAME' and email address '$MAINTAINER_EMAIL' will be used as maintainer info!${TERMINAL_COLOR_NC}"
+
 
 # License
 echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}How do you want to licence your package? Current team license standard:['$TEAM_LICENSE']: ${TERMINAL_COLOR_NC}"
