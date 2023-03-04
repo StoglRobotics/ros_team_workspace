@@ -72,13 +72,14 @@ esac
 
 
 # MAINTAINER_NAME and MAINTAINER_EMAIL options for a multiple choice
-maintainer_info_options=("user input")
+maintainer_info_user_input_option="user input"
+maintainer_info_options=("$maintainer_info_user_input_option")
 
 global_git_name=`git config --global user.name`
 global_git_email=`git config --global user.email`
 if [ -n "$global_git_name" ] && [ -n "$global_git_email" ]; then
-  maintainer_info_global_git="global git: $global_git_name, $global_git_email"
-  maintainer_info_options+=("$maintainer_info_global_git")
+  maintainer_info_global_git_option="global git: $global_git_name, $global_git_email"
+  maintainer_info_options+=("$maintainer_info_global_git_option")
 fi
 
 local_git_name=""; local_git_email=""
@@ -86,8 +87,8 @@ if [[ -d ".git" ]]; then
   local_git_name=`git config user.name`
   local_git_email=`git config user.email`
   if [ -n "$local_git_name" ] && [ -n "$local_git_email" ]; then
-    maintainer_info_local_git="local git: $local_git_name, $local_git_email"
-    maintainer_info_options+=("$maintainer_info_local_git")
+    maintainer_info_local_git_option="local git: $local_git_name, $local_git_email"
+    maintainer_info_options+=("$maintainer_info_local_git_option")
   fi
 fi
 
@@ -112,25 +113,25 @@ function get_maintainer_email_from_input() {
 }
 
 # If there is only user input option ask for maintainer info directly
-if [[ -z "$maintainer_info_global_git" && -z "$maintainer_info_local_git" ]]; then
+if [[ -z "$maintainer_info_global_git_option" && -z "$maintainer_info_local_git_option" ]]; then
   echo "No local or global git name and email found"
   MAINTAINER_NAME=$(get_maintainer_name_from_input)
   MAINTAINER_EMAIL=$(get_maintainer_email_from_input)
 else
-  select maintainer_info in "${maintainer_info_options[@]}";
+  select maintainer_info_option in "${maintainer_info_options[@]}";
   do
-    case "$maintainer_info" in
-          "user input")
+    case "$maintainer_info_option" in
+          "$maintainer_info_user_input_option")
               MAINTAINER_NAME=$(get_maintainer_name_from_input)
               MAINTAINER_EMAIL=$(get_maintainer_email_from_input)
               break
             ;;
-          $maintainer_info_global_git)
+          "$maintainer_info_global_git_option")
               MAINTAINER_NAME=$global_git_name
               MAINTAINER_EMAIL=$global_git_email
               break
             ;;
-          $maintainer_info_local_git)
+          "$maintainer_info_local_git_option")
               MAINTAINER_NAME=$local_git_name
               MAINTAINER_EMAIL=$local_git_email
               break
