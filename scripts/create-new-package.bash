@@ -47,6 +47,9 @@ CREATE_PARAMS=""
 case "$META" in
 "2")
    echo -e "${TERMINAL_COLOR_USER_NOTICE}Meta-package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
+    if [[ -d "$PKG_NAME" ]]; then
+      print_and_exit "ERROR: Directory '$PKG_NAME' already exists. Nothing to do 😯" "$usage"
+    fi
     CREATE_PARAMS="--meta"
     mkdir $PKG_NAME
     cd $PKG_NAME
@@ -54,12 +57,10 @@ case "$META" in
 "3")
    read -p "To create a subpackage, enter the name of metapackage: " META_NAME
    if [ -z "$META_NAME" ]; then
-    echo "ERROR: You have to enter the name of metapackage! Exiting..."
-    exit;
+     print_and_exit "ERROR: You have to enter the name of metapackage! Exiting..." "$usage"
    fi
    if [[ ! -d $META_NAME ]]; then
-     echo "ERROR: metapackage with the name '$META_NAME' does not exist! Exiting..."
-     exit;
+     print_and_exit "ERROR: metapackage with the name '$META_NAME' does not exist! Exiting..." "$usage"
    fi
    echo -e "${TERMINAL_COLOR_USER_NOTICE}Subpackage '$PKG_NAME' will be created in the metapackage '$META_NAME'!${TERMINAL_COLOR_NC}"
    cd $META_NAME
