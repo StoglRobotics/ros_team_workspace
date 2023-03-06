@@ -22,53 +22,52 @@ echo -e "${TERMINAL_COLOR_USER_NOTICE}Your path is `pwd`. Is this your workspace
 echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If so press <ENTER> otherwise <CTRL>+C and start the script again from your source folder.${TERMINAL_COLOR_NC}"
 read
 
+
+# PKG_TYPE options
+package_type_standard_option="standard"
+package_type_metapackage_option="metapackage"
+package_type_subpackage_option="subpackage"
+packae_type_options=("$package_type_standard_option" "$package_type_metapackage_option" "$package_type_subpackage_option")
+
 echo -n -e ""
-echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}What type of package you want to create? (1 - standard, 2 - metapackage, 3 - subpackage):${TERMINAL_COLOR_NC}"
-select META in standard metapackage subpackage;
+echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}What type of package you want to create?${TERMINAL_COLOR_NC}"
+select PKG_TYPE in "${packae_type_options[@]}";
 do
-  case "$META" in
-        standard)
-            META="1"
+  case "$PKG_TYPE" in
+        "$package_type_standard_option")
+            echo -e "${TERMINAL_COLOR_USER_NOTICE}Standard package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
+            if [[ -d "$PKG_NAME" ]]; then
+              print_and_exit "ERROR: Directory '$PKG_NAME' already exists. Nothing to do 😯" "$usage"
+            fi
+            CREATE_PARAMS=""
             break
           ;;
-        metapackage)
-            META="2"
+        "$package_type_metapackage_option")
+            echo -e "${TERMINAL_COLOR_USER_NOTICE}Meta-package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
+            if [[ -d "$PKG_NAME" ]]; then
+              print_and_exit "ERROR: Directory '$PKG_NAME' already exists. Nothing to do 😯" "$usage"
+            fi
+            CREATE_PARAMS="--meta"
+            mkdir $PKG_NAME
+            cd $PKG_NAME
             break
           ;;
-        subpackage)
-            META="3"
+        "$package_type_subpackage_option")
+            echo -e "${TERMINAL_COLOR_USER_NOTICE}Subpackage '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
+            read -p "To create a subpackage, enter the name of metapackage: " META_NAME
+            if [ -z "$META_NAME" ]; then
+              print_and_exit "ERROR: You have to enter the name of metapackage! Exiting..." "$usage"
+            fi
+            if [[ ! -d $META_NAME ]]; then
+              print_and_exit "ERROR: metapackage with the name '$META_NAME' does not exist! Exiting..." "$usage"
+            fi
+            CREATE_PARAMS=""
+            cd $META_NAME
+            # TODO: read licence of the meta-package
             break
           ;;
   esac
 done
-
-CREATE_PARAMS=""
-
-case "$META" in
-"2")
-   echo -e "${TERMINAL_COLOR_USER_NOTICE}Meta-package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
-    if [[ -d "$PKG_NAME" ]]; then
-      print_and_exit "ERROR: Directory '$PKG_NAME' already exists. Nothing to do 😯" "$usage"
-    fi
-    CREATE_PARAMS="--meta"
-    mkdir $PKG_NAME
-    cd $PKG_NAME
-   ;;
-"3")
-   read -p "To create a subpackage, enter the name of metapackage: " META_NAME
-   if [ -z "$META_NAME" ]; then
-     print_and_exit "ERROR: You have to enter the name of metapackage! Exiting..." "$usage"
-   fi
-   if [[ ! -d $META_NAME ]]; then
-     print_and_exit "ERROR: metapackage with the name '$META_NAME' does not exist! Exiting..." "$usage"
-   fi
-   echo -e "${TERMINAL_COLOR_USER_NOTICE}Subpackage '$PKG_NAME' will be created in the metapackage '$META_NAME'!${TERMINAL_COLOR_NC}"
-   cd $META_NAME
-   # TODO: read licence of the meta-package
-   ;;
-*)
-  echo -e "${TERMINAL_COLOR_USER_NOTICE}Package '$PKG_NAME' will be created!${TERMINAL_COLOR_NC}"
-esac
 
 
 # MAINTAINER_NAME and MAINTAINER_EMAIL options for a multiple choice
@@ -112,6 +111,9 @@ function get_maintainer_email_from_input() {
   echo "$email"
 }
 
+echo ""
+echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Who will maintain the package you want to create? Please provide the info:${TERMINAL_COLOR_NC}"
+
 # If there is only user input option ask for maintainer info directly
 if [[ -z "$maintainer_info_global_git_option" && -z "$maintainer_info_local_git_option" ]]; then
   echo "No local or global git name and email found"
@@ -142,29 +144,128 @@ fi
 echo -e "${TERMINAL_COLOR_USER_NOTICE}The name '$MAINTAINER_NAME' and email address '$MAINTAINER_EMAIL' will be used as maintainer info!${TERMINAL_COLOR_NC}"
 
 
-# License
-echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}How do you want to licence your package? Current team license standard:['$TEAM_LICENSE']: ${TERMINAL_COLOR_NC}"
-read LICENSE
-LICENSE=${LICENSE:=$TEAM_LICENSE}
+# License options for a multiple choice
+license_user_input_option="user input"
+licence_team_option="Current team license standard: ['$TEAM_LICENSE']"
+
+license_apache_option="Apache-2.0"
+license_apache_desc="A permissive license with an added patent grant."
+
+license_bsl_option="BSL-1.0"
+license_bsl_desc="A permissive license with a requirement to display the license."
+
+license_bsd2_option="BSD-2.0"
+license_bsd2_desc="A permissive license with a requirement to display the license and copyright."
+
+license_bsd2c_option="BSD-2-Clause"
+license_bsd2c_desc="A permissive license with a requirement to display the license and copyright."
+
+license_bsd3c_option="BSD-3-Clause"
+license_bsd3c_desc="A permissive license with a requirement to display the license and copyright."
+
+license_gpl3_option="GPL-3.0-only"
+license_gpl3_desc="A copyleft license that requires derivative works to be licensed under the same license."
+
+license_lgpl3_option="LGPL-3.0-only"
+license_lgpl3_desc="A copyleft license that allows for linking with proprietary software."
+
+license_mit_option="MIT"
+license_mit_desc="A permissive license with a requirement to display the license and copyright."
+
+license_mit0_option="MIT-0"
+license_mit0_desc="A permissive license with no requirements."
+
+license_options=("$license_user_input_option" "$licence_team_option" "$license_apache_option" "$license_bsl_option" "$license_bsd2_option" "$license_bsd2c_option")
+license_options+=("$license_bsd3c_option" "$license_gpl3_option" "$license_lgpl3_option" "$license_mit_option" "$license_mit0_option")
+
+echo ""
+echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}How do you want to licence your package? ${TERMINAL_COLOR_NC}"
+select licence_option in "${license_options[@]}";
+do
+  case "$licence_option" in
+        "$license_user_input_option")
+            read -p "Enter your licence: " LICENSE
+            licence_description=""
+            break
+          ;;
+        "$licence_team_option")
+            LICENSE="$TEAM_LICENSE"
+            licence_description=""
+            break
+          ;;
+        "$license_apache_option")
+            LICENSE="$license_apache_option"
+            licence_description="$license_apache_desc"
+            break
+          ;;
+        "$license_bsl_option")
+            LICENSE="$license_bsl_option"
+            licence_description="$license_bsl_desc"
+            break
+          ;;
+        "$license_bsd2_option")
+            LICENSE="$license_bsd2_option"
+            licence_description="$license_bsd2_desc"
+            break
+          ;;
+        "$license_bsd2c_option")
+            LICENSE="$license_bsd2c_option"
+            licence_description="$license_bsd2c_desc"
+            break
+          ;;
+        "$license_bsd3c_option")
+            LICENSE="$license_bsd3c_option"
+            licence_description="$license_bsd3c_desc"
+            break
+          ;;
+        "$license_gpl3_option")
+            LICENSE="$license_gpl3_option"
+            licence_description="$license_gpl3_desc"
+            break
+          ;;
+        "$license_lgpl3_option")
+            LICENSE="$license_lgpl3_option"
+            licence_description="$license_lgpl3_desc"
+            break
+          ;;
+        "$license_mit_option")
+            LICENSE="$license_mit_option"
+            licence_description="$license_mit_desc"
+            break
+          ;;
+        "$license_mit0_option")
+            LICENSE="$license_mit0_option"
+            licence_description="$license_mit0_desc"
+            break
+          ;;
+  esac
+done
+echo -e "${TERMINAL_COLOR_USER_NOTICE}The licence '$LICENSE' will be used! ($) $licence_description ${TERMINAL_COLOR_NC}"
+
+
+# BUILD_TYPE
+ros2_build_type_ament_cmake_option="ament_cmake"
+ros2_build_type_ament_python_option="ament_python"
+ros2_build_type_cmake_option="cmake"
+ros2_build_type_options=("$ros2_build_type_ament_cmake_option" "$ros2_build_type_ament_python_option" "$ros2_build_type_cmake_option")
 
 if [[ $ros_version == 1 ]]; then
     BUILD_TYPE="catkin"
-
 elif [[ $ros_version == 2 ]]; then
-  # Build type
-  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Please choose your package build type (1 - ament_cmake, 2 - ament_python, 3 - cmake):${TERMINAL_COLOR_NC}"
-  select build_type in ament_cmake ament_python cmake;
+  echo ""
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Please choose your package build type:${TERMINAL_COLOR_NC}"
+  select build_type in "${ros2_build_type_options[@]}";
   do
     case "$build_type" in
-          ament_cmake)
+          "$ros2_build_type_ament_cmake_option")
               BUILD_TYPE="ament_cmake"
               break
             ;;
-          ament_python)
+          "$ros2_build_type_ament_python_option")
               BUILD_TYPE="ament_python"
               break
             ;;
-          cmake)
+          "$ros2_build_type_cmake_option")
               BUILD_TYPE="cmake"
               break
             ;;
@@ -185,7 +286,7 @@ elif [[ $ros_version == 2 ]]; then
   ros2 pkg create --package-format 3 --description "$PKG_DESCRIPTION" --license "$LICENSE" --build-type "$BUILD_TYPE" --maintainer-email "$MAINTAINER_EMAIL" --maintainer-name "$MAINTAINER_NAME" $PKG_NAME
 
   ## Until it is corrected upstream
-  if [[ $META == 2 ]]; then
+  if [[ "$PKG_TYPE" == "$package_type_metapackage_option" ]]; then
     cd $PKG_NAME
     rm -r include
     rm -r src
@@ -198,6 +299,7 @@ elif [[ $ros_version == 2 ]]; then
   fi
 fi
 
+echo ""
 user_decision "Do you want to setup/update repository with the new package configuration?"
 if [[ " ${positive_answers[*]} " =~ " ${user_answer} " ]]; then
   choice="y"
@@ -207,7 +309,7 @@ fi
 
 case "$choice" in
 "y")
-  if [[ $META != 3 ]]; then
+  if [[ "$PKG_TYPE" != "$package_type_subpackage_option" ]]; then
 
     if [[ $ros_version == 1 ]]; then
       roscd $PKG_NAME
