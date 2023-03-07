@@ -16,11 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-usage="setup-robot-description.bash ROBOT_NAME [PKG_NAME]"
-
-# echo ""
-# echo "Your path is `pwd`. Is this your package folder where to setup robot's description?"
-# read -p "If so press <ENTER> otherwise <CTRL>+C and start the script again from the description folder."
+usage="setup-robot-description ROBOT_NAME"
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
@@ -28,28 +24,22 @@ source $script_own_dir/../setup.bash
 check_and_set_ros_distro_and_version ${ROS_DISTRO}
 
 ROBOT_NAME=$1
-if [ -z "$1" ]; then
-  echo "You should provide robot name!"
-  exit 0
+if [ -z "$ROBOT_NAME" ]; then
+  print_and_exit "ERROR: You should provide robot name! Nothing to do 😯" "$usage"
 fi
 
-PKG_NAME=$2
-if [ -z "$2" ]; then
-  current=$(pwd)
-  PKG_NAME=$(basename "$current")
-  user_decision "Package name guessed from the current path is '$PKG_NAME' is this correct?"
-  if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
-    print_and_exit "Please provide the package name as second parameter."
-  fi
+if [ ! -f "package.xml" ]; then
+  print_and_exit "ERROR: You should execute this script in a package folder. Nothing to do 😯" "$usage"
 fi
+PKG_NAME="$(grep -Po '(?<=<name>).*?(?=</name>)' package.xml | sed -e 's/[[:space:]]//g')"
 
 echo ""
-echo "ATTENTION: Setting up description configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '`pwd`'."
-echo ""
-read -p "If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name."
+echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up description configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '`pwd`'.${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name.${TERMINAL_COLOR_NC}"
+read
 
 # Create folders for meshes
-F_NAME="meshes/${ROBOT_NAME}/visual"
+F_NAME="meshes/${ROBOT_NAME}/collision"
 mkdir -p $F_NAME
 touch $F_NAME/.gitkeep
 
@@ -117,11 +107,11 @@ fi
 
 #TODO: Set license
 
-git add .
-git commit -m "RosTeamWS: Description files for $ROBOT_NAME generated."
+# make a commit message
+user_decision_commit_changes "RosTeamWS: Description files for robot '$ROBOT_NAME' generated."
 
 # Compile and add new package the to the path
 compile_and_source_package $PKG_NAME
 
 echo ""
-echo "FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch.py'"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch.py'${TERMINAL_COLOR_NC}"
