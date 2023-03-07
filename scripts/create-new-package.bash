@@ -160,12 +160,10 @@ do
   case "$licence_option" in
         "$license_user_input_option")
             read -p "Enter your licence: " LICENSE
-            licence_description=""
             break
           ;;
         "$licence_team_option")
             LICENSE="$TEAM_LICENSE"
-            licence_description=""
             break
           ;;
         *)
@@ -174,7 +172,7 @@ do
           ;;
   esac
 done
-echo -e "${TERMINAL_COLOR_USER_NOTICE}The licence '$LICENSE' will be used! ($) $licence_description ${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}The licence '$LICENSE' will be used! ($) ${TERMINAL_COLOR_NC}"
 
 
 # BUILD_TYPE
