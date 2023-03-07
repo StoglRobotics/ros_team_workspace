@@ -147,9 +147,12 @@ echo -e "${TERMINAL_COLOR_USER_NOTICE}The name '$MAINTAINER_NAME' and email addr
 # License options for a multiple choice
 license_user_input_option="user input"
 licence_team_option="Current team license standard: ['$TEAM_LICENSE']"
-supported_licenses=$(ros2 pkg create dummy --license "?")
-supported_licenses=${supported_licenses#"Supported licenses:"}
-
+if [[ $ros_version == 1 ]]; then
+  supported_licenses=""
+elif [[ $ros_version == 2 ]]; then
+  supported_licenses=$(ros2 pkg create dummy --license "?")
+  supported_licenses=${supported_licenses#"Supported licenses:"}
+fi
 license_options=("$license_user_input_option" "$licence_team_option")
 license_options+=($supported_licenses)
 
