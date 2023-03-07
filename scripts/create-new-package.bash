@@ -27,11 +27,11 @@ read
 package_type_standard_option="standard"
 package_type_metapackage_option="metapackage"
 package_type_subpackage_option="subpackage"
-packae_type_options=("$package_type_standard_option" "$package_type_metapackage_option" "$package_type_subpackage_option")
+package_type_options=("$package_type_standard_option" "$package_type_metapackage_option" "$package_type_subpackage_option")
 
 echo -n -e ""
 echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}What type of package you want to create?${TERMINAL_COLOR_NC}"
-select PKG_TYPE in "${packae_type_options[@]}";
+select PKG_TYPE in "${package_type_options[@]}";
 do
   case "$PKG_TYPE" in
         "$package_type_standard_option")
@@ -147,36 +147,11 @@ echo -e "${TERMINAL_COLOR_USER_NOTICE}The name '$MAINTAINER_NAME' and email addr
 # License options for a multiple choice
 license_user_input_option="user input"
 licence_team_option="Current team license standard: ['$TEAM_LICENSE']"
+supported_licenses=$(ros2 pkg create dummy --license "?")
+supported_licenses=${supported_licenses#"Supported licenses:"}
 
-license_apache_option="Apache-2.0"
-license_apache_desc="A permissive license with an added patent grant."
-
-license_bsl_option="BSL-1.0"
-license_bsl_desc="A permissive license with a requirement to display the license."
-
-license_bsd2_option="BSD-2.0"
-license_bsd2_desc="A permissive license with a requirement to display the license and copyright."
-
-license_bsd2c_option="BSD-2-Clause"
-license_bsd2c_desc="A permissive license with a requirement to display the license and copyright."
-
-license_bsd3c_option="BSD-3-Clause"
-license_bsd3c_desc="A permissive license with a requirement to display the license and copyright."
-
-license_gpl3_option="GPL-3.0-only"
-license_gpl3_desc="A copyleft license that requires derivative works to be licensed under the same license."
-
-license_lgpl3_option="LGPL-3.0-only"
-license_lgpl3_desc="A copyleft license that allows for linking with proprietary software."
-
-license_mit_option="MIT"
-license_mit_desc="A permissive license with a requirement to display the license and copyright."
-
-license_mit0_option="MIT-0"
-license_mit0_desc="A permissive license with no requirements."
-
-license_options=("$license_user_input_option" "$licence_team_option" "$license_apache_option" "$license_bsl_option" "$license_bsd2_option" "$license_bsd2c_option")
-license_options+=("$license_bsd3c_option" "$license_gpl3_option" "$license_lgpl3_option" "$license_mit_option" "$license_mit0_option")
+license_options=("$license_user_input_option" "$licence_team_option")
+license_options+=($supported_licenses)
 
 echo ""
 echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}How do you want to licence your package? ${TERMINAL_COLOR_NC}"
@@ -193,49 +168,8 @@ do
             licence_description=""
             break
           ;;
-        "$license_apache_option")
-            LICENSE="$license_apache_option"
-            licence_description="$license_apache_desc"
-            break
-          ;;
-        "$license_bsl_option")
-            LICENSE="$license_bsl_option"
-            licence_description="$license_bsl_desc"
-            break
-          ;;
-        "$license_bsd2_option")
-            LICENSE="$license_bsd2_option"
-            licence_description="$license_bsd2_desc"
-            break
-          ;;
-        "$license_bsd2c_option")
-            LICENSE="$license_bsd2c_option"
-            licence_description="$license_bsd2c_desc"
-            break
-          ;;
-        "$license_bsd3c_option")
-            LICENSE="$license_bsd3c_option"
-            licence_description="$license_bsd3c_desc"
-            break
-          ;;
-        "$license_gpl3_option")
-            LICENSE="$license_gpl3_option"
-            licence_description="$license_gpl3_desc"
-            break
-          ;;
-        "$license_lgpl3_option")
-            LICENSE="$license_lgpl3_option"
-            licence_description="$license_lgpl3_desc"
-            break
-          ;;
-        "$license_mit_option")
-            LICENSE="$license_mit_option"
-            licence_description="$license_mit_desc"
-            break
-          ;;
-        "$license_mit0_option")
-            LICENSE="$license_mit0_option"
-            licence_description="$license_mit0_desc"
+        *)
+            LICENSE="$licence_option"
             break
           ;;
   esac
