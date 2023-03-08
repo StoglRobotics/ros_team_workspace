@@ -325,34 +325,6 @@ function user_decision {
   done
 }
 
-# If git directory exist then let the user decide if the changes in the current folder should be commited
-#
-# $1 - commit message
-function user_decision_commit_changes {
-  if [ -d .git ]; then
-    commit_negative_option="no commit"
-    commit_positive_option="make a commit"
-    commit_options=("$commit_negative_option" "$commit_positive_option")
-    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Do you want to make a commit with your changes? ${TERMINAL_COLOR_NC}"
-    select commit_option in "${commit_options[@]}";
-    do
-      case "$commit_option" in
-            "$commit_negative_option")
-                echo -e "${TERMINAL_COLOR_USER_NOTICE}No commit is made. ${TERMINAL_COLOR_NC}"
-                break
-              ;;
-            "$commit_positive_option")
-                commit_msg="$1"
-                git add .
-                git commit -m "$commit_msg"
-                echo -e "${TERMINAL_COLOR_USER_NOTICE}Commit is made. Message: [$commit_msg]  ${TERMINAL_COLOR_NC}"
-                break
-              ;;
-      esac
-    done
-  fi
-}
-
 # function which prints a notification in predefined color scheme and wait for user confirmation
 # $1 - notification = The message which gets print to the commandline
 function user_confirmation {

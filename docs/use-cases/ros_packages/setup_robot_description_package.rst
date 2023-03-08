@@ -25,7 +25,7 @@ The scripts copies template files from the ``templates/robot_description`` folde
    setup-robot-description ROBOT_NAME
 
 
-After all files are copied and placeholders set, a commit can be automatically created.
+After all files are copied and placeholders set, changes are automatically staged in git.
 
 To test the generated files compile and source your workspace and execute:
 

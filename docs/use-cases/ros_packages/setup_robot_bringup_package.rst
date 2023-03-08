@@ -25,4 +25,4 @@ The scripts copies template files from the ``templates/robot_bringup`` folder, r
    setup-robot-bringup ROBOT_NAME DESCRIPTION_PKG_NAME
 
 
-After all files are copied and placeholders set, a commit can be automatically created.
+After all files are copied and placeholders set, changes are automatically staged in git.

@@ -106,8 +106,8 @@ fi
 
 # TODO: Add license checks
 
-# make a commit message
-user_decision_commit_changes "RosTeamWS: Bringup files for $ROBOT_NAME generated."
+git add .
+# git commit -m "RosTeamWS: Bringup files for $ROBOT_NAME generated."
 
 # Compile and add new package the to the path
 compile_and_source_package $PKG_NAME
