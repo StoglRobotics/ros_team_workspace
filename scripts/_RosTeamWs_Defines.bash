@@ -325,7 +325,7 @@ function user_decision {
   done
 }
 
-# Let the user decide if the changes in the current folder should be commited only if .git directory exists
+# If git directory exist then let the user decide if the changes in the current folder should be commited
 #
 # $1 - commit message
 function user_decision_commit_changes {
