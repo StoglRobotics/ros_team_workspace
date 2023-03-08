@@ -31,7 +31,7 @@ if [ -f src/$FILE_NAME.cpp ]; then
 fi
 
 if [ ! -f "package.xml" ]; then
-  print_and_exit "ERROR: You should execute this script in a package folder. Nothing to do 😯" "$usage"
+  print_and_exit "ERROR: 'package.xml' not found. You should execute this script at the top level of your package folder. Nothing to do 😯" "$usage"
 fi
 PKG_NAME="$(grep -Po '(?<=<name>).*?(?=</name>)' package.xml | sed -e 's/[[:space:]]//g')"
 
