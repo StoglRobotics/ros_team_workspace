@@ -42,7 +42,7 @@ For more details check :ref:`use-case description <uc-setup-robot-description>`.
    source <path to your ROS workspace>/install/setup.bash
    cd <src folder of your ROS workspace>/<package_name>
 
-   setup-robot-description <my_cool_robot_name> <package_name>
+   setup-robot-description <my_cool_robot_name>
 
 
 Create robot bringup package
@@ -54,7 +54,7 @@ For more details check :ref:`use-case description <uc-setup-robot-bringup>`.
    source <path to your ROS workspace>/install/setup.bash
    cd <src folder of your ROS workspace>/<package_name>
 
-   setup-robot-bringup <my_cool_robot_name> <package_name>
+   setup-robot-bringup <my_cool_robot_name> <my_cool_robot_description_package_name>
 
 
 Setup  ros2_control control hardware
