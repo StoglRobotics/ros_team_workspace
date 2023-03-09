@@ -199,7 +199,7 @@ The script creates a full skeleton of a controller with plugin description and t
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Usage of script for setting up a controller.</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2_control_setup-controller-package<span class="w"> </span>FILE_NAME<span class="w"> </span><span class="o">[</span>CLASS_NAME<span class="o">]</span><span class="w"> </span><span class="o">[</span>PKG_NAME<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2_control_setup-controller-package<span class="w"> </span>FILE_NAME<span class="w"> </span><span class="o">[</span>CLASS_NAME<span class="o">]</span>
 </pre></div>
 </div>
 </div>
@@ -210,11 +210,10 @@ The script creates a full skeleton of a controller with plugin description and t
 It assumes standard ROS format, e.g, “my_cool_controller”.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CLASS_NAME</span></code> optional name used for controller class.
 If not set, it is guessed by camel-casing the file name.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">PKG_NAME</span></code> name of the controller’s package.
-If not set, it is guessed from the current path using the folder’s name.</p></li>
 </ul>
 </div></blockquote>
 <p>The script will ask for some additional input.</p>
+<p>The package name is obtained from the ‘package.xml’ file.</p>
 <p>After all files are copied and placeholders set, changes are automatically staged in git.</p>
 </section>
 </section>

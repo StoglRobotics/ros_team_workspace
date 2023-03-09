@@ -194,8 +194,8 @@
 The package follows as far as possible best practices for <a class="reference external" href="http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages">robot support packages</a> from ROS-Industrial consortia. (<strong>This has to be verified!</strong>)</p>
 <section id="script-for-setting-up-description-package">
 <h2>Script for Setting up Description Package<a class="headerlink" href="#script-for-setting-up-description-package" title="Permalink to this headline"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">setup-robot-bringup</span></code> script accepts the robot name and, optionally, the package name.
-If the package name is not set, it is guessed from the current path using the folder’s name.
+<p><code class="docutils literal notranslate"><span class="pre">setup-robot-bringup</span></code> script accepts the robot name and the robot description package name.
+The package name is obtained from the ‘package.xml’ file.
 The script <strong>has to be executed</strong> from the folder where the bringup should be generated.</p>
 <blockquote>
 <div><div class="admonition note">
@@ -203,14 +203,14 @@ The script <strong>has to be executed</strong> from the folder where the bringup
 <p>it is recommended to setup your package using <a class="reference internal" href="create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> script.</p>
 </div>
 </div></blockquote>
-<p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/robot_bringup</span></code> folder, rename the files, and replaces the placeholders.</p>
+<p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/robot_bringup</span></code> folder, renames the files, and replaces the placeholders.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Usage of script for setting up the robot bringup.</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-robot-bringup<span class="w"> </span>ROBOT_NAME<span class="w"> </span><span class="o">[</span>PKG_NAME<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-robot-bringup<span class="w"> </span>ROBOT_NAME<span class="w"> </span>DESCRIPTION_PKG_NAME
 </pre></div>
 </div>
 </div>
-<p>After all files are copied and placeholders set, a commit is automatically created.</p>
+<p>After all files are copied and placeholders set, changes are automatically staged in git.</p>
 </section>
 </section>
 
