@@ -28,13 +28,14 @@ class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
 };
 
-TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
+TEST_F(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set)
 {
   SetUpController();
 
   ASSERT_TRUE(controller_->params_.joints.empty());
   ASSERT_TRUE(controller_->params_.state_joints.empty());
   ASSERT_TRUE(controller_->params_.interface_name.empty());
+  ASSERT_EQ(controller_->params_.reference_timeout, 0.0);
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
@@ -42,9 +43,10 @@ TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
   ASSERT_TRUE(controller_->params_.state_joints.empty());
   ASSERT_THAT(controller_->state_joints_, testing::ElementsAreArray(joint_names_));
   ASSERT_EQ(controller_->params_.interface_name, interface_name_);
+  ASSERT_EQ(controller_->params_.reference_timeout, 0.1);
 }
 
-TEST_F(DummyClassNameTest, check_exported_intefaces)
+TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces)
 {
   SetUpController();
 
