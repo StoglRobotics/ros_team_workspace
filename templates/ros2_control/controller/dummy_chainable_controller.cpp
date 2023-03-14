@@ -93,6 +93,8 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   subscribers_qos.keep_last(1);
   subscribers_qos.best_effort();
 
+  ref_timeout_ = rclcpp::Duration::from_seconds(params_.reference_timeout);
+
   // Reference Subscriber
   ref_subscriber_ = get_node()->create_subscription<ControllerReferenceMsg>(
     "~/reference", subscribers_qos,
@@ -167,8 +169,20 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
 
 void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
 {
+  const auto age_of_last_command = get_node()->now() - msg->header.stamp;
   if (msg->joint_names.size() == params_.joints.size()) {
-    input_ref_.writeFromNonRT(msg);
+    if (ref_timeout_ == rclcpp::Duration::from_seconds(0) || age_of_last_command <= ref_timeout_) {
+      input_ref_.writeFromNonRT(msg);
+    } else {
+      RCLCPP_ERROR(
+        get_node()->get_logger(),
+        "Received message has timestamp %.10f older for %.10f which "
+        "is more then allowed timeout "
+        "(%.4f).",
+        rclcpp::Time(msg->header.stamp).seconds(), age_of_last_command.seconds(),
+        ref_timeout_.seconds());
+      reset_controller_reference_msg(msg, params_.joints, get_node());
+    }
   } else {
     RCLCPP_ERROR(
       get_node()->get_logger(),
@@ -222,14 +236,22 @@ controller_interface::CallbackReturn DummyClassName::on_deactivate(
 controller_interface::return_type DummyClassName::update_reference_from_subscribers()
 {
   auto current_ref = input_ref_.readFromRT();
+  const auto age_of_last_command = time - (*current_ref)->header.stamp;
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
-    if (!std::isnan((*current_ref)->displacements[i])) {
-      reference_interfaces_[i] = (*current_ref)->displacements[i];
-
-      (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+    // send message only if there is no timeout
+    if (age_of_last_command <= ref_timeout_ || ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
+      if (!std::isnan((*current_ref)->displacements[i])) {
+        if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
+          (*current_ref)->displacements[i] /= 2;
+        }
+        reference_interfaces_[i] = (*current_ref)->displacements[i];
+        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
+          (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+        }
+      }
     }
   }
   return controller_interface::return_type::OK;
@@ -238,16 +260,22 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
 controller_interface::return_type DummyClassName::update_and_write_commands(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
+  auto current_ref = input_ref_.readFromRT();
+  const auto age_of_last_command = time - (*current_ref)->header.stamp;
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < command_interfaces_.size(); ++i) {
-    if (!std::isnan(reference_interfaces_[i])) {
-      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
-        reference_interfaces_[i] /= 2;
+    // send message only if there is no timeout
+    if (age_of_last_command <= ref_timeout_ || ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
+      if (!std::isnan(reference_interfaces_[i])) {
+        if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
+          reference_interfaces_[i] /= 2;
+        }
+        command_interfaces_[i].set_value(reference_interfaces_[i]);
+        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
+          reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
+        }
       }
-      command_interfaces_[i].set_value(reference_interfaces_[i]);
-
-      reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
     }
   }
 
