@@ -50,6 +50,7 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
   FRIEND_TEST(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set);
   FRIEND_TEST(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces);
+  FRIEND_TEST(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_reset);
   FRIEND_TEST(DummyClassNameTest, when_controller_is_activated_expect_reference_reset);
   FRIEND_TEST(DummyClassNameTest, when_controller_active_and_update_called_expect_success);
   FRIEND_TEST(DummyClassNameTest, when_active_controller_is_deactivated_expect_success);

@@ -77,6 +77,32 @@ TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_i
   }
 }
 
+// when assigned wrong num of joints then expect in-equality between set values and storage
+TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_reset)
+{
+  SetUpController();
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(controller_->get_node()->get_node_base_interface());
+
+  ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
+  ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
+
+  auto reference = controller_->input_ref_.readFromNonRT();
+  auto old_timestamp = (*reference)->header.stamp;
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), joint_names_.size());
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], joint_names_[0]);
+  EXPECT_TRUE(std::isnan((*reference)->displacements[0]));
+  EXPECT_TRUE(std::isnan((*reference)->velocities[0]));
+  EXPECT_TRUE(std::isnan((*reference)->duration));
+  publish_commands(controller_->get_node()->now(), {"joint1", "joint2"});
+  ASSERT_TRUE(controller_->wait_for_commands(executor));
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), joint_names_.size());
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], joint_names_[0]);
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->velocities[0]));
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->duration));
+}
+
 TEST_F(DummyClassNameTest, when_controller_is_activated_expect_reference_reset)
 {
   SetUpController();
