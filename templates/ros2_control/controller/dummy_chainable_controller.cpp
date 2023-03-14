@@ -252,6 +252,12 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
           (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
         }
       }
+    } else {
+      if (!std::isnan((*current_ref)->displacements[i])) {
+        reference_interfaces_[i] = 0.0;
+
+        (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+      }
     }
   }
   return controller_interface::return_type::OK;
@@ -276,6 +282,8 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
           reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
         }
       }
+    } else {
+      command_interfaces_[i].set_value(0.0);
     }
   }
 

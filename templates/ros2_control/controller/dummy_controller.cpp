@@ -235,6 +235,9 @@ controller_interface::return_type DummyClassName::update(
           (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
         }
       }
+    } else {
+      command_interfaces_[i].set_value(0.0);
+      (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
     }
   }
 
