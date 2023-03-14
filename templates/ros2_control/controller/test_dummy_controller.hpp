@@ -48,14 +48,21 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
   FRIEND_TEST(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set);
+  FRIEND_TEST(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces);
+  FRIEND_TEST(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_reset);
   FRIEND_TEST(DummyClassNameTest, when_controller_is_activated_expect_reference_reset);
+  FRIEND_TEST(DummyClassNameTest, when_controller_active_and_update_called_expect_success);
+  FRIEND_TEST(DummyClassNameTest, when_active_controller_is_deactivated_expect_success);
   FRIEND_TEST(
     DummyClassNameTest, when_controller_is_reactivated_expect_cmd_itfs_not_set_and_update_success);
+  FRIEND_TEST(DummyClassNameTest, when_update_is_called_expect_status_message);
   FRIEND_TEST(
     DummyClassNameTest,
     when_controller_is_configured_and_activated_properly_expect_correct_setting_of_mode_service);
   FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_fast_expect_update_logic_for_fast_mode);
   FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for_slow_mode);
+  FRIEND_TEST(
+    DummyClassNameTest, when_reference_msg_received_expect_updated_commands_and_status_message);
 
 public:
   controller_interface::CallbackReturn on_configure(
