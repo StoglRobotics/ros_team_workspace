@@ -28,7 +28,8 @@ class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
 };
 
-TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
+
+TEST_F(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set)
 {
   SetUpController();
 
