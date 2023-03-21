@@ -68,12 +68,12 @@ TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_i
   // check ref itfs
   auto reference_interfaces = controller_->export_reference_interfaces();
   ASSERT_EQ(reference_interfaces.size(), NR_REF_ITFS);
-  for (size_t i = 0; i < reference_interface_names.size(); ++i) {
+  for (size_t i = 0; i < NR_REF_ITFS; ++i) {
     const std::string ref_itf_name = std::string(controller_->get_node()->get_name()) +
-                                     std::string("/") + reference_interface_names[i];
+                                     state_joint_names_[i] + "/" + interface_name_;
     EXPECT_EQ(reference_interfaces[i].get_name(), ref_itf_name);
     EXPECT_EQ(reference_interfaces[i].get_prefix_name(), controller_->get_node()->get_name());
-    EXPECT_EQ(reference_interfaces[i].get_interface_name(), reference_interface_names[i]);
+    EXPECT_EQ(reference_interfaces[i].get_interface_name(), state_joint_names_[i] + "/" + interface_name_);
   }
 }
 

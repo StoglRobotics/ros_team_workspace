@@ -195,12 +195,10 @@ std::vector<hardware_interface::CommandInterface> DummyClassName::on_export_refe
   std::vector<hardware_interface::CommandInterface> reference_interfaces;
   reference_interfaces.reserve(reference_interfaces_.size());
 
-  std::vector<std::string> reference_interface_names = {
-    "linear/x/velocity", "linear/y/velocity", "angular/z/velocity"};
-
-  for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
+  for (size_t i = 0; i < NR_REF_ITFS; ++i) {
     reference_interfaces.push_back(hardware_interface::CommandInterface(
-      get_node()->get_name(), reference_interface_names[i], &reference_interfaces_[i]));
+      get_node()->get_name(), state_joints_[i] + "/" + params_.interface_name,
+      &reference_interfaces_[i]));
   }
 
   return reference_interfaces;
@@ -261,8 +259,6 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
       command_interfaces_[i].set_value(reference_interfaces_[i]);
 
       reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
-    } else {
-      command_interfaces_[i].set_value(0.0);
     }
   }
 

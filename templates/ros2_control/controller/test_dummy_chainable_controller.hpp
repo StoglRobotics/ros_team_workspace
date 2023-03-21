@@ -268,8 +268,6 @@ protected:
   // TODO(anyone): adjust the members as needed
 
   // Controller-related parameters
-  std::vector<std::string> reference_interface_names = {
-    "linear/x/velocity", "linear/y/velocity", "angular/z/velocity"};
   std::vector<std::string> command_joint_names_ = {"joint1"};
   std::vector<std::string> state_joint_names_ = {"joint1state"};
   std::string interface_name_ = "acceleration";
