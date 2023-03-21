@@ -13,3 +13,4 @@ Check the repository and PRs for other, undocumented use-cases.
    operating_system/*
    ros_packages/*
    ros2_control/*
+   ros_workspaces/*
