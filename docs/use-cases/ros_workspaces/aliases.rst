@@ -12,7 +12,7 @@ The aliases set for each workspace (see :ref:`ṁanaging multiple workspaces <tu
 
 Explanation of Standard Aliases
 --------------------------------
-The standard aliases are callable from any folder as long as a workspace is sorced using ``_<workspace_name>`` alias.
+The standard aliases are callable from any folder as long as a workspace is sourced using ``_<workspace_name>`` alias.
 
 .. note:: To make this reading short, Dr. Denis's favorite aliases are ``cb``, ``ca`` and ``crm`` - simply start with using those.
 
@@ -38,7 +38,7 @@ rosdi
 
 Building Packages in Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Every alias has optional package names. If none is provided the whole workspace is build.
+Every alias has optional package names. If none is provided the whole workspace is built.
 
 cb [package1_name, package2_name]
   Building named packages or the whole workspace.
@@ -59,7 +59,7 @@ cbr [package1_name, package2_name]
 
 Executing Package Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Every alias has optional package names. If none is provided the whole workspace is build.
+Every alias has optional package names. If none is provided the whole workspace is built.
 
 ct [package1_name, package2_name]
   Testing named packages or the whole workspace.
@@ -76,7 +76,7 @@ ctres [package_name]
 
 Executing Multiple Commands
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Every alias has optional package names. If none is provided the whole workspace is build.
+Every alias has optional package names. If none is provided the whole workspace is built.
 
 ca [package1_name, package2_name]
   Build, test and show test results for the named packages or the whole workspace.
