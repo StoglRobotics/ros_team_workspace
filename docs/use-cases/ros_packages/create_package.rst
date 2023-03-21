@@ -27,11 +27,8 @@ The script supports the following options and opportunities for data entry:
 
      - If subpackage, then you will need to enter the name of its metapackage
 
-  #. License (string) - enter a full name to add into package.xml
-  #. Manual input of the maintainer or using data from git-config - (y/n)
-
-     - If *yes* then you should enter the full name and email address of the maintainer
-
+  #. License (string) - choose a license to add into package.xml - multiple choice
+  #. Maintainer info: name and email (user input, local git, global git) - multiple choice
   #. Package build type (ament_cmake, ament_python, cmake) - multiple choice
   #. Create/Update repository with CI configuration - (y/n)
 

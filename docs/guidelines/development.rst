@@ -10,7 +10,7 @@ This documents proposes development guidelines to increase work efficiency and s
 Overview
 =========
 
-1. `Making changes to the code-base by submitting a Pull Request <#>`_
+1. `Making changes to the code-base by submitting a Pull Request <#code-changes-and-pull-request-submissions>`_
 
 2. `Using *pre-commit* <#use-pre-commit-for-formatting-and-linting>`_
 
