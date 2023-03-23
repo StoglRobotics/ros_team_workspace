@@ -20,8 +20,8 @@
 #include <utility>
 #include <vector>
 
-using dummy_package_namespace::::NR_CMD_ITFS;
-using dummy_package_namespace::::NR_STATE_ITFS;
+using dummy_package_namespace::NR_CMD_ITFS;
+using dummy_package_namespace::NR_STATE_ITFS;
 
 using dummy_package_namespace::control_mode_type;
 
