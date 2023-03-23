@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -206,7 +206,7 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const std::vector<double> & displacements = {0.45},
+    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name) {
@@ -225,6 +225,7 @@ protected:
     wait_for_topic(command_publisher_->get_topic_name());
 
     ControllerReferenceMsg msg;
+    msg.header.stamp = stamp;
     msg.joint_names = joint_names_;
     msg.displacements = displacements;
     msg.velocities = velocities;
