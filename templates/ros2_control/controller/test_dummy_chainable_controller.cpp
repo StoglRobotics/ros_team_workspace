@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -331,7 +331,7 @@ TEST_F(DummyClassNameTest, publish_status_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   ControllerStateMsg msg;
@@ -350,7 +350,7 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   ControllerStateMsg msg;
@@ -362,7 +362,7 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
   ASSERT_TRUE(controller_->wait_for_commands(executor));
 
   ASSERT_EQ(
-    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[CMD_MY_ITFS], 0.45);
@@ -432,7 +432,7 @@ TEST_F(DummyClassNameTest, when_ref_msg_old_expect_cmnd_itfs_set_to_zero_otherwi
   ASSERT_FALSE(age_of_last_command <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[0], 0.0);
@@ -457,7 +457,7 @@ TEST_F(DummyClassNameTest, when_ref_msg_old_expect_cmnd_itfs_set_to_zero_otherwi
   ASSERT_TRUE(age_of_last_command_2 <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   EXPECT_EQ(joint_command_values_[0], TEST_DISPLACEMENT);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
@@ -495,7 +495,7 @@ TEST_F(DummyClassNameTest, when_reference_timeout_is_zero_expect_reference_msg_b
   ASSERT_FALSE(age_of_last_command <= controller_->ref_timeout_);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
-    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
   EXPECT_FALSE(std::isnan(joint_command_values_[0]));
   ASSERT_NE((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
