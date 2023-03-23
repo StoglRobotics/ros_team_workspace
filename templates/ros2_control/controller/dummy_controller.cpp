@@ -43,7 +43,7 @@ using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::Controll
 void reset_controller_reference_msg(
   const std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names,
   const std::shared_ptr<rclcpp_lifecycle::LifecycleNode> & node)
-{ 
+{
   msg->header.stamp = node->now();
   msg->joint_names = joint_names;
   msg->displacements.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());

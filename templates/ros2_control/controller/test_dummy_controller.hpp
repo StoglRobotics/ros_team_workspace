@@ -48,7 +48,7 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
   FRIEND_TEST(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set);
-  FRIEND_TEST(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces);  
+  FRIEND_TEST(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces);
   FRIEND_TEST(DummyClassNameTest, activate_success);
   FRIEND_TEST(DummyClassNameTest, reactivate_success);
   FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);

@@ -195,7 +195,7 @@ TEST_F(DummyClassNameTest, test_update_logic_fast)
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT);
-  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);  
+  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(controller_->reference_interfaces_.size(), joint_names_.size());
   for (const auto & interface : controller_->reference_interfaces_) {
@@ -234,7 +234,7 @@ TEST_F(DummyClassNameTest, test_update_logic_slow)
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT / 4);
-  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT/2);  
+  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT / 2);
   EXPECT_EQ(controller_->reference_interfaces_.size(), joint_names_.size());
   for (const auto & interface : controller_->reference_interfaces_) {
     EXPECT_TRUE(std::isnan(interface));
