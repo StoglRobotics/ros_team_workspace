@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,9 +20,8 @@
 #include <utility>
 #include <vector>
 
-using dummy_package_namespace::NR_CMD_ITFS;
-using dummy_package_namespace::NR_REF_ITFS;
-using dummy_package_namespace::NR_STATE_ITFS;
+using contr_stndr_mecnum_on_rtw::NR_CMD_ITFS;
+using contr_stndr_mecnum_on_rtw::NR_STATE_ITFS;
 
 using dummy_package_namespace::control_mode_type;
 
@@ -42,7 +41,6 @@ TEST_F(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_s
 
   ASSERT_THAT(
     controller_->params_.command_joint_names, testing::ElementsAreArray(command_joint_names_));
-  ASSERT_TRUE(controller_->params_.state_joint_names.empty());
   ASSERT_THAT(controller_->state_joint_names_, testing::ElementsAreArray(state_joint_names_));
   ASSERT_EQ(controller_->params_.interface_name, interface_name_);
 }
@@ -62,7 +60,7 @@ TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_i
   auto state_intefaces = controller_->state_interface_configuration();
   ASSERT_EQ(state_intefaces.names.size(), joint_state_values_.size());
   for (size_t i = 0; i < state_intefaces.names.size(); ++i) {
-    EXPECT_EQ(state_intefaces.names[i], command_joint_names_[i] + "/" + interface_name_);
+    EXPECT_EQ(state_intefaces.names[i], state_joint_names_[i] + "/" + interface_name_);
   }
 }
 
@@ -78,15 +76,15 @@ TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_re
 
   auto reference = controller_->input_ref_.readFromNonRT();
   auto old_timestamp = (*reference)->header.stamp;
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), joint_names_.size());
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], joint_names_[0]);
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], state_joint_names_[0]);
   EXPECT_TRUE(std::isnan((*reference)->displacements[0]));
   EXPECT_TRUE(std::isnan((*reference)->velocities[0]));
   EXPECT_TRUE(std::isnan((*reference)->duration));
   publish_commands(controller_->get_node()->now(), {"joint1", "joint2"});
   ASSERT_TRUE(controller_->wait_for_commands(executor));
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), joint_names_.size());
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], joint_names_[0]);
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], state_joint_names_[0]);
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->velocities[0]));
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->duration));
@@ -209,8 +207,6 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_fast_expect_update_logic_for
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
-  // set command statically
-  static constexpr double TEST_DISPLACEMENT = 23.24;
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   msg->joint_names = command_joint_names_;
   msg->displacements.resize(command_joint_names_.size(), TEST_DISPLACEMENT);
@@ -238,8 +234,6 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
-  // set command statically
-  static constexpr double TEST_DISPLACEMENT = 23.24;
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   // When slow mode is enabled command ends up being half of the value
   msg->joint_names = command_joint_names_;

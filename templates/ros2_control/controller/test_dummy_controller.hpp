@@ -197,7 +197,8 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45},
+    const rclcpp::Time & stamp, const std::vector<std::string> & joint_names = {"joint1_test"}, 
+    const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name) {
@@ -217,7 +218,7 @@ protected:
 
     ControllerReferenceMsg msg;
     msg.header.stamp = stamp;
-    msg.joint_names = command_joint_names_;
+    msg.joint_names = joint_names;
     msg.displacements = displacements;
     msg.velocities = velocities;
     msg.duration = duration;
