@@ -53,13 +53,15 @@ TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_i
 
   auto command_intefaces = controller_->command_interface_configuration();
   ASSERT_EQ(command_intefaces.names.size(), joint_command_values_.size());
-  for (size_t i = 0; i < command_intefaces.names.size(); ++i) {
+  for (size_t i = 0; i < command_intefaces.names.size(); ++i)
+  {
     EXPECT_EQ(command_intefaces.names[i], command_joint_names_[i] + "/" + interface_name_);
   }
 
   auto state_intefaces = controller_->state_interface_configuration();
   ASSERT_EQ(state_intefaces.names.size(), joint_state_values_.size());
-  for (size_t i = 0; i < state_intefaces.names.size(); ++i) {
+  for (size_t i = 0; i < state_intefaces.names.size(); ++i)
+  {
     EXPECT_EQ(state_intefaces.names[i], state_joint_names_[i] + "/" + interface_name_);
   }
 }
@@ -76,14 +78,16 @@ TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_re
 
   auto reference = controller_->input_ref_.readFromNonRT();
   auto old_timestamp = (*reference)->header.stamp;
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ(
+    (*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], state_joint_names_[0]);
   EXPECT_TRUE(std::isnan((*reference)->displacements[0]));
   EXPECT_TRUE(std::isnan((*reference)->velocities[0]));
   EXPECT_TRUE(std::isnan((*reference)->duration));
   publish_commands(controller_->get_node()->now(), {"joint1", "joint2"});
   ASSERT_TRUE(controller_->wait_for_commands(executor));
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ(
+    (*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], state_joint_names_[0]);
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->velocities[0]));
@@ -100,11 +104,13 @@ TEST_F(DummyClassNameTest, when_controller_is_activated_expect_reference_reset)
   // check that the message is reset
   auto msg = controller_->input_ref_.readFromNonRT();
   EXPECT_EQ((*msg)->displacements.size(), command_joint_names_.size());
-  for (const auto & cmd : (*msg)->displacements) {
+  for (const auto & cmd : (*msg)->displacements)
+  {
     EXPECT_TRUE(std::isnan(cmd));
   }
   EXPECT_EQ((*msg)->velocities.size(), command_joint_names_.size());
-  for (const auto & cmd : (*msg)->velocities) {
+  for (const auto & cmd : (*msg)->velocities)
+  {
     EXPECT_TRUE(std::isnan(cmd));
   }
 

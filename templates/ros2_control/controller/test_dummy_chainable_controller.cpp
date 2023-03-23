@@ -55,25 +55,29 @@ TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_i
 
   auto command_intefaces = controller_->command_interface_configuration();
   ASSERT_EQ(command_intefaces.names.size(), joint_command_values_.size());
-  for (size_t i = 0; i < command_intefaces.names.size(); ++i) {
+  for (size_t i = 0; i < command_intefaces.names.size(); ++i)
+  {
     EXPECT_EQ(command_intefaces.names[i], command_joint_names_[i] + "/" + interface_name_);
   }
 
   auto state_intefaces = controller_->state_interface_configuration();
   ASSERT_EQ(state_intefaces.names.size(), joint_state_values_.size());
-  for (size_t i = 0; i < state_intefaces.names.size(); ++i) {
+  for (size_t i = 0; i < state_intefaces.names.size(); ++i)
+  {
     EXPECT_EQ(state_intefaces.names[i], command_joint_names_[i] + "/" + interface_name_);
   }
 
   // check ref itfs
   auto reference_interfaces = controller_->export_reference_interfaces();
   ASSERT_EQ(reference_interfaces.size(), NR_REF_ITFS);
-  for (size_t i = 0; i < NR_REF_ITFS; ++i) {
+  for (size_t i = 0; i < NR_REF_ITFS; ++i)
+  {
     const std::string ref_itf_name = std::string(controller_->get_node()->get_name()) +
                                      state_joint_names_[i] + "/" + interface_name_;
     EXPECT_EQ(reference_interfaces[i].get_name(), ref_itf_name);
     EXPECT_EQ(reference_interfaces[i].get_prefix_name(), controller_->get_node()->get_name());
-    EXPECT_EQ(reference_interfaces[i].get_interface_name(), state_joint_names_[i] + "/" + interface_name_);
+    EXPECT_EQ(
+      reference_interfaces[i].get_interface_name(), state_joint_names_[i] + "/" + interface_name_);
   }
 }
 
@@ -113,18 +117,21 @@ TEST_F(DummyClassNameTest, when_controller_is_activated_expect_reference_reset)
   // check that the message is reset
   auto msg = controller_->input_ref_.readFromNonRT();
   EXPECT_EQ((*msg)->displacements.size(), command_joint_names_.size());
-  for (const auto & cmd : (*msg)->displacements) {
+  for (const auto & cmd : (*msg)->displacements)
+  {
     EXPECT_TRUE(std::isnan(cmd));
   }
   EXPECT_EQ((*msg)->velocities.size(), command_joint_names_.size());
-  for (const auto & cmd : (*msg)->velocities) {
+  for (const auto & cmd : (*msg)->velocities)
+  {
     EXPECT_TRUE(std::isnan(cmd));
   }
 
   ASSERT_TRUE(std::isnan((*msg)->duration));
 
   EXPECT_EQ(controller_->reference_interfaces_.size(), command_joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }
@@ -283,7 +290,8 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_fast_expect_update_logic_for
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(controller_->reference_interfaces_.size(), command_joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }
@@ -320,7 +328,8 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for
   EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT / 2);
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
   EXPECT_EQ(controller_->reference_interfaces_.size(), command_joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }
@@ -340,7 +349,8 @@ TEST_F(
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_TRUE(controller_->is_in_chained_mode());
 
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
   // set mode to fast
@@ -367,7 +377,8 @@ TEST_F(
   EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(controller_->reference_interfaces_.size(), command_joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }
@@ -387,7 +398,8 @@ TEST_F(
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_TRUE(controller_->is_in_chained_mode());
 
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 
@@ -412,7 +424,8 @@ TEST_F(
   // message is not touched in chained mode
   EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   EXPECT_EQ(controller_->reference_interfaces_.size(), command_joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }

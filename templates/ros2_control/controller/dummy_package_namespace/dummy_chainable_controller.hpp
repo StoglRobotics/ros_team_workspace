@@ -44,7 +44,8 @@ static constexpr size_t NR_CMD_ITFS = 0;
 static constexpr size_t NR_REF_ITFS = 0;
 
 // TODO(anyone: example setup for control mode (usually you will use some enums defined in messages)
-enum class control_mode_type : std::uint8_t {
+enum class control_mode_type : std::uint8_t
+{
   FAST = 0,
   SLOW = 1,
 };

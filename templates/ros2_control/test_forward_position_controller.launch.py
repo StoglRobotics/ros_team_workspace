@@ -23,7 +23,6 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-
     position_goals = PathJoinSubstitution(
         [FindPackageShare("$PKG_NAME$"), "config", "test_goal_publishers_config.yaml"]
     )
