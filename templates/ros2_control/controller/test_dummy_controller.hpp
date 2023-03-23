@@ -78,7 +78,7 @@ public:
   controller_interface::CallbackReturn on_activate(
     const rclcpp_lifecycle::State & previous_state) override
   {
-    return controller_standard_ref_timeout::ControllerStandard::on_activate(previous_state);
+    return dummy_package_namespace::DummyClassName::on_activate(previous_state);
   }
 
   /**
