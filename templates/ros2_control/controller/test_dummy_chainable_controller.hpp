@@ -66,12 +66,10 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for_slow_mode);
   FRIEND_TEST(
     DummyClassNameTest,
-    when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces
-      _directly_with_fast_mode_logic_effect);
+    when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces_directly_with_fast_mode_logic_effect);
   FRIEND_TEST(
     DummyClassNameTest,
-    when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces
-      _directly_with_slow_mode_logic_effect);
+    when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces_directly_with_slow_mode_logic_effect);
   FRIEND_TEST(
     DummyClassNameTest,
     when_reference_msg_has_timestamp_zero_expect_reference_set_and_timestamp_set_to_current_time);
@@ -224,7 +222,8 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45},
+    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45}, 
+    const std::vector<std::string> & joint_names = {"joint1_test"},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name)
@@ -235,7 +234,7 @@ protected:
         if (wait_count >= 5)
         {
           auto error_msg =
-            std::string("publishing to ") + topic_name + " but no node subscribes to it";
+              std::string("publishing to ") + topic_name + " but no node subscribes to it";
           throw std::runtime_error(error_msg);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -247,7 +246,7 @@ protected:
 
     ControllerReferenceMsg msg;
     msg.header.stamp = stamp;
-    msg.joint_names = command_joint_names_;
+    msg.joint_names = joint_names;
     msg.displacements = displacements;
     msg.velocities = velocities;
     msg.duration = duration;

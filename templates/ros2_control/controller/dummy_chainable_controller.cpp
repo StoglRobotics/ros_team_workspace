@@ -195,6 +195,7 @@ void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenc
       "timestamp.");
     msg->header.stamp = get_node()->now();
   }
+
   if (msg->joint_names.size() == params_.command_joint_names.size())
   {
     input_ref_.writeFromNonRT(msg);
@@ -287,12 +288,17 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
 
       reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
     }
+    else
+    {
+        command_interfaces_[i].set_value(0.0);
+    }
+    
   }
 
   if (state_publisher_ && state_publisher_->trylock())
   {
     state_publisher_->msg_.header.stamp = time;
-    state_publisher_->msg_.set_point = command_interfaces_[NR_CMD_ITFS].get_value();
+    state_publisher_->msg_.set_point = command_interfaces_[NR_CMD_ITFS-1].get_value();
 
     state_publisher_->unlockAndPublish();
   }
