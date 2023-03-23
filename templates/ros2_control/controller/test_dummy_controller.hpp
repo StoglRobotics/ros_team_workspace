@@ -78,8 +78,7 @@ public:
   controller_interface::CallbackReturn on_activate(
     const rclcpp_lifecycle::State & previous_state) override
   {
-    auto ref_itfs = on_export_reference_interfaces();
-    return dummy_package_namespace::DummyClassName::on_activate(previous_state);
+    return controller_standard_ref_timeout::ControllerStandard::on_activate(previous_state);
   }
 
   /**
@@ -203,7 +202,7 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const std::vector<double> & displacements = {0.45},
+    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name) {
@@ -222,6 +221,7 @@ protected:
     wait_for_topic(command_publisher_->get_topic_name());
 
     ControllerReferenceMsg msg;
+    msg.header.stamp = stamp;
     msg.joint_names = joint_names_;
     msg.displacements = displacements;
     msg.velocities = velocities;

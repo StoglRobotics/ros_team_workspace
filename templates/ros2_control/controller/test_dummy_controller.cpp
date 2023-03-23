@@ -161,6 +161,7 @@ TEST_F(DummyClassNameTest, test_update_logic_fast)
   // set command statically
   static constexpr double TEST_DISPLACEMENT = 23.24;
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
+  msg->header.stamp = controller_->get_node()->now();
   msg->joint_names = joint_names_;
   msg->displacements.resize(joint_names_.size(), TEST_DISPLACEMENT);
   msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
@@ -173,7 +174,7 @@ TEST_F(DummyClassNameTest, test_update_logic_fast)
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT);
-  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
+  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);  
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
 }
 
@@ -191,6 +192,7 @@ TEST_F(DummyClassNameTest, test_update_logic_slow)
   static constexpr double TEST_DISPLACEMENT = 23.24;
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   // When slow mode is enabled command ends up being half of the value
+  msg->header.stamp = controller_->get_node()->now();
   msg->joint_names = joint_names_;
   msg->displacements.resize(joint_names_.size(), TEST_DISPLACEMENT);
   msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
@@ -205,7 +207,7 @@ TEST_F(DummyClassNameTest, test_update_logic_slow)
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT / 2);
-  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
+  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT/2);  
 }
 
 TEST_F(DummyClassNameTest, publish_status_success)
@@ -216,7 +218,7 @@ TEST_F(DummyClassNameTest, publish_status_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   ControllerStateMsg msg;
@@ -235,7 +237,7 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_EQ(
-    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   ControllerStateMsg msg;
@@ -243,11 +245,11 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
 
   ASSERT_EQ(msg.set_point, 101.101);
 
-  publish_commands();
+  publish_commands(controller_->get_node()->now());
   ASSERT_TRUE(controller_->wait_for_commands(executor));
 
   ASSERT_EQ(
-    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[CMD_MY_ITFS], 0.45);
@@ -375,7 +377,7 @@ TEST_F(DummyClassNameTest, when_reference_timeout_is_zero_expect_reference_msg_b
     controller_interface::return_type::OK);
   EXPECT_FALSE(std::isnan(joint_command_values_[0]));
   ASSERT_NE((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
-  EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT);
+  EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT);
   ASSERT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
 }
 
@@ -399,7 +401,7 @@ TEST_F(
   publish_commands(controller_->get_node()->now());
   ASSERT_TRUE(controller_->wait_for_commands(executor));
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), joint_names_.size());
-  EXPECT_NE((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], joint_names_[0]);
+  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], joint_names_[0]);
   EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
   EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->velocities[0]));
   EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->duration));

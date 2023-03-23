@@ -41,8 +41,10 @@ using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::Controll
 
 // called from RT control loop
 void reset_controller_reference_msg(
-  std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names)
-{
+  const std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names,
+  const std::shared_ptr<rclcpp_lifecycle::LifecycleNode> & node)
+{ 
+  msg->header.stamp = node->now();
   msg->joint_names = joint_names;
   msg->displacements.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
   msg->velocities.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
@@ -97,11 +99,11 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 
   // Reference Subscriber
   ref_subscriber_ = get_node()->create_subscription<ControllerReferenceMsg>(
-    "~/reference", subscribers_qos,
+    "~/commands", subscribers_qos,
     std::bind(&DummyClassName::reference_callback, this, std::placeholders::_1));
 
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
-  reset_controller_reference_msg(msg, params_.joints);
+  reset_controller_reference_msg(msg, params_.joints, get_node());
   input_ref_.writeFromNonRT(msg);
 
   auto set_slow_mode_service_callback =
@@ -199,7 +201,7 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
   // `controller_interface::get_ordered_interfaces` helper function
 
   // Set default value in command
-  reset_controller_reference_msg(*(input_ref_.readFromRT)(), params_.joints);
+  reset_controller_reference_msg(*(input_ref_.readFromRT)(), params_.joints, get_node());
 
   return controller_interface::CallbackReturn::SUCCESS;
 }
