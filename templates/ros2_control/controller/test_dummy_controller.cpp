@@ -20,8 +20,8 @@
 #include <utility>
 #include <vector>
 
-using contr_stndr_mecnum_on_rtw::NR_CMD_ITFS;
-using contr_stndr_mecnum_on_rtw::NR_STATE_ITFS;
+using dummy_package_namespace::::NR_CMD_ITFS;
+using dummy_package_namespace::::NR_STATE_ITFS;
 
 using dummy_package_namespace::control_mode_type;
 
