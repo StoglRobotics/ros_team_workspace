@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ Result forbidden_interface_name_prefix(rclcpp::Parameter const & parameter)
 {
   auto const & interface_name = parameter.as_string();
 
-  if (interface_name.rfind("blup_", 0) == 0) {
+  if (interface_name.rfind("blup_", 0) == 0)
+  {
     return ERROR("'interface_name' parameter can not start with 'blup_'");
   }
 
