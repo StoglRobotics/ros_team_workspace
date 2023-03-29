@@ -268,25 +268,18 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
 controller_interface::return_type DummyClassName::update_and_write_commands(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
-  auto current_ref = input_ref_.readFromRT();
-  const auto age_of_last_command = get_node()->now() - (*current_ref)->header.stamp;
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < command_interfaces_.size(); ++i) {
     // send message only if there is no timeout
-    if (age_of_last_command <= ref_timeout_ || ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
-      if (!std::isnan(reference_interfaces_[i])) {
-        if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
-          reference_interfaces_[i] /= 2;
-        }
-        command_interfaces_[i].set_value(reference_interfaces_[i]);
-        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
-          reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
-        }
+    if (!std::isnan(reference_interfaces_[i])) {
+      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
+        reference_interfaces_[i] /= 2;
       }
-    } else {
-      command_interfaces_[i].set_value(0.0);
-      (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+      command_interfaces_[i].set_value(reference_interfaces_[i]);
+      if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
+        reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
+      }
     }
   }
 
