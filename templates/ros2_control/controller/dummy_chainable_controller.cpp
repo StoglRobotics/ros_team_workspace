@@ -99,7 +99,7 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 
   // Reference Subscriber
   ref_subscriber_ = get_node()->create_subscription<ControllerReferenceMsg>(
-    "~/commands", subscribers_qos,
+    "~/reference", subscribers_qos,
     std::bind(&DummyClassName::reference_callback, this, std::placeholders::_1));
 
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();

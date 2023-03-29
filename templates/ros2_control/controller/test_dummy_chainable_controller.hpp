@@ -130,7 +130,7 @@ public:
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
     command_publisher_ = command_publisher_node_->create_publisher<ControllerReferenceMsg>(
-      "/test_dummy_controller/commands", rclcpp::SystemDefaultsQoS());
+      "/test_dummy_controller/reference", rclcpp::SystemDefaultsQoS());
 
     service_caller_node_ = std::make_shared<rclcpp::Node>("service_caller");
     slow_control_service_client_ = service_caller_node_->create_client<ControllerModeSrvType>(
