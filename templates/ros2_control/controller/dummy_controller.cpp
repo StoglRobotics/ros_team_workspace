@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,8 +41,10 @@ using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::Controll
 
 // called from RT control loop
 void reset_controller_reference_msg(
-  std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names)
+  const std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names,
+  const std::shared_ptr<rclcpp_lifecycle::LifecycleNode> & node)
 {
+  msg->header.stamp = node->now();
   msg->joint_names = joint_names;
   msg->displacements.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
   msg->velocities.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
@@ -93,13 +95,15 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   subscribers_qos.keep_last(1);
   subscribers_qos.best_effort();
 
+  ref_timeout_ = rclcpp::Duration::from_seconds(params_.reference_timeout);
+
   // Reference Subscriber
   ref_subscriber_ = get_node()->create_subscription<ControllerReferenceMsg>(
     "~/reference", subscribers_qos,
     std::bind(&DummyClassName::reference_callback, this, std::placeholders::_1));
 
   std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
-  reset_controller_reference_msg(msg, params_.joints);
+  reset_controller_reference_msg(msg, params_.joints, get_node());
   input_ref_.writeFromNonRT(msg);
 
   auto set_slow_mode_service_callback =
@@ -141,8 +145,20 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 
 void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
 {
+  const auto age_of_last_command = get_node()->now() - msg->header.stamp;
   if (msg->joint_names.size() == params_.joints.size()) {
-    input_ref_.writeFromNonRT(msg);
+    if (ref_timeout_ == rclcpp::Duration::from_seconds(0) || age_of_last_command <= ref_timeout_) {
+      input_ref_.writeFromNonRT(msg);
+    } else {
+      RCLCPP_ERROR(
+        get_node()->get_logger(),
+        "Received message has timestamp %.10f older for %.10f which "
+        "is more then allowed timeout "
+        "(%.4f).",
+        rclcpp::Time(msg->header.stamp).seconds(), age_of_last_command.seconds(),
+        ref_timeout_.seconds());
+      reset_controller_reference_msg(msg, params_.joints, get_node());
+    }
   } else {
     RCLCPP_ERROR(
       get_node()->get_logger(),
@@ -185,7 +201,7 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
   // `controller_interface::get_ordered_interfaces` helper function
 
   // Set default value in command
-  reset_controller_reference_msg(*(input_ref_.readFromRT)(), params_.joints);
+  reset_controller_reference_msg(*(input_ref_.readFromRT)(), params_.joints, get_node());
 
   return controller_interface::CallbackReturn::SUCCESS;
 }
@@ -205,17 +221,29 @@ controller_interface::return_type DummyClassName::update(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
   auto current_ref = input_ref_.readFromRT();
+  const auto age_of_last_command = get_node()->now() - (*current_ref)->header.stamp;
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < command_interfaces_.size(); ++i) {
-    if (!std::isnan((*current_ref)->displacements[i])) {
-      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
-        (*current_ref)->displacements[i] /= 2;
+    // send message only if there is no timeout
+    if (age_of_last_command <= ref_timeout_ || ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
+      if (!std::isnan((*current_ref)->displacements[i])) {
+        if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
+          (*current_ref)->displacements[i] /= 2;
+        }
+        command_interfaces_[i].set_value((*current_ref)->displacements[i]);
+        if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
+          (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+          (*current_ref)->velocities[i] = std::numeric_limits<double>::quiet_NaN();
+          (*current_ref)->duration = std::numeric_limits<double>::quiet_NaN();
+        }
       }
-      command_interfaces_[i].set_value((*current_ref)->displacements[i]);
-
+    } else {
+      command_interfaces_[i].set_value(0.0);
       (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+      (*current_ref)->velocities[i] = std::numeric_limits<double>::quiet_NaN();
+      (*current_ref)->duration = std::numeric_limits<double>::quiet_NaN();
     }
   }
 

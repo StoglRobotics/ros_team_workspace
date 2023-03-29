@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,7 +48,8 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 // subclassing and friending so we can access member variables
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
-  FRIEND_TEST(DummyClassNameTest, all_parameters_set_configure_success);
+  FRIEND_TEST(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set);
+  FRIEND_TEST(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces);
   FRIEND_TEST(DummyClassNameTest, activate_success);
   FRIEND_TEST(DummyClassNameTest, reactivate_success);
   FRIEND_TEST(DummyClassNameTest, test_setting_slow_mode_service);
@@ -56,6 +57,14 @@ class TestableDummyClassName : public dummy_package_namespace::DummyClassName
   FRIEND_TEST(DummyClassNameTest, test_update_logic_slow);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_fast);
   FRIEND_TEST(DummyClassNameTest, test_update_logic_chainable_slow);
+  FRIEND_TEST(DummyClassNameTest, when_reference_msg_is_too_old_expect_unset_reference);
+  FRIEND_TEST(
+    DummyClassNameTest, when_ref_msg_old_expect_cmnd_itfs_set_to_zero_otherwise_to_valid_cmnds);
+  FRIEND_TEST(
+    DummyClassNameTest, when_reference_timeout_is_zero_expect_reference_msg_being_used_only_once);
+  FRIEND_TEST(
+    DummyClassNameTest,
+    when_ref_timeout_zero_for_reference_callback_expect_reference_msg_being_used_only_once);
 
 public:
   controller_interface::CallbackReturn on_configure(
@@ -121,7 +130,7 @@ public:
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
     command_publisher_ = command_publisher_node_->create_publisher<ControllerReferenceMsg>(
-      "/test_dummy_controller/commands", rclcpp::SystemDefaultsQoS());
+      "/test_dummy_controller/reference", rclcpp::SystemDefaultsQoS());
 
     service_caller_node_ = std::make_shared<rclcpp::Node>("service_caller");
     slow_control_service_client_ = service_caller_node_->create_client<ControllerModeSrvType>(
@@ -197,7 +206,7 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const std::vector<double> & displacements = {0.45},
+    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
     auto wait_for_topic = [&](const auto topic_name) {
@@ -216,6 +225,7 @@ protected:
     wait_for_topic(command_publisher_->get_topic_name());
 
     ControllerReferenceMsg msg;
+    msg.header.stamp = stamp;
     msg.joint_names = joint_names_;
     msg.displacements = displacements;
     msg.velocities = velocities;
@@ -254,6 +264,9 @@ protected:
 
   std::vector<hardware_interface::StateInterface> state_itfs_;
   std::vector<hardware_interface::CommandInterface> command_itfs_;
+
+  double ref_timeout_ = 0.2;
+  static constexpr double TEST_DISPLACEMENT = 23.24;
 
   // Test related parameters
   std::unique_ptr<TestableDummyClassName> controller_;

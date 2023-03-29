@@ -1,4 +1,4 @@
-// Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
+// Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,23 +28,24 @@ class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
 };
 
-TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
+TEST_F(DummyClassNameTest, when_controller_is_configured_expect_all_parameters_set)
 {
   SetUpController();
 
   ASSERT_TRUE(controller_->params_.joints.empty());
   ASSERT_TRUE(controller_->params_.state_joints.empty());
   ASSERT_TRUE(controller_->params_.interface_name.empty());
+  ASSERT_EQ(controller_->params_.reference_timeout, 0.0);
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   ASSERT_THAT(controller_->params_.joints, testing::ElementsAreArray(joint_names_));
-  ASSERT_THAT(controller_->params_.state_joints, testing::ElementsAreArray(state_joint_names_));
   ASSERT_THAT(controller_->state_joints_, testing::ElementsAreArray(state_joint_names_));
   ASSERT_EQ(controller_->params_.interface_name, interface_name_);
+  ASSERT_EQ(controller_->params_.reference_timeout, 0.1);
 }
 
-TEST_F(DummyClassNameTest, check_exported_intefaces)
+TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_interfaces)
 {
   SetUpController();
 
