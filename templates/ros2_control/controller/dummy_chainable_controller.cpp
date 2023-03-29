@@ -252,6 +252,8 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
         reference_interfaces_[i] = (*current_ref)->displacements[i];
         if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
           (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+          (*current_ref)->velocities[i] = std::numeric_limits<double>::quiet_NaN();
+          (*current_ref)->duration = std::numeric_limits<double>::quiet_NaN();
         }
       }
     } else {
@@ -259,6 +261,8 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
         reference_interfaces_[i] = 0.0;
 
         (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+        (*current_ref)->velocities[i] = std::numeric_limits<double>::quiet_NaN();
+        (*current_ref)->duration = std::numeric_limits<double>::quiet_NaN();
       }
     }
   }
@@ -268,6 +272,7 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
 controller_interface::return_type DummyClassName::update_and_write_commands(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
+  auto current_ref = input_ref_.readFromRT();
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < command_interfaces_.size(); ++i) {
@@ -279,6 +284,9 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
       command_interfaces_[i].set_value(reference_interfaces_[i]);
       if (ref_timeout_ == rclcpp::Duration::from_seconds(0)) {
         reference_interfaces_[i] = std::numeric_limits<double>::quiet_NaN();
+        (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+        (*current_ref)->velocities[i] = std::numeric_limits<double>::quiet_NaN();
+        (*current_ref)->duration = std::numeric_limits<double>::quiet_NaN();
       }
     }
   }

@@ -408,6 +408,12 @@ TEST_F(
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->displacements[0], 0.45);
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->velocities[0], 0.0);
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->duration, 1.25);
+  ASSERT_EQ(
+    controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
+    controller_interface::return_type::OK);
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->velocities[0]));
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->duration));
 }
 
 int main(int argc, char ** argv)
