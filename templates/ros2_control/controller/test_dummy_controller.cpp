@@ -162,17 +162,30 @@ TEST_F(DummyClassNameTest, when_update_is_called_expect_status_message)
 {
   SetUpController();
 
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(controller_->get_node()->get_node_base_interface());
+
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
+
+  // reference_callback() is implicitly called when publish_commands() is called
+  // reference_msg is published with provided time stamp when publish_commands( time_stamp)
+  // is called
+  //setting ref msg here
+  publish_commands(controller_->get_node()->now());
+  ASSERT_TRUE(controller_->wait_for_commands(executor));
 
   ASSERT_EQ(
     controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
+  //checking if previously set reference msg persists
+  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], 0.45);
+
   ControllerStateMsg msg;
   subscribe_to_controller_status_execute_update_and_get_messages(msg);
 
-  EXPECT_EQ(msg.set_point, 101.101);
+  EXPECT_EQ(msg.set_point, 0.45);
 }
 
 TEST_F(
@@ -226,7 +239,7 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_fast_expect_update_logic_for
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT);
-  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
+  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
 }
 
@@ -256,7 +269,7 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT / 2);
-  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
+  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT/2);
 }
 
 // reference_interfaces and command_interfaces values depend on the reference_msg,
@@ -277,8 +290,8 @@ TEST_F(DummyClassNameTest, when_reference_msg_received_expect_updated_commands_a
   ControllerStateMsg msg;
   subscribe_to_controller_status_execute_update_and_get_messages(msg);
 
-  ASSERT_EQ(msg.set_point, 101.101);
-  joint_command_values_[0] = TEST_DISPLACEMENT;
+  ASSERT_EQ(msg.set_point, 0.0);
+  joint_command_values_[0] = 0.0;
 
   // reference_callback() is implicitly called when publish_commands() is called
   // reference_msg is published with provided time stamp when publish_commands( time_stamp)
