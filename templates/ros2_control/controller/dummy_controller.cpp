@@ -250,7 +250,9 @@ controller_interface::return_type DummyClassName::update(
       }
       command_interfaces_[i].set_value((*current_ref)->displacements[i]);
 
-      (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+    }else
+    {
+        command_interfaces_[i].set_value(0.0);
     }
   }
 
