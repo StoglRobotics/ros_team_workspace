@@ -264,8 +264,6 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
     if (!std::isnan((*current_ref)->displacements[i]))
     {
       reference_interfaces_[i] = (*current_ref)->displacements[i];
-
-      (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
     }
   }
   return controller_interface::return_type::OK;
