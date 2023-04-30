@@ -142,7 +142,7 @@ open_source=${open_source="n"}
 
 case "$open_source" in
 "y")
-  # TODO: Add here Licencse choice
+  # TODO: Add here License choice
   license="Apache-2.0"
   echo "Adding 'LICENSE' file for '$license' license."
   # TODO: maybe use "-i,  --input-file=DATEI  in local or external FILE" option?
