@@ -1,4 +1,4 @@
-# Copyright 2021 Open Source Robotics Foundation, Inc.
+# Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,89 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import functools
-import inspect
-import os
-import time
+import click
+import shutil
+import sys
 
 
-def get_ros_domain_id():
-    return int(os.environ.get("ROS_DOMAIN_ID", 0))
+def print_and_exit(message, usage, color="red"):
+    click.echo(click.style(message, fg=color))
+    click.echo(usage)
+    sys.exit()
 
 
-def wait_for(predicate, timeout, period=0.1):
-    """
-    Wait for a predicate to evaluate to `True`.
-
-    :param timeout: duration, in seconds, to wait
-      for the predicate to evaluate to `True`.
-      Non-positive durations will result in an
-      indefinite wait.
-    :param period: predicate evaluation period,
-      in seconds.
-    :return: predicate result
-    """
-    if timeout < 0:
-        timeout = float("+inf")
-    deadline = time.time() + timeout
-    while not predicate():
-        if time.time() > deadline:
-            return predicate()
-        time.sleep(period)
-    return True
+def print_info(message, color="yellow"):
+    print_message(message, color)
 
 
-def bind(func, *args, **kwargs):
-    """
-    Bind a function with a set of arguments.
-
-    A functools.partial equivalent that is actually a function.
-    """
-    partial = functools.partial(func, *args, **kwargs)
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        return partial(*args, **kwargs)
-
-    wrapper.__signature__ = inspect.signature(func)
-    return wrapper
+def print_error(message, color="red"):
+    print_message(message, color)
 
 
-def pretty_print_call(func, *args, **kwargs):
-    """
-    Print a function invocation.
-
-    See `before_invocation` for usage as a hook.
-    """
-    name = func.__name__
-    arguments = ", ".join([f"{v!r}" for v in args] + [f"{k}={v!r}" for k, v in kwargs.items()])
-    print(f"{name}({arguments})")
+def print_message(message, color):
+    click.echo(click.style(message, fg=color))
 
 
-def before_invocation(func, hook):
-    """
-    Invoke a `hook` before every `func` invocation.
-
-    `hook` may take no arguments or take the `func`
-    and arbitrary positional and keyword arguments.
-    """
-    signature = inspect.signature(hook)
-    nargs = len(signature.parameters)
-    if inspect.ismethod(hook):
-        nargs = nargs - 1
-    if nargs > 0:
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            hook(func, *args, **kwargs)
-            return func(*args, **kwargs)
-
+def check_ros2_command_available():
+    ros2 = shutil.which("ros2")
+    if ros2:
+        return True
     else:
+        return False
 
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            hook()
-            return func(*args, **kwargs)
 
-    wrapper.__signature__ = inspect.signature(func)
-    return wrapper
+def get_choice_number_from_user(num_range: range):
+    while True:
+        try:
+            user_input = int(input("Enter the number corresponding to your choice: "))
+            if user_input in num_range:
+                return user_input
+            else:
+                print("Invalid input. Please enter a valid number.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")

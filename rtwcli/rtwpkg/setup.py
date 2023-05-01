@@ -15,15 +15,14 @@
 from setuptools import find_packages
 from setuptools import setup
 
+package_name = "rtwpkg"
+
 setup(
-    name="rtwcli",
+    name=package_name,
     version="0.1.0",
     packages=find_packages(exclude=["test"]),
-    install_requires=["click", "shutil"],
-    extras_require={
-        "completion": ["argcomplete"],
-    },
-    zip_safe=False,
+    install_requires=["rtwcli"],
+    zip_safe=True,
     keywords=[],
     classifiers=[
         "Environment :: Console",
@@ -31,22 +30,20 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
     ],
-    description="Framework for ROS Team Workspace command line tools.",
+    description="The docker command for ROS Team Workspace command line tools.",
     long_description="""\
-The framework provides a single command line script which can be extended with
-commands and verbs.""",
+The package provides the docker command for the ROS Team Workspace command line tools.""",
     license="Apache License, Version 2.0",
     tests_require=["pytest"],
     entry_points={
         "rtwcli.command": [
-            "extension_points =" " rtwcli.command.extension_points:ExtensionPointsCommand",
-            "extensions = rtwcli.command.extensions:ExtensionsCommand",
+            "pkg = rtwpkg.command.pkg:PkgCommand",
         ],
         "rtwcli.extension_point": [
-            "rtwcli.command = rtwcli.command:CommandExtension",
+            "rtwpkg.verb = rtwpkg.verb:VerbExtension",
         ],
-        "console_scripts": [
-            "rtw = rtwcli.cli:main",
+        "rtwpkg.verb": [
+            "create = rtwpkg.verb.create:CreateVerb",
         ],
     },
 )
