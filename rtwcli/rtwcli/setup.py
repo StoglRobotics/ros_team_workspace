@@ -19,7 +19,7 @@ setup(
     name="rtwcli",
     version="0.1.0",
     packages=find_packages(exclude=["test"]),
-    install_requires=["click", "shutil"],
+    install_requires=["click"],
     extras_require={
         "completion": ["argcomplete"],
     },
