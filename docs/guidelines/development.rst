@@ -49,7 +49,7 @@ This section describes in short process with valuable tips to make your and revi
 
 #. When you are finished with development and want to submit code for the review - consider the following tips:
 
-   - **Always** run *pre-commit* formaters;
+   - **Always** run *pre-commit* formatters;
    - Review your code **first by yourself** before asking someone else;
    - Make sure there **are not** commented code blocks or if they have to be there add explanation why;
    - Resolve all TODOs or add concrete questions about them either in the code or in review comments so that other people know this is open for discussion;

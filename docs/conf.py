@@ -248,7 +248,6 @@ macros = {
 
 # Add any paths that contain custom themes here, relative to this directory.
 class RedirectFrom(Directive):
-
     has_content = True
     template_name = "layout.html"
     redirections = {}
