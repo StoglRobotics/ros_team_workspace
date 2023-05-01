@@ -1,6 +1,6 @@
 pip
 sphinx==4.3.2
-sphinx-tabs
+sphinx-copybutton
 sphinx-multiversion
 sphinx-rtd-theme
-sphinx-copybutton
+sphinx-tabs

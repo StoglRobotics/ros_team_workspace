@@ -59,9 +59,12 @@ controller_interface::CallbackReturn DummyClassName::on_init()
 {
   control_mode_.initRT(control_mode_type::FAST);
 
-  try {
+  try
+  {
     param_listener_ = std::make_shared<dummy_controller::ParamListener>(get_node());
-  } catch (const std::exception & e) {
+  }
+  catch (const std::exception & e)
+  {
     fprintf(stderr, "Exception thrown during controller's init with message: %s \n", e.what());
     return controller_interface::CallbackReturn::ERROR;
   }
@@ -74,13 +77,17 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 {
   params_ = param_listener_->get_params();
 
-  if (!params_.state_joints.empty()) {
+  if (!params_.state_joints.empty())
+  {
     state_joints_ = params_.state_joints;
-  } else {
+  }
+  else
+  {
     state_joints_ = params_.joints;
   }
 
-  if (params_.joints.size() != state_joints_.size()) {
+  if (params_.joints.size() != state_joints_.size())
+  {
     RCLCPP_FATAL(
       get_node()->get_logger(),
       "Size of 'joints' (%zu) and 'state_joints' (%zu) parameters has to be the same!",
@@ -105,25 +112,32 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   auto set_slow_mode_service_callback =
     [&](
       const std::shared_ptr<ControllerModeSrvType::Request> request,
-      std::shared_ptr<ControllerModeSrvType::Response> response) {
-      if (request->data) {
-        control_mode_.writeFromNonRT(control_mode_type::SLOW);
-      } else {
-        control_mode_.writeFromNonRT(control_mode_type::FAST);
-      }
-      response->success = true;
-    };
+      std::shared_ptr<ControllerModeSrvType::Response> response)
+  {
+    if (request->data)
+    {
+      control_mode_.writeFromNonRT(control_mode_type::SLOW);
+    }
+    else
+    {
+      control_mode_.writeFromNonRT(control_mode_type::FAST);
+    }
+    response->success = true;
+  };
 
   set_slow_control_mode_service_ = get_node()->create_service<ControllerModeSrvType>(
     "~/set_slow_control_mode", set_slow_mode_service_callback,
     rmw_qos_profile_services_hist_keep_all);
 
-  try {
+  try
+  {
     // State publisher
     s_publisher_ =
       get_node()->create_publisher<ControllerStateMsg>("~/state", rclcpp::SystemDefaultsQoS());
     state_publisher_ = std::make_unique<ControllerStatePublisher>(s_publisher_);
-  } catch (const std::exception & e) {
+  }
+  catch (const std::exception & e)
+  {
     fprintf(
       stderr, "Exception thrown during publisher creation at configure stage with message : %s \n",
       e.what());
@@ -145,7 +159,8 @@ controller_interface::InterfaceConfiguration DummyClassName::command_interface_c
   command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
 
   command_interfaces_config.names.reserve(params_.joints.size());
-  for (const auto & joint : params_.joints) {
+  for (const auto & joint : params_.joints)
+  {
     command_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
   }
 
@@ -158,7 +173,8 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
   state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
 
   state_interfaces_config.names.reserve(state_joints_.size());
-  for (const auto & joint : state_joints_) {
+  for (const auto & joint : state_joints_)
+  {
     state_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
   }
 
@@ -167,9 +183,12 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
 
 void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
 {
-  if (msg->joint_names.size() == params_.joints.size()) {
+  if (msg->joint_names.size() == params_.joints.size())
+  {
     input_ref_.writeFromNonRT(msg);
-  } else {
+  }
+  else
+  {
     RCLCPP_ERROR(
       get_node()->get_logger(),
       "Received %zu , but expected %zu joints in command. Ignoring message.",
@@ -184,7 +203,8 @@ std::vector<hardware_interface::CommandInterface> DummyClassName::on_export_refe
   std::vector<hardware_interface::CommandInterface> reference_interfaces;
   reference_interfaces.reserve(reference_interfaces_.size());
 
-  for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
+  for (size_t i = 0; i < reference_interfaces_.size(); ++i)
+  {
     reference_interfaces.push_back(hardware_interface::CommandInterface(
       get_node()->get_name(), state_joints_[i] + "/" + params_.interface_name,
       &reference_interfaces_[i]));
@@ -213,7 +233,8 @@ controller_interface::CallbackReturn DummyClassName::on_deactivate(
 {
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
-  for (size_t i = 0; i < command_interfaces_.size(); ++i) {
+  for (size_t i = 0; i < command_interfaces_.size(); ++i)
+  {
     command_interfaces_[i].set_value(std::numeric_limits<double>::quiet_NaN());
   }
   return controller_interface::CallbackReturn::SUCCESS;
@@ -225,8 +246,10 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
 
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
-  for (size_t i = 0; i < reference_interfaces_.size(); ++i) {
-    if (!std::isnan((*current_ref)->displacements[i])) {
+  for (size_t i = 0; i < reference_interfaces_.size(); ++i)
+  {
+    if (!std::isnan((*current_ref)->displacements[i]))
+    {
       reference_interfaces_[i] = (*current_ref)->displacements[i];
 
       (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
@@ -240,9 +263,12 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
 {
   // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
   // instead of a loop
-  for (size_t i = 0; i < command_interfaces_.size(); ++i) {
-    if (!std::isnan(reference_interfaces_[i])) {
-      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW) {
+  for (size_t i = 0; i < command_interfaces_.size(); ++i)
+  {
+    if (!std::isnan(reference_interfaces_[i]))
+    {
+      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW)
+      {
         reference_interfaces_[i] /= 2;
       }
       command_interfaces_[i].set_value(reference_interfaces_[i]);
@@ -251,7 +277,8 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
     }
   }
 
-  if (state_publisher_ && state_publisher_->trylock()) {
+  if (state_publisher_ && state_publisher_->trylock())
+  {
     state_publisher_->msg_.header.stamp = time;
     state_publisher_->msg_.set_point = command_interfaces_[CMD_MY_ITFS].get_value();
 

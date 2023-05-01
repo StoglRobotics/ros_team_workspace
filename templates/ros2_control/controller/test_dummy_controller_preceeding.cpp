@@ -52,13 +52,15 @@ TEST_F(DummyClassNameTest, check_exported_intefaces)
 
   auto command_intefaces = controller_->command_interface_configuration();
   ASSERT_EQ(command_intefaces.names.size(), joint_command_values_.size());
-  for (size_t i = 0; i < command_intefaces.names.size(); ++i) {
+  for (size_t i = 0; i < command_intefaces.names.size(); ++i)
+  {
     EXPECT_EQ(command_intefaces.names[i], joint_names_[i] + "/" + interface_name_);
   }
 
   auto state_intefaces = controller_->state_interface_configuration();
   ASSERT_EQ(state_intefaces.names.size(), joint_state_values_.size());
-  for (size_t i = 0; i < state_intefaces.names.size(); ++i) {
+  for (size_t i = 0; i < state_intefaces.names.size(); ++i)
+  {
     EXPECT_EQ(state_intefaces.names[i], state_joint_names_[i] + "/" + interface_name_);
   }
 }
