@@ -52,20 +52,23 @@ TEST_F(DummyClassNameTest, check_exported_intefaces)
 
   auto command_intefaces = controller_->command_interface_configuration();
   ASSERT_EQ(command_intefaces.names.size(), joint_command_values_.size());
-  for (size_t i = 0; i < command_intefaces.names.size(); ++i) {
+  for (size_t i = 0; i < command_intefaces.names.size(); ++i)
+  {
     EXPECT_EQ(command_intefaces.names[i], joint_names_[i] + "/" + interface_name_);
   }
 
   auto state_intefaces = controller_->state_interface_configuration();
   ASSERT_EQ(state_intefaces.names.size(), joint_state_values_.size());
-  for (size_t i = 0; i < state_intefaces.names.size(); ++i) {
+  for (size_t i = 0; i < state_intefaces.names.size(); ++i)
+  {
     EXPECT_EQ(state_intefaces.names[i], joint_names_[i] + "/" + interface_name_);
   }
 
   // check ref itfs
   auto reference_interfaces = controller_->export_reference_interfaces();
   ASSERT_EQ(reference_interfaces.size(), joint_names_.size());
-  for (size_t i = 0; i < joint_names_.size(); ++i) {
+  for (size_t i = 0; i < joint_names_.size(); ++i)
+  {
     const std::string ref_itf_name = std::string(controller_->get_node()->get_name()) + "/" +
                                      joint_names_[i] + "/" + interface_name_;
     EXPECT_EQ(reference_interfaces[i].get_name(), ref_itf_name);
@@ -85,18 +88,21 @@ TEST_F(DummyClassNameTest, activate_success)
   // check that the message is reset
   auto msg = controller_->input_ref_.readFromNonRT();
   EXPECT_EQ((*msg)->displacements.size(), joint_names_.size());
-  for (const auto & cmd : (*msg)->displacements) {
+  for (const auto & cmd : (*msg)->displacements)
+  {
     EXPECT_TRUE(std::isnan(cmd));
   }
   EXPECT_EQ((*msg)->velocities.size(), joint_names_.size());
-  for (const auto & cmd : (*msg)->velocities) {
+  for (const auto & cmd : (*msg)->velocities)
+  {
     EXPECT_TRUE(std::isnan(cmd));
   }
 
   ASSERT_TRUE(std::isnan((*msg)->duration));
 
   EXPECT_EQ(controller_->reference_interfaces_.size(), joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }
@@ -195,7 +201,8 @@ TEST_F(DummyClassNameTest, test_update_logic_fast)
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(controller_->reference_interfaces_.size(), joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }
@@ -232,7 +239,8 @@ TEST_F(DummyClassNameTest, test_update_logic_slow)
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT / 2);
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
   EXPECT_EQ(controller_->reference_interfaces_.size(), joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }
@@ -271,7 +279,8 @@ TEST_F(DummyClassNameTest, test_update_logic_chainable_fast)
   EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(controller_->reference_interfaces_.size(), joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }
@@ -312,7 +321,8 @@ TEST_F(DummyClassNameTest, test_update_logic_chainable_slow)
   // message is not touched in chained mode
   EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   EXPECT_EQ(controller_->reference_interfaces_.size(), joint_names_.size());
-  for (const auto & interface : controller_->reference_interfaces_) {
+  for (const auto & interface : controller_->reference_interfaces_)
+  {
     EXPECT_TRUE(std::isnan(interface));
   }
 }
