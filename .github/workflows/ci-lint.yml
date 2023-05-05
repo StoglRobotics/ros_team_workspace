@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        linter: [cppcheck, cpplint, lint_cmake]
+        linter: [cppcheck, copyright, lint_cmake]
         arguments: [""]
         include:
           - linter: copyright
@@ -25,5 +25,23 @@ jobs:
         distribution: rolling
         linter: ${{ matrix.linter }}
         arguments: ${{ matrix.arguments }}
+        package-name:
+          ros_team_workspace
+
+  ament_lint_100:
+    name: ament_${{ matrix.linter }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+          linter: [cpplint]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ros-tooling/setup-ros@master
+    - uses: ros-tooling/action-ros-lint@master
+      with:
+        distribution: rolling
+        linter: cpplint
+        arguments: "--linelength=100 --filter=-whitespace/newline"
         package-name:
           ros_team_workspace
