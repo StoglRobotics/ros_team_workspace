@@ -53,7 +53,7 @@ fi
 echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Which license-header do you want to use? [1]"
 echo "(0) None"
 echo "(1) Apache 2.0 License"
-echo "(2) Propiatery"
+echo "(2) Proprietary"
 echo -n -e "${TERMINAL_COLOR_NC}"
 read choice
 choice=${choice:="1"}
@@ -123,7 +123,7 @@ cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/test_robot_hardware_interface.cpp $TEST_CPP
 echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files copied.${TERMINAL_COLOR_NC}"
 
 # Add license header to the files
-# TODO: When Propiatery then add the following before ament_lint_auto_find_test_dependencies()
+# TODO: When Proprietary then add the following before ament_lint_auto_find_test_dependencies()
 # list(APPEND AMENT_LINT_AUTO_EXCLUDE
 #    ament_cmake_copyright
 #  )
