@@ -465,11 +465,11 @@ function compile_and_source_package {
     if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
       print_and_exit "Aborting. Not the correct workspace sourced. Please source the correct workspace folder and compile manually."
     fi
-
-    cd "$sourced_ws_dirname" || { print_and_exit "Could not change directory to workspace:\"$sourced_ws_dirname\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
-  else
-    cd "$ROS_WS" || { print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
+  # set ROS_WS ourselves, as other functions need it later and will fail/use wrong path otherwise
+  export ROS_WS="$sourced_ws_dirname"
   fi
+
+  cd "$ROS_WS" || { print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
 
   colcon_build_up_to $pkg_name
   source install/setup.bash
