@@ -10,7 +10,8 @@ General Script for Creating Packages
 =====================================
 
 ``create-new-package`` script is used, accepting the package name and description as parameters.
-The script **has to be executed** from the *source* folder of your workspace.
+
+  .. warning:: The script **has to be executed** from the *source* folder of your workspace.
 
 .. code-block:: bash
    :caption: Usage of script for setting up new packages.

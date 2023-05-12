@@ -7,7 +7,8 @@ Setup Repository CI configuration (GitHub)
 ===========================================
 
 ``setup-repository-ci`` script is used, accepting the github repository name and github user/organization namespace as parameters.
-The script **has to be executed** from the *main* folder of your package.
+
+  .. warning:: The script **has to be executed** from the *main* folder of your package.
 
 .. code-block:: bash
    :caption: Usage of the script for setting up new packages.

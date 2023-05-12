@@ -12,9 +12,10 @@ Script for Setting up Description Package
 
 ``setup-robot-description`` script accepts the robot name.
 The package name is obtained from the 'package.xml' file.
-The script **has to be executed** from the package folder where the description should be generated.
 
   .. note:: it is recommended to setup your package using :ref:`create-new-package <uc-new-package>` script.
+
+  .. warning:: The script **has to be executed** from the folder where the package should be generated.
 
 The scripts copies template files from the ``templates/robot_description`` folder, renames the files, and replaces the placeholders.
 
