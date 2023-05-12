@@ -3,7 +3,7 @@ Quick start with RosTeamWorkspace
 ==================================
 .. _tutorial-quick-start:
 
-This tutorial show use of RosTeamWorkspace for very common use-cases that can be done without permanent changes to your environment.
+This tutorial shows use of RosTeamWorkspace for very common use-cases that can be done without permanent changes to your environment.
 First you have to clone and source the workspace and then continue with the use-case you are interested in:
 
 .. toctree::

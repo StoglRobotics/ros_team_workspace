@@ -426,7 +426,7 @@ function set_ros_version_for_distro {
       ros_version=2
       ;;
     *)
-      print_and_exit "FATAL: For the chosen ros distribution ${ros_distribution} does no ros version exist."
+      print_and_exit "FATAL: For the chosen ros distribution ${ros_distribution} there is no ros version."
       ;;
   esac
 }
