@@ -31,8 +31,8 @@ Details about CI setup and created workflows
 ---------------------------------------------
 Code formatters and linters
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-For executing formatters ``pre-commit`` program is used and automatically setup.
-To use it in a cloned repositors (if there is ``.pre-commit-conifg.yaml`` file) execute once ``pre-commit install``.
+For executing formatters, ``pre-commit`` program is used and automatically setup.
+To use it in a cloned repository (if there is ``.pre-commit-conifg.yaml`` file), execute once ``pre-commit install``.
 Clang-Format is used as the main code formatting program.
 
 
@@ -43,8 +43,8 @@ Each of those stages test different compatibility levels where users can experie
 In the following each stage is explained.
 
 ``binary``
-  Building against released packages in a ROS distribution. The stage ensures that isolated build on a local machine and build-farm is possible. Unreleased dependencies can be defined in ``.repos``-file with suffix ``-not-released.<ros-distro>.repos``. This functionality is useful for new projects where packages are located in multiple repositories and when packages are released in a new ROS distribution (and you are not releasing regularly to ``rolling``).
-  The ``binary`` build has two workflows to build against ``main`` and ``testing`` ROS debian repositories. This is useful when for example API changes are done that involve multiple packages. Then it is expected that build against binary packages in the ``main`` repository fails, but if all the changes are released, building against ``testing`` repository has to work. Otherwise it means that the code has some regressions and cannot be synced to the ``main`` repositories (This is what is happening after maintainers from OpenRobotics announce a "Sync" or a ros distribution).
+  Building against released packages in a ROS distribution. The stage ensures that isolated builds on a local machine and build-farm are possible. Unreleased dependencies can be defined in ``.repos``-file with suffix ``-not-released.<ros-distro>.repos``. This functionality is useful for new projects where packages are located in multiple repositories and when packages are released in a new ROS distribution (and you are not releasing regularly to ``rolling``).
+  The ``binary`` build has two workflows to build against ``main`` and ``testing`` ROS debian repositories. This is useful when for example API changes are done that involve multiple packages. Then it is expected that build against binary packages in the ``main`` repository fails, but if all the changes are released, building against ``testing`` repository has to work. Otherwise it means that the code has some regressions and cannot be synced to the ``main`` repositories (This is what is happening after maintainers from OpenRobotics announce a "Sync" or a ROS distribution).
   Scheduled ``binary`` build warns you that your package is incompatible with released dependencies (``main``) or that a package is breaking changes that will be released (``testing``). The first case should actually never happen if you are using all three building stages.
 
 ``semi-binary``
@@ -52,8 +52,8 @@ In the following each stage is explained.
   There are two workflows building against ``main`` and ``testing`` ROS repositories with released packages.
 
 ``source``
-  Core ROS packages are build from source. Expect the ``.repos`` files for ROS core it uses is the ``.repos``-file with suffix ``.<ros-distro>.repos`` for the package-specific dependencies. This stage makes mostly sense when working with ``rolling`` since other distribution of ROS should be API stable once released. This stage helps to anticipate braking changes in the ROS API that will be relevant the mid-term future.
+  Core ROS packages are build from source. Expects the ``.repos`` files for ROS core and the ``.repos``-file with suffix ``.<ros-distro>.repos`` for the package-specific dependencies. This stage makes mostly sense when working with ``rolling`` since other distribution of ROS should be API stable once released. This stage helps to anticipate breaking changes in the ROS API that will be relevant the mid-term future.
 
 
-For the better overview and to avoid confusion for users there are two different tables with the workflow overview.
+For the better overview and to avoid confusion for users, there are two different tables with the workflow overview.
 One in the README file showing only the ``binary`` and ``semi-binary`` builds against ``main`` ROS repository, and another in the ``.github/workflows/README.md`` that shows all the workflows.
