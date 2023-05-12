@@ -94,7 +94,7 @@ done
 
 # CMakeLists.txt: Add install paths of the files
 prepend_to_string="if(BUILD_TESTING)"
-sed -i "s/$prepend_to_string/install\(\\n  DIRECTORY config launch\/\\n  DESTINATION share\/\$\{PROJECT_NAME\}\\n\)\\n\\n$prepend_to_string/g" CMakeLists.txt
+sed -i "s/$prepend_to_string/install\(\\n  DIRECTORY config launch\\n  DESTINATION share\/\$\{PROJECT_NAME\}\\n\)\\n\\n$prepend_to_string/g" CMakeLists.txt
 
 # extend README with general instructions
 if [ -f README.md ]; then
