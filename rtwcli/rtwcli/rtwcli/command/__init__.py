@@ -28,7 +28,7 @@ from rtwcli.plugin_system import satisfies_version
 
 class CommandExtension:
     """
-    The extension point for 'command' extensions.
+    The extension point for 'command' extensions. Those are the base extensions in RTW.
 
     The following properties must be defined:
     * `NAME` (will be set to the entry point name)
