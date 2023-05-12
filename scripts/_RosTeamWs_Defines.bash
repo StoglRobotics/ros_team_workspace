@@ -391,8 +391,13 @@ function check_ros_distro {
         # check if the chosen ros-distro location is correct.
         if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
           print_and_exit "Please set ${alternative_ros_location} to the correct location. Exiting..."
+        else
+          source "${!alternative_ros_location}/setup.bash"
         fi
       fi
+    else
+      # source ros to have access to ros cli commands for other functions
+      source "/opt/ros/${ros_distro}/setup.bash"
     fi
   fi
 }
