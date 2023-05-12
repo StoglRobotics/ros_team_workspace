@@ -373,7 +373,11 @@ function check_ros_distro {
   # check if the given distribution is a distribution supported by rtw
   while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@];
   do
-      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please chose either of the following:${rtw_supported_ros_distributions[*]}"
+    if [ -z "$ros_distro" ]; then
+        echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}No ros distribution provided. Please choose either of the following:${rtw_supported_ros_distributions[*]}"
+    else
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please choose either of the following:${rtw_supported_ros_distributions[*]}"
+    fi
       read ros_distro
   done
 
