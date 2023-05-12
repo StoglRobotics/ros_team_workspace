@@ -60,9 +60,9 @@ to send command to the robot `ForwardCommandController` (direct goals) or `Joint
 The sections below describe their usage.
 
 ### Joint State Controller
-Joint state Controllers provides output of robot's internal states to `/joint_states` and `/dynamic_joint_states` ROS2-topics.
+Joint state Controllers provides output of robot's internal states to `/joint_states` and `/dynamic_joint_states` ROS 2-topics.
 
-In a new terminal with sourced ROS2 environment load, configure and start `joint_state_broadcaster`:
+In a new terminal with sourced ROS 2 environment load, configure and start `joint_state_broadcaster`:
   ```
   ros2 control load_start_controller joint_state_broadcaster
   ```
@@ -111,7 +111,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
 
 3. Send command to the controller, either:
 
-   a. Manually using ros2 cli interface:
+   a. Manually using ROS 2 cli interface:
    ```
    ros2 topic pub /forward_<controller_type>_controller/commands std_msgs/msg/Float64MultiArray "data:
    - 0.5

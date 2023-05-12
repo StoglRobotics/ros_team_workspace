@@ -18,7 +18,7 @@ The script **has to be executed** from the *main* folder of your package.
 When executing the script, read all output carefully.
 If you make any wrong decision or enter incorrect data, use <CTRL>+C keys to terminate the script.
 
-The script can add setup for multiple ROS2 versions.
+The script can add setup for multiple ROS 2 versions.
 Simply follow the output.
 
 After a setup is created, you should go through the files and check if they are correct.
@@ -38,7 +38,7 @@ Clang-Format is used as the main code formatting program.
 
 Building packages
 ,,,,,,,,,,,,,,,,,,
-This script creates three stages of build configuration for each ROS2 version.
+This script creates three stages of build configuration for each ROS 2 version.
 Each of those stages test different compatibility levels where users can experience issues with actively developed repositories and ensures future compatibility of the repository.
 In the following each stage is explained.
 
