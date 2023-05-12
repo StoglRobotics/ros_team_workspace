@@ -1,1 +1,2 @@
 -e ./rtwcli
+-e ./rtw_cmds
