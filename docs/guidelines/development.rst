@@ -88,8 +88,8 @@ This will execute ``pre-commit`` on every commit you make and prevent it from do
 If you really need to ignore check in the commit, you can add ``-n`` flag to the ``git commit`` command and they will be skipped.
 
 
-**NOTE**: If your repository does not uses ``pre-commit`` yet, it is very easy to add it by creating a configuration file ``.pre-commit-config.yaml`` in the top level of your repository (there where ``.git`` folder is).
-If you don't know where to start with *pre-commit* configuration in your ROS project, simply copy our template from `templates/package/.pre-commit-config.yaml <https://github.com/StoglRobotics/ros_team_workspace/blob/master/templates/package/.pre-commit-config.yaml>`_.
+.. note:: If your repository does not use ``pre-commit`` yet, it is very easy to add it by creating a configuration file ``.pre-commit-config.yaml`` in the top level of your repository (there where ``.git`` folder is).
+          If you don't know where to start with *pre-commit* configuration in your ROS project, simply copy our template from `templates/package/.pre-commit-config.yaml <https://github.com/StoglRobotics/ros_team_workspace/blob/master/templates/package/.pre-commit-config.yaml>`_.
 
 
 Useful commands and options

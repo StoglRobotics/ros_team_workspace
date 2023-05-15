@@ -42,7 +42,7 @@ Let's now add a test package into your workspace.
 
     rosdep install --from-paths src -y -i -r
 
-**NOTE**: if ``rosdep`` command fails with a comment that binary packages can not be found by apt, try to update you rosdep index using ``rosdep update`` command or even your package index using ``sudo apt update``.
+.. note:: if ``rosdep`` command fails with a comment that binary packages can not be found by apt, try to update your rosdep index using ``rosdep update`` command or even your package index using ``sudo apt update``.
 
 5. You can then build your workspace using the alias for colcon build:
 
