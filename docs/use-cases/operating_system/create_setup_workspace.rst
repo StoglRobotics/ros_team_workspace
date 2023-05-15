@@ -17,7 +17,7 @@ The ``setup-ros-workspace`` command creates a new workspace in the current folde
    setup-ros-workspace WS_FOLDER ROS_DISTRO
 
 All parameters are optional but they are positional. If you want to omit any of the input parameters use ``"-"`` as argument.
-The script creates a new ROS workspace with name ``<WS_FOLDER>`` in ``<CURRENT_WORKING_DIRECTORY>/<WS_FOLDER>``. However if you pass a folder name relative to your ``$HOME`` directory, like for example: ``setup-ros-workspace ROS_DISTRO ~/<WS_FOLDER>``, then a new workspace is created inside ``$HOME/<WS_FOLDER>``. The passed ROS distribution ``<ROS_DISTRO>`` is sourced as base if no other workspace is sourced. After the workspace has been created, you have to open a new terminal and can then type the new created alias ``_<WS_FOLDER>``. This is going to source the new workspace and you can then switch to its root|source|install|build folders by executing respectively ``rosd|rosds|rosdi|rosdb``.
+The script creates a new ROS workspace with name ``<WS_FOLDER>`` in ``<CURRENT_WORKING_DIRECTORY>/<WS_FOLDER>``. However if you pass a folder name relative to your ``$HOME`` directory, like for example: ``setup-ros-workspace ~/<WS_FOLDER> ROS_DISTRO``, then a new workspace is created inside ``$HOME/<WS_FOLDER>``. The passed ROS distribution ``<ROS_DISTRO>`` is sourced as base if no other workspace is sourced. After the workspace has been created, you have to open a new terminal and can then type the new created alias ``_<WS_FOLDER>``. This is going to source the new workspace and you can then switch to its root|source|install|build folders by executing respectively ``rosd|rosds|rosdi|rosdb``.
 
 Example:
 
