@@ -19,21 +19,21 @@ Code Changes and Pull Request Submissions
 ==========================================
 
 To make a change of the existing code base, Pull Request (GitHub) or Merge Request (GitLab) are used.
-This section describes in short process with valuable tips to make your and reviewers' life easier.
+This section describes in short the process with valuable tips to make your and reviewers' life easier.
 
-#. Check with the team if it is usual to submit a PR/MR from a fork or directly into target repository.
+#. Check with the team if it is usual to submit a PR/MR from a fork or directly into the target repository.
    This usually depends on the team size and organization.
    When working with public repositories you always need to create a fork.
 
    .. note::
 
       In *Stogl Robotics* we have the organization called `StoglRobotics-forks <https://github.com/StoglRobotics-forks>`_ where all forks of public repositories live and are accessible for writing by all team members.
-      This simplify collaboration inside the team - there is no need for individual access grants when using forks under your user.
+      This simplifies collaboration inside the team - there is no need for individual access grants when using forks under your user.
       **Always** check if there is already a fork in *StoglRobotics-forks* organization and if not create it.
 
 #. Start development always from the up-to date state of the repositories default branch (usually called *master* or *main* - for simplicity we call it *master* here).
-   Take into account that master branch of your fork is usually not up to date with the upstream repository.
-   Therefore be careful about that and use the opportunity to sync *master* branch of the fork to the state of the *master* branch of the upstream repository.
+   Take into account that the master branch of your fork is usually not up to date with the upstream repository.
+   Therefore be careful about that and use the opportunity to sync the *master* branch of the fork to the state of the *master* branch of the upstream repository.
 
 #. **Always** create a new branch for each feature or bug fix.
    **Never** make multiple changes on a same feature branch. One feature / change == one branch. Don't submit PRs from *master* branch.
@@ -51,10 +51,10 @@ This section describes in short process with valuable tips to make your and revi
 
    - **Always** run *pre-commit* formatters;
    - Review your code **first by yourself** before asking someone else;
-   - Make sure there **are not** commented code blocks or if they have to be there add explanation why;
+   - Make sure there **are no** commented code blocks or if they have to be there, add explanations why;
    - Resolve all TODOs or add concrete questions about them either in the code or in review comments so that other people know this is open for discussion;
    - By iterating on the review adjust **all parts** of the code with the same or similar patterns even if you get a comment about those only in one place - reviewers usually don't like to repeat themselves on each iteration of the same issue - if you are not sure about something, ask;
-   - Ask yourself: *Would I like to review this code?*.
+   - Ask yourself: *Would I like to review this code ?*.
 
    .. important::
 
@@ -65,7 +65,7 @@ This section describes in short process with valuable tips to make your and revi
 Use *pre-commit* for formatting and linting
 ============================================
 
-``pre-commit`` is a program that adds hooks into ``git`` so when you commit something actions can be automatically executed.
+``pre-commit`` is a program that adds hooks into ``git`` so when you commit something, actions can be automatically executed.
 There are many different possibility with ``pre-commit`` but it is mostly used for integrating code linters and formatters to always commit clean code.
 
 Getting started with *pre-commit*

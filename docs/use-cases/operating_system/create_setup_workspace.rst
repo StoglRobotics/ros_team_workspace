@@ -42,7 +42,7 @@ Docker workspace
 
    setup-ros-workspace-docker WS_FOLDER ROS_DISTRO
 
-Like the ``setup-ros-workspace`` script, the ``setup-ros-workspace-docker`` script creates a new local ROS workspace. Then a Ubuntu docker container is built and the new created workspace is mounted inside the docker container under the same directory as in the host. The first time a docker container is build can take quite a while. When the first build is finished you are directly connected as user inside the container. You can verify this by checking if your hostname has changed. To exit a container simply type the ``exit`` command.
+Like the ``setup-ros-workspace`` script, the ``setup-ros-workspace-docker`` script creates a new local ROS workspace. Then a Ubuntu docker container is built and the new created workspace is mounted inside the docker container under the same directory as in the host. The first time a docker container is built can take quite a while. When the first build is finished you are directly connected as user inside the container. You can verify this by checking if your hostname has changed. To exit a container simply type the ``exit`` command.
 
 Reconnect to a container
 """"""""""""""""""""""""""
