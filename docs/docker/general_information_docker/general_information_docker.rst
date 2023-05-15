@@ -5,8 +5,8 @@ General information on docker
 
 Generally you can always have a look at the `docs of docker <https://docs.docker.com/>`_.
 
-Installation
-""""""""""""""""
+Installation of Docker
+"""""""""""""""""""""""
 .. _general-info-on-docker-installation:
 
 You have to install docker which is dependent on the operating system you are using.

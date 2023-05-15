@@ -3,8 +3,8 @@ Setting up RosTeamWorkspace
 ============================
 .. _tutorial-setting-up-rtw:
 
-Installation
-""""""""""""""""
+Installation of RosTeamWS
+""""""""""""""""""""""""""
 To start using RosTeamWS framework clone the repository to any location using:
 
 .. code-block:: bash

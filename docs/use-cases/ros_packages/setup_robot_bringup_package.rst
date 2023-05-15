@@ -7,7 +7,7 @@ This use-case describes how to set up a robot bringup package using scripts from
 The package follows as far as possible best practices for `robot support packages <http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_ from ROS-Industrial consortia. (**This has to be verified!**)
 
 
-Script for Setting up Description Package
+Script for Setting up a Bringup Package
 ============================================
 
 ``setup-robot-bringup`` script accepts the robot name and the robot description package name.
