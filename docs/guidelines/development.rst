@@ -43,7 +43,7 @@ This section describes in short the process with valuable tips to make your and 
 
    .. note::
 
-      In *Stogl Robotics* we are always *squashing* commits, i.e., one future or one bug fix is one commit in the default branch. The commit message is edited before merging.
+      In *Stogl Robotics* we are always *squashing* commits, i.e., one future or one bug fix is one commit in the default branch. The commit message is edited before merging. Make sure the commit message retains relevant information of the commits to be squashed (e.g. non-trivial reason why a change was made)
 
 #. Explain in the PR/MR description what your code is doing and why.
 
