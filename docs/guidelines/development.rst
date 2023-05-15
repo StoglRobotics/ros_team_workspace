@@ -5,7 +5,7 @@ Development Guidelines
 
 This documents proposes development guidelines to increase work efficiency and synergy within the rest of the team.
 
-**NOTE**: All the proposal here are the results of authors' personal experiences. Saying that, if you have any idea to make them better you are very wellcome to create a PR.
+**NOTE**: All the proposal here are the results of authors' personal experiences. Saying that, if you have any idea to make them better you are very welcome to create a PR.
 
 Overview
 =========

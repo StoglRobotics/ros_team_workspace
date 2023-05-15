@@ -20,8 +20,8 @@ Here proposed architecture try to split the robot's files to minimize per-packag
   ├── <robot_name>_bringup/                              # Launch and config files for starting the robot using ros2_control
   │   ├── [CMakeLists.txt]                               # if ament_cmake is used (recommended)
   │   ├── package.xml
-  │   ├── [setup.py]                                     # if amend_python is used
-  │   ├── [setup.cfg]                                    # if amend_python is used
+  │   ├── [setup.py]                                     # if ament_python is used
+  │   ├── [setup.cfg]                                    # if ament_python is used
   │   ├── config/
   │   │   ├── <robot_name>_controllers.yaml              # Controllers' configuration for ros2_control
   │   │   ├── <robot_name>_forward_position_publisher.yaml  # Setup test publisher for forward position controller
@@ -33,8 +33,8 @@ Here proposed architecture try to split the robot's files to minimize per-packag
   ├── <manufacturer|robot_name>_description/             # Robot's description files
   │   ├── [CMakeLists.txt]                               # if ament_cmake is used (recommended)
   │   ├── package.xml
-  │   ├── [setup.py]                                     # if amend_python is used
-  │   ├── [setup.cfg]                                    # if amend_python is used
+  │   ├── [setup.py]                                     # if ament_python is used
+  │   ├── [setup.cfg]                                    # if ament_python is used
   │   ├── config/                                        # general YAML files for a robot
   │   │   └── <robot_name>_<someting_specific>.yaml
   │   ├── launch/                                        # launch files related to testing robots' description
