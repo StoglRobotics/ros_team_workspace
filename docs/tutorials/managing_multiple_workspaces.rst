@@ -60,4 +60,6 @@ Next let's add another workspace
 
 Now repeat the above steps to add `gz_ros2_control <https://github.com/ros-controls/gz_ros2_control>`_ repository for testing and execute a demo from there.
 
+.. note:: if ``rosdep`` commands fails with a comment on ros-rolling-ros-gz-sim not being installed successfully, maybe force the desired gazebo version with e.g. ``export GZ_VERSION=fortress``
+
 Now each time you open a new terminal you can use either ``_ws_rolling_ros2c_demos`` or ``_ws_rolling_gz_demos`` to source needed workspace and use the same :ref:`aliases <uc-aliases>` without constantly thinking about exact workspace/folder you are working in.
