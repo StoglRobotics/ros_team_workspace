@@ -92,7 +92,7 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   {
     RCLCPP_FATAL(
       get_node()->get_logger(),
-      "Size of 'command_joint_names' (%d) and 'state_joint_names' (%d) parameters has to be the "
+      "Size of 'command_joint_names' (%zu) and 'state_joint_names' (%zu) parameters has to be the "
       "same!",
       params_.command_joint_names.size(), state_joint_names_.size());
     return CallbackReturn::FAILURE;
