@@ -3,11 +3,11 @@
 # This file is distributed under the same license as the sphinx_rtd_theme
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
-#
+# 
 # Translators:
 # Anthony <aj@ohess.org>, 2019
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2020
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: sphinx_rtd_theme 0.4.3.dev0\n"
@@ -71,7 +71,7 @@ msgid "Built with %(sphinx_web)s using a"
 msgstr "Construido con %(sphinx_web)s usando un"
 
 #. "theme" refers to a theme for Sphinx, which alters the appearance of the
-#. generated documentation
+#. generated documenation
 #: sphinx_rtd_theme/footer.html:54
 msgid "theme"
 msgstr "tema"
@@ -102,7 +102,7 @@ msgstr "Búsqueda"
 
 #: sphinx_rtd_theme/layout.html:102
 msgid "Copyright"
-msgstr "Derechos de author"
+msgstr "Derechos de autor"
 
 #: sphinx_rtd_theme/layout.html:134
 msgid "Logo"
