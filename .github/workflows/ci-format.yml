@@ -14,12 +14,10 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v4.6.0
       with:
-        python-version: '3.9'
+        python-version: '3.10'
         cache: 'pip'
-    - name: Install clang-format-12
-      run: sudo apt-get install clang-format-12
     - uses: pre-commit/action@v3.0.0
       with:
         extra_args: --all-files --hook-stage manual

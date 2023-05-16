@@ -156,6 +156,30 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
+void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
+{
+  // if no timestamp provided use current time for command timestamp
+  if (msg->header.stamp.sec == 0 && msg->header.stamp.nanosec == 0u)
+  {
+    RCLCPP_WARN(
+      get_node()->get_logger(),
+                "Timestamp in header is missing, using current time as command "
+                "timestamp.");
+    msg->header.stamp = get_node()->now();
+  }
+  if (msg->joint_names.size() == params_.command_joint_names.size())
+  {
+    input_ref_.writeFromNonRT(msg);
+  }
+  else
+  {
+    RCLCPP_ERROR(
+      get_node()->get_logger(),
+                 "Received %zu , but expected %zu command_joint_names in command. Ignoring message.",
+                 msg->joint_names.size(), params_.command_joint_names.size());
+  }
+}
+
 controller_interface::InterfaceConfiguration DummyClassName::command_interface_configuration() const
 {
   controller_interface::InterfaceConfiguration command_interfaces_config;
@@ -182,30 +206,6 @@ controller_interface::InterfaceConfiguration DummyClassName::state_interface_con
   }
 
   return state_interfaces_config;
-}
-
-void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
-{
-  // if no timestamp provided use current time for command timestamp
-  if (msg->header.stamp.sec == 0 && msg->header.stamp.nanosec == 0u)
-  {
-    RCLCPP_WARN(
-      get_node()->get_logger(),
-      "Timestamp in header is missing, using current time as command "
-      "timestamp.");
-    msg->header.stamp = get_node()->now();
-  }
-  if (msg->joint_names.size() == params_.command_joint_names.size())
-  {
-    input_ref_.writeFromNonRT(msg);
-  }
-  else
-  {
-    RCLCPP_ERROR(
-      get_node()->get_logger(),
-      "Received %zu , but expected %zu command_joint_names in command. Ignoring message.",
-      msg->joint_names.size(), params_.command_joint_names.size());
-  }
 }
 
 controller_interface::CallbackReturn DummyClassName::on_activate(

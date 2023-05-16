@@ -288,9 +288,9 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
     }
     else
     {
-        command_interfaces_[i].set_value(0.0);
+      // NOTE: use this only if using velocity input
+      command_interfaces_[i].set_value(0.0);
     }
-    
   }
 
   if (state_publisher_ && state_publisher_->trylock())

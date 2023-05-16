@@ -18,7 +18,10 @@ source <PATH TO ros_team_workspace>/setup.bash
 
 #export CYCLONEDDS_URI='<CycloneDDS><Domain><General><NetworkInterfaceAddress>ADD_HERE_INTERFACE_NAME</NetworkInterfaceAddress></General></Domain></CycloneDDS>'
 
-export ROS_DOMAIN_ID=42  # Set your Domain ID if you are in a network with multiple computers
+export ROS_DOMAIN_ID=0 # Set your Domain ID if you are in a network with multiple computers
+
+# needed to execute cppcheck version 2.7 used in pre-commit
+export AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=true
 
 # Logging setup
 # export RCUTILS_LOGGING_CONFIG_FILE="/home/deniss/workspace/ros2_logging_config"

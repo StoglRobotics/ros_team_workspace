@@ -17,11 +17,7 @@
 #
 
 from launch import LaunchDescription
-from launch.actions import (
-    DeclareLaunchArgument,
-    RegisterEventHandler,
-    TimerAction,
-)
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler, TimerAction
 from launch.event_handlers import OnProcessExit, OnProcessStart
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node

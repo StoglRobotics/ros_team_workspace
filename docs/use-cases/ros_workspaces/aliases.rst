@@ -14,7 +14,7 @@ Explanation of Standard Aliases
 --------------------------------
 The standard aliases are callable from any folder as long as a workspace is sourced using ``_<workspace_name>`` alias.
 
-.. note:: To make this reading short, Dr. Denis's favorite aliases are ``cb``, ``ca`` and ``crm`` - simply start with using those.
+.. note:: To make this reading short, Dr. Denis' favorite aliases are ``cb``, ``ca`` and ``crm`` - simply start with using those.
 
 
 Entering Workspace Folders
