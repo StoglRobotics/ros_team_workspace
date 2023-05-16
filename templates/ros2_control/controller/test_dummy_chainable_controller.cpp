@@ -92,20 +92,19 @@ TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_re
 
   auto reference = controller_->input_ref_.readFromNonRT();
   auto old_timestamp = (*reference)->header.stamp;
-  EXPECT_EQ(
-    (*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], state_joint_names_[0]);
+  EXPECT_EQ((*(reference))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ((*(reference))->joint_names[0], state_joint_names_[0]);
   EXPECT_TRUE(std::isnan((*reference)->displacements[0]));
   EXPECT_TRUE(std::isnan((*reference)->velocities[0]));
   EXPECT_TRUE(std::isnan((*reference)->duration));
   publish_commands(controller_->get_node()->now(), {TEST_DISPLACEMENT}, {"joint1", "joint2"});
   ASSERT_TRUE(controller_->wait_for_commands(executor));
-  EXPECT_EQ(
-    (*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], state_joint_names_[0]);
-  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
-  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->velocities[0]));
-  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->duration));
+  reference = controller_->input_ref_.readFromNonRT();
+  EXPECT_EQ((*(reference))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ((*(reference))->joint_names[0], state_joint_names_[0]);  
+  EXPECT_TRUE(std::isnan((*(reference))->displacements[0]));
+  EXPECT_TRUE(std::isnan((*(reference))->velocities[0]));
+  EXPECT_TRUE(std::isnan((*(reference))->duration));
 }
 
 TEST_F(DummyClassNameTest, when_controller_is_activated_expect_reference_reset)
@@ -449,11 +448,12 @@ TEST_F(
   publish_commands(controller_->get_node()->now());
 
   ASSERT_TRUE(controller_->wait_for_commands(executor));
-  ASSERT_EQ(old_timestamp.sec, (*(controller_->input_ref_.readFromNonRT()))->header.stamp.sec);
-  EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->displacements[0], 0.45);
+  reference = controller_->input_ref_.readFromNonRT();
+  ASSERT_EQ(old_timestamp.sec, (*(reference))->header.stamp.sec);
+  EXPECT_FALSE(std::isnan((*(reference))->displacements[0]));
+  EXPECT_EQ((*(reference))->displacements[0], 0.45);
 
-  EXPECT_NE((*(controller_->input_ref_.readFromNonRT()))->header.stamp.sec, 0.0);
+  EXPECT_NE((*(reference))->header.stamp.sec, 0.0);
 }
 
 // when the reference_msg has valid timestamp then the timeout check in reference_callback()
@@ -477,8 +477,9 @@ TEST_F(DummyClassNameTest, when_message_has_valid_timestamp_expect_reference_set
   publish_commands(controller_->get_node()->now());
 
   ASSERT_TRUE(controller_->wait_for_commands(executor));
-  EXPECT_FALSE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->displacements[0], 0.45);
+  reference = controller_->input_ref_.readFromNonRT();
+  EXPECT_FALSE(std::isnan((*(reference))->displacements[0]));
+  EXPECT_EQ((*(reference))->displacements[0], 0.45);
 }
 
 int main(int argc, char ** argv)
