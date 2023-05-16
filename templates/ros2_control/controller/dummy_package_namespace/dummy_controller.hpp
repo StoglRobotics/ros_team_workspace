@@ -35,10 +35,10 @@
 namespace dummy_package_namespace
 {
 // name constants for state interfaces
-static constexpr size_t NR_STATE_ITFS = 0;
+static constexpr size_t NR_STATE_ITFS = 1;
 
 // name constants for command interfaces
-static constexpr size_t NR_CMD_ITFS = 0;
+static constexpr size_t NR_CMD_ITFS = 1;
 
 // TODO(anyone: example setup for control mode (usually you will use some enums defined in messages)
 enum class control_mode_type : std::uint8_t
