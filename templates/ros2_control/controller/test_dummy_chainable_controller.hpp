@@ -222,7 +222,7 @@ protected:
 
   // TODO(anyone): add/remove arguments as it suites your command message type
   void publish_commands(
-    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45}, 
+    const rclcpp::Time & stamp, const std::vector<double> & displacements = {0.45},
     const std::vector<std::string> & joint_names = {"joint1_test"},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
@@ -234,7 +234,7 @@ protected:
         if (wait_count >= 5)
         {
           auto error_msg =
-              std::string("publishing to ") + topic_name + " but no node subscribes to it";
+            std::string("publishing to ") + topic_name + " but no node subscribes to it";
           throw std::runtime_error(error_msg);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

@@ -71,8 +71,8 @@ TEST_F(DummyClassNameTest, when_controller_configured_expect_properly_exported_i
   ASSERT_EQ(reference_interfaces.size(), NR_REF_ITFS);
   for (size_t i = 0; i < NR_REF_ITFS; ++i)
   {
-    const std::string ref_itf_name = std::string(controller_->get_node()->get_name()) + "/"
-                                     + state_joint_names_[i] + "/" + interface_name_;
+    const std::string ref_itf_name = std::string(controller_->get_node()->get_name()) + "/" +
+                                     state_joint_names_[i] + "/" + interface_name_;
     EXPECT_EQ(reference_interfaces[i].get_name(), ref_itf_name);
     EXPECT_EQ(reference_interfaces[i].get_prefix_name(), controller_->get_node()->get_name());
     EXPECT_EQ(
@@ -92,14 +92,16 @@ TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_re
 
   auto reference = controller_->input_ref_.readFromNonRT();
   auto old_timestamp = (*reference)->header.stamp;
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ(
+    (*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], state_joint_names_[0]);
   EXPECT_TRUE(std::isnan((*reference)->displacements[0]));
   EXPECT_TRUE(std::isnan((*reference)->velocities[0]));
   EXPECT_TRUE(std::isnan((*reference)->duration));
   publish_commands(controller_->get_node()->now(), {TEST_DISPLACEMENT}, {"joint1", "joint2"});
   ASSERT_TRUE(controller_->wait_for_commands(executor));
-  EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ(
+    (*(controller_->input_ref_.readFromNonRT()))->joint_names.size(), state_joint_names_.size());
   EXPECT_EQ((*(controller_->input_ref_.readFromNonRT()))->joint_names[0], state_joint_names_[0]);
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->displacements[0]));
   EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromNonRT()))->velocities[0]));
@@ -163,11 +165,11 @@ TEST_F(
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
-  ASSERT_EQ(controller_->command_interfaces_[NR_CMD_ITFS-1].get_value(), 101.101);
+  ASSERT_EQ(controller_->command_interfaces_[NR_CMD_ITFS - 1].get_value(), 101.101);
   ASSERT_EQ(controller_->on_deactivate(rclcpp_lifecycle::State()), NODE_SUCCESS);
-  ASSERT_TRUE(std::isnan(controller_->command_interfaces_[NR_CMD_ITFS-1].get_value()));
+  ASSERT_TRUE(std::isnan(controller_->command_interfaces_[NR_CMD_ITFS - 1].get_value()));
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
-  ASSERT_TRUE(std::isnan(controller_->command_interfaces_[NR_CMD_ITFS-1].get_value()));
+  ASSERT_TRUE(std::isnan(controller_->command_interfaces_[NR_CMD_ITFS - 1].get_value()));
 
   ASSERT_EQ(
     controller_->update(controller_->get_node()->now(), rclcpp::Duration::from_seconds(0.01)),
@@ -183,7 +185,7 @@ TEST_F(DummyClassNameTest, when_update_is_called_expect_status_message)
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
-  controller_->reference_interfaces_[NR_STATE_ITFS-1] = 1.5;
+  controller_->reference_interfaces_[NR_STATE_ITFS - 1] = 1.5;
 
   ControllerStateMsg msg;
   subscribe_to_controller_status_execute_update_and_get_messages(msg);
@@ -358,7 +360,6 @@ TEST_F(
   // is called
   publish_commands(controller_->get_node()->now(), {TEST_DISPLACEMENT});
   ASSERT_TRUE(controller_->wait_for_commands(executor));
-
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);

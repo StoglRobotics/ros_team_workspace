@@ -296,7 +296,7 @@ controller_interface::return_type DummyClassName::update_and_write_commands(
   if (state_publisher_ && state_publisher_->trylock())
   {
     state_publisher_->msg_.header.stamp = time;
-    state_publisher_->msg_.set_point = command_interfaces_[NR_CMD_ITFS-1].get_value();
+    state_publisher_->msg_.set_point = command_interfaces_[NR_CMD_ITFS - 1].get_value();
 
     state_publisher_->unlockAndPublish();
   }

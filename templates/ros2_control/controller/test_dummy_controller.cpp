@@ -269,7 +269,7 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[NR_STATE_ITFS], TEST_DISPLACEMENT / 2);
-  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT/2);
+  EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT / 2);
 }
 
 // reference_interfaces and command_interfaces values depend on the reference_msg,

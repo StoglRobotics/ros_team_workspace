@@ -163,8 +163,8 @@ void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenc
   {
     RCLCPP_WARN(
       get_node()->get_logger(),
-                "Timestamp in header is missing, using current time as command "
-                "timestamp.");
+      "Timestamp in header is missing, using current time as command "
+      "timestamp.");
     msg->header.stamp = get_node()->now();
   }
   if (msg->joint_names.size() == params_.command_joint_names.size())
@@ -175,8 +175,8 @@ void DummyClassName::reference_callback(const std::shared_ptr<ControllerReferenc
   {
     RCLCPP_ERROR(
       get_node()->get_logger(),
-                 "Received %zu , but expected %zu command_joint_names in command. Ignoring message.",
-                 msg->joint_names.size(), params_.command_joint_names.size());
+      "Received %zu , but expected %zu command_joint_names in command. Ignoring message.",
+      msg->joint_names.size(), params_.command_joint_names.size());
   }
 }
 
@@ -249,10 +249,10 @@ controller_interface::return_type DummyClassName::update(
         (*current_ref)->displacements[i] /= 2;
       }
       command_interfaces_[i].set_value((*current_ref)->displacements[i]);
-
-    }else
+    }
+    else
     {
-        command_interfaces_[i].set_value(0.0);
+      command_interfaces_[i].set_value(0.0);
     }
   }
 
