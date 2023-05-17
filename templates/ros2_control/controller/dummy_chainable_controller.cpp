@@ -245,7 +245,7 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
 controller_interface::CallbackReturn DummyClassName::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `NR_CMD_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < NR_CMD_ITFS; ++i)
   {
@@ -259,7 +259,7 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
 {
   auto current_ref = input_ref_.readFromRT();
 
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `NR_CMD_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < NR_REF_ITFS; ++i)
   {
@@ -274,7 +274,7 @@ controller_interface::return_type DummyClassName::update_reference_from_subscrib
 controller_interface::return_type DummyClassName::update_and_write_commands(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `NR_CMD_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < NR_CMD_ITFS; ++i)
   {

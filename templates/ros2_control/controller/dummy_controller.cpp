@@ -225,9 +225,9 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
 controller_interface::CallbackReturn DummyClassName::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `NR_CMD_ITFS`,
   // instead of a loop
-  for (size_t i = 0; i <= NR_CMD_ITFS; ++i)
+  for (size_t i = 0; i < NR_CMD_ITFS; ++i)
   {
     command_interfaces_[i].set_value(std::numeric_limits<double>::quiet_NaN());
   }
@@ -239,7 +239,7 @@ controller_interface::return_type DummyClassName::update(
 {
   auto current_ref = input_ref_.readFromRT();
 
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
+  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `NR_CMD_ITFS`,
   // instead of a loop
   for (size_t i = 0; i < command_interfaces_.size(); ++i)
   {
@@ -260,7 +260,7 @@ controller_interface::return_type DummyClassName::update(
   if (state_publisher_ && state_publisher_->trylock())
   {
     state_publisher_->msg_.header.stamp = time;
-    state_publisher_->msg_.set_point = command_interfaces_[NR_CMD_ITFS].get_value();
+    state_publisher_->msg_.set_point = command_interfaces_[NR_CMD_ITFS - 1].get_value();
 
     state_publisher_->unlockAndPublish();
   }
