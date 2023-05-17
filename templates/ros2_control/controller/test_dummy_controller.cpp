@@ -90,6 +90,7 @@ TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_re
   EXPECT_EQ(
     (*(reference))->joint_names.size(), state_joint_names_.size());
   EXPECT_EQ((*(reference))->joint_names[0], state_joint_names_[0]);
+  ASSERT_EQ(old_timestamp, (*(reference))->header.stamp);  
   EXPECT_TRUE(std::isnan((*(reference))->displacements[0]));
   EXPECT_TRUE(std::isnan((*(reference))->velocities[0]));
   EXPECT_TRUE(std::isnan((*(reference))->duration));
