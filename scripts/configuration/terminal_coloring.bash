@@ -126,7 +126,57 @@ function parse_ros_workspace {
 # export PS1="\[\e]0;"'$(parse_ros_workspace)'"\a\]\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_git_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
 
 # Version with git color
-export PS1="\[\e]0;"'$(parse_ros_workspace)'"\a\]\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_git_bracket)'"\["'$(set_git_color)'"\]"'$(get_gitbranch)'"\[${TERMINAL_COLOR_GREEN}\]"'>'"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
+# Start with an empty PS1
+PS1=""
+
+# Set the terminal title to the current ROS workspace
+PS1+="\[\e]0;\$(parse_ros_workspace)\a\]"
+
+# Set the user text color to light green
+PS1+="\[${TERMINAL_COLOR_LIGHT_GREEN}\]\u"
+
+# Add a light gray '@'
+PS1+="\[${TERMINAL_COLOR_LIGHT_GRAY}\]@"
+
+# Set the host name color to brown
+PS1+="\[${TERMINAL_COLOR_BROWN}\]\h"
+
+# Add a yellow '-ssh-session' if SSH client is connected
+PS1+="\[${TERMINAL_COLOR_YELLOW}\]${text}"
+
+# Add a light gray ':'
+PS1+="\[${TERMINAL_COLOR_LIGHT_GRAY}\]:"
+
+# Set the color of the ROS workspace
+PS1+="\[\$(set_ros_workspace_color)\]"
+
+# Add the name of the ROS workspace
+PS1+="\$(parse_ros_workspace)"
+
+# Set the color of the Git branch
+PS1+="\[${TERMINAL_COLOR_GREEN}\]\$(parse_git_bracket)"
+
+# Add the name of the Git branch
+PS1+="\[\$(set_git_color)\]\$(get_gitbranch)"
+
+# Add a green '>'
+PS1+="\[${TERMINAL_COLOR_GREEN}\]>"
+
+# Add the full file path relative to the user's home directory
+# We can use the \w escape sequence to achieve this
+PS1+="\[${TERMINAL_COLOR_LIGHT_PURPLE}\]\w"
+
+# Add a newline character to move the prompt symbol to the next line
+PS1+="\n"
+
+# Add the prompt symbol ('$') with a light purple color
+PS1+="\[${TERMINAL_COLOR_CYAN}\]\$"
+
+# Reset the color and add a space
+PS1+="\[${TERMINAL_COLOR_NC}\]\[\e[m\] "
+
+# Export the PS1 variable
+export PS1
 
 
 # END: Stogl Robotics custom setup for nice colors and showing ROS workspace
