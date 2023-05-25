@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Authors: Manuel Muth, Denis Štogl
+# Authors: Manuel Muth, Denis Štogl, Atticus Russell
 #
 
 # BEGIN: Stogl Robotics custom setup for nice colors and showing ROS workspace
@@ -62,12 +62,6 @@ function get_gitbranch {
   echo `git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
 }
 
-function parse_git_bracket {
-  if [[ "$(get_gitbranch)" != '' ]]; then
-    echo "<"
-  fi
-}
-
 function set_git_color {
   if [[ "$(get_gitbranch)" != '' ]]; then
     # Get the status of the repo and chose a color accordingly
@@ -86,16 +80,6 @@ function set_git_color {
     fi
 
     echo -e "${color}"
-  fi
-}
-
-function parse_git_branch_and_add_brackets {
-  gitbranch="$(get_gitbranch)"
-
-  if [[ "$gitbranch" != '' ]]; then
-    echo "<${gitbranch}"
-#   else
-#     echo "<no-git-branch"
   fi
 }
 
@@ -119,15 +103,12 @@ function parse_ros_workspace {
   fi
 }
 
-# Version mit time infront of values
-# export PS1="\[\e]0;"'$(parse_ros_workspace)'"\a\]\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'[\t]\['"\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_git_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
 
-# Version without git color
-# export PS1="\[\e]0;"'$(parse_ros_workspace)'"\a\]\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_git_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
-
-# Version with git color
 # Start with an empty PS1
 PS1=""
+
+# Add a newline character to move to the next line and visually separate from the previous terminal command
+PS1+="\n"
 
 # Set the terminal title to the current ROS workspace
 PS1+="\[\e]0;\$(parse_ros_workspace)\a\]"
@@ -144,8 +125,8 @@ PS1+="\[${TERMINAL_COLOR_BROWN}\]\h"
 # Add a yellow '-ssh-session' if SSH client is connected
 PS1+="\[${TERMINAL_COLOR_YELLOW}\]${text}"
 
-# Add a light gray ':'
-PS1+="\[${TERMINAL_COLOR_LIGHT_GRAY}\]:"
+# separate parts of header with a space with no highlighting
+PS1+="\[${TERMINAL_COLOR_NC}\] "
 
 # Set the color of the ROS workspace
 PS1+="\[\$(set_ros_workspace_color)\]"
@@ -153,27 +134,37 @@ PS1+="\[\$(set_ros_workspace_color)\]"
 # Add the name of the ROS workspace
 PS1+="\$(parse_ros_workspace)"
 
-# Set the color of the Git branch
-PS1+="\[${TERMINAL_COLOR_GREEN}\]\$(parse_git_bracket)"
+# separate parts of header with a space with no highlighting
+PS1+="\[${TERMINAL_COLOR_NC}\] "
 
-# Add the name of the Git branch
-PS1+="\[\$(set_git_color)\]\$(get_gitbranch)"
+# if in a git repo add the branch name in brackets
+# conditionals *in* the PS are needed so its evaluated each time the PS is printed
+PS1+="\[\$([[ \$(get_gitbranch) != '' ]] && echo -n \$(set_git_color))\]"
+PS1+="\$(if [[ \$(get_gitbranch) != '' ]]; then echo -n '<' && echo -n \$(get_gitbranch) && echo -n '>'; fi)"
 
-# Add a green '>'
-PS1+="\[${TERMINAL_COLOR_GREEN}\]>"
-
-# Add the full file path relative to the user's home directory
-# We can use the \w escape sequence to achieve this
-PS1+="\[${TERMINAL_COLOR_LIGHT_PURPLE}\]\w"
-
-# Add a newline character to move the prompt symbol to the next line
+# Add a newline character to move to the next line
 PS1+="\n"
 
-# Add the prompt symbol ('$') with a light purple color
-PS1+="\[${TERMINAL_COLOR_CYAN}\]\$"
+# Add the full file path relative to the user's home directory
+PS1+="\[${TERMINAL_COLOR_LIGHT_PURPLE}\]\w"
 
-# Reset the color and add a space
-PS1+="\[${TERMINAL_COLOR_NC}\]\[\e[m\] "
+# Add a newline character to move to the next line
+PS1+="\n"
+
+# Add the time
+PS1+="\[${TERMINAL_COLOR_NC}\]\D{%T}"
+
+# separate parts of header with a space with no highlighting
+PS1+="\[${TERMINAL_COLOR_NC}\] "
+
+# Add the prompt symbol ('$')
+PS1+="\[${TERMINAL_COLOR_NC}\]\$"
+
+# Add a space after the prompt symbol
+PS1+=" "
+
+# Reset the color
+PS1+="\[${TERMINAL_COLOR_NC}\]\[\e[m\]"
 
 # Export the PS1 variable
 export PS1
