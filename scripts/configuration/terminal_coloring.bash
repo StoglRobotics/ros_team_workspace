@@ -80,7 +80,7 @@ function set_git_color {
         color=${TERMINAL_COLOR_YELLOW}
     elif [[ "$STATUS" == *' have diverged,'* ]]; then
       # brown if need to force push
-      color=${TERMINAL_COLOR_BLACK}${TERMINAL_BG_COLOR_YELLOW}
+      color=${TERMINAL_COLOR_BROWN}
     else
       # else green
       color=${TERMINAL_COLOR_GREEN}
