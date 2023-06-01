@@ -130,8 +130,9 @@ controller_interface::CallbackReturn DummyClassName::on_configure(
 
   set_slow_control_mode_service_ = get_node()->create_service<ControllerModeSrvType>(
     "~/set_slow_control_mode", set_slow_mode_service_callback,
-    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_services_hist_keep_all),
-    rmw_qos_profile_services_hist_keep_all));
+    rclcpp::QoS(
+      rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_services_hist_keep_all),
+      rmw_qos_profile_services_hist_keep_all));
 
   try
   {

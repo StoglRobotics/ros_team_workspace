@@ -78,8 +78,7 @@ TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_re
 
   auto reference = controller_->input_ref_.readFromNonRT();
   auto old_timestamp = (*reference)->header.stamp;
-  EXPECT_EQ(
-    (*(reference))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ((*(reference))->joint_names.size(), state_joint_names_.size());
   EXPECT_EQ((*(reference))->joint_names[0], state_joint_names_[0]);
   EXPECT_TRUE(std::isnan((*reference)->displacements[0]));
   EXPECT_TRUE(std::isnan((*reference)->velocities[0]));
@@ -87,10 +86,9 @@ TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_re
   publish_commands(controller_->get_node()->now(), {"joint1", "joint2"});
   ASSERT_TRUE(controller_->wait_for_commands(executor));
   reference = controller_->input_ref_.readFromNonRT();
-  EXPECT_EQ(
-    (*(reference))->joint_names.size(), state_joint_names_.size());
+  EXPECT_EQ((*(reference))->joint_names.size(), state_joint_names_.size());
   EXPECT_EQ((*(reference))->joint_names[0], state_joint_names_[0]);
-  ASSERT_EQ(old_timestamp, (*(reference))->header.stamp);  
+  ASSERT_EQ(old_timestamp, (*(reference))->header.stamp);
   EXPECT_TRUE(std::isnan((*(reference))->displacements[0]));
   EXPECT_TRUE(std::isnan((*(reference))->velocities[0]));
   EXPECT_TRUE(std::isnan((*(reference))->duration));
@@ -173,7 +171,7 @@ TEST_F(DummyClassNameTest, when_update_is_called_expect_status_message)
   // reference_callback() is implicitly called when publish_commands() is called
   // reference_msg is published with provided time stamp when publish_commands( time_stamp)
   // is called
-  //setting ref msg here
+  // setting ref msg here
   publish_commands(controller_->get_node()->now());
   ASSERT_TRUE(controller_->wait_for_commands(executor));
 
@@ -181,7 +179,7 @@ TEST_F(DummyClassNameTest, when_update_is_called_expect_status_message)
     controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
-  //checking if previously set reference msg persists
+  // checking if previously set reference msg persists
   EXPECT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], 0.45);
 
   ControllerStateMsg msg;

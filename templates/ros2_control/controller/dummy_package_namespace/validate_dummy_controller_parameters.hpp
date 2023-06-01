@@ -24,8 +24,7 @@
 
 namespace parameter_traits
 {
-tl::expected<void, std::string> forbidden_interface_name_prefix(
-  rclcpp::Parameter const & parameter)
+tl::expected<void, std::string> forbidden_interface_name_prefix(rclcpp::Parameter const & parameter)
 {
   auto const & interface_name = parameter.as_string();
 

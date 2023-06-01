@@ -101,8 +101,8 @@ TEST_F(DummyClassNameTest, when_invalid_reference_msg_is_set_expect_reference_re
   ASSERT_TRUE(controller_->wait_for_commands(executor));
   reference = controller_->input_ref_.readFromNonRT();
   EXPECT_EQ((*(reference))->joint_names.size(), state_joint_names_.size());
-  EXPECT_EQ((*(reference))->joint_names[0], state_joint_names_[0]);  
-  ASSERT_EQ(old_timestamp, (*(reference))->header.stamp);  
+  EXPECT_EQ((*(reference))->joint_names[0], state_joint_names_[0]);
+  ASSERT_EQ(old_timestamp, (*(reference))->header.stamp);
   EXPECT_TRUE(std::isnan((*(reference))->displacements[0]));
   EXPECT_TRUE(std::isnan((*(reference))->velocities[0]));
   EXPECT_TRUE(std::isnan((*(reference))->duration));
@@ -334,7 +334,7 @@ TEST_F(DummyClassNameTest, when_controller_mode_set_slow_expect_update_logic_for
 
 TEST_F(
   DummyClassNameTest,
-  when_controller_mode_set_chainable_and_fast_expect_receiving_commands_from_reference_interfaces_directly_with_fast_mode_logic_effect)
+  when_ctrl_mode_set_chainable_fast_expect_cmds_from_ref_ifs_direct_with_fast_mode_logic_effect)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -383,7 +383,7 @@ TEST_F(
 
 TEST_F(
   DummyClassNameTest,
-  when_controller_mode_set_chainable_and_slow_expect_receiving_commands_from_reference_interfaces_directly_with_slow_mode_logic_effect)
+  when_ctrl_mode_set_chainable_slow_expect_cmds_from_ref_ifs_direct_with_slow_mode_logic_effect)
 {
   SetUpController();
   rclcpp::executors::MultiThreadedExecutor executor;
