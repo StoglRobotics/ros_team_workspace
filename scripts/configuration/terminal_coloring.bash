@@ -75,14 +75,15 @@ function set_git_color {
     if [[ "$STATUS" != *'working tree clean'* ]]; then
       # red if need to commit
       color=${TERMINAL_COLOR_RED}
-    else
-      if [[ "$STATUS" == *'Your branch is ahead'* ]]; then
+    elif [[ "$STATUS" == *'Your branch is ahead'* ]]; then
         # yellow if need to push
         color=${TERMINAL_COLOR_YELLOW}
-      else
-        # else green
-        color=${TERMINAL_COLOR_GREEN}
-      fi
+    elif [[ "$STATUS" == *' have diverged,'* ]]; then
+      # brown if need to force push
+      color=${TERMINAL_COLOR_BROWN}
+    else
+      # else green
+      color=${TERMINAL_COLOR_GREEN}
     fi
 
     echo -e "${color}"
