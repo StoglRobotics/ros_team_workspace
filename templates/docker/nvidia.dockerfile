@@ -53,6 +53,7 @@ RUN pip install -U rosdep && \
 
 # setup ros_team_ws
 RUN git clone -b ROS_TEAM_WS_DUMMY_BRANCH https://github.com/StoglRobotics/ros_team_workspace.git /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/
+RUN cd /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/rtwcli && pip3 install -r requirements.txt && cd -
 
 # setup standard .bashrc
 COPY bashrc ${home}/.bashrc

@@ -27,7 +27,7 @@ fi
 
 # All the possible supported ros distributions supported by rtw
 if [ -z "$rtw_supported_ros_distributions" ]; then
-  readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "rolling")
+  readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "iron" "rolling")
 fi
 
 # This needs to be set for every branch
@@ -55,7 +55,7 @@ function set_supported_versions {
     ros_version=2
     ;;
   rolling)
-    supported_ros_distributions=("rolling")
+    supported_ros_distributions=("iron" "rolling")
     ros_version=2
     ;;
   *)
@@ -373,7 +373,7 @@ function check_ros_distro {
   # check if the given distribution is a distribution supported by rtw
   while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@];
   do
-      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please chose either of the following:${rtw_supported_ros_distributions[*]}"
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please chose either of the following: ${rtw_supported_ros_distributions[*]}"
       read ros_distro
   done
 
@@ -411,6 +411,9 @@ function set_ros_version_for_distro {
       ros_version=2
       ;;
     humble)
+      ros_version=2
+      ;;
+    iron)
       ros_version=2
       ;;
     rolling)
