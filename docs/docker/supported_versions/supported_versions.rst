@@ -19,6 +19,12 @@ For the supported Ubuntu and ros version combinations have a look at the table b
    * - galactic
      - X
      -
+   * - humble
+     -
+     - X
+   * - iron
+     -
+     - X
    * - rolling
      - X
      - X
