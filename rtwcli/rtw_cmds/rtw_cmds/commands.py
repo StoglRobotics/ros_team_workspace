@@ -50,3 +50,10 @@ class PkgCommand(BaseCommand):
 
     def __init__(self):
         super().__init__("rtw_cmds.pkg.verbs")
+
+
+class WorkspaceCommand(BaseCommand):
+    """Various workspace related sub-commands."""
+
+    def __init__(self):
+        super().__init__("rtw_cmds.workspace.verbs")
