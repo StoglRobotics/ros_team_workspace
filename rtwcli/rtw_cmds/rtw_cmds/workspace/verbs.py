@@ -40,7 +40,6 @@ workspace name prefix is defined as first letters of the path and last folder if
 
 import copy
 import os
-import subprocess
 import questionary
 from typing import Any, List
 from rtwcli.command.info import ROS_TEAM_WS_VARIABLES
@@ -54,7 +53,6 @@ WORKSPACES_KEY = "workspaces"
 
 def create_file_if_not_exists(file_path: str, initial_content: str = "") -> bool:
     if not os.path.isfile(file_path):
-        print(f"Creating file in {file_path}")
         try:
             # Create the directories if they don't exist
             directory = os.path.dirname(file_path)
@@ -65,14 +63,11 @@ def create_file_if_not_exists(file_path: str, initial_content: str = "") -> bool
                 # Write initial content to the file if needed
                 if initial_content:
                     file.write(f"{initial_content}")
-
-            print(f"Created file in {file_path}")
             return True
         except OSError as e:
             print(f"Failed to create file in {file_path}. Error: {e}")
             return False
     else:
-        print(f"File already exists in {file_path}")
         return True
 
 
@@ -82,13 +77,12 @@ def read_yaml_file(file_path: str) -> Any:
 
 
 def write_yaml_file(file_path: str, yaml_data: Any) -> bool:
-    with open(file_path, "w") as file:
-        try:
+    try:
+        with open(file_path, "w") as file:
             yaml.dump(yaml_data, file)
-            print("YAML file updated and saved successfully!")
             return True
-        except yaml.YAMLError as e:
-            print(f"Failed to save the updated YAML file. Error: {e}")
+    except (OSError, yaml.YAMLError) as e:
+        print(f"Failed to update YAML file. Error: {e}")
     return False
 
 
@@ -103,7 +97,6 @@ def get_ws_names(workspaces_config: dict) -> List[str]:
 
 
 def update_workspaces_config(config_path: str, workspace: dict) -> bool:
-    print(f"config_path: {config_path}")
     if not create_file_if_not_exists(config_path):
         print("Could not create workspaces config file. Cannot proceed with porting.")
         return False
@@ -115,23 +108,24 @@ def update_workspaces_config(config_path: str, workspace: dict) -> bool:
         return False
     if not workspaces_config:
         workspaces_config = {WORKSPACES_KEY: {}}
-    print(f"workspaces_config: {workspaces_config}")
 
-    assert len(workspace.keys()) == 1, f"The workspace {workspace} does not have exactly one key."
+    assert len(workspace.keys()) == 1, f"The workspace does not have exactly one key: {workspace}"
     ws_name = list(workspace.keys())[0]
     existing_ws_names = get_ws_names(workspaces_config)
 
     if ws_name in existing_ws_names:
-        raise NotImplementedError("TODO: Duplicate workspace name handling.")
+        raise NotImplementedError(
+            f"Workspace name '{ws_name}' is already in the config. "
+            "Duplicate workspace name handling is not implemented yet."
+        )
 
     workspaces_config[WORKSPACES_KEY][ws_name] = workspace[ws_name]
-    print(f"workspaces_config: {workspaces_config}")
 
     if not write_yaml_file(config_path, workspaces_config):
         print("Error: Failed to update YAML file.")
         return False
 
-    print(f"Updated YAML file '{config_path}' with a new workspace '{workspace}'")
+    print(f"Updated YAML file '{config_path}' with a new workspace '{ws_name}'")
     return True
 
 
@@ -146,23 +140,25 @@ class UseVerb(VerbExtension):
     """Select and source an existing ROS workspace."""
 
     def main(self, *, args):
-        print(f"Not implemented yet, a bash script is currently used: {USE_WORKSPACE_SCRIPT_PATH}")
-
         workspaces_config_path = os.path.expanduser(WORKSPACES_PATH)
+        if not os.path.isfile(workspaces_config_path):
+            print(
+                "No workspaces are available as the workspaces config file "
+                f"'{workspaces_config_path}' does not exist"
+            )
+            return
+
         try:
             workspaces_config = read_yaml_file(workspaces_config_path)
-        except yaml.YAMLError as e:
+        except (OSError, yaml.YAMLError) as e:
             print(f"Failed to load yaml file {workspaces_config_path}. Error: {e}")
             return
+
         if not workspaces_config:
-            print(f"No workspaces found in config {workspaces_config_path}")
+            print(f"No workspaces found in config file '{workspaces_config_path}'")
             return
 
-        print(f"workspaces_config: {workspaces_config}")
-
         ws_names = get_ws_names(workspaces_config)
-        print(f"type workspaces_config[WORKSPACES_KEY]: {type(workspaces_config[WORKSPACES_KEY])}")
-
         ws_name = str(
             questionary.autocomplete(
                 "Choose workspace",
@@ -172,42 +168,14 @@ class UseVerb(VerbExtension):
                 validate=lambda ws_choice: ws_choice in ws_names,
             ).ask()
         )
-        print(f"Chosen workspace name: {ws_name}")
-        print(f"type workspaces_config[WORKSPACES_KEY]: {type(workspaces_config[WORKSPACES_KEY])}")
-
         if not ws_name or ws_name not in workspaces_config[WORKSPACES_KEY]:
-            print(f"workspace name is not valid: {ws_name}")
+            print(f"Workspace name is invalid: '{ws_name}'")
             return
 
         ws_data = workspaces_config[WORKSPACES_KEY][ws_name]
-        print(f"ws_data: {ws_data}")
+        print(yaml.dump(ws_data, indent=4, default_flow_style=False))
 
-        distro = workspaces_config[WORKSPACES_KEY][ws_name]["distro"]
-        ws_folder = workspaces_config[WORKSPACES_KEY][ws_name]["ws_folder"]
-        print(f"distro: {distro}")
-        print(f"ws_folder: {ws_folder}")
-        # cmd = ["bash", os.path.expanduser(USE_WORKSPACE_SCRIPT_PATH), distro, ws_folder]
-        # cmd = [
-        #     "bash",
-        #     "-c",
-        #     # f"source {os.path.expanduser('~/.bashrc')} && {os.path.expanduser(USE_WORKSPACE_SCRIPT_PATH)} {distro} {ws_folder}",
-        #     f"echo $GZ_VERSION && source {os.path.expanduser('~/.bashrc')} && echo $GZ_VERSION",
-        # ]
-        # subprocess.run(cmd)
-
-        # test_bash_file = "~/ros_team_workspace/scripts/create-new-package.bash"
-
-        # [f"{os.path.expanduser(test_bash_file)}", "foo", "foo"],
-        print(
-            subprocess.run(
-                [
-                    "bash",
-                    "-c",
-                    f"source {os.path.expanduser(USE_WORKSPACE_SCRIPT_PATH)} {distro} {ws_folder}",
-                ],
-                capture_output=True,
-            )
-        )
+        raise NotImplementedError("Actual use is not implemented yet.")
 
 
 class PortVerb(VerbExtension):
@@ -215,6 +183,8 @@ class PortVerb(VerbExtension):
 
     def main(self, *, args):
         workspace_data_to_port = {}
+        print("Reading workspace environment variables: ")
+        str_format = "\t{:<30} -> {:<20}: {}"
         for var in ROS_TEAM_WS_VARIABLES:
             value = os.environ.get(var, None)
             # check if variable is exported
@@ -222,36 +192,34 @@ class PortVerb(VerbExtension):
                 print(f"Variable {var} is not exported. Cannot proceed with porting.")
                 return
             new_var = var.replace("RosTeamWS_", "").lower()
+            print(str_format.format(var, new_var, value))
             workspace_data_to_port[new_var] = value
 
+        print("Generating workspace name from workspace path with first folder letters: ")
         ws_folder = os.environ.get("RosTeamWS_WS_FOLDER")
-        print(f"ws_folder: {ws_folder}")
         ws_path_folders = ws_folder.split(os.path.sep)[1:]
-        print(f"ws_path_folders: {ws_path_folders}")
         ws_name = ws_path_folders[-1]
-        print(f"ws_name: {ws_name}")
         new_ws_name_prefix = ""
         num_folders = len(ws_path_folders)
-        print(f"num_folders: {num_folders}")
 
         if num_folders > 1:  # /folder1/my_ws
             # first letter of the folders
             new_ws_name_prefix += "".join([folder[0] for folder in ws_path_folders[:-2]])
-            print(f"new_ws_name_prefix: {new_ws_name_prefix}")
             prev_folder = ws_path_folders[-2]
-            print(f"prev_folder: {prev_folder}")
             if prev_folder != "workspace":
                 if new_ws_name_prefix:
                     new_ws_name_prefix += "_"
                 new_ws_name_prefix += prev_folder
             else:
                 new_ws_name_prefix += prev_folder[0]
-            print(f"new_ws_name_prefix: {new_ws_name_prefix}")
 
         new_ws_name = "__".join([new_ws_name_prefix, ws_name])
-        print(f"new_ws_name: {new_ws_name}")
+        print(f"\t'{ws_folder}' -> {new_ws_name}")
+
         workspace_to_port = {new_ws_name: workspace_data_to_port}
-        print(f"workspace_to_port: {workspace_to_port}")
+        # print(f"workspace_to_port: {workspace_to_port}")
 
         workspaces_config_path = os.path.expanduser(WORKSPACES_PATH)
+
+        print(f"Updating workspace config in '{workspaces_config_path}'")
         update_workspaces_config(workspaces_config_path, workspace_to_port)
