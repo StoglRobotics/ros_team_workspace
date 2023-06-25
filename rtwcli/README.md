@@ -18,4 +18,4 @@ source your workspace: `_<ws_name>`
 
 port config: `rtw wokspace port`
 
-test porting by trying to use workspace in a new terminal: `rtw wokspace use`
+test porting: `rtw wokspace use`
