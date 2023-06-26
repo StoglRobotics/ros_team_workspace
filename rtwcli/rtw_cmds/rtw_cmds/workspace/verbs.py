@@ -40,6 +40,7 @@ workspace name prefix is defined as first letters of the path and last folder if
 
 import copy
 import os
+import subprocess
 import questionary
 from typing import Any, List
 from rtwcli.command.info import ROS_TEAM_WS_VARIABLES
@@ -175,7 +176,13 @@ class UseVerb(VerbExtension):
         ws_data = workspaces_config[WORKSPACES_KEY][ws_name]
         print(yaml.dump(ws_data, indent=4, default_flow_style=False))
 
-        raise NotImplementedError("Actual use is not implemented yet.")
+        script = os.path.expanduser(USE_WORKSPACE_SCRIPT_PATH)
+        distro = ws_data["distro"]
+        ws_folder = ws_data["ws_folder"]
+        bash_cmd = f"source {script} {distro} {ws_folder}"
+        subprocess_cmd = ["/bin/bash", "-i", "-c", bash_cmd]
+        print(f"Actual use is not implemented yet: the script is used instead: \n{subprocess_cmd}")
+        subprocess.call(subprocess_cmd)
 
 
 class PortVerb(VerbExtension):
