@@ -20,3 +20,16 @@ RosTeamWS_FRAMEWORK_MAIN_PATH="$(RosTeamWS_script_own_dir)/../"
 
 # Source autocompletion for rtwcli
 source $setup_script_own_dir/rtwcli/rtwcli/completion/rtw-argcomplete.bash
+
+# rtwcli: export ros workspace variables if chosen (rtw workspace use)
+export ROS_WS_CACHE_SOURCED=false
+function update_ros_ws_variables {
+  local file_name="/tmp/ros_team_workspace/wokspace_$$.bash"
+  if [[ "$ROS_WS_CACHE_SOURCED" = false ]] && [[ -f $file_name ]]; then
+      source $file_name
+      ROS_WS_CACHE_SOURCED=true
+      export ROS_WS_CACHE_SOURCED
+  fi
+}
+# run this command before every prompt, similar to PS1 variable
+PROMPT_COMMAND=update_ros_ws_variables

@@ -40,51 +40,21 @@ workspace name prefix is defined as first letters of the path and last folder if
 
 import copy
 import os
-import subprocess
 import questionary
-from typing import Any, List
+from typing import List
 from rtwcli.command.info import ROS_TEAM_WS_VARIABLES
+from rtwcli.helpers import (
+    create_file_and_write,
+    create_file_if_not_exists,
+    read_yaml_file,
+    write_yaml_file,
+)
 from rtwcli.verb import VerbExtension
 import yaml
 
 WORKSPACES_PATH = "~/.ros_team_workspace/workspaces.yaml"
 USE_WORKSPACE_SCRIPT_PATH = "~/ros_team_workspace/scripts/environment/setup.bash"
 WORKSPACES_KEY = "workspaces"
-
-
-def create_file_if_not_exists(file_path: str, initial_content: str = "") -> bool:
-    if not os.path.isfile(file_path):
-        try:
-            # Create the directories if they don't exist
-            directory = os.path.dirname(file_path)
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-
-            with open(file_path, "w") as file:
-                # Write initial content to the file if needed
-                if initial_content:
-                    file.write(f"{initial_content}")
-            return True
-        except OSError as e:
-            print(f"Failed to create file in {file_path}. Error: {e}")
-            return False
-    else:
-        return True
-
-
-def read_yaml_file(file_path: str) -> Any:
-    with open(file_path) as file:
-        return yaml.safe_load(file)
-
-
-def write_yaml_file(file_path: str, yaml_data: Any) -> bool:
-    try:
-        with open(file_path, "w") as file:
-            yaml.dump(yaml_data, file)
-            return True
-    except (OSError, yaml.YAMLError) as e:
-        print(f"Failed to update YAML file. Error: {e}")
-    return False
 
 
 def get_ws_names(workspaces_config: dict) -> List[str]:
@@ -104,9 +74,10 @@ def update_workspaces_config(config_path: str, workspace: dict) -> bool:
 
     try:
         workspaces_config = read_yaml_file(config_path)
-    except yaml.YAMLError as e:
+    except (OSError, yaml.YAMLError) as e:
         print(f"Failed to load yaml file {config_path}. Error: {e}")
         return False
+
     if not workspaces_config:
         workspaces_config = {WORKSPACES_KEY: {}}
 
@@ -122,8 +93,10 @@ def update_workspaces_config(config_path: str, workspace: dict) -> bool:
 
     workspaces_config[WORKSPACES_KEY][ws_name] = workspace[ws_name]
 
-    if not write_yaml_file(config_path, workspaces_config):
-        print("Error: Failed to update YAML file.")
+    try:
+        write_yaml_file(config_path, workspaces_config)
+    except (OSError, yaml.YAMLError) as e:
+        print(f"Failed to update YAML file {config_path}. Error: {e}")
         return False
 
     print(f"Updated YAML file '{config_path}' with a new workspace '{ws_name}'")
@@ -174,15 +147,24 @@ class UseVerb(VerbExtension):
             return
 
         ws_data = workspaces_config[WORKSPACES_KEY][ws_name]
+        print("Workspace data:")
         print(yaml.dump(ws_data, indent=4, default_flow_style=False))
 
         script = os.path.expanduser(USE_WORKSPACE_SCRIPT_PATH)
         distro = ws_data["distro"]
         ws_folder = ws_data["ws_folder"]
-        bash_cmd = f"source {script} {distro} {ws_folder}"
-        subprocess_cmd = ["/bin/bash", "-i", "-c", bash_cmd]
-        print(f"Actual use is not implemented yet: the script is used instead: \n{subprocess_cmd}")
-        subprocess.call(subprocess_cmd)
+        to_write = "#!/bin/bash\n"
+        for ws_var, ws_var_value in ws_data.items():
+            new_var = "RosTeamWS_" + ws_var.upper()
+            to_write += f"export {new_var}='{ws_var_value}'\n"
+        to_write += f"source {script} {distro} {ws_folder}\n"
+        tmp_file = f"/tmp/ros_team_workspace/wokspace_{os.getppid()}.bash"
+        print(f"Following text will be written into file '{tmp_file}':\n{to_write}")
+        try:
+            create_file_and_write(tmp_file, content=to_write)
+        except (OSError, yaml.YAMLError) as e:
+            print(f"Failed to write workspace data to a file {tmp_file}. Error: {e}")
+            return
 
 
 class PortVerb(VerbExtension):
