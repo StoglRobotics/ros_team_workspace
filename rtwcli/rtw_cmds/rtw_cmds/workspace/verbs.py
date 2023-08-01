@@ -140,6 +140,7 @@ class UseVerb(VerbExtension):
                 qmark="'Tab' to see all workspaces\n",
                 meta_information=copy.deepcopy(workspaces_config[WORKSPACES_KEY]),
                 validate=lambda ws_choice: ws_choice in ws_names,
+                style=questionary.Style([("answer", "bg:ansiwhite")]),
             ).ask()
         )
         if not ws_name or ws_name not in workspaces_config[WORKSPACES_KEY]:
