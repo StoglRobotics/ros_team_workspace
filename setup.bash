@@ -22,13 +22,19 @@ RosTeamWS_FRAMEWORK_MAIN_PATH="$(RosTeamWS_script_own_dir)/../"
 source $setup_script_own_dir/rtwcli/rtwcli/completion/rtw-argcomplete.bash
 
 # rtwcli: export ros workspace variables if chosen (rtw workspace use)
-export ROS_WS_CACHE_SOURCED=false
+export ROS_WS_CACHE_SOURCED_TIME=0
 function update_ros_ws_variables {
   local file_name="/tmp/ros_team_workspace/wokspace_$$.bash"
-  if [[ "$ROS_WS_CACHE_SOURCED" = false ]] && [[ -f $file_name ]]; then
-      source $file_name
-      ROS_WS_CACHE_SOURCED=true
-      export ROS_WS_CACHE_SOURCED
+  # If file exists
+  if [[ -f $file_name ]]; then
+    local file_mod_time=$(stat -c %Y $file_name)
+
+    # If file was modified after the last source operation
+    if (( file_mod_time > ROS_WS_CACHE_SOURCED_TIME )); then
+        source $file_name
+        ROS_WS_CACHE_SOURCED_TIME=$file_mod_time
+        export ROS_WS_CACHE_SOURCED_TIME
+    fi
   fi
 }
 # run this command before every prompt, similar to PS1 variable

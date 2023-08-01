@@ -162,7 +162,7 @@ class UseVerb(VerbExtension):
         print(f"Following text will be written into file '{tmp_file}':\n{to_write}")
         try:
             create_file_and_write(tmp_file, content=to_write)
-        except (OSError, yaml.YAMLError) as e:
+        except OSError as e:
             print(f"Failed to write workspace data to a file {tmp_file}. Error: {e}")
             return
 
