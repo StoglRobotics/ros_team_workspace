@@ -14,22 +14,9 @@
 
 
 import os
-from typing import Any, NoReturn, Optional, Type
+from typing import Any
 
 import yaml
-
-
-def log_and_raise(
-    exception_type: Type[BaseException],
-    error_msg: str,
-    original_exception: Optional[BaseException] = None,
-) -> NoReturn:
-    """Log an error message and raise an exception."""
-    print(f"{error_msg}")
-    if original_exception is None:
-        raise exception_type(error_msg)
-    else:
-        raise exception_type(error_msg) from original_exception
 
 
 def create_file_if_not_exists(file_path: str) -> bool:
@@ -49,20 +36,23 @@ def create_file_if_not_exists(file_path: str) -> bool:
         return False
 
 
-def read_yaml_file(file_path: str) -> Any:
+def load_yaml_file(file_path: str) -> Any:
     try:
         with open(file_path) as file:
             return yaml.safe_load(file)
     except (OSError, yaml.YAMLError) as e:
-        log_and_raise(type(e), f"Failed to read YAML file. Error: {e}", e)
+        print(f"Failed to load YAML file. Error: {e}")
+        return None
 
 
-def write_yaml_file(file_path: str, yaml_data: Any) -> None:
+def write_to_yaml_file(file_path: str, yaml_data: Any) -> bool:
     try:
         with open(file_path, "w") as file:
             yaml.dump(yaml_data, file)
+            return True
     except (OSError, yaml.YAMLError) as e:
-        log_and_raise(type(e), f"Failed to write to a YAML file. Error: {e}", e)
+        print(f"Failed to write to a YAML file. Error: {e}")
+        return False
 
 
 def create_file_and_write(file_path: str, content: str) -> bool:
