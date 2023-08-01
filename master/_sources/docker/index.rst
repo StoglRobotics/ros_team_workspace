@@ -15,4 +15,4 @@ RosTeamWS supports the usage of docker containers.
    supported_versions/*
 
 .. note::
-  If you want to forward a xsession from docker (e.g. rviz2), you have to install xhost.
+  If you want to forward an *xsession* from docker (e.g. rviz2), you have to install *xhost*.

@@ -103,7 +103,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="quick-start.html">1. Quick start with RosTeamWorkspace</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">2. Setting up RosTeamWorkspace</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#installation">2.1. Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation-of-rosteamws">2.1. Installation of RosTeamWS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#manual-auto-sourcing">2.2. Manual auto-sourcing</a></li>
 </ul>
 </li>
@@ -187,8 +187,8 @@
             
   <section id="setting-up-rosteamworkspace">
 <h1><span class="section-number">2. </span>Setting up RosTeamWorkspace<a class="headerlink" href="#setting-up-rosteamworkspace" title="Permalink to this headline"></a></h1>
-<section id="installation">
-<span id="tutorial-setting-up-rtw"></span><h2><span class="section-number">2.1. </span>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<section id="installation-of-rosteamws">
+<span id="tutorial-setting-up-rtw"></span><h2><span class="section-number">2.1. </span>Installation of RosTeamWS<a class="headerlink" href="#installation-of-rosteamws" title="Permalink to this headline"></a></h2>
 <p>To start using RosTeamWS framework clone the repository to any location using:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/StoglRobotics/ros_team_workspace.git
 </pre></div>
@@ -215,13 +215,13 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>&lt;PATH<span class="w"> </span>TO<span class="w"> </span>ros_team_workspace&gt;/templates/.ros_team_ws_rc<span class="w"> </span>~/
 </pre></div>
 </div>
-<p>and adjust the following values using your favorite text editor:</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">~/.ros_team_ws_rc</span></code> adjust the following values using your favorite text editor:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;PATH</span> <span class="pre">TO</span> <span class="pre">ros_team_workspace&gt;</span></code> - with the path to the framework folder</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;PATH</span> <span class="pre">TO</span> <span class="pre">ros_team_workspace&gt;</span></code> to point to the path to the framework folder</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you have ros installed at another location than /opt/ros/&lt;ros-distro&gt; , please adjust the ALTERNATIVE_ROS_&lt;ROS-DISTRO&gt;_LOCATION variable in the ~/.ros_team_ws_rc to according location.</p>
+<p>If you have ROS installed at another location than /opt/ros/&lt;ros-distro&gt; , please adjust the ALTERNATIVE_ROS_&lt;ROS-DISTRO&gt;_LOCATION variable in the <code class="docutils literal notranslate"><span class="pre">~/.ros_team_ws_rc</span></code> to the according location.</p>
 </div>
 <p>Now you are ready to:</p>
 <ul class="simple">

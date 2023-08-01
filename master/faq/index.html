@@ -105,10 +105,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../docker/index.html">Docker</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">FAQ</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#on-docker">On Docker</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#how-to-forward-a-xsession">How to forward a xsession</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-forward-an-xsession">How to forward an xsession</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#how-to-use-nvidia-driver-in-docker">How to use nvidia driver in docker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sudo-unable-to-resolve-host-hostname-name-or-service-not-known">sudo: unable to resolve host &lt;hostname&gt;: Name or service not known</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#docker-and-ros1-can-not-start-my-roscore">Docker and ROS1: Can not start my roscore.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#docker-and-ros-ros1-can-not-start-my-roscore">Docker and ROS (ROS1): Can not start my roscore.</a></li>
 </ul>
 </li>
 </ul>
@@ -186,9 +186,9 @@
 <h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline"></a></h1>
 <section id="on-docker">
 <h2>On Docker<a class="headerlink" href="#on-docker" title="Permalink to this headline"></a></h2>
-<section id="how-to-forward-a-xsession">
-<h3>How to forward a xsession<a class="headerlink" href="#how-to-forward-a-xsession" title="Permalink to this headline"></a></h3>
-<p>If you want to forward a xsession from docker (e.g. rviz2), you have to install xhost.
+<section id="how-to-forward-an-xsession">
+<h3>How to forward an xsession<a class="headerlink" href="#how-to-forward-an-xsession" title="Permalink to this headline"></a></h3>
+<p>If you want to forward an xsession from docker (e.g. rviz2), you have to install xhost.
 The forwarding is done automatically by adding docker user to the X Server access list when docker is created.</p>
 </section>
 <section id="how-to-use-nvidia-driver-in-docker">
@@ -199,8 +199,8 @@ The forwarding is done automatically by adding docker user to the X Server acces
 <h3>sudo: unable to resolve host &lt;hostname&gt;: Name or service not known<a class="headerlink" href="#sudo-unable-to-resolve-host-hostname-name-or-service-not-known" title="Permalink to this headline"></a></h3>
 <p>Problem using sudo: If you encounter following message trying to use sudo: <code class="docutils literal notranslate"><span class="pre">sudo:</span> <span class="pre">unable</span> <span class="pre">to</span> <span class="pre">resolve</span> <span class="pre">host</span> <span class="pre">&lt;hostname&gt;:</span> <span class="pre">Name</span> <span class="pre">or</span> <span class="pre">service</span> <span class="pre">not</span> <span class="pre">known</span></code>. You have to add <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span> <span class="pre">&lt;hostname&gt;</span></code> to the <code class="docutils literal notranslate"><span class="pre">/etc/hosts</span></code> file inside the container. However, using sudo should work fine without adding it.</p>
 </section>
-<section id="docker-and-ros1-can-not-start-my-roscore">
-<h3>Docker and ROS1: Can not start my roscore.<a class="headerlink" href="#docker-and-ros1-can-not-start-my-roscore" title="Permalink to this headline"></a></h3>
+<section id="docker-and-ros-ros1-can-not-start-my-roscore">
+<h3>Docker and ROS (ROS1): Can not start my roscore.<a class="headerlink" href="#docker-and-ros-ros1-can-not-start-my-roscore" title="Permalink to this headline"></a></h3>
 <p>If you try to start your roscore inside the docker container with <code class="docutils literal notranslate"><span class="pre">roscore</span></code>-command and get the following error message: <code class="docutils literal notranslate"><span class="pre">RLException:</span> <span class="pre">Unable</span> <span class="pre">to</span> <span class="pre">contact</span> <span class="pre">my</span> <span class="pre">own</span> <span class="pre">server</span> <span class="pre">at</span> <span class="pre">[http://&lt;hostname&gt;:&lt;port&gt;]</span></code>. You have to add <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span> <span class="pre">&lt;hostname&gt;</span></code> to the <code class="docutils literal notranslate"><span class="pre">/etc/hosts</span></code> file inside the container.</p>
 </section>
 </section>

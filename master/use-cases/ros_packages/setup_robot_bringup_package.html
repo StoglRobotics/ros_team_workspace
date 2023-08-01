@@ -107,7 +107,7 @@
 <li class="toctree-l2"><a class="reference internal" href="configure_repository.html">Configure Repository</a></li>
 <li class="toctree-l2"><a class="reference internal" href="create_package.html">Create New Package</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Setup robot bringup</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#script-for-setting-up-description-package">Script for Setting up Description Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#script-for-setting-up-a-bringup-package">Script for Setting up a Bringup Package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="setup_robot_description_package.html">Setup robot description</a></li>
@@ -193,15 +193,18 @@
 <h1>Setup robot bringup<a class="headerlink" href="#setup-robot-bringup" title="Permalink to this headline"></a></h1>
 <p id="uc-setup-robot-bringup">This use-case describes how to set up a robot bringup package using scripts from ROS Team Workspace (RosTeamWS) framework.
 The package follows as far as possible best practices for <a class="reference external" href="http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages">robot support packages</a> from ROS-Industrial consortia. (<strong>This has to be verified!</strong>)</p>
-<section id="script-for-setting-up-description-package">
-<h2>Script for Setting up Description Package<a class="headerlink" href="#script-for-setting-up-description-package" title="Permalink to this headline"></a></h2>
+<section id="script-for-setting-up-a-bringup-package">
+<h2>Script for Setting up a Bringup Package<a class="headerlink" href="#script-for-setting-up-a-bringup-package" title="Permalink to this headline"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">setup-robot-bringup</span></code> script accepts the robot name and the robot description package name.
-The package name is obtained from the ‘package.xml’ file.
-The script <strong>has to be executed</strong> from the folder where the bringup should be generated.</p>
+The package name is obtained from the ‘package.xml’ file.</p>
 <blockquote>
 <div><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>it is recommended to setup your package using <a class="reference internal" href="create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> script.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The script <strong>has to be executed</strong> from the folder where the package should be generated.</p>
 </div>
 </div></blockquote>
 <p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/robot_bringup</span></code> folder, renames the files, and replaces the placeholders.</p>

@@ -183,14 +183,14 @@
             
   <section id="managing-multiple-workspaces">
 <h1><span class="section-number">3. </span>Managing multiple workspaces<a class="headerlink" href="#managing-multiple-workspaces" title="Permalink to this headline"></a></h1>
-<p id="tutorial-managing-multiple-workspaces">Before learning how to manage multiple workspace with RosTeamWorkspace be sure that you have set everything up as described in this <a class="reference internal" href="setting_up_rtw.html#tutorial-setting-up-rtw"><span class="std std-ref">tutorial</span></a>.</p>
+<p id="tutorial-managing-multiple-workspaces">Before learning how to manage multiple workspace with RosTeamWorkspace be sure that you have set everything up as described in the <a class="reference internal" href="setting_up_rtw.html#tutorial-setting-up-rtw"><span class="std std-ref">setting up RosTeamWorkspace tutorial</span></a>.</p>
 <p>Also be sure that you opened a new terminal after you setup RosTeamWorkspace to be configured permanently.</p>
 <p>First setup a new workspace called <code class="docutils literal notranslate"><span class="pre">ws_rolling_ros2c_demos</span></code> inside a <code class="docutils literal notranslate"><span class="pre">~/workspace</span></code> folder.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace<span class="w"> </span>~/workspace/ws_rolling_ros2c_demos<span class="w"> </span>rolling
 </pre></div>
 </div>
 <p>When asked for confirmation just press &lt;ENTER&gt;.
-After a workspace is created open a new terminal and execute <code class="docutils literal notranslate"><span class="pre">_ws_rolling_ros2c_demos</span></code> alias for sourcing your new workspace. You can then switch to the new sourced workspace with <code class="docutils literal notranslate"><span class="pre">rosd</span></code>.
+After a workspace is created, open a new terminal and execute <code class="docutils literal notranslate"><span class="pre">_ws_rolling_ros2c_demos</span></code> alias for sourcing your new workspace. You can then switch to the new sourced workspace with <code class="docutils literal notranslate"><span class="pre">rosd</span></code>.
 Now you can use <a class="reference internal" href="../use-cases/ros_workspaces/aliases.html#uc-aliases"><span class="std std-ref">aliases</span></a> to interact with your workspace.
 Those can be used out of any folder you are in.</p>
 <p>Let’s now add a test package into your workspace.</p>
@@ -215,9 +215,12 @@ git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ros-c
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>-y<span class="w"> </span>-i<span class="w"> </span>-r
 </pre></div>
 </div>
-<p><strong>NOTE</strong>: if <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> command fails with a comment that binary packages can not be found by apt, try to update you rosdep index using <code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">update</span></code> command or even your package index using <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">update</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>if <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> command fails with a comment that binary packages can not be found by apt, try to update your rosdep index using <code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">update</span></code> command or even your package index using <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">update</span></code>.</p>
+</div>
 <ol class="arabic simple" start="5">
-<li><p>You can then build your workspace using:</p></li>
+<li><p>You can then build your workspace using the alias for colcon build:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cb
 </pre></div>
@@ -227,7 +230,11 @@ git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ros-c
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-ros-workspace<span class="w"> </span>~/workspace/ws_rolling_gz_demos<span class="w"> </span>rolling
 </pre></div>
 </div>
-<p>Now repeat the above steps to and add <a class="reference external" href="https://github.com/ros-controls/gz_ros2_control">gz_ros2_control</a> repository for testing and execute a demo from there.</p>
+<p>Now repeat the above steps to add <a class="reference external" href="https://github.com/ros-controls/gz_ros2_control">gz_ros2_control</a> repository for testing and execute a demo from there.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>if <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> commands fails with a comment on ros-rolling-ros-gz-sim not being installed successfully, maybe force the desired gazebo version with e.g. <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">GZ_VERSION=fortress</span></code></p>
+</div>
 <p>Now each time you open a new terminal you can use either <code class="docutils literal notranslate"><span class="pre">_ws_rolling_ros2c_demos</span></code> or <code class="docutils literal notranslate"><span class="pre">_ws_rolling_gz_demos</span></code> to source needed workspace and use the same <a class="reference internal" href="../use-cases/ros_workspaces/aliases.html#uc-aliases"><span class="std std-ref">aliases</span></a> without constantly thinking about exact workspace/folder you are working in.</p>
 </section>
 

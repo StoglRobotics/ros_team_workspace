@@ -237,7 +237,7 @@ Alias for command: <code class="docutils literal notranslate"><span class="pre">
 <dt>cb [package1_name, package2_name]</dt><dd><p>Building named packages or the whole workspace.
 Alias for command: <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">build</span> <span class="pre">--symlink-install</span> <span class="pre">--cmake-args</span> <span class="pre">-DCMAKE_BUILD_TYPE=RelWithDebInfo</span></code>.</p>
 </dd>
-<dt>cbup [package1_name, package2_name]</dt><dd><p>Building all packages up the named package (build all dependencies).
+<dt>cbup [package1_name, package2_name]</dt><dd><p>Building all packages up to the named packages (build all dependencies).
 Alias for command: <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">build</span> <span class="pre">--symlink-install</span> <span class="pre">--cmake-args</span> <span class="pre">-DCMAKE_BUILD_TYPE=RelWithDebInfo</span> <span class="pre">--packages-up-to</span></code>.</p>
 </dd>
 <dt>cbd [package1_name, package2_name]</dt><dd><p>Building named packages or the whole workspace as <em>Debug</em> build type.
@@ -255,10 +255,10 @@ Alias for command: <code class="docutils literal notranslate"><span class="pre">
 <dt>ct [package1_name, package2_name]</dt><dd><p>Testing named packages or the whole workspace.
 Alias for command: <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">test</span></code>.</p>
 </dd>
-<dt>ctup [package_name]</dt><dd><p>Testing named packages up to the workspace (build all dependencies).
+<dt>ctup [package_name]</dt><dd><p>Testing named packages up to the named package (build all dependencies).
 Alias for command: <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">test</span> <span class="pre">--packages-up-to</span></code>.</p>
 </dd>
-<dt>ctres [package_name]</dt><dd><p>Get test results for the whole workspace or a package. If using package the output will be <code class="docutils literal notranslate"><span class="pre">grep</span></code>-processed to filter-out the package you are looking for.
+<dt>ctres [package_name]</dt><dd><p>Get test results for the whole workspace or a package. If using package, the output will be <code class="docutils literal notranslate"><span class="pre">grep</span></code>-processed to filter-out the package you are looking for.
 Alias for command: <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">test-result</span> <span class="pre">--all</span></code></p>
 </dd>
 </dl>

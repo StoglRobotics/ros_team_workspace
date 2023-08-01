@@ -2,14 +2,14 @@
 ROS-Robot Package structure
 ============================
 
-This documents proposes guidelines for structure of ROS packages in larger detail than provided by `ROS Enhancement Proposals (REPs) <https://github.com/ros-infrastructure/rep>`_
+This document proposes guidelines for the structure of ROS packages in larger details than provided by `ROS Enhancement Proposals (REPs) <https://github.com/ros-infrastructure/rep>`_
 
 **NOTE**: All the proposal here are the resuls of authors' personal experiences. Saying that, if you don't like some of it, you are free to change what you want and need (and hopefully propose it as PR).
 
 Package structure for Robot support in ROS
 ------------------------------------------
 
-Here proposed architecture try to split the robot's files to minimize per-package dependencies.
+The here down proposed architecture tries to split the robot's files to minimize per-package dependencies.
 
 .. code:: text
 
@@ -20,8 +20,8 @@ Here proposed architecture try to split the robot's files to minimize per-packag
   ├── <robot_name>_bringup/                              # Launch and config files for starting the robot using ros2_control
   │   ├── [CMakeLists.txt]                               # if ament_cmake is used (recommended)
   │   ├── package.xml
-  │   ├── [setup.py]                                     # if amend_python is used
-  │   ├── [setup.cfg]                                    # if amend_python is used
+  │   ├── [setup.py]                                     # if ament_python is used
+  │   ├── [setup.cfg]                                    # if ament_python is used
   │   ├── config/
   │   │   ├── <robot_name>_controllers.yaml              # Controllers' configuration for ros2_control
   │   │   ├── <robot_name>_forward_position_publisher.yaml  # Setup test publisher for forward position controller
@@ -33,8 +33,8 @@ Here proposed architecture try to split the robot's files to minimize per-packag
   ├── <manufacturer|robot_name>_description/             # Robot's description files
   │   ├── [CMakeLists.txt]                               # if ament_cmake is used (recommended)
   │   ├── package.xml
-  │   ├── [setup.py]                                     # if amend_python is used
-  │   ├── [setup.cfg]                                    # if amend_python is used
+  │   ├── [setup.py]                                     # if ament_python is used
+  │   ├── [setup.cfg]                                    # if ament_python is used
   │   ├── config/                                        # general YAML files for a robot
   │   │   └── <robot_name>_<someting_specific>.yaml
   │   ├── launch/                                        # launch files related to testing robots' description
