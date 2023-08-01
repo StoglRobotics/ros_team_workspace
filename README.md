@@ -1,7 +1,7 @@
 # ros_team_workspace
 
 Ros Team Workspace (RosTeamWS) is a framework for boosting collaboration in teams when developing software for robots using [Robot Operating System (ROS)](https://www.ros.org/).
-It supports both **ROS1** and **ROS2**.
+It supports both **ROS** and **ROS 2**.
 Its main goal is to optimize the workflow of development teams and focus more on programming robots.
 
 [![Licence](https://img.shields.io/badge/License-Apache%20License%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -29,23 +29,23 @@ This package targets the following stakeholders:
 
 **The framework is the main entry-point for teams to**:
 
-#. organize their public and private ROS packages;
-#. describes scenarios;
-#. enable continuous integration across the use-cases;
-#. and provide scripts for easy use of ROS.
+1. organize their public and private ROS packages;
+2. describes scenarios;
+3. enable continuous integration across the use-cases;
+4. and provide scripts for easy use of ROS.
 
 
 **To achieve this, RosTeamWS defines**:
 
-#. an architecture of overlaid workspaces for sharing standard ROS packages;
-#. standardized package structure for straightforward collaboration;
-#. scripts for workspace and package management to keep their internal structure familiar to everyone in the team;
-#. often-used scripts for tests of small development-chunks.
+1. an architecture of overlaid workspaces for sharing standard ROS packages;
+2. standardized package structure for straightforward collaboration;
+3. scripts for workspace and package management to keep their internal structure familiar to everyone in the team;
+4. often-used scripts for tests of small development-chunks.
 
 
-The framework is initiated by Denis Stogl (2017-2020) for increasing collaboration at the Institute for Anthropomatics and Robotics (IAR) - Intelligent Process Control and Robotics (IPR) of Karlsruhe Institute of Technology (KIT).
+The framework was initiated by Dr. Denis (2017-2020) for increasing collaboration at the Institute for Anthropomatics and Robotics (IAR) - Intelligent Process Control and Robotics (IPR) of Karlsruhe Institute of Technology (KIT).
 
-From the 2021 the framework is maintained by Stogl Robotic Consulting.
+From 2021, the framework is maintained by Stogl Robotics Consulting.
 
 DISCLAIMER
 -------------

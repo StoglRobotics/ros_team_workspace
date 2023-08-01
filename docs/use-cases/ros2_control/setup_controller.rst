@@ -7,9 +7,9 @@ This use-case describes how to set up a controller for the ros2_control framewor
 The scripts uses template files from ``templates/ros2_control/controller`` folder.
 The script creates a full skeleton of a controller with plugin description and tests for loading controller and checking its basic functionality.
 
-**Note**: it is recommended to setup your package using :ref:`setup-new-package <uc-new-package>` script.
+  .. note:: it is recommended to setup your package using :ref:`setup-new-package <uc-new-package>` script.
 
-**IMPORTANT**: The script **has to be executed** from the folder where the package should be generated.
+  .. warning:: The script **has to be executed** from the folder where the package should be generated.
 
 Usage
 ------
