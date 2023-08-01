@@ -43,7 +43,7 @@ This package targets the following stakeholders:
 4. often-used scripts for tests of small development-chunks.
 
 
-The framework was initiated by Denis Stogl (2017-2020) for increasing collaboration at the Institute for Anthropomatics and Robotics (IAR) - Intelligent Process Control and Robotics (IPR) of Karlsruhe Institute of Technology (KIT).
+The framework was initiated by Dr. Denis (2017-2020) for increasing collaboration at the Institute for Anthropomatics and Robotics (IAR) - Intelligent Process Control and Robotics (IPR) of Karlsruhe Institute of Technology (KIT).
 
 From 2021, the framework is maintained by Stogl Robotics Consulting.
 
