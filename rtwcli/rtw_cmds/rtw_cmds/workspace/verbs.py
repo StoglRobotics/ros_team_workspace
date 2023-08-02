@@ -75,6 +75,9 @@ class WorkspacesConfig:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Dict[str, dict]]) -> "WorkspacesConfig":
+        if not data:
+            return cls({})
+
         workspaces = {
             ws_name: Workspace(**ws_data)
             for ws_name, ws_data in data.get(WORKSPACES_KEY, {}).items()
