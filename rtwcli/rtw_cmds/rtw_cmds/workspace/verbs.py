@@ -91,7 +91,7 @@ class WorkspacesConfig:
             }
         }
 
-    def get_ws_names(self):
+    def get_ws_names(self) -> List[str]:
         if not self.workspaces:
             return []
         return list(self.workspaces.keys())
