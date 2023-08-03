@@ -91,6 +91,11 @@ class WorkspacesConfig:
             }
         }
 
+    def get_ws_names(self):
+        if not self.workspaces:
+            return []
+        return list(self.workspaces.keys())
+
 
 def load_workspaces_config_from_yaml_file(file_path: str):
     return WorkspacesConfig.from_dict(load_yaml_file(file_path))
@@ -100,19 +105,14 @@ def save_workspaces_config(filepath: str, config: WorkspacesConfig):
     return write_to_yaml_file(filepath, config.to_dict())
 
 
-def get_ws_names(workspaces_config: WorkspacesConfig) -> List[str]:
-    return list(workspaces_config.workspaces.keys())
-
-
 def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspace) -> bool:
     if not create_file_if_not_exists(config_path):
         print("Could not create workspaces config file. Cannot proceed with porting.")
         return False
 
     workspaces_config = load_workspaces_config_from_yaml_file(config_path)
-    existing_ws_names = get_ws_names(workspaces_config)
 
-    if ws_name in existing_ws_names:
+    if ws_name in workspaces_config.get_ws_names():
         raise NotImplementedError(
             f"Workspace name '{ws_name}' is already in the config. "
             "Duplicate workspace name handling is not implemented yet."
@@ -151,7 +151,7 @@ class UseVerb(VerbExtension):
             print(f"No workspaces found in config file '{WORKSPACES_PATH}'")
             return
 
-        ws_names = get_ws_names(workspaces_config)
+        ws_names = workspaces_config.get_ws_names()
         ws_name = questionary.autocomplete(
             "Choose workspace",
             ws_names,
