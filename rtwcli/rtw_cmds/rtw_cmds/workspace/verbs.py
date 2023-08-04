@@ -159,6 +159,54 @@ def extract_workspaces_from_bash_script(script_path: str) -> Dict[str, dict]:
     return workspaces_dict
 
 
+def generate_workspace_name(ws_path: str) -> str:
+    """Generate workspace name based on the folder letters."""
+    ws_path_folders = ws_path.split(os.path.sep)[1:]
+    ws_name = ws_path_folders[-1]
+    new_ws_name_prefix = ""
+    num_folders = len(ws_path_folders)
+
+    if num_folders > 1:  # /folder1/my_ws
+        # First letters of the folders, except for the last two
+        new_ws_name_prefix += "".join([folder[0] for folder in ws_path_folders[:-2]])
+        prev_folder = ws_path_folders[-2]
+        if prev_folder != "workspace":
+            if new_ws_name_prefix:
+                new_ws_name_prefix += "_"
+            new_ws_name_prefix += prev_folder
+        else:
+            new_ws_name_prefix += prev_folder[0]
+
+    new_ws_name = "__".join([new_ws_name_prefix, ws_name])
+    return new_ws_name
+
+
+def env_var_to_workspace_var(env_var: str) -> str:
+    return env_var.replace("RosTeamWS_", "").lower()
+
+
+def workspace_var_to_env_var(workspace_var: str) -> str:
+    return "RosTeamWS_" + workspace_var.upper()
+
+
+def create_bash_script_content_for_using_ws(
+    workspace: Workspace, use_workspace_script_path: str
+) -> str:
+    """Create a bash script content string using the workspace information."""
+    bash_script_content = "#!/bin/bash\n"
+
+    ws_data = dataclasses.asdict(workspace)
+    for ws_var, ws_var_value in ws_data.items():
+        env_var = workspace_var_to_env_var(ws_var)
+        bash_script_content += f"export {env_var}='{ws_var_value}'\n"
+
+    bash_script_content += (
+        f"source {use_workspace_script_path} {workspace.distro} {workspace.ws_folder}\n"
+    )
+
+    return bash_script_content
+
+
 class CreateVerb(VerbExtension):
     """Create a new ROS workspace."""
 
@@ -197,23 +245,12 @@ class UseVerb(VerbExtension):
         workspace = workspaces_config.workspaces[ws_name]
         print(f"Workspace data: {workspace}")
 
-        distro = workspace.distro
-        ws_folder = workspace.ws_folder
-        to_write = "#!/bin/bash\n"
-        ws_data = [
-            ("base_ws", workspace.base_ws),
-            ("distro", workspace.distro),
-            ("docker_tag", workspace.docker_tag),
-            ("ws_docker_support", workspace.ws_docker_support),
-            ("ws_folder", workspace.ws_folder),
-        ]
-        for ws_var, ws_var_value in ws_data:
-            new_var = "RosTeamWS_" + ws_var.upper()
-            to_write += f"export {new_var}='{ws_var_value}'\n"
-        to_write += f"source {USE_WORKSPACE_SCRIPT_PATH} {distro} {ws_folder}\n"
+        script_content = create_bash_script_content_for_using_ws(
+            workspace, USE_WORKSPACE_SCRIPT_PATH
+        )
         tmp_file = f"/tmp/ros_team_workspace/wokspace_{os.getppid()}.bash"
-        print(f"Following text will be written into file '{tmp_file}':\n{to_write}")
-        if not create_file_and_write(tmp_file, content=to_write):
+        print(f"Following text will be written into file '{tmp_file}':\n{script_content}")
+        if not create_file_and_write(tmp_file, content=script_content):
             print(f"Failed to write workspace data to a file {tmp_file}.")
             return
 
@@ -234,30 +271,14 @@ class PortAllVerb(VerbExtension):
             workspace_data_to_port = {}
             str_format = "\t{:<30} -> {:<20}: {}"
             for var, value in script_ws_data.items():
-                new_var = var.replace("RosTeamWS_", "").lower()
+                new_var = env_var_to_workspace_var(var)
                 print(str_format.format(var, new_var, value))
                 workspace_data_to_port[new_var] = value
 
             print("Generating workspace name from workspace path with first folder letters: ")
-            ws_folder = script_ws_data["RosTeamWS_WS_FOLDER"]
-            ws_path_folders = ws_folder.split(os.path.sep)[1:]
-            ws_name = ws_path_folders[-1]
-            new_ws_name_prefix = ""
-            num_folders = len(ws_path_folders)
-
-            if num_folders > 1:  # /folder1/my_ws
-                # first letter of the folders
-                new_ws_name_prefix += "".join([folder[0] for folder in ws_path_folders[:-2]])
-                prev_folder = ws_path_folders[-2]
-                if prev_folder != "workspace":
-                    if new_ws_name_prefix:
-                        new_ws_name_prefix += "_"
-                    new_ws_name_prefix += prev_folder
-                else:
-                    new_ws_name_prefix += prev_folder[0]
-
-            new_ws_name = "__".join([new_ws_name_prefix, ws_name])
-            print(f"\t'{ws_folder}' -> {new_ws_name}")
+            ws_path = script_ws_data["RosTeamWS_WS_FOLDER"]
+            new_ws_name = generate_workspace_name(ws_path)
+            print(f"\t'{ws_path}' -> {new_ws_name}")
 
             workspace_to_port = Workspace(**workspace_data_to_port)
 
@@ -282,32 +303,20 @@ class PortVerb(VerbExtension):
             if value is None:
                 print(f"Variable {var} is not exported. Cannot proceed with porting.")
                 return
-            new_var = var.replace("RosTeamWS_", "").lower()
+            new_var = env_var_to_workspace_var(var)
             print(str_format.format(var, new_var, value))
             workspace_data_to_port[new_var] = value
 
         print("Generating workspace name from workspace path with first folder letters: ")
-        ws_folder = os.environ.get("RosTeamWS_WS_FOLDER")
-        ws_path_folders = ws_folder.split(os.path.sep)[1:]
-        ws_name = ws_path_folders[-1]
-        new_ws_name_prefix = ""
-        num_folders = len(ws_path_folders)
-
-        if num_folders > 1:  # /folder1/my_ws
-            # first letter of the folders
-            new_ws_name_prefix += "".join([folder[0] for folder in ws_path_folders[:-2]])
-            prev_folder = ws_path_folders[-2]
-            if prev_folder != "workspace":
-                if new_ws_name_prefix:
-                    new_ws_name_prefix += "_"
-                new_ws_name_prefix += prev_folder
-            else:
-                new_ws_name_prefix += prev_folder[0]
-
-        new_ws_name = "__".join([new_ws_name_prefix, ws_name])
-        print(f"\t'{ws_folder}' -> {new_ws_name}")
+        ws_path = os.environ.get("RosTeamWS_WS_FOLDER")
+        new_ws_name = generate_workspace_name(ws_path)
+        print(f"\t'{ws_path}' -> {new_ws_name}")
 
         workspace_to_port = Workspace(**workspace_data_to_port)
 
         print(f"Updating workspace config in '{WORKSPACES_PATH}'")
-        update_workspaces_config(WORKSPACES_PATH, new_ws_name, workspace_to_port)
+        success = update_workspaces_config(WORKSPACES_PATH, new_ws_name, workspace_to_port)
+        if success:
+            print(f"Updated workspace config in '{WORKSPACES_PATH}'")
+        else:
+            print(f"Updating workspace config in '{WORKSPACES_PATH}' failed")
