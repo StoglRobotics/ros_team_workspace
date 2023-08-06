@@ -21,7 +21,7 @@
 
 namespace dummy_package_namespace
 {
-  DummyNode::DummyNode(const std::string & node_name) : rclcpp::Node(node_name) {}
+DummyNode::DummyNode(const std::string & node_name) : rclcpp::Node(node_name) {}
 
 }  // namespace dummy_package_namespace
 
@@ -29,7 +29,8 @@ int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
 
-  std::shared_ptr<rclcpp::Executor> executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+  std::shared_ptr<rclcpp::Executor> executor =
+    std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
   const std::string node_name = "dummy_node";
 
   auto node = std::make_shared<dummy_package_namespace::DummyNode>(node_name);

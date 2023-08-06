@@ -22,13 +22,13 @@
 
 namespace dummy_package_namespace
 {
-  class DummyNode : public rclcpp::Node
-  {
-  public:
-    explicit DummyNode(const std::string & node_name = "dummy_node");
+class DummyNode : public rclcpp::Node
+{
+public:
+  explicit DummyNode(const std::string & node_name = "dummy_node");
 
-    virtual ~DummyNode() = default;
-  };
+  virtual ~DummyNode() = default;
+};
 
 }  // namespace dummy_package_namespace
 
