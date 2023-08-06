@@ -65,6 +65,7 @@ WORKSPACES_PATH_BACKUP = os.path.expanduser("~/.ros_team_workspace/workspaces_ba
 TRASH_FOLDER = os.path.expanduser("~/.local/share/Trash/ros_team_workspace")
 WS_FOLDER_ENV_VAR = "RosTeamWS_WS_FOLDER"
 ROS_TEAM_WS_PREFIX = "RosTeamWS_"
+DELETE_WS_FORMAT = "{:<40} {:<10} {:<60} {}"
 
 
 @dataclasses.dataclass
@@ -334,3 +335,51 @@ class PortVerb(VerbExtension):
             print(f"Updated workspace config in '{WORKSPACES_PATH}'")
         else:
             print(f"Updating workspace config in '{WORKSPACES_PATH}' failed")
+
+
+class DeleteVerb(VerbExtension):
+    """Delete an available ROS workspace in the config."""
+
+    def main(self, *, args):
+        if not os.path.isfile(WORKSPACES_PATH):
+            print(
+                "No workspaces are available as the workspaces config file "
+                f"'{WORKSPACES_PATH}' does not exist"
+            )
+            return
+
+        workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
+        if not workspaces_config.workspaces:
+            print(f"No workspaces found in config file '{WORKSPACES_PATH}'")
+            return
+
+        choice_data = []
+        for ws_name, ws in workspaces_config.workspaces.items():
+            choice_data.append(
+                DELETE_WS_FORMAT.format(ws_name, ws.distro, ws.ws_folder, ws.docker_tag)
+            )
+
+        ws_names_to_delete = questionary.checkbox(
+            "Select workspaces to delete",
+            choices=choice_data,
+        ).ask()
+        if not ws_names_to_delete:
+            return
+
+        ws_names_to_delete_to_confirm = ""
+        for ws_name_to_delete in ws_names_to_delete:
+            ws_names_to_delete_to_confirm += "\n" + ws_name_to_delete
+        ws_names_to_delete_to_confirm += "\n"
+
+        confirm_delete = questionary.confirm(
+            f"Are you sure you want to delete following workspaces? {ws_names_to_delete_to_confirm}"
+        ).ask()
+        if not confirm_delete:
+            return
+
+        for ws_name_i, ws_name in enumerate(ws_names_to_delete):
+            print(
+                f"[Placeholder] Deleting workspace {ws_name_i+1}/{len(ws_names_to_delete)} '{ws_name}'..."
+            )
+
+        print("[Placeholder] Deleted all workspaces")
