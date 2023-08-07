@@ -43,8 +43,9 @@ import dataclasses
 import os
 import re
 import shutil
-import questionary
 from typing import Any, Dict, List
+
+import questionary
 from rtwcli.command.info import ROS_TEAM_WS_VARIABLES
 from rtwcli.helpers import (
     create_file_and_write,
