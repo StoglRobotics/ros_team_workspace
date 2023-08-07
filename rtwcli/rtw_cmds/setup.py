@@ -21,7 +21,7 @@ setup(
     name=package_name,
     version="0.2.0",
     packages=find_packages(exclude=["test"]),
-    install_requires=["questionary", "rtwcli", "send2trash"],
+    install_requires=["questionary", "rtwcli"],
     zip_safe=True,
     keywords=[],
     classifiers=[

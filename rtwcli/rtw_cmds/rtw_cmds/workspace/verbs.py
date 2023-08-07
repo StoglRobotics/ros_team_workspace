@@ -40,7 +40,9 @@ workspace name prefix is defined as first letters of the path and last folder if
 
 import copy
 import dataclasses
+import datetime
 import os
+import pathlib
 import re
 import shutil
 from typing import Any, Dict, List
@@ -54,16 +56,18 @@ from rtwcli.helpers import (
     write_to_yaml_file,
 )
 from rtwcli.verb import VerbExtension
-from send2trash import send2trash
 
 WORKSPACES_PATH = os.path.expanduser("~/.ros_team_workspace/workspaces.yaml")
-USE_WORKSPACE_SCRIPT_PATH = os.path.expanduser(
-    "~/ros_team_workspace/scripts/environment/setup.bash"
+CURRENT_FILE_DIR = pathlib.Path(__file__).parent.absolute()
+USE_WORKSPACE_SCRIPT_PATH = (
+    CURRENT_FILE_DIR / ".." / ".." / ".." / ".." / "scripts" / "environment" / "setup.bash"
 )
 WORKSPACES_KEY = "workspaces"
 ROS_TEAM_WS_RC_PATH = os.path.expanduser("~/.ros_team_ws_rc")
-WORKSPACES_PATH_BACKUP = os.path.expanduser("~/.ros_team_workspace/workspaces_backup.yaml")
-TRASH_FOLDER = os.path.expanduser("~/.local/share/Trash/ros_team_workspace")
+BACKUP_DATETIME_FORMAT = "%Y-%m-%d_%H-%M-%S-%f"
+WORKSPACES_PATH_BACKUP_FORMAT = os.path.expanduser(
+    "~/.ros_team_workspace/bkp/workspaces_bkp_{}.yaml"
+)
 WS_FOLDER_ENV_VAR = "RosTeamWS_WS_FOLDER"
 ROS_TEAM_WS_PREFIX = "RosTeamWS_"
 
@@ -130,19 +134,17 @@ def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspac
     workspaces_config.workspaces[ws_name] = workspace
 
     # Backup current config file
-    shutil.copy(config_path, WORKSPACES_PATH_BACKUP)
-    print(f"Backed up current workspaces config file to '{WORKSPACES_PATH_BACKUP}'")
+    current_date = datetime.datetime.now().strftime(BACKUP_DATETIME_FORMAT)
+    backup_filename = WORKSPACES_PATH_BACKUP_FORMAT.format(current_date)
+    create_file_if_not_exists(backup_filename)
+    shutil.copy(config_path, backup_filename)
+    print(f"Backed up current workspaces config file to '{backup_filename}'")
 
     if not save_workspaces_config(config_path, workspaces_config):
         print(f"Failed to update YAML file '{config_path}'.")
         return False
 
     print(f"Updated YAML file '{config_path}' with a new workspace '{ws_name}'")
-
-    # Move backup to trash
-    send2trash(WORKSPACES_PATH_BACKUP)
-    print(f"Moved backup config file '{WORKSPACES_PATH_BACKUP}' to the trash")
-
     return True
 
 
