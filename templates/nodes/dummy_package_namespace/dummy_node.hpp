@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TEMPLATES__NODE__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_NODE_HPP_
-#define TEMPLATES__NODE__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_NODE_HPP_
+#ifndef TEMPLATES__NODES__DUMMY_PACKAGE_NAMESPACE__DUMMY_NODE_HPP_
+#define TEMPLATES__NODES__DUMMY_PACKAGE_NAMESPACE__DUMMY_NODE_HPP_
 
 #include <string>
 
@@ -32,4 +32,4 @@ public:
 
 }  // namespace dummy_package_namespace
 
-#endif  // TEMPLATES__NODE__CONTROLLER__DUMMY_PACKAGE_NAMESPACE__DUMMY_NODE_HPP_
+#endif  // TEMPLATES__NODES__DUMMY_PACKAGE_NAMESPACE__DUMMY_NODE_HPP_
