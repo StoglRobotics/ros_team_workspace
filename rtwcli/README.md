@@ -19,3 +19,9 @@ source your workspace: `_<ws_name>`
 port config: `rtw wokspace port`
 
 test porting: `rtw wokspace use`
+
+## deleting workspace
+
+choose workspace to delete: `rtw workspace delete`
+
+The files will be sent to the trash folder, docker images removed, and workspaces config updated.

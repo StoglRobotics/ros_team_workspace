@@ -57,6 +57,7 @@ from rtwcli.helpers import (
     write_to_yaml_file,
 )
 from rtwcli.verb import VerbExtension
+from send2trash import send2trash
 
 WORKSPACES_PATH = os.path.expanduser("~/.ros_team_workspace/workspaces.yaml")
 CURRENT_FILE_DIR = pathlib.Path(__file__).parent.absolute()
@@ -71,6 +72,7 @@ WORKSPACES_PATH_BACKUP_FORMAT = os.path.expanduser(
 )
 WS_FOLDER_ENV_VAR = "RosTeamWS_WS_FOLDER"
 ROS_TEAM_WS_PREFIX = "RosTeamWS_"
+DELETE_WS_FORMAT = "{:<40} {:<10} {:<60} {}"
 
 # constants for workspace field names
 F_BASE_WS = "base_ws"
@@ -125,6 +127,21 @@ class WorkspacesConfig:
             return []
         return list(self.workspaces.keys())
 
+    def get_ws(self, ws_name: str) -> Workspace:
+        return copy.deepcopy(self.workspaces[ws_name])
+
+    def get_workspaces(self) -> Dict[str, Workspace]:
+        return copy.deepcopy(self.workspaces)
+
+    def add_ws(self, ws_name: str, ws: Workspace) -> None:
+        self.workspaces[ws_name] = ws
+
+    def delete_ws(self, ws_name) -> bool:
+        if ws_name not in self.workspaces:
+            return True
+        self.workspaces.pop(ws_name)
+        return True
+
 
 def load_workspaces_config_from_yaml_file(file_path: str):
     return WorkspacesConfig.from_dict(load_yaml_file(file_path))
@@ -132,6 +149,19 @@ def load_workspaces_config_from_yaml_file(file_path: str):
 
 def save_workspaces_config(filepath: str, config: WorkspacesConfig):
     return write_to_yaml_file(filepath, config.to_dict())
+
+
+def backup_workspaces_config(config_path: str) -> bool:
+    current_date = datetime.datetime.now().strftime(BACKUP_DATETIME_FORMAT)
+    backup_filename = WORKSPACES_PATH_BACKUP_FORMAT.format(current_date)
+    if not create_file_if_not_exists(backup_filename):
+        return False
+    try:
+        shutil.copy(config_path, backup_filename)
+    except Exception as e:
+        print(f"Exception {type(e)} caught while creating backup file for config '{config_path}' ")
+        return False
+    return True
 
 
 def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspace) -> bool:
@@ -148,20 +178,48 @@ def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspac
         )
         return False
 
-    workspaces_config.workspaces[ws_name] = workspace
+    workspaces_config.add_ws(ws_name, workspace)
 
     # Backup current config file
-    current_date = datetime.datetime.now().strftime(BACKUP_DATETIME_FORMAT)
-    backup_filename = WORKSPACES_PATH_BACKUP_FORMAT.format(current_date)
-    create_file_if_not_exists(backup_filename)
-    shutil.copy(config_path, backup_filename)
-    print(f"Backed up current workspaces config file to '{backup_filename}'")
+    backup_success = backup_workspaces_config(config_path)
+    if backup_success:
+        print(f"Backed up current workspaces config '{config_path}' successfully")
+    else:
+        print(f"Backing up current workspaces config '{config_path}' failed")
 
     if not save_workspaces_config(config_path, workspaces_config):
         print(f"Failed to update YAML file '{config_path}'.")
         return False
 
     print(f"Updated YAML file '{config_path}' with a new workspace '{ws_name}'")
+    return True
+
+
+def delete_ws_in_workspaces_config(config_path: str, ws_name: str) -> bool:
+    if not os.path.exists(config_path):
+        print(f"No workspaces config file found in '{config_path}'. Cannot proceed with deleting.")
+        return False
+
+    workspaces_config = load_workspaces_config_from_yaml_file(config_path)
+
+    if ws_name not in workspaces_config.get_ws_names():
+        print(f"Workspace name '{ws_name}' was not found in the config. Nothing to delete.")
+        return True
+
+    # Backup current config file
+    backup_success = backup_workspaces_config(config_path)
+    if backup_success:
+        print(f"Backed up current workspaces config '{config_path}' successfully")
+    else:
+        print(f"Backing up current workspaces config '{config_path}' failed")
+
+    workspaces_config.delete_ws(ws_name)
+
+    if not save_workspaces_config(config_path, workspaces_config):
+        print(f"Failed to update YAML file '{config_path}'.")
+        return False
+
+    print(f"Updated YAML file '{config_path}' while deleting workspace '{ws_name}'")
     return True
 
 
@@ -345,7 +403,7 @@ class UseVerb(VerbExtension):
             return
 
         workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
-        if not workspaces_config.workspaces:
+        if not workspaces_config.get_ws_names():
             print(f"No workspaces found in config file '{WORKSPACES_PATH}'")
             return
 
@@ -361,7 +419,7 @@ class UseVerb(VerbExtension):
         if not ws_name:  # Cancelled by user
             return
 
-        workspace = workspaces_config.workspaces[ws_name]
+        workspace = workspaces_config.get_ws(ws_name)
         print(f"Workspace data: {workspace}")
 
         script_content = create_bash_script_content_for_using_ws(
@@ -455,4 +513,139 @@ class PortVerb(VerbExtension):
         if success:
             print(f"Ported workspace '{new_ws_name}' successfully")
         else:
-            print(f"Porting workspace '{new_ws_name}' failed")
+            print(f"Updating workspace config in '{WORKSPACES_PATH}' failed")
+
+
+class DeleteVerb(VerbExtension):
+    """Delete an available ROS workspace in the config."""
+
+    def main(self, *, args):
+        if not os.path.isfile(WORKSPACES_PATH):
+            print(
+                "No workspaces are available as the workspaces config file "
+                f"'{WORKSPACES_PATH}' does not exist"
+            )
+            return
+
+        workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
+        if not workspaces_config.get_ws_names():
+            print(f"No workspaces found in config file '{WORKSPACES_PATH}'")
+            return
+
+        choice_data = {}
+        for ws_name, ws in workspaces_config.get_workspaces().items():
+            ws_choice_data = DELETE_WS_FORMAT.format(
+                ws_name, ws.distro, ws.ws_folder, ws.docker_tag
+            )
+            choice_data[ws_choice_data] = ws_name
+
+        ws_choices_to_delete = questionary.checkbox(
+            "Select workspaces to delete",
+            choices=list(choice_data.keys()),
+        ).ask()
+        if not ws_choices_to_delete:
+            return
+
+        ws_names_to_delete_to_confirm = ""
+        for ws_name_to_delete in ws_choices_to_delete:
+            ws_names_to_delete_to_confirm += "\n" + ws_name_to_delete
+        ws_names_to_delete_to_confirm += "\n"
+
+        confirm_delete = questionary.confirm(
+            f"Are you sure you want to delete following workspaces? {ws_names_to_delete_to_confirm}"
+        ).ask()
+        if not confirm_delete:
+            return
+
+        ws_names_to_delete = [
+            choice_data[ws_choice_to_delete] for ws_choice_to_delete in ws_choices_to_delete
+        ]
+        self.handle_delete_workspaces(ws_names_to_delete, workspaces_config)
+
+    def delete_docker_image(self, docker_tag: str) -> None:
+        try:
+            subprocess.check_output(["docker", "rmi", docker_tag])
+            print(f"Docker image '{docker_tag}' has been deleted.")
+        except subprocess.CalledProcessError as e:
+            print(
+                f"Failed to delete docker image '{docker_tag}'. Error:\n{e.output.decode('utf-8')}"
+            )
+
+    def handle_delete_workspaces(
+        self, ws_names_to_delete: List[str], workspaces_config: WorkspacesConfig
+    ) -> None:
+        sent_to_trash_ws_names = []
+        sent_to_trash_and_deleted_in_config_ws_names = []
+        failed_to_send_to_trash_ws_names = []
+        failed_to_send_and_deleted_in_config_ws_names = []
+        docker_images_to_be_removed = []
+        docker_images_removed = []
+        docker_images_failed_to_remove = []
+        num_to_delete = len(ws_names_to_delete)
+        line_sep = "-" * 50
+        for ws_name_i, ws_name in enumerate(ws_names_to_delete):
+            print(f"{line_sep}\nDeleting workspace {ws_name_i+1}/{num_to_delete} '{ws_name}'...")
+            ws = workspaces_config.get_ws(ws_name)
+
+            if ws.ws_docker_support:
+                docker_images_to_be_removed.append(ws.docker_tag)
+
+            try:
+                if ws.ws_docker_support:
+                    print(f"Removing workspace docker image '{ws.docker_tag}'")
+                    subprocess.check_output(["docker", "rmi", ws.docker_tag])
+                    docker_images_removed.append(ws.docker_tag)
+
+                print(f"Sending workspace folder '{ws.ws_folder}' to the trash folder")
+                send2trash(ws.ws_folder)
+                sent_to_trash_ws_names.append(ws_name)
+
+                if delete_ws_in_workspaces_config(WORKSPACES_PATH, ws_name):
+                    sent_to_trash_and_deleted_in_config_ws_names.append(ws_name)
+                else:
+                    print(
+                        f"Failed to delete workspace ({ws_name}) from the config file "
+                        f"({WORKSPACES_PATH})"
+                    )
+            except Exception as e:
+                print(
+                    f"Exception {type(e)} caught while sending ws folder '{ws.ws_folder}' "
+                    f"to the trash folder: {e}"
+                )
+                if ws.ws_docker_support and ws.docker_tag not in docker_images_removed:
+                    docker_images_failed_to_remove.append(ws.docker_tag)
+
+                failed_to_send_to_trash_ws_names.append(ws_name)
+                confirm_delete_from_config = questionary.confirm(
+                    f"Do you still want to delete this workspace ({ws_name}) from the config "
+                    f"file? ({WORKSPACES_PATH})"
+                ).ask()
+                if confirm_delete_from_config:
+                    if delete_ws_in_workspaces_config(WORKSPACES_PATH, ws_name):
+                        failed_to_send_and_deleted_in_config_ws_names.append(ws_name)
+                    else:
+                        print(
+                            f"Failed to delete workspace ({ws_name}) from the config file "
+                            f"({WORKSPACES_PATH})"
+                        )
+
+        print(
+            f"Deleting workspaces done. {len(sent_to_trash_ws_names)}/{num_to_delete} workspaces "
+            f"sent to trash: {sent_to_trash_ws_names} while "
+            f"{len(sent_to_trash_and_deleted_in_config_ws_names)}/{len(sent_to_trash_ws_names)} "
+            "of these were deleted from the config file: "
+            f"{sent_to_trash_and_deleted_in_config_ws_names}"
+        )
+        print(
+            f"Deleted {len(docker_images_removed)}/{len(docker_images_to_be_removed)} "
+            f"Docker images: {docker_images_removed}. Failed for Docker images: "
+            f"{docker_images_failed_to_remove}"
+        )
+        if failed_to_send_to_trash_ws_names:
+            print(
+                f"Failed to send {len(failed_to_send_to_trash_ws_names)}/{num_to_delete} "
+                f"workspaces to trash: {failed_to_send_to_trash_ws_names} while "
+                f"{len(failed_to_send_and_deleted_in_config_ws_names)}/"
+                f"{len(failed_to_send_to_trash_ws_names)} of these were deleted from the config "
+                f"file: {failed_to_send_and_deleted_in_config_ws_names}"
+            )
