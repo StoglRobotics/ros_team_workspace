@@ -224,6 +224,48 @@ def create_bash_script_content_for_using_ws(
     return bash_script_content
 
 
+def get_expected_ws_field_names() -> List[str]:
+    return [field.name for field in dataclasses.fields(Workspace)]
+
+
+def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str) -> bool:
+    expected_ws_field_names = get_expected_ws_field_names()
+    current_ws_field_names = list(workspace_data_to_port.keys())
+
+    # ask user for missing ws fields
+    choices = [
+        "Skip this workspace",
+        "Enter the missing field (validation not implemented yet)",
+        "Stop porting entirely",
+    ]
+    for expected_ws_field_name in expected_ws_field_names:
+        if expected_ws_field_name in current_ws_field_names:
+            continue
+        choice = questionary.select(
+            f"Missing field '{expected_ws_field_name}'. What would you like to do?",
+            choices=choices,
+        ).ask()
+        if choice is None:  # Cancelled by user
+            return False
+        elif choice == choices[0]:
+            return False
+        if choice == choices[1]:
+            value = questionary.text(f"Enter value for {expected_ws_field_name}:").ask()
+            workspace_data_to_port[expected_ws_field_name] = value
+        else:
+            exit("Stopped porting due to a missing field.")
+
+    workspace_to_port = Workspace(**workspace_data_to_port)
+    print(f"Updating workspace config in '{WORKSPACES_PATH}'")
+    success = update_workspaces_config(WORKSPACES_PATH, new_ws_name, workspace_to_port)
+    if success:
+        print(f"Updated workspace config in '{WORKSPACES_PATH}'")
+        return True
+    else:
+        print(f"Updating workspace config in '{WORKSPACES_PATH}' failed")
+        return False
+
+
 class CreateVerb(VerbExtension):
     """Create a new ROS workspace."""
 
@@ -256,7 +298,7 @@ class UseVerb(VerbExtension):
             validate=lambda ws_choice: ws_choice in ws_names,
             style=questionary.Style([("answer", "bg:ansiwhite")]),
         ).ask()
-        if not ws_name:
+        if not ws_name:  # Cancelled by user
             return
 
         workspace = workspaces_config.workspaces[ws_name]
@@ -281,8 +323,10 @@ class PortAllVerb(VerbExtension):
         ws_num = len(script_workspaces)
         print(f"Found {ws_num} workspaces in script '{ROS_TEAM_WS_RC_PATH}'")
         var_str_format = "\t{:>30} -> {:<20}: {}"
+        sep_line = "-" * 50
         for i, (script_ws, script_ws_data) in enumerate(script_workspaces.items()):
             print(
+                f"{sep_line}\n"
                 f"Processing {i+1}/{ws_num} script workspace '{script_ws}',"
                 f" ws_data: {script_ws_data}"
             )
@@ -297,14 +341,11 @@ class PortAllVerb(VerbExtension):
             new_ws_name = generate_workspace_name(ws_path)
             print(f"\t'{ws_path}' -> {new_ws_name}")
 
-            workspace_to_port = Workspace(**workspace_data_to_port)
-
-            print(f"Updating workspace config in '{WORKSPACES_PATH}'")
-            success = update_workspaces_config(WORKSPACES_PATH, new_ws_name, workspace_to_port)
+            success = try_port_workspace(workspace_data_to_port, new_ws_name)
             if success:
-                print(f"Updated workspace config in '{WORKSPACES_PATH}'")
+                print(f"Ported workspace '{new_ws_name}' successfully")
             else:
-                print(f"Updating workspace config in '{WORKSPACES_PATH}' failed")
+                print(f"Porting workspace '{new_ws_name}' failed")
 
 
 class PortVerb(VerbExtension):
@@ -329,11 +370,8 @@ class PortVerb(VerbExtension):
         new_ws_name = generate_workspace_name(ws_path)
         print(f"\t'{ws_path}' -> {new_ws_name}")
 
-        workspace_to_port = Workspace(**workspace_data_to_port)
-
-        print(f"Updating workspace config in '{WORKSPACES_PATH}'")
-        success = update_workspaces_config(WORKSPACES_PATH, new_ws_name, workspace_to_port)
+        success = try_port_workspace(workspace_data_to_port, new_ws_name)
         if success:
-            print(f"Updated workspace config in '{WORKSPACES_PATH}'")
+            print(f"Ported workspace '{new_ws_name}' successfully")
         else:
-            print(f"Updating workspace config in '{WORKSPACES_PATH}' failed")
+            print(f"Porting workspace '{new_ws_name}' failed")

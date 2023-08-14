@@ -40,6 +40,7 @@ The package provides the commands for the ROS Team Workspace command line tools.
             "docker = rtw_cmds.commands:DockerCommand",
             "pkg = rtw_cmds.commands:PkgCommand",
             "workspace = rtw_cmds.commands:WorkspaceCommand",
+            "ws = rtw_cmds.aliases:WSAlias",
         ],
         "rtwcli.extension_point": [
             "rtw_cmds.docker.verbs = rtwcli.verb:VerbExtension",
