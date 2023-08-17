@@ -88,6 +88,15 @@ class Workspace:
     docker_tag: str = None
     base_ws: str = None
 
+    def __post_init__(self):
+        self.distro = str(self.distro)
+        self.ws_folder = str(self.ws_folder)
+        self.ws_docker_support = bool(self.ws_docker_support)
+        if self.docker_tag is not None:
+            self.docker_tag = str(self.docker_tag)
+        if self.base_ws is not None:
+            self.base_ws = str(self.base_ws)
+
 
 @dataclasses.dataclass
 class WorkspacesConfig:
@@ -256,9 +265,6 @@ def is_docker_tag_valid(tag: str) -> bool:
 
 
 def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str) -> bool:
-    expected_ws_field_names = get_expected_ws_field_names()
-    current_ws_field_names = list(workspace_data_to_port.keys())
-
     # set workspace missing fields to default values
     if F_WS_DOCKER_SUPPORT not in workspace_data_to_port:
         workspace_data_to_port[F_WS_DOCKER_SUPPORT] = False
@@ -275,6 +281,8 @@ def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str)
             return False
 
     # Identify and inform about unexpected fields
+    expected_ws_field_names = get_expected_ws_field_names()
+    current_ws_field_names = list(workspace_data_to_port.keys())
     unexpected_fields = set(current_ws_field_names) - set(expected_ws_field_names)
     if unexpected_fields:
         print(f"Current fields to port: {', '.join(current_ws_field_names)}")
@@ -391,7 +399,7 @@ class PortAllVerb(VerbExtension):
             workspace_data_to_port = {}
             for env_var, env_var_value in script_ws_data.items():
                 ws_var, ws_var_value = env_var_to_workspace_var(env_var, env_var_value)
-                print(var_str_format.format(env_var, env_var_value, ws_var, ws_var_value))
+                print(var_str_format.format(env_var, ws_var, env_var_value))
                 workspace_data_to_port[ws_var] = ws_var_value
 
             print("Generating workspace name from workspace path with first folder letters: ")
@@ -430,11 +438,11 @@ class PortVerb(VerbExtension):
         var_str_format = "\t{:>30} -> {:<20}: {}"
         for env_var in ROS_TEAM_WS_VARIABLES:
             env_var_value = os.environ.get(env_var, None)
+            ws_var, ws_var_value = env_var_to_workspace_var(env_var, env_var_value)
             # check if variable is exported
-            if env_var_value is None:
+            if ws_var in [F_DISTRO, F_WS_FOLDER] and ws_var_value is None:
                 print(f"Variable {env_var} is not exported. Cannot proceed with porting.")
                 return
-            ws_var, ws_var_value = env_var_to_workspace_var(env_var, env_var_value)
             print(var_str_format.format(env_var, ws_var, env_var_value))
             workspace_data_to_port[ws_var] = ws_var_value
 
