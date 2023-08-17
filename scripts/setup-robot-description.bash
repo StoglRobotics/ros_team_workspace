@@ -96,7 +96,7 @@ done
 
 # Add install paths of the files
 preppend_to_string="if(BUILD_TESTING)"
-sed -i "s/$preppend_to_string/install\(\\n  DIRECTORY config launch\/ meshes rviz urdf\\n  DESTINATION share\/\$\{PROJECT_NAME\}\\n\)\\n\\n$preppend_to_string/g" CMakeLists.txt
+sed -i "s/$preppend_to_string/install\(\\n  DIRECTORY config launch meshes rviz urdf\\n  DESTINATION share\/\$\{PROJECT_NAME\}\\n\)\\n\\n$preppend_to_string/g" CMakeLists.txt
 
 # extend README with general instructions
 if [ -f README.md ]; then

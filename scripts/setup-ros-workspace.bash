@@ -10,7 +10,7 @@ if [ -z "$ros_distributions_20_04" ]; then
   readonly ros_distributions_20_04=("noetic" "foxy" "galactic")
 fi
 if [ -z "$ros_distributions_22_04" ]; then
-  readonly ros_distributions_22_04=("humble")
+  readonly ros_distributions_22_04=("humble" "iron")
 fi
 if [ -z "$ros_distributions_20_and_22_04" ]; then
   readonly ros_distributions_20_and_22_04=("rolling")

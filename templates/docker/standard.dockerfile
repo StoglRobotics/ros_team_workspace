@@ -50,6 +50,7 @@ RUN pip install -U rosdep && \
 
 # setup ros_team_ws
 RUN git clone -b ROS_TEAM_WS_DUMMY_BRANCH https://github.com/StoglRobotics/ros_team_workspace.git /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/
+RUN cd /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/rtwcli && pip3 install -r requirements.txt && cd -
 
 # setup standard .bashrc
 COPY bashrc ${home}/.bashrc
@@ -59,7 +60,7 @@ COPY ros_team_ws_rc_docker ${home}/.ros_team_ws_rc
 # the passwd delete is needed to update /etc/shadow otherwise user cannot use sudo
 RUN mkdir -p ${home} && \
   echo "${user}:x:${uid}:${gid}:${user},,,:${home}:/bin/bash" >> /etc/passwd && \
-  echo "${user}:x:${uid}:" >> /etc/group && \
+  echo "${user}:x:${gid}:" >> /etc/group && \
   echo "${user} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${user}" && \
   chmod 0440 "/etc/sudoers.d/${user}" && \
   usermod -aG sudo ${user} && \

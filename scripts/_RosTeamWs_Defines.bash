@@ -27,7 +27,7 @@ fi
 
 # All the possible supported ros distributions supported by rtw
 if [ -z "$rtw_supported_ros_distributions" ]; then
-  readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "rolling")
+  readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "iron" "rolling")
 fi
 
 # This needs to be set for every branch
@@ -55,7 +55,7 @@ function set_supported_versions {
     ros_version=2
     ;;
   rolling)
-    supported_ros_distributions=("rolling")
+    supported_ros_distributions=("iron" "rolling")
     ros_version=2
     ;;
   *)
@@ -373,7 +373,11 @@ function check_ros_distro {
   # check if the given distribution is a distribution supported by rtw
   while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@];
   do
-      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please chose either of the following:${rtw_supported_ros_distributions[*]}"
+    if [ -z "$ros_distro" ]; then
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}No ROS distribution provided. Please choose either of the following:${rtw_supported_ros_distributions[*]}"
+    else
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ROS distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please choose either of the following:${rtw_supported_ros_distributions[*]}"
+    fi
       read ros_distro
   done
 
@@ -391,8 +395,13 @@ function check_ros_distro {
         # check if the chosen ros-distro location is correct.
         if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
           print_and_exit "Please set ${alternative_ros_location} to the correct location. Exiting..."
+        else
+          source "${!alternative_ros_location}/setup.bash"
         fi
       fi
+    else
+      # source ros to have access to ros cli commands for other functions
+      source "/opt/ros/${ros_distro}/setup.bash"
     fi
   fi
 }
@@ -413,11 +422,14 @@ function set_ros_version_for_distro {
     humble)
       ros_version=2
       ;;
+    iron)
+      ros_version=2
+      ;;
     rolling)
       ros_version=2
       ;;
     *)
-      print_and_exit "FATAL: For the chosen ros distribution ${ros_distribution} does no ros version exist."
+      print_and_exit "FATAL: For the chosen ros distribution ${ros_distribution} there is no ros version."
       ;;
   esac
 }
@@ -456,11 +468,11 @@ function compile_and_source_package {
     if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
       print_and_exit "Aborting. Not the correct workspace sourced. Please source the correct workspace folder and compile manually."
     fi
-
-    cd "$sourced_ws_dirname" || { print_and_exit "Could not change directory to workspace:\"$sourced_ws_dirname\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
-  else
-    cd "$ROS_WS" || { print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
+  # set ROS_WS ourselves, as other functions need it later and will fail/use wrong path otherwise
+  export ROS_WS="$sourced_ws_dirname"
   fi
+
+  cd "$ROS_WS" || { print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
 
   colcon_build_up_to $pkg_name
   source install/setup.bash

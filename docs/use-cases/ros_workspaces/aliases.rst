@@ -45,7 +45,7 @@ cb [package1_name, package2_name]
   Alias for command: ``colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo``.
 
 cbup [package1_name, package2_name]
-  Building all packages up the named package (build all dependencies).
+  Building all packages up to the named packages (build all dependencies).
   Alias for command: ``colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo --packages-up-to``.
 
 cbd [package1_name, package2_name]
@@ -66,11 +66,11 @@ ct [package1_name, package2_name]
   Alias for command: ``colcon test``.
 
 ctup [package_name]
-  Testing named packages up to the workspace (build all dependencies).
+  Testing named packages up to the named package (build all dependencies).
   Alias for command: ``colcon test --packages-up-to``.
 
 ctres [package_name]
-  Get test results for the whole workspace or a package. If using package the output will be ``grep``-processed to filter-out the package you are looking for.
+  Get test results for the whole workspace or a package. If using package, the output will be ``grep``-processed to filter-out the package you are looking for.
   Alias for command: ``colcon test-result --all``
 
 

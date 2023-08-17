@@ -53,7 +53,7 @@ fi
 echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Which license-header do you want to use? [1]"
 echo "(0) None"
 echo "(1) Apache-2.0"
-echo "(2) Propiatery"
+echo "(2) Proprietary"
 echo -n -e "${TERMINAL_COLOR_NC}"
 read choice
 choice=${choice:="1"}

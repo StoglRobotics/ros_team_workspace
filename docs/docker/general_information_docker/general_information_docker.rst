@@ -5,8 +5,8 @@ General information on docker
 
 Generally you can always have a look at the `docs of docker <https://docs.docker.com/>`_.
 
-Installation
-""""""""""""""""
+Installation of Docker
+"""""""""""""""""""""""
 .. _general-info-on-docker-installation:
 
 You have to install docker which is dependent on the operating system you are using.
@@ -28,7 +28,7 @@ which should print out a "Hello from Docker!" message.
 
 Useful commands
 """"""""""""""""
-For complete list of commands have a look at `official docker cli reference <https://docs.docker.com/engine/reference/commandline/cli/>`_.
+For a complete list of commands have a look at `official docker cli reference <https://docs.docker.com/engine/reference/commandline/cli/>`_.
 
 * ``docker container <command>``:
 

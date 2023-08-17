@@ -19,9 +19,9 @@ package_name = "rtw_cmds"
 
 setup(
     name=package_name,
-    version="0.1.0",
+    version="0.2.0",
     packages=find_packages(exclude=["test"]),
-    install_requires=["rtwcli", "click"],
+    install_requires=["questionary", "rtwcli"],
     zip_safe=True,
     keywords=[],
     classifiers=[
@@ -39,16 +39,25 @@ The package provides the commands for the ROS Team Workspace command line tools.
         "rtwcli.command": [
             "docker = rtw_cmds.commands:DockerCommand",
             "pkg = rtw_cmds.commands:PkgCommand",
+            "workspace = rtw_cmds.commands:WorkspaceCommand",
+            "ws = rtw_cmds.aliases:WSAlias",
         ],
         "rtwcli.extension_point": [
             "rtw_cmds.docker.verbs = rtwcli.verb:VerbExtension",
             "rtw_cmds.pkg.verbs = rtwcli.verb:VerbExtension",
+            "rtw_cmds.workspace.verbs = rtwcli.verb:VerbExtension",
         ],
         "rtw_cmds.docker.verbs": [
             "enter = rtw_cmds.docker.verbs:EnterVerb",
         ],
         "rtw_cmds.pkg.verbs": [
             "create = rtw_cmds.pkg.verbs:CreateVerb",
+        ],
+        "rtw_cmds.workspace.verbs": [
+            "create = rtw_cmds.workspace.verbs:CreateVerb",
+            "port = rtw_cmds.workspace.verbs:PortVerb",
+            "port_all = rtw_cmds.workspace.verbs:PortAllVerb",
+            "use = rtw_cmds.workspace.verbs:UseVerb",
         ],
     },
 )
