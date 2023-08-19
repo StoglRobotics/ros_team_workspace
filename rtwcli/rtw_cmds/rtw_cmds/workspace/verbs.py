@@ -45,6 +45,7 @@ import os
 import pathlib
 import re
 import shutil
+import subprocess
 from typing import Any, Dict, List
 
 import questionary
@@ -71,14 +72,30 @@ WORKSPACES_PATH_BACKUP_FORMAT = os.path.expanduser(
 WS_FOLDER_ENV_VAR = "RosTeamWS_WS_FOLDER"
 ROS_TEAM_WS_PREFIX = "RosTeamWS_"
 
+# constants for workspace field names
+F_BASE_WS = "base_ws"
+F_DISTRO = "distro"
+F_DOCKER_TAG = "docker_tag"
+F_WS_DOCKER_SUPPORT = "ws_docker_support"
+F_WS_FOLDER = "ws_folder"
+
 
 @dataclasses.dataclass
 class Workspace:
-    base_ws: str
     distro: str
-    docker_tag: str
-    ws_docker_support: bool
     ws_folder: str
+    ws_docker_support: bool = False
+    docker_tag: str = None
+    base_ws: str = None
+
+    def __post_init__(self):
+        self.distro = str(self.distro)
+        self.ws_folder = str(self.ws_folder)
+        self.ws_docker_support = bool(self.ws_docker_support)
+        if self.docker_tag is not None:
+            self.docker_tag = str(self.docker_tag)
+        if self.base_ws is not None:
+            self.base_ws = str(self.base_ws)
 
 
 @dataclasses.dataclass
@@ -228,9 +245,52 @@ def get_expected_ws_field_names() -> List[str]:
     return [field.name for field in dataclasses.fields(Workspace)]
 
 
+def is_docker_tag_valid(tag: str) -> bool:
+    """Validate a given Docker tag by trying to inspect it."""
+    try:
+        result = subprocess.run(
+            ["docker", "image", "inspect", tag],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True,
+        )
+        if result.returncode == 0:
+            return True
+    except subprocess.CalledProcessError:
+        print(f"'{tag}' is not a valid Docker tag or image.")
+        return False
+    except Exception as e:
+        print(f"Error while trying to validate Docker tag: {e}")
+        return False
+
+
 def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str) -> bool:
+    # set workspace missing fields to default values
+    if F_WS_DOCKER_SUPPORT not in workspace_data_to_port:
+        workspace_data_to_port[F_WS_DOCKER_SUPPORT] = False
+    if F_DOCKER_TAG not in workspace_data_to_port:
+        workspace_data_to_port[F_DOCKER_TAG] = None
+    if F_BASE_WS not in workspace_data_to_port:
+        workspace_data_to_port[F_BASE_WS] = None
+
+    # validate workspace fields
+    if not workspace_data_to_port[F_WS_DOCKER_SUPPORT]:
+        workspace_data_to_port[F_DOCKER_TAG] = None
+    if workspace_data_to_port[F_WS_DOCKER_SUPPORT]:
+        if not is_docker_tag_valid(workspace_data_to_port[F_DOCKER_TAG]):
+            return False
+
+    # Identify and inform about unexpected fields
     expected_ws_field_names = get_expected_ws_field_names()
     current_ws_field_names = list(workspace_data_to_port.keys())
+    unexpected_fields = set(current_ws_field_names) - set(expected_ws_field_names)
+    if unexpected_fields:
+        print(f"Current fields to port: {', '.join(current_ws_field_names)}")
+        print(f"Found unexpected fields: {', '.join(unexpected_fields)}")
+        print(f"Available fields are: {', '.join(expected_ws_field_names)}")
+        print("These unexpected fields will be skipped.")
+        for field in unexpected_fields:
+            del workspace_data_to_port[field]
 
     # ask user for missing ws fields
     choices = [
@@ -319,21 +379,27 @@ class PortAllVerb(VerbExtension):
 
     def main(self, *, args):
         print(f"Reading workspaces from script '{ROS_TEAM_WS_RC_PATH}'")
+
         script_workspaces = extract_workspaces_from_bash_script(ROS_TEAM_WS_RC_PATH)
         ws_num = len(script_workspaces)
         print(f"Found {ws_num} workspaces in script '{ROS_TEAM_WS_RC_PATH}'")
+
         var_str_format = "\t{:>30} -> {:<20}: {}"
         sep_line = "-" * 50
+
+        # For statistics:
+        porting_stats = {
+            "successful": [],
+            "failed": [],
+        }
+
         for i, (script_ws, script_ws_data) in enumerate(script_workspaces.items()):
-            print(
-                f"{sep_line}\n"
-                f"Processing {i+1}/{ws_num} script workspace '{script_ws}',"
-                f" ws_data: {script_ws_data}"
-            )
+            ws_name_to_print = f"{i+1}/{ws_num} script workspace '{script_ws}'"
+            print(f"{sep_line}\n" f"Processing {ws_name_to_print}," f" ws_data: {script_ws_data}")
             workspace_data_to_port = {}
             for env_var, env_var_value in script_ws_data.items():
                 ws_var, ws_var_value = env_var_to_workspace_var(env_var, env_var_value)
-                print(var_str_format.format(env_var, env_var_value, ws_var, ws_var_value))
+                print(var_str_format.format(env_var, ws_var, env_var_value))
                 workspace_data_to_port[ws_var] = ws_var_value
 
             print("Generating workspace name from workspace path with first folder letters: ")
@@ -344,8 +410,23 @@ class PortAllVerb(VerbExtension):
             success = try_port_workspace(workspace_data_to_port, new_ws_name)
             if success:
                 print(f"Ported workspace '{new_ws_name}' successfully")
+                porting_stats["successful"].append(ws_name_to_print)
             else:
                 print(f"Porting workspace '{new_ws_name}' failed")
+                porting_stats["failed"].append(ws_name_to_print)
+
+        # Print the final summary:
+        summary_sep_line = "#" * 50
+        print("\n" + summary_sep_line)
+        print("Porting Summary:")
+        print(f"Total Workspaces: {ws_num}")
+        print(f"Successfully Ported: {len(porting_stats['successful'])}")
+        for ws_name in porting_stats["successful"]:
+            print(f" - {ws_name}")
+        print(f"Failed to Port: {len(porting_stats['failed'])}")
+        for ws_name in porting_stats["failed"]:
+            print(f" - {ws_name}")
+        print(summary_sep_line)
 
 
 class PortVerb(VerbExtension):
@@ -357,11 +438,11 @@ class PortVerb(VerbExtension):
         var_str_format = "\t{:>30} -> {:<20}: {}"
         for env_var in ROS_TEAM_WS_VARIABLES:
             env_var_value = os.environ.get(env_var, None)
+            ws_var, ws_var_value = env_var_to_workspace_var(env_var, env_var_value)
             # check if variable is exported
-            if env_var_value is None:
+            if ws_var in [F_DISTRO, F_WS_FOLDER] and ws_var_value is None:
                 print(f"Variable {env_var} is not exported. Cannot proceed with porting.")
                 return
-            ws_var, ws_var_value = env_var_to_workspace_var(env_var, env_var_value)
             print(var_str_format.format(env_var, ws_var, env_var_value))
             workspace_data_to_port[ws_var] = ws_var_value
 
