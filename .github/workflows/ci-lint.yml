@@ -18,7 +18,7 @@ jobs:
           - linter: copyright
             arguments: "--exclude docs/conf.py"
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ros-tooling/setup-ros@master
     - uses: ros-tooling/action-ros-lint@master
       with:
@@ -36,7 +36,7 @@ jobs:
       matrix:
           linter: [cpplint]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ros-tooling/setup-ros@master
     - uses: ros-tooling/action-ros-lint@master
       with:
