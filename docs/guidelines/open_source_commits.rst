@@ -11,7 +11,7 @@ This documents proposes development guidelines on how to make contributions to o
 
 #. Once you've found a good solution, commit and push to your own feature branch. Be aware that you only fix the relevant issue in this feature branch, don't make more changes than is necessary.
 
-#. Go to the upstream branch of your forked repository, and create a new feature branch. 
+#. Go to the upstream branch of your forked repository, and create a new feature branch.
 
 #. In this feature branch, apply the changes you made in your previous branch with its commit hash(using cherry-pick) and push it.
 
