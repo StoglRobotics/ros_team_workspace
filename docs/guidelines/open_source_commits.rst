@@ -1,6 +1,6 @@
-=======================
+===================================================
 Guidelines on contributing to open-source projects
-=======================
+===================================================
 .. _guidelines-development:
 
 This documents proposes development guidelines on how to make contributions to open-source projects in a structured manner. When you find a new issue or want to solve an existing issue in an open source project, you can perform the following steps to increase the chances of making your contribution useful and appreciated.
@@ -16,4 +16,3 @@ This documents proposes development guidelines on how to make contributions to o
 #. In this feature branch, apply the changes you made in your previous branch with its commit hash(using cherry-pick) and push it.
 
 #. Open a pull request on the upstream branch of the main repository for your feature branch. Make sure you adhere to the project's guidelines on how to write the pull request.
-
