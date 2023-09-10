@@ -189,79 +189,79 @@ class DeletionStats:
     )
     fully_succeeded: List[str] = dataclasses.field(default_factory=list)
 
-    def print_summary(self):
-        print("\n------ Summary of Deletion ------")
-
-        # List for Succeeded Workspaces
-        succeeded_ws_names = []
-
-        # Loop to determine which workspace deletions were successful:
-        for ws_name in self.ws_names_to_delete:
-            if ws_name in self.docker_stats:
-                if not self.docker_stats[ws_name].docker_image_removed:
-                    continue
-
-            if ws_name not in self.send2trash_stats:
-                continue
-
-            send2trash_stat = self.send2trash_stats.get(ws_name, None)
-            if send2trash_stat and len(send2trash_stat.failed_to_remove_top_level_items) > 0:
-                continue
-
-            config_stat = self.deleted_from_config_stats.get(ws_name, None)
-            if (
-                config_stat
-                and not config_stat.deleted_from_config
-                or not config_stat.saved_new_config
-            ):
-                continue
-
-            succeeded_ws_names.append(ws_name)
+    def print_summary(self, fst_level="└── ", snd_level="    │   └── ", cancel_level=">>> "):
+        num_all_ws = len(self.ws_names_to_delete)
+        print(f"\n------ Summary of Deletion ({num_all_ws} ws) ------")
 
         # Print Succeeded Workspaces:
-        print("\n-- Succeeded --")
-        for ws_name in succeeded_ws_names:
-            print(f"Successfully deleted workspace: {ws_name}")
+        print(f"\n-- Succeeded ({len(self.fully_succeeded)}/{num_all_ws} ws) --")
+        for ws_name in self.fully_succeeded:
+            print(f"{fst_level}{ws_name}")
 
         # Print Failed Workspaces:
-        print("\n-- Failed --")
+        num_failed = len(self.ws_names_to_delete) - len(self.fully_succeeded)
+        deletion_order = "[Docker Stats -> Send2Trash Stats -> Config Deletion Stats]"
+        print(f"\n-- Failed ({num_failed}/{num_all_ws} ws) {deletion_order} --")
         for ws_name in self.ws_names_to_delete:
-            if ws_name not in succeeded_ws_names:
-                print(f"\nFailed to delete workspace: {ws_name}")
+            if ws_name not in self.fully_succeeded:
+                print(f"{fst_level}{ws_name}")
 
                 docker_stat = self.docker_stats.get(ws_name, None)
                 if docker_stat:
+                    docker_stats_title = "    ├── Docker Stats:"
+                    if docker_stat.docker_image_removed:
+                        docker_stats_title += " OK"
+                    print(docker_stats_title)
                     if docker_stat.failed_to_get_container_ids:
                         print(
-                            f"  Failed to get Docker containers for image {docker_stat.docker_image_tag}. Error: {docker_stat.failed_to_get_container_ids}"
+                            f"{snd_level}Failed to get Docker containers for image "
+                            f"{docker_stat.docker_image_tag}. "
+                            f"Error: {docker_stat.failed_to_get_container_ids}"
                         )
                     for container_id, error in docker_stat.failed_to_stop_container_ids.items():
-                        print(f"  Failed to stop container {container_id}. Error: {error}")
+                        print(
+                            f"{snd_level}Failed to stop container {container_id}. "
+                            f"Error: {error}"
+                        )
                     for container_id, error in docker_stat.failed_to_remove_containers.items():
-                        print(f"  Failed to remove container {container_id}. Error: {error}")
+                        print(
+                            f"{snd_level}Failed to remove container {container_id}. "
+                            f"Error: {error}"
+                        )
                     if not docker_stat.docker_image_removed:
                         print(
-                            f"  Failed to remove Docker image {docker_stat.docker_image_tag}. Error: {docker_stat.failed_to_remove_image}"
+                            f"{snd_level}Failed to remove Docker image "
+                            f"{docker_stat.docker_image_tag}. "
+                            f"Error: {docker_stat.failed_to_remove_image}"
                         )
 
                 send2trash_stat = self.send2trash_stats.get(ws_name, None)
                 if send2trash_stat:
+                    send2trash_title = "    ├── Send2Trash Stats:"
+                    if not send2trash_stat.failed_to_remove_top_level_items:
+                        send2trash_title += " OK"
+                    print(send2trash_title)
                     for item, error in send2trash_stat.failed_to_remove_top_level_items.items():
-                        print(f"  Failed to send item {item} to trash. Error: {error}")
+                        print(f"{snd_level}Failed to send item {item} to trash. Error: {error}")
 
                 config_stat = self.deleted_from_config_stats.get(ws_name, None)
                 if config_stat:
+                    config_deletion_title = "    ├── Config Deletion Stats:"
+                    if config_stat.deleted_from_config:
+                        config_deletion_title += " OK"
+                    print(config_deletion_title)
                     if config_stat.failed_to_backup_config:
-                        print("  Failed to backup config.")
+                        print(f"{snd_level}Failed to backup config.")
                     if config_stat.failed_to_delete_from_config:
-                        print("  Failed to delete workspace from config.")
+                        print(f"{snd_level}Failed to delete workspace from config.")
                     if config_stat.failed_to_save_new_config:
-                        print("  Failed to save new config.")
+                        print(f"{snd_level}Failed to save new config.")
 
         if self.cancelled_by_user:
             ws_name, reason = self.cancelled_by_user
             print(
-                f"\nOperation for workspace '{ws_name}' was cancelled by the user. Reason: {reason}"
+                f"\n{cancel_level}Operation for workspace '{ws_name}' was cancelled by the user. "
+                f"\n{cancel_level}Reason: {reason}\n"
             )
 
 
@@ -661,8 +661,9 @@ class DeleteVerb(VerbExtension):
             )
             choice_data[ws_choice_data] = ws_name
 
+        choices_selection_data = "[workspace name, distro, path, docker tag]"
         ws_choices_to_delete = questionary.checkbox(
-            "Select workspaces to delete",
+            f"Select workspaces to delete {choices_selection_data}\n",
             choices=list(choice_data.keys()),
         ).ask()
         if not ws_choices_to_delete:
@@ -674,7 +675,8 @@ class DeleteVerb(VerbExtension):
         ws_names_to_delete_to_confirm += "\n"
 
         confirm_delete = questionary.confirm(
-            f"Are you sure you want to delete following workspaces? {ws_names_to_delete_to_confirm}"
+            f"Are you sure you want to delete following workspaces? {choices_selection_data}"
+            f"{ws_names_to_delete_to_confirm}"
         ).ask()
         if not confirm_delete:
             return
@@ -753,7 +755,7 @@ class DeleteVerb(VerbExtension):
         except Exception as e:
             stats.docker_image_removed = False
             error_msg = (
-                f"Exception {type(e)} caught during Docker rmi cmd {docker_rm_cmd} for "
+                f"Exception {type(e)} caught during Docker rmi cmd {docker_rmi_cmd} for "
                 f"'{docker_tag}': {e}"
             )
             print(error_msg)
@@ -766,55 +768,54 @@ class DeleteVerb(VerbExtension):
     ) -> DeletionSend2TrashStats:
         stats = DeletionSend2TrashStats(ws_name=ws_name, ws_folder=ws_folder)
 
-        # check if src folder should be removed
-        send_to_trash_src = True
-        src_items = None
+        # check if the src folder should be removed
+        send_src_folder_to_trash = True
+        items_in_src_folder = None
         src_path = os.path.join(ws_folder, src_folder)
         if os.path.exists(src_path):
-            src_items = os.listdir(src_path)
-            if src_items:
-                delete_src = questionary.confirm(
-                    f"Found non-empty '{src_folder}' folder in {src_path} for ws '{ws_name}'. "
+            items_in_src_folder = os.listdir(src_path)
+            if items_in_src_folder:
+                send_src_folder_to_trash = questionary.confirm(
+                    f"Found non-empty '{src_folder}' folder in '{src_path}' for ws '{ws_name}'. "
                     f"\nDo you want to delete the '{src_folder}' folder that has following content?"
-                    f"\n{src_items}\n"
+                    f"\n{items_in_src_folder}\n"
                 ).ask()
-                if delete_src is None:  # cancelled by user
+                if send_src_folder_to_trash is None:  # cancelled by user
                     return None
-                print(f"delete_src: {delete_src}")
-                if not delete_src:
-                    send_to_trash_src = False
+                print(f"send_src_folder_to_trash: {send_src_folder_to_trash}")
 
-        # todo(muritane): rewrite this
-        if not send_to_trash_src:
-            if src_items:
-                print(
-                    f"Sending to trash everything in ws folder '{ws_folder}' of ws '{ws_name}' "
-                    f"except '{src_folder}' folder"
-                )
-                item_paths = [
-                    os.path.join(ws_folder, item) for item in src_items if item != src_folder
-                ]
-                stats.top_level_items_to_remove = item_paths
-                for item_path in item_paths:
-                    try:
-                        send2trash(item_path)
-                        stats.removed_top_level_items.append(item_path)
-                    except Exception as e:
-                        error_msg = (
-                            f"Exception {type(e)} caught while sending '{item_path}' to trash: {e}"
-                        )
-                        print(error_msg)
-                        stats.failed_to_remove_top_level_items[item_path] = error_msg
-        # todo(muritane): rewrite this
-        else:
+        top_level_items_to_remove = []
+
+        # remove the src folder
+        if send_src_folder_to_trash:
             print(f"Sending to trash the whole workspace folder '{ws_folder}' of ws '{ws_name}'")
+            top_level_items_to_remove = [ws_folder]
+        # keep the src folder
+        else:
+            items_in_ws_folder = os.listdir(ws_folder)
+            if not items_in_ws_folder:
+                print(f"Nothing to remove in ws folder '{ws_folder}'")
+                return stats
+            item_paths_in_ws_folder = [
+                os.path.join(ws_folder, item) for item in items_in_ws_folder if item != src_folder
+            ]
+            print(
+                f"Sending to trash everything in ws folder '{ws_folder}' of ws '{ws_name}' "
+                f"except '{src_folder}' folder: {item_paths_in_ws_folder}"
+            )
+            top_level_items_to_remove = item_paths_in_ws_folder
+
+        stats.top_level_items_to_remove = top_level_items_to_remove
+
+        for item_path in top_level_items_to_remove:
             try:
-                send2trash(ws_folder)
-                stats.removed_top_level_items.append(ws_folder)
+                send2trash(item_path)
+                stats.removed_top_level_items.append(item_path)
+                print(f"Sent to trash: '{item_path}'")
             except Exception as e:
-                error_msg = f"Exception {type(e)} caught while sending '{ws_folder}' to trash: {e}"
+                error_msg = f"Exception {type(e)} caught while sending '{item_path}' to trash: {e}"
                 print(error_msg)
-                stats.failed_to_remove_top_level_items[ws_folder] = error_msg
+                stats.failed_to_remove_top_level_items[item_path] = error_msg
 
         return stats
 
@@ -888,8 +889,10 @@ class DeleteVerb(VerbExtension):
                     f"Send2trash deletion operation of ws '{ws_name}' was interrupted"
                 )
                 return stats
+
             stats.send2trash_stats[ws_name] = send2trash_stats
-            if len(send2trash_stats.failed_to_remove_top_level_items) != 0:
+
+            if send2trash_stats.failed_to_remove_top_level_items:
                 confirm_delete_from_config = questionary.confirm(
                     f"Failed to send to trash {send2trash_stats.failed_to_remove_top_level_items}."
                     f" Do you still want to delete this workspace ({ws_name}) from the config "
@@ -907,120 +910,21 @@ class DeleteVerb(VerbExtension):
             delete_from_config_stats = self.handle_delete_from_config(
                 ws_name=ws_name, ws_config=workspaces_config, config_path=WORKSPACES_PATH
             )
-            stats.deleted_from_config_stats[ws_name] = delete_from_config_stats
+            if delete_from_config_stats is not None:
+                stats.deleted_from_config_stats[ws_name] = delete_from_config_stats
+
+            # check if the workspace deletion succeeded entirely
+            if ws_name in stats.docker_stats:
+                if not stats.docker_stats[ws_name].docker_image_removed:
+                    continue
+            if ws_name not in stats.send2trash_stats:
+                continue
+            if stats.send2trash_stats[ws_name].failed_to_remove_top_level_items:
+                continue
+            if ws_name not in stats.deleted_from_config_stats:
+                continue
+            if not stats.deleted_from_config_stats[ws_name].deleted_from_config:
+                continue
+            stats.fully_succeeded.append(ws_name)
 
         return stats
-
-        # docker_images_to_be_removed.append(ws.docker_tag)
-
-        #     num_to_delete = len(ws_names_to_delete)
-        #     line_sep = "-" * 50
-        #     for ws_name_i, ws_name in enumerate(ws_names_to_delete):
-        #         # ... (rest of the loop logic)
-
-        #         if self.handle_docker_operations(ws):
-        #             if ws.ws_docker_support:
-        #                 stats.docker_images_removed.append(ws.docker_tag)
-        #         elif ws.ws_docker_support:
-        #             stats.docker_images_failed_to_remove.append(ws.docker_tag)
-
-        #         if self.handle_send_to_trash(ws):
-        #             stats.sent_to_trash_ws_names.append(ws_name)
-        #         else:
-        #             stats.failed_to_send_to_trash_ws_names.append(ws_name)
-
-        #         if self.handle_delete_from_config(ws_name):
-        #             if ws_name in stats.sent_to_trash_ws_names:
-        #                 stats.sent_to_trash_and_deleted_in_config_ws_names.append(ws_name)
-        #             else:
-        #                 stats.failed_to_send_and_deleted_in_config_ws_names.append(ws_name)
-
-        #     # Print the deletion summary
-        #     stats.print_summary()
-
-        # # def handle_delete_workspaces(
-        # #     self, ws_names_to_delete: List[str], workspaces_config: WorkspacesConfig
-        # # ) -> None:
-        # sent_to_trash_ws_names = []
-        # sent_to_trash_and_deleted_in_config_ws_names = []
-        # failed_to_send_to_trash_ws_names = []
-        # failed_to_send_and_deleted_in_config_ws_names = []
-        # docker_images_to_be_removed = []
-        # docker_images_removed = []
-        # docker_images_failed_to_remove = []
-
-        # try:
-        #     if ws.ws_docker_support:
-        #         # Get container IDs for the given Docker image
-        #         container_ids = (
-        #             subprocess.check_output(
-        #                 ["docker", "ps", "-a", "-q", "--filter", f"ancestor={ws.docker_tag}"]
-        #             )
-        #             .decode("utf-8")
-        #             .splitlines()
-        #         )
-
-        #         for container_id in container_ids:
-        #             print(f"Stopping container {container_id}")
-        #             subprocess.check_output(["docker", "stop", container_id])
-
-        #             print(f"Removing container {container_id}")
-        #             subprocess.check_output(["docker", "rm", container_id])
-
-        #         print(f"Removing workspace docker image '{ws.docker_tag}'")
-        #         subprocess.check_output(["docker", "rmi", ws.docker_tag])
-        #         docker_images_removed.append(ws.docker_tag)
-
-        #         print(f"Sending workspace folder '{ws.ws_folder}' to the trash folder")
-        #         send2trash(ws.ws_folder)
-        #         sent_to_trash_ws_names.append(ws_name)
-
-        #         if delete_ws_in_workspaces_config(WORKSPACES_PATH, ws_name):
-        #             sent_to_trash_and_deleted_in_config_ws_names.append(ws_name)
-        #         else:
-        #             print(
-        #                 f"Failed to delete workspace ({ws_name}) from the config file "
-        #                 f"({WORKSPACES_PATH})"
-        #             )
-        #     except Exception as e:
-        #         print(
-        #             f"Exception {type(e)} caught while sending ws folder '{ws.ws_folder}' "
-        #             f"to the trash folder: {e}"
-        #         )
-        #         if ws.ws_docker_support and ws.docker_tag not in docker_images_removed:
-        #             docker_images_failed_to_remove.append(ws.docker_tag)
-
-        #         failed_to_send_to_trash_ws_names.append(ws_name)
-        #         confirm_delete_from_config = questionary.confirm(
-        #             f"Do you still want to delete this workspace ({ws_name}) from the config "
-        #             f"file? ({WORKSPACES_PATH})"
-        #         ).ask()
-        #         if confirm_delete_from_config:
-        #             if delete_ws_in_workspaces_config(WORKSPACES_PATH, ws_name):
-        #                 failed_to_send_and_deleted_in_config_ws_names.append(ws_name)
-        #             else:
-        #                 print(
-        #                     f"Failed to delete workspace ({ws_name}) from the config file "
-        #                     f"({WORKSPACES_PATH})"
-        #                 )
-
-        # print(
-        #     f"Deleting workspaces done. {len(sent_to_trash_ws_names)}/{num_to_delete} workspaces "
-        #     f"sent to trash: {sent_to_trash_ws_names} while "
-        #     f"{len(sent_to_trash_and_deleted_in_config_ws_names)}/{len(sent_to_trash_ws_names)} "
-        #     "of these were deleted from the config file: "
-        #     f"{sent_to_trash_and_deleted_in_config_ws_names}"
-        # )
-        # print(
-        #     f"Deleted {len(docker_images_removed)}/{len(docker_images_to_be_removed)} "
-        #     f"Docker images: {docker_images_removed}. Failed for Docker images: "
-        #     f"{docker_images_failed_to_remove}"
-        # )
-        # if failed_to_send_to_trash_ws_names:
-        #     print(
-        #         f"Failed to send {len(failed_to_send_to_trash_ws_names)}/{num_to_delete} "
-        #         f"workspaces to trash: {failed_to_send_to_trash_ws_names} while "
-        #         f"{len(failed_to_send_and_deleted_in_config_ws_names)}/"
-        #         f"{len(failed_to_send_to_trash_ws_names)} of these were deleted from the config "
-        #         f"file: {failed_to_send_and_deleted_in_config_ws_names}"
-        #     )
