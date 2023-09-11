@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (c) 2023, Stogl Robotics Consulting UG (haftungsbeschränkt)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +18,19 @@ import docker
 import os
 import yaml
 
+try:
+    from rtw_cmds.workspace.verbs import WORKSPACES_PATH
+except ImportError as e:
+    print(f"Please install rtwcli first: {e}")
+    exit(0)
+
 A_DUMMY_DOCKER_WS_NAME = "a_dummy_docker_ws"
 A_DUMMY_WS_NAME = "a_dummy_ws"
 TESTING_PATH = "/tmp/ros_team_workspace_testing"
-WORKSPACES_CONFIG_PATH = os.path.expanduser("~/.ros_team_workspace/workspaces.yaml")
 IMAGE_NAME = "hello-world"
 DOCKER_TAG = f"hello-world-for-{A_DUMMY_DOCKER_WS_NAME}:latest"
 CONTAINER_PREFIX = f"container-for-{A_DUMMY_DOCKER_WS_NAME}"
+MAKE_DUMMY_DIRS = True
 
 
 def build_and_run_docker_image(
@@ -40,13 +48,25 @@ def build_and_run_docker_image(
         print(f"Error by pulling image '{image_name}': {e}")
         return False
 
-    image.tag(docker_tag)
+    # Tag image
+    try:
+        image.tag(repository=image_name, tag=docker_tag)
+    except Exception as tag_e:
+        print(f"Error tagging image '{image_name}' with tag '{docker_tag}': {tag_e}")
+        return False
 
     # Create and run containers from the new image
     for i in range(num_containers):
-        client.containers.run(
-            docker_tag, name=f"{container_prefix}{i}", detach=detach, remove=remove
-        )
+        try:
+            client.containers.run(
+                f"{image_name}:{docker_tag}",
+                name=f"{container_prefix}{i}",
+                detach=detach,
+                remove=remove,
+            )
+        except Exception as e:
+            print(f"Unexpected error for container '{container_prefix}{i}': {e}")
+            return False
 
     return True
 
@@ -104,11 +124,11 @@ if __name__ == "__main__":
         container_prefix=CONTAINER_PREFIX,
     ):
         update_yaml_config(
-            workspaces_config_path=WORKSPACES_CONFIG_PATH,
+            workspaces_config_path=WORKSPACES_PATH,
             a_dummy_docker_ws_name=A_DUMMY_DOCKER_WS_NAME,
             a_dummy_ws_name=A_DUMMY_WS_NAME,
             docker_tag=DOCKER_TAG,
             docker_ws_path=os.path.join(TESTING_PATH, A_DUMMY_DOCKER_WS_NAME),
             ws_path=os.path.join(TESTING_PATH, A_DUMMY_WS_NAME),
-            make_dirs=False,
+            make_dirs=MAKE_DUMMY_DIRS,
         )
