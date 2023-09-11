@@ -203,59 +203,59 @@ class DeletionStats:
         deletion_order = "[Docker Stats -> Send2Trash Stats -> Config Deletion Stats]"
         print(f"\n-- Failed ({num_failed}/{num_all_ws} ws) {deletion_order} --")
         for ws_name in self.ws_names_to_delete:
-            if ws_name not in self.fully_succeeded:
-                print(f"{fst_level}{ws_name}")
+            if ws_name in self.fully_succeeded:
+                continue
 
-                docker_stat = self.docker_stats.get(ws_name, None)
-                if docker_stat:
-                    docker_stats_title = "    ├── Docker Stats:"
-                    if docker_stat.docker_image_removed:
-                        docker_stats_title += " OK"
-                    print(docker_stats_title)
-                    if docker_stat.failed_to_get_container_ids:
-                        print(
-                            f"{snd_level}Failed to get Docker containers for image "
-                            f"{docker_stat.docker_image_tag}. "
-                            f"Error: {docker_stat.failed_to_get_container_ids}"
-                        )
-                    for container_id, error in docker_stat.failed_to_stop_container_ids.items():
-                        print(
-                            f"{snd_level}Failed to stop container {container_id}. "
-                            f"Error: {error}"
-                        )
-                    for container_id, error in docker_stat.failed_to_remove_containers.items():
-                        print(
-                            f"{snd_level}Failed to remove container {container_id}. "
-                            f"Error: {error}"
-                        )
-                    if not docker_stat.docker_image_removed:
-                        print(
-                            f"{snd_level}Failed to remove Docker image "
-                            f"{docker_stat.docker_image_tag}. "
-                            f"Error: {docker_stat.failed_to_remove_image}"
-                        )
+            print(f"{fst_level}{ws_name}")
 
-                send2trash_stat = self.send2trash_stats.get(ws_name, None)
-                if send2trash_stat:
-                    send2trash_title = "    ├── Send2Trash Stats:"
-                    if not send2trash_stat.failed_to_remove_top_level_items:
-                        send2trash_title += " OK"
-                    print(send2trash_title)
-                    for item, error in send2trash_stat.failed_to_remove_top_level_items.items():
-                        print(f"{snd_level}Failed to send item {item} to trash. Error: {error}")
+            docker_stat = self.docker_stats.get(ws_name, None)
+            if docker_stat:
+                docker_stats_title = "    ├── Docker Stats:"
+                if docker_stat.docker_image_removed:
+                    docker_stats_title += " OK"
+                print(docker_stats_title)
+                if docker_stat.failed_to_get_container_ids:
+                    print(
+                        f"{snd_level}Failed to get Docker containers for image "
+                        f"{docker_stat.docker_image_tag}. "
+                        f"Error: {docker_stat.failed_to_get_container_ids}"
+                    )
+                for container_id, error in docker_stat.failed_to_stop_container_ids.items():
+                    print(
+                        f"{snd_level}Failed to stop container {container_id}. " f"Error: {error}"
+                    )
+                for container_id, error in docker_stat.failed_to_remove_containers.items():
+                    print(
+                        f"{snd_level}Failed to remove container {container_id}. " f"Error: {error}"
+                    )
+                if not docker_stat.docker_image_removed:
+                    print(
+                        f"{snd_level}Failed to remove Docker image "
+                        f"{docker_stat.docker_image_tag}. "
+                        f"Error: {docker_stat.failed_to_remove_image}"
+                    )
 
-                config_stat = self.deleted_from_config_stats.get(ws_name, None)
-                if config_stat:
-                    config_deletion_title = "    ├── Config Deletion Stats:"
-                    if config_stat.deleted_from_config:
-                        config_deletion_title += " OK"
-                    print(config_deletion_title)
-                    if config_stat.failed_to_backup_config:
-                        print(f"{snd_level}Failed to backup config.")
-                    if config_stat.failed_to_delete_from_config:
-                        print(f"{snd_level}Failed to delete workspace from config.")
-                    if config_stat.failed_to_save_new_config:
-                        print(f"{snd_level}Failed to save new config.")
+            send2trash_stat = self.send2trash_stats.get(ws_name, None)
+            if send2trash_stat:
+                send2trash_title = "    ├── Send2Trash Stats:"
+                if not send2trash_stat.failed_to_remove_top_level_items:
+                    send2trash_title += " OK"
+                print(send2trash_title)
+                for item, error in send2trash_stat.failed_to_remove_top_level_items.items():
+                    print(f"{snd_level}Failed to send item {item} to trash. Error: {error}")
+
+            config_stat = self.deleted_from_config_stats.get(ws_name, None)
+            if config_stat:
+                config_deletion_title = "    ├── Config Deletion Stats:"
+                if config_stat.deleted_from_config:
+                    config_deletion_title += " OK"
+                print(config_deletion_title)
+                if config_stat.failed_to_backup_config:
+                    print(f"{snd_level}Failed to backup config.")
+                if config_stat.failed_to_delete_from_config:
+                    print(f"{snd_level}Failed to delete workspace from config.")
+                if config_stat.failed_to_save_new_config:
+                    print(f"{snd_level}Failed to save new config.")
 
         if self.cancelled_by_user:
             ws_name, reason = self.cancelled_by_user
