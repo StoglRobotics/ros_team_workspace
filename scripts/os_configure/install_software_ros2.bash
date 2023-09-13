@@ -22,7 +22,7 @@ ROS_DISTRO=$1
 if [ -z "$1" ]
 then
   ROS_DISTRO=${ROS_DISTRO}
-  echo "ROS2 version not specified! Using default distribution \"${ROS_DISTRO}\""
+  echo "ROS 2 version not specified! Using default distribution \"${ROS_DISTRO}\""
   echo "Press <ENTER> to continue..."
   read
 fi
@@ -38,7 +38,16 @@ sudo apt -y install python3-vcstool
 
 sudo apt -y install ros-${ROS_DISTRO}-desktop
 
-sudo apt -y install python3-colcon-common-extensions #Install colcon for workspace creation
+# sudo apt install -y python3-pip
+# sudo pip3 install -U argcomplete
+# sudo pip3 install -U rosdep
+
+# echo "ROS - ROS 2 bridge also gets installed"
+# echo "Press <ENTER> to continue..."
+# read  # probably to be removed later
+# sudo apt install -y ros-${ROS_DISTRO}-ros1-bridge
+
+sudo apt install -y python3-colcon-common-extensions #Install colcon for workspace creation
 
 sudo apt -y install ccache
 

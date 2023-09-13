@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2022 Manuel Muth (Stogl Robotics Consulting)
+# Copyright 2022 Stogl Robotics Consulting UG (haftungsbeschränkt)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Authors: Manuel Muth, Denis Štogl
+#
 
 # BEGIN: Stogl Robotics custom setup for nice colors and showing ROS workspace
 
@@ -55,8 +58,40 @@ export TERMINAL_BG_COLOR_WHITE='\e[1;47m'
 if [ -n "$SSH_CLIENT" ]; then text="-ssh-session"
 fi
 
+function get_gitbranch {
+  echo `git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+}
+
+function parse_git_bracket {
+  if [[ "$(get_gitbranch)" != '' ]]; then
+    echo "<"
+  fi
+}
+
+function set_git_color {
+  if [[ "$(get_gitbranch)" != '' ]]; then
+    # Get the status of the repo and chose a color accordingly
+    local STATUS=`LANG=en_GB git status 2>&1`
+    if [[ "$STATUS" != *'working tree clean'* ]]; then
+      # red if need to commit
+      color=${TERMINAL_COLOR_RED}
+    elif [[ "$STATUS" == *'Your branch is ahead'* ]]; then
+        # yellow if need to push
+        color=${TERMINAL_COLOR_YELLOW}
+    elif [[ "$STATUS" == *' have diverged,'* ]]; then
+      # brown if need to force push
+      color=${TERMINAL_COLOR_BROWN}
+    else
+      # else green
+      color=${TERMINAL_COLOR_GREEN}
+    fi
+
+    echo -e "${color}"
+  fi
+}
+
 function parse_git_branch_and_add_brackets {
-  gitbranch=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+  gitbranch="$(get_gitbranch)"
 
   if [[ "$gitbranch" != '' ]]; then
     echo "<${gitbranch}"
@@ -85,6 +120,14 @@ function parse_ros_workspace {
   fi
 }
 
-export PS1="\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'[\t]\['"\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_git_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
+# Version mit time infront of values
+# export PS1="\[\e]0;"'$(parse_ros_workspace)'"\a\]\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'[\t]\['"\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_git_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
+
+# Version without git color
+# export PS1="\[\e]0;"'$(parse_ros_workspace)'"\a\]\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_git_branch_and_add_brackets)>\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
+
+# Version with git color
+export PS1="\[\e]0;"'$(parse_ros_workspace)'"\a\]\[${TERMINAL_COLOR_LIGHT_GREEN}\]"'\u\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"'@\['"\[${TERMINAL_COLOR_BROWN}\]"'\h\['"\[${TERMINAL_COLOR_YELLOW}\]"'${text}\['"\[${TERMINAL_COLOR_LIGHT_GRAY}\]"':'"\["'$(set_ros_workspace_color)'"\]"'$(parse_ros_workspace)\['"\[${TERMINAL_COLOR_GREEN}\]"'$(parse_git_bracket)'"\["'$(set_git_color)'"\]"'$(get_gitbranch)'"\[${TERMINAL_COLOR_GREEN}\]"'>'"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'\W\['"\[${TERMINAL_COLOR_LIGHT_PURPLE}\]"'$\['"\[${TERMINAL_COLOR_NC}\]"'\[\e[m\] '
+
 
 # END: Stogl Robotics custom setup for nice colors and showing ROS workspace

@@ -28,7 +28,7 @@ fi
 
 # All the possible supported ros distributions supported by rtw
 if [ -z "$rtw_supported_ros_distributions" ]; then
-  readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "rolling")
+  readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "iron" "rolling")
 fi
 
 # Mapping of ubuntu version and supported ros distributions
@@ -64,7 +64,7 @@ function set_supported_versions {
     ros_version=2
     ;;
   rolling)
-    supported_ros_distributions=("rolling")
+    supported_ros_distributions=("iron" "rolling")
     ros_version=2
     ;;
   *)
@@ -324,19 +324,29 @@ function user_decision {
   local decision=$1
   user_answer=$2
 
-  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}[${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}${TERMINAL_COLOR_NC} [${rtw_accepted_answers[*]}]"
   read user_answer
 
   while ! $(is_accepted_user_answer "$user_answer");
   do
-    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision} Please type one of the following: [${rtw_accepted_answers[*]}]${TERMINAL_COLOR_NC}"
+    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}${TERMINAL_COLOR_NC} ${TERMINAL_COLOR_USER_NOTICE}Please type one of the following:${TERMINAL_COLOR_NC} [${rtw_accepted_answers[*]}]"
     read user_answer
   done
 }
 
+# function which prints a notification in predefined color scheme and wait for user confirmation
+# $1 - notification = The message which gets print to the commandline
+function user_confirmation {
+  notification=$1
+
+  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}${notification}${TERMINAL_COLOR_NC}"
+  read
+}
+
 function set_framework_default_paths {
   FRAMEWORK_NAME="ros_team_workspace"
-  FRAMEWORK_BASE_PATH="$(RosTeamWS_script_own_dir)/.."
+  # readlink prints resolved symbolic links or canonical file names -> the "dir/dir_2/.." becomes "dir"
+  FRAMEWORK_BASE_PATH="$(readlink -f "$(RosTeamWS_script_own_dir)"/..)"
 
   RosTeamWS_FRAMEWORK_SCRIPTS_PATH="$FRAMEWORK_BASE_PATH/scripts"
   RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/os_configure"
@@ -364,25 +374,44 @@ function is_valid_ros_distribution {
 
 function check_ros_distro {
   ros_distro=$1
+  if [ -z "$2" ]; then
+    use_docker="false"
+  else
+    use_docker=$2
+  fi
 
   # check if the given distribution is a distribution supported by rtw
   while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@];
   do
-      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ros distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please chose either of the following:${rtw_supported_ros_distributions[*]}"
+    if [ -z "$ros_distro" ]; then
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}No ROS distribution provided. Please choose either of the following:${rtw_supported_ros_distributions[*]}"
+    else
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ROS distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please choose either of the following:${rtw_supported_ros_distributions[*]}"
+    fi
       read ros_distro
   done
 
-  if [ ! -d "/opt/ros/$ros_distro" ]; then
-    local upper_case=$(echo $ros_distro | tr '[:lower:]' '[:upper:]')
-    local alternative_ros_location=ALTERNATIVE_ROS_${upper_case}_LOCATION
-    if [ ! -f "${!alternative_ros_location}/setup.bash" ]; then
-      print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
-    else
-      user_decision "Using ${ALTERNATIVE_ROS_LOCATION} for ${ros_distro}." user_answer
-      # check if the chosen ros-distro location is correct.
-      if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
-        print_and_exit "Please set your ALTERNATIVE_ROS_LOCATION to the correct location. Exiting..."
+  # inside docker container we don't need to check if ros distro is present on system
+  if [ "${use_docker}" != "true" ]; then
+    if [ ! -d "/opt/ros/$ros_distro" ]; then
+      local upper_case=$(echo $ros_distro | tr '[:lower:]' '[:upper:]')
+      local alternative_ros_location=ALTERNATIVE_ROS_${upper_case}_LOCATION
+      if [ ! -f "${!alternative_ros_location}/setup.bash" ]; then
+        notify_user "You are possibly trying to run unsupported ROS distro ('$ros_distro') for your version of Ubuntu. Please set ${alternative_ros_location} variable, e.g., 'export ${alternative_ros_location}=/opt/ros/rolling'. The best is to add that line somewhere at the beginning of the '~/.ros_team_ws_rc' file."
+
+        print_and_exit "FATAL: ROS '$ros_distro' not installed on this computer! Exiting..."
+      else
+        user_decision "Using ${!alternative_ros_location} for ${ros_distro}." user_answer
+        # check if the chosen ros-distro location is correct.
+        if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
+          print_and_exit "Please set ${alternative_ros_location} to the correct location. Exiting..."
+        else
+          source "${!alternative_ros_location}/setup.bash"
+        fi
       fi
+    else
+      # source ros to have access to ros cli commands for other functions
+      source "/opt/ros/${ros_distro}/setup.bash"
     fi
   fi
 }
@@ -403,19 +432,27 @@ function set_ros_version_for_distro {
     humble)
       ros_version=2
       ;;
+    iron)
+      ros_version=2
+      ;;
     rolling)
       ros_version=2
       ;;
     *)
-      print_and_exit "FATAL: For the chosen ros distribution ${ros_distribution} does no ros version exist."
+      print_and_exit "FATAL: For the chosen ros distribution ${ros_distribution} there is no ros version."
       ;;
   esac
 }
 
 function check_and_set_ros_distro_and_version {
   ros_distro=$1
+  if [ -z "$2" ]; then
+    use_docker="false"
+  else
+    use_docker=$2
+  fi
 
-  check_ros_distro "${ros_distro}"
+  check_ros_distro "${ros_distro}" "${use_docker}"
   set_ros_version_for_distro "${ros_distro}"
 }
 
@@ -441,11 +478,11 @@ function compile_and_source_package {
     if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
       print_and_exit "Aborting. Not the correct workspace sourced. Please source the correct workspace folder and compile manually."
     fi
-
-    cd "$sourced_ws_dirname" || { print_and_exit "Could not change directory to workspace:\"$sourced_ws_dirname\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
-  else
-    cd "$ROS_WS" || { print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
+  # set ROS_WS ourselves, as other functions need it later and will fail/use wrong path otherwise
+  export ROS_WS="$sourced_ws_dirname"
   fi
+
+  cd "$ROS_WS" || { print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
 
   colcon_build_up_to $pkg_name
   source install/setup.bash

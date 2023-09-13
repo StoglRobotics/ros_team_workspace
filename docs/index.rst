@@ -3,12 +3,12 @@ Welcome the documentation of *ROS Team Workspace*-Framework
 ============================================================
 
 ROS Team Workspace (RosTeamWS) is a framework for boosting collaboration in teams when developing software for robots using `Robot Operating System (ROS) <https://www.ros.org/>`_.
-It supports both **ROS1** and **ROS2**.
+It supports both **ROS** and **ROS 2**.
 Its main goal is to optimize the workflow of development teams and focus more on programming robots.
 
-The framework is initiated by Denis Stogl in 2016 to increase collaboration at the Institute for Anthropomatics and Robotics (IAR) - Intelligent Process Control and Robotics (IPR), Karlsruhe Institute of Technology (KIT).
+The framework was initiated by Dr. Denis in 2016 to increase collaboration at the Institute for Anthropomatics and Robotics (IAR) - Intelligent Process Control and Robotics (IPR), Karlsruhe Institute of Technology (KIT).
 
-From the 2021 the framework is maintained by Stogl Robotic Consulting.
+From 2021, the framework is maintained by Stogl Robotics Consulting.
 
 .. .. contents:: Table of Contents
 ..    :depth: 2
@@ -30,7 +30,7 @@ The framework is the main entry-point for teams to:
 #. organize their public and private ROS packages;
 #. describes scenarios;
 #. enable continuous integration across the use-cases;
-#. and provide scripts for easy use of ROS.
+#. provide scripts for easy use of ROS.
 
 
 To achieve this, RosTeamWS defines:

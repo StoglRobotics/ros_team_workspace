@@ -1,7 +1,10 @@
-name: $Ros_distro$ Semi-Binary Build
+name: $Ros_distro$ Semi-Binary Build - main
 # description: 'Build & test that compiles the main dependencies from source.'
 
 on:
+  workflow_dispatch:
+    branches:
+      - $branch$
   pull_request:
     branches:
       - $branch$
@@ -16,7 +19,7 @@ jobs:
   semi_binary:
     uses: ./.github/workflows/reusable-industrial-ci-with-cache.yml
     with:
-      ros_distro: $ROS_DISTRO$
-      ros_repo: $ROS_REPO$
-      upstream_workspace: $NAME$.$ROS_DISTRO$.repos
+      ros_distro: $ros_distro$
+      ros_repo: main
+      upstream_workspace: $NAME$.$ros_distro$.repos
       ref_for_scheduled_build: $branch$

@@ -24,7 +24,8 @@ namespace dummy_package_namespace
 hardware_interface::CallbackReturn DummyClassName::on_init(
   const hardware_interface::HardwareInfo & info)
 {
-  if (hardware_interface::Dummy_Interface_TypeInterface::on_init(info) != CallbackReturn::SUCCESS) {
+  if (hardware_interface::Dummy_Interface_TypeInterface::on_init(info) != CallbackReturn::SUCCESS)
+  {
     return CallbackReturn::ERROR;
   }
 
@@ -35,10 +36,19 @@ hardware_interface::CallbackReturn DummyClassName::on_init(
   return CallbackReturn::SUCCESS;
 }
 
+hardware_interface::CallbackReturn DummyClassName::on_configure(
+  const rclcpp_lifecycle::State & /*previous_state*/)
+{
+  // TODO(anyone): prepare the robot to be ready for read calls and write calls of some interfaces
+
+  return CallbackReturn::SUCCESS;
+}
+
 std::vector<hardware_interface::StateInterface> DummyClassName::export_state_interfaces()
 {
   std::vector<hardware_interface::StateInterface> state_interfaces;
-  for (uint i = 0; i < info_.joints.size(); i++) {
+  for (size_t i = 0; i < info_.joints.size(); ++i)
+  {
     state_interfaces.emplace_back(hardware_interface::StateInterface(
       // TODO(anyone): insert correct interfaces
       info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_[i]));
@@ -50,7 +60,8 @@ std::vector<hardware_interface::StateInterface> DummyClassName::export_state_int
 std::vector<hardware_interface::CommandInterface> DummyClassName::export_command_interfaces()
 {
   std::vector<hardware_interface::CommandInterface> command_interfaces;
-  for (uint i = 0; i < info_.joints.size(); i++) {
+  for (size_t i = 0; i < info_.joints.size(); ++i)
+  {
     command_interfaces.emplace_back(hardware_interface::CommandInterface(
       // TODO(anyone): insert correct interfaces
       info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_commands_[i]));

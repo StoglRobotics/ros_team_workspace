@@ -14,11 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-usage="setup-robot-ros2-control-hardware.bash FILE_NAME [CLASS_NAME] [PKG_NAME]"
-
-# echo ""
-# echo "Your path is `pwd`. Is this your package folder where to setup robot's bringup?"
-# read -p "If so press <ENTER> otherwise <CTRL>+C and start the script again from the bringup folder."
+usage="ros2_control_setup-hardware-interface-package FILE_NAME [CLASS_NAME]"
 
 # Load Framework defines
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
@@ -33,6 +29,11 @@ fi
 if [ -f src/$FILE_NAME.cpp ]; then
   print_and_exit "ERROR:The file '$FILE_NAME' already exist! 😱!" "$usage"
 fi
+
+if [ ! -f "package.xml" ]; then
+  print_and_exit "ERROR: 'package.xml' not found. You should execute this script at the top level of your package folder. Nothing to do 😯" "$usage"
+fi
+PKG_NAME="$(grep -Po '(?<=<name>).*?(?=</name>)' package.xml | sed -e 's/[[:space:]]//g')"
 
 echo ""  # Adds empty line
 
@@ -49,17 +50,10 @@ if [ -z "$2" ]; then
   echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}ClassName guessed from the '$FILE_NAME': '$CLASS_NAME'. Is this correct? If not provide it as the second parameter.${TERMINAL_COLOR_NC}"
 fi
 
-PKG_NAME=$3
-if [ -z "$3" ]; then
-  current=`pwd`
-  PKG_NAME=$(basename "$current")
-  echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}Package name guessed from the current path is '$PKG_NAME'. Is this correct? If not provide it as the third parameter.${TERMINAL_COLOR_NC}"
-fi
-
 echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Which license-header do you want to use? [1]"
 echo "(0) None"
 echo "(1) Apache 2.0 License"
-echo "(2) Propiatery"
+echo "(2) Proprietary"
 echo -n -e "${TERMINAL_COLOR_NC}"
 read choice
 choice=${choice:="1"}
@@ -129,7 +123,7 @@ cp -n $ROS2_CONTROL_HW_ITF_TEMPLATES/test_robot_hardware_interface.cpp $TEST_CPP
 echo -e "${TERMINAL_COLOR_USER_NOTICE}Template files copied.${TERMINAL_COLOR_NC}"
 
 # Add license header to the files
-# TODO: When Propiatery then add the following before ament_lint_auto_find_test_dependencies()
+# TODO: When Proprietary then add the following before ament_lint_auto_find_test_dependencies()
 # list(APPEND AMENT_LINT_AUTO_EXCLUDE
 #    ament_cmake_copyright
 #  )

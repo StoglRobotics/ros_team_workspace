@@ -2,7 +2,7 @@ name: "Build & Deploy Page"
 on:
   push:
     branches:
-      - $ROS_DISTRO$
+      - $ros_distro$
 
 jobs:
   build:

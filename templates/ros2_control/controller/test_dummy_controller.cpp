@@ -28,91 +28,20 @@ class DummyClassNameTest : public DummyClassNameFixture<TestableDummyClassName>
 {
 };
 
-// When there are many mandatory parameters, set all by default and remove one by one in a
-// parameterized test
-TEST_P(DummyClassNameTestParameterizedParameters, one_parameter_is_missing)
-{
-  SetUpController();
-
-  ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_ERROR);
-}
-
-// TODO(anyone): the new gtest version after 1.8.0 uses INSTANTIATE_TEST_SUITE_P
-INSTANTIATE_TEST_SUITE_P(
-  MissingMandatoryParameterDuringConfiguration, DummyClassNameTestParameterizedParameters,
-  ::testing::Values(
-    std::make_tuple(std::string("joints"), rclcpp::ParameterValue(std::vector<std::string>({}))),
-    std::make_tuple(
-      std::string("state_joints"), rclcpp::ParameterValue(std::vector<std::string>({}))),
-    std::make_tuple(std::string("interface_name"), rclcpp::ParameterValue(""))));
-
-TEST_F(DummyClassNameTest, joint_names_parameter_not_set)
-{
-  SetUpController(false);
-
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
-
-  controller_->get_node()->set_parameter({"state_joints", state_joint_names_});
-  controller_->get_node()->set_parameter({"interface_name", interface_name_});
-
-  ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_ERROR);
-
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
-}
-
-TEST_F(DummyClassNameTest, state_joint_names_parameter_not_set)
-{
-  SetUpController(false);
-
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
-
-  controller_->get_node()->set_parameter({"joints", joint_names_});
-  controller_->get_node()->set_parameter({"interface_name", interface_name_});
-
-  ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_ERROR);
-
-  ASSERT_THAT(controller_->joint_names_, testing::ElementsAreArray(joint_names_));
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
-}
-
-TEST_F(DummyClassNameTest, interface_parameter_not_set)
-{
-  SetUpController(false);
-
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
-
-  controller_->get_node()->set_parameter({"joints", joint_names_});
-  controller_->get_node()->set_parameter({"state_joints", state_joint_names_});
-
-  ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_ERROR);
-
-  ASSERT_THAT(controller_->joint_names_, testing::ElementsAreArray(joint_names_));
-  ASSERT_THAT(controller_->state_joint_names_, testing::ElementsAreArray(state_joint_names_));
-  ASSERT_TRUE(controller_->interface_name_.empty());
-}
-
 TEST_F(DummyClassNameTest, all_parameters_set_configure_success)
 {
   SetUpController();
 
-  ASSERT_TRUE(controller_->joint_names_.empty());
-  ASSERT_TRUE(controller_->state_joint_names_.empty());
-  ASSERT_TRUE(controller_->interface_name_.empty());
+  ASSERT_TRUE(controller_->params_.joints.empty());
+  ASSERT_TRUE(controller_->params_.state_joints.empty());
+  ASSERT_TRUE(controller_->params_.interface_name.empty());
 
   ASSERT_EQ(controller_->on_configure(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
-  ASSERT_THAT(controller_->joint_names_, testing::ElementsAreArray(joint_names_));
-  ASSERT_THAT(controller_->state_joint_names_, testing::ElementsAreArray(state_joint_names_));
-  ASSERT_EQ(controller_->interface_name_, interface_name_);
+  ASSERT_THAT(controller_->params_.joints, testing::ElementsAreArray(joint_names_));
+  ASSERT_TRUE(controller_->params_.state_joints.empty());
+  ASSERT_THAT(controller_->state_joints_, testing::ElementsAreArray(joint_names_));
+  ASSERT_EQ(controller_->params_.interface_name, interface_name_);
 }
 
 TEST_F(DummyClassNameTest, check_exported_intefaces)
@@ -123,14 +52,16 @@ TEST_F(DummyClassNameTest, check_exported_intefaces)
 
   auto command_intefaces = controller_->command_interface_configuration();
   ASSERT_EQ(command_intefaces.names.size(), joint_command_values_.size());
-  for (size_t i = 0; i < command_intefaces.names.size(); ++i) {
+  for (size_t i = 0; i < command_intefaces.names.size(); ++i)
+  {
     EXPECT_EQ(command_intefaces.names[i], joint_names_[i] + "/" + interface_name_);
   }
 
   auto state_intefaces = controller_->state_interface_configuration();
   ASSERT_EQ(state_intefaces.names.size(), joint_state_values_.size());
-  for (size_t i = 0; i < state_intefaces.names.size(); ++i) {
-    EXPECT_EQ(state_intefaces.names[i], state_joint_names_[i] + "/" + interface_name_);
+  for (size_t i = 0; i < state_intefaces.names.size(); ++i)
+  {
+    EXPECT_EQ(state_intefaces.names[i], joint_names_[i] + "/" + interface_name_);
   }
 }
 
@@ -142,13 +73,15 @@ TEST_F(DummyClassNameTest, activate_success)
   ASSERT_EQ(controller_->on_activate(rclcpp_lifecycle::State()), NODE_SUCCESS);
 
   // check that the message is reset
-  auto msg = controller_->input_cmd_.readFromNonRT();
+  auto msg = controller_->input_ref_.readFromNonRT();
   EXPECT_EQ((*msg)->displacements.size(), joint_names_.size());
-  for (const auto & cmd : (*msg)->displacements) {
+  for (const auto & cmd : (*msg)->displacements)
+  {
     EXPECT_TRUE(std::isnan(cmd));
   }
   EXPECT_EQ((*msg)->velocities.size(), joint_names_.size());
-  for (const auto & cmd : (*msg)->velocities) {
+  for (const auto & cmd : (*msg)->velocities)
+  {
     EXPECT_TRUE(std::isnan(cmd));
   }
 
@@ -231,12 +164,12 @@ TEST_F(DummyClassNameTest, test_update_logic_fast)
 
   // set command statically
   static constexpr double TEST_DISPLACEMENT = 23.24;
-  std::shared_ptr<ControllerCommandMsg> msg = std::make_shared<ControllerCommandMsg>();
+  std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   msg->joint_names = joint_names_;
   msg->displacements.resize(joint_names_.size(), TEST_DISPLACEMENT);
   msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
   msg->duration = std::numeric_limits<double>::quiet_NaN();
-  controller_->input_cmd_.writeFromNonRT(msg);
+  controller_->input_ref_.writeFromNonRT(msg);
 
   ASSERT_EQ(
     controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
@@ -244,7 +177,7 @@ TEST_F(DummyClassNameTest, test_update_logic_fast)
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT);
-  EXPECT_TRUE(std::isnan((*(controller_->input_cmd_.readFromRT()))->displacements[0]));
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::FAST);
 }
 
@@ -260,23 +193,23 @@ TEST_F(DummyClassNameTest, test_update_logic_slow)
 
   // set command statically
   static constexpr double TEST_DISPLACEMENT = 23.24;
-  std::shared_ptr<ControllerCommandMsg> msg = std::make_shared<ControllerCommandMsg>();
+  std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
   // When slow mode is enabled command ends up being half of the value
   msg->joint_names = joint_names_;
   msg->displacements.resize(joint_names_.size(), TEST_DISPLACEMENT);
   msg->velocities.resize(joint_names_.size(), std::numeric_limits<double>::quiet_NaN());
   msg->duration = std::numeric_limits<double>::quiet_NaN();
-  controller_->input_cmd_.writeFromNonRT(msg);
+  controller_->input_ref_.writeFromNonRT(msg);
   controller_->control_mode_.writeFromNonRT(control_mode_type::SLOW);
 
   EXPECT_EQ(*(controller_->control_mode_.readFromRT()), control_mode_type::SLOW);
-  ASSERT_EQ((*(controller_->input_cmd_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
+  ASSERT_EQ((*(controller_->input_ref_.readFromRT()))->displacements[0], TEST_DISPLACEMENT);
   ASSERT_EQ(
     controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01)),
     controller_interface::return_type::OK);
 
   EXPECT_EQ(joint_command_values_[STATE_MY_ITFS], TEST_DISPLACEMENT / 2);
-  EXPECT_TRUE(std::isnan((*(controller_->input_cmd_.readFromRT()))->displacements[0]));
+  EXPECT_TRUE(std::isnan((*(controller_->input_ref_.readFromRT()))->displacements[0]));
 }
 
 TEST_F(DummyClassNameTest, publish_status_success)
@@ -326,4 +259,13 @@ TEST_F(DummyClassNameTest, receive_message_and_publish_updated_status)
   subscribe_and_get_messages(msg);
 
   ASSERT_EQ(msg.set_point, 0.45);
+}
+
+int main(int argc, char ** argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  rclcpp::init(argc, argv);
+  int result = RUN_ALL_TESTS();
+  rclcpp::shutdown();
+  return result;
 }

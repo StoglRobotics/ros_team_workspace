@@ -35,7 +35,7 @@
 
 // TODO(anyone): replace the state and command message types
 using ControllerStateMsg = dummy_package_namespace::DummyClassName::ControllerStateMsg;
-using ControllerCommandMsg = dummy_package_namespace::DummyClassName::ControllerCommandMsg;
+using ControllerReferenceMsg = dummy_package_namespace::DummyClassName::ControllerReferenceMsg;
 using ControllerModeSrvType = dummy_package_namespace::DummyClassName::ControllerModeSrvType;
 
 namespace
@@ -47,9 +47,6 @@ constexpr auto NODE_ERROR = controller_interface::CallbackReturn::ERROR;
 // subclassing and friending so we can access member variables
 class TestableDummyClassName : public dummy_package_namespace::DummyClassName
 {
-  FRIEND_TEST(DummyClassNameTest, joint_names_parameter_not_set);
-  FRIEND_TEST(DummyClassNameTest, state_joint_names_parameter_not_set);
-  FRIEND_TEST(DummyClassNameTest, interface_parameter_not_set);
   FRIEND_TEST(DummyClassNameTest, all_parameters_set_configure_success);
   FRIEND_TEST(DummyClassNameTest, activate_success);
   FRIEND_TEST(DummyClassNameTest, reactivate_success);
@@ -63,25 +60,27 @@ public:
   {
     auto ret = dummy_package_namespace::DummyClassName::on_configure(previous_state);
     // Only if on_configure is successful create subscription
-    if (ret == CallbackReturn::SUCCESS) {
-      cmd_subscriber_wait_set_.add_subscription(cmd_subscriber_);
+    if (ret == CallbackReturn::SUCCESS)
+    {
+      ref_subscriber_wait_set_.add_subscription(ref_subscriber_);
     }
     return ret;
   }
 
   /**
-   * @brief wait_for_command blocks until a new ControllerCommandMsg is received.
+   * @brief wait_for_command blocks until a new ControllerReferenceMsg is received.
    * Requires that the executor is not spinned elsewhere between the
    *  message publication and the call to this function.
    *
-   * @return true if new ControllerCommandMsg msg was received, false if timeout.
+   * @return true if new ControllerReferenceMsg msg was received, false if timeout.
    */
   bool wait_for_command(
     rclcpp::Executor & executor, rclcpp::WaitSet & subscriber_wait_set,
     const std::chrono::milliseconds & timeout = std::chrono::milliseconds{500})
   {
     bool success = subscriber_wait_set.wait(timeout).kind() == rclcpp::WaitResultKind::Ready;
-    if (success) {
+    if (success)
+    {
       executor.spin_some();
     }
     return success;
@@ -91,13 +90,13 @@ public:
     rclcpp::Executor & executor,
     const std::chrono::milliseconds & timeout = std::chrono::milliseconds{500})
   {
-    return wait_for_command(executor, cmd_subscriber_wait_set_, timeout);
+    return wait_for_command(executor, ref_subscriber_wait_set_, timeout);
   }
 
   // TODO(anyone): add implementation of any methods of your controller is needed
 
 private:
-  rclcpp::WaitSet cmd_subscriber_wait_set_;
+  rclcpp::WaitSet ref_subscriber_wait_set_;
 };
 
 // We are using template class here for easier reuse of Fixture in specializations of controllers
@@ -105,7 +104,7 @@ template <typename CtrlType>
 class DummyClassNameFixture : public ::testing::Test
 {
 public:
-  static void SetUpTestCase() { rclcpp::init(0, nullptr); }
+  static void SetUpTestCase() {}
 
   void SetUp()
   {
@@ -113,21 +112,20 @@ public:
     controller_ = std::make_unique<CtrlType>();
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
-    command_publisher_ = command_publisher_node_->create_publisher<ControllerCommandMsg>(
-      "/test_dummy_package_namespace/commands", rclcpp::SystemDefaultsQoS());
+    command_publisher_ = command_publisher_node_->create_publisher<ControllerReferenceMsg>(
+      "/test_dummy_controller/commands", rclcpp::SystemDefaultsQoS());
 
     service_caller_node_ = std::make_shared<rclcpp::Node>("service_caller");
     slow_control_service_client_ = service_caller_node_->create_client<ControllerModeSrvType>(
-      "/test_dummy_package_namespace/set_slow_control_mode");
+      "/test_dummy_controller/set_slow_control_mode");
   }
 
-  static void TearDownTestCase() { rclcpp::shutdown(); }
+  static void TearDownTestCase() {}
 
   void TearDown() { controller_.reset(nullptr); }
 
 protected:
-  void SetUpController(
-    bool set_parameters = true, std::string controller_name = "test_dummy_package_namespace")
+  void SetUpController(const std::string controller_name = "test_dummy_controller")
   {
     ASSERT_EQ(controller_->init(controller_name), controller_interface::return_type::OK);
 
@@ -135,7 +133,8 @@ protected:
     command_itfs_.reserve(joint_command_values_.size());
     command_ifs.reserve(joint_command_values_.size());
 
-    for (size_t i = 0; i < joint_command_values_.size(); ++i) {
+    for (size_t i = 0; i < joint_command_values_.size(); ++i)
+    {
       command_itfs_.emplace_back(hardware_interface::CommandInterface(
         joint_names_[i], interface_name_, &joint_command_values_[i]));
       command_ifs.emplace_back(command_itfs_.back());
@@ -146,7 +145,8 @@ protected:
     state_itfs_.reserve(joint_state_values_.size());
     state_ifs.reserve(joint_state_values_.size());
 
-    for (size_t i = 0; i < joint_state_values_.size(); ++i) {
+    for (size_t i = 0; i < joint_state_values_.size(); ++i)
+    {
       state_itfs_.emplace_back(hardware_interface::StateInterface(
         joint_names_[i], interface_name_, &joint_state_values_[i]));
       state_ifs.emplace_back(state_itfs_.back());
@@ -154,12 +154,6 @@ protected:
     // TODO(anyone): Add other state interfaces, if any
 
     controller_->assign_interfaces(std::move(command_ifs), std::move(state_ifs));
-
-    if (set_parameters) {
-      controller_->get_node()->set_parameter({"joints", joint_names_});
-      controller_->get_node()->set_parameter({"state_joints", state_joint_names_});
-      controller_->get_node()->set_parameter({"interface_name", interface_name_});
-    }
   }
 
   void subscribe_and_get_messages(ControllerStateMsg & msg)
@@ -168,7 +162,7 @@ protected:
     rclcpp::Node test_subscription_node("test_subscription_node");
     auto subs_callback = [&](const ControllerStateMsg::SharedPtr) {};
     auto subscription = test_subscription_node.create_subscription<ControllerStateMsg>(
-      "/test_dummy_package_namespace/state", 10, subs_callback);
+      "/test_dummy_controller/state", 10, subs_callback);
 
     // call update to publish the test value
     ASSERT_EQ(
@@ -180,10 +174,12 @@ protected:
     int max_sub_check_loop_count = 5;  // max number of tries for pub/sub loop
     rclcpp::WaitSet wait_set;          // block used to wait on message
     wait_set.add_subscription(subscription);
-    while (max_sub_check_loop_count--) {
+    while (max_sub_check_loop_count--)
+    {
       controller_->update(rclcpp::Time(0), rclcpp::Duration::from_seconds(0.01));
       // check if message has been received
-      if (wait_set.wait(std::chrono::milliseconds(2)).kind() == rclcpp::WaitResultKind::Ready) {
+      if (wait_set.wait(std::chrono::milliseconds(2)).kind() == rclcpp::WaitResultKind::Ready)
+      {
         break;
       }
     }
@@ -200,10 +196,13 @@ protected:
     const std::vector<double> & displacements = {0.45},
     const std::vector<double> & velocities = {0.0}, const double duration = 1.25)
   {
-    auto wait_for_topic = [&](const auto topic_name) {
+    auto wait_for_topic = [&](const auto topic_name)
+    {
       size_t wait_count = 0;
-      while (command_publisher_node_->count_subscribers(topic_name) == 0) {
-        if (wait_count >= 5) {
+      while (command_publisher_node_->count_subscribers(topic_name) == 0)
+      {
+        if (wait_count >= 5)
+        {
           auto error_msg =
             std::string("publishing to ") + topic_name + " but no node subscribes to it";
           throw std::runtime_error(error_msg);
@@ -215,7 +214,7 @@ protected:
 
     wait_for_topic(command_publisher_->get_topic_name());
 
-    ControllerCommandMsg msg;
+    ControllerReferenceMsg msg;
     msg.joint_names = joint_names_;
     msg.displacements = displacements;
     msg.velocities = velocities;
@@ -233,7 +232,8 @@ protected:
     bool wait_for_service_ret =
       slow_control_service_client_->wait_for_service(std::chrono::milliseconds(500));
     EXPECT_TRUE(wait_for_service_ret);
-    if (!wait_for_service_ret) {
+    if (!wait_for_service_ret)
+    {
       throw std::runtime_error("Services is not available!");
     }
     auto result = slow_control_service_client_->async_send_request(request);
@@ -248,7 +248,7 @@ protected:
   // Controller-related parameters
   std::vector<std::string> joint_names_ = {"joint1"};
   std::vector<std::string> state_joint_names_ = {"joint1state"};
-  std::string interface_name_ = "my_interface";
+  std::string interface_name_ = "acceleration";
   std::array<double, 1> joint_state_values_ = {1.1};
   std::array<double, 1> joint_command_values_ = {101.101};
 
@@ -258,27 +258,9 @@ protected:
   // Test related parameters
   std::unique_ptr<TestableDummyClassName> controller_;
   rclcpp::Node::SharedPtr command_publisher_node_;
-  rclcpp::Publisher<ControllerCommandMsg>::SharedPtr command_publisher_;
+  rclcpp::Publisher<ControllerReferenceMsg>::SharedPtr command_publisher_;
   rclcpp::Node::SharedPtr service_caller_node_;
   rclcpp::Client<ControllerModeSrvType>::SharedPtr slow_control_service_client_;
-};
-
-// From the tutorial: https://www.sandordargo.com/blog/2019/04/24/parameterized-testing-with-gtest
-class DummyClassNameTestParameterizedParameters
-: public DummyClassNameFixture<TestableDummyClassName>,
-  public ::testing::WithParamInterface<std::tuple<std::string, rclcpp::ParameterValue>>
-{
-public:
-  virtual void SetUp() { DummyClassNameFixture::SetUp(); }
-
-  static void TearDownTestCase() { DummyClassNameFixture::TearDownTestCase(); }
-
-protected:
-  void SetUpController(bool set_parameters = true)
-  {
-    DummyClassNameFixture::SetUpController(set_parameters);
-    controller_->get_node()->set_parameter({std::get<0>(GetParam()), std::get<1>(GetParam())});
-  }
 };
 
 #endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_

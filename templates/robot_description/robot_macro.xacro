@@ -11,14 +11,14 @@
            to get more realistic behaviour-->
       <xacro:default_inertial/>
       <visual>
-        <origin rpy="0 0 0" xyz="0 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.3" radius="0.3" />
 <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/base_link.dae" /> -->
         </geometry>
       </visual>
       <collision>
-        <origin rpy="0 0 0" xyz="0 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.3" radius="0.3" />
 <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/base_link.stl" /> -->

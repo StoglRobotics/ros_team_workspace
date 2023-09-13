@@ -7,21 +7,41 @@ jobs:
   ament_lint:
     name: ament_${{ matrix.linter }}
     runs-on: ubuntu-latest
+    env:
+      AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS: True
     strategy:
       fail-fast: false
       matrix:
-        linter: [cppcheck, cpplint, lint_cmake]
+        linter: [cppcheck, copyright, lint_cmake]
         arguments: [""]
         include:
           - linter: copyright
-            arguments: "--exclude conf.py test_robot_description.launch.py view_robot.launch.py robot_ros2_control.launch.py test_forward_position_controller.launch.py test_joint_trajectory_controller.launch.py"
+            arguments: "--exclude docs/conf.py"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: ros-tooling/setup-ros@master
     - uses: ros-tooling/action-ros-lint@master
       with:
-        distribution: galactic
+        distribution: rolling
         linter: ${{ matrix.linter }}
         arguments: ${{ matrix.arguments }}
+        package-name:
+          ros_team_workspace
+
+  ament_lint_100:
+    name: ament_${{ matrix.linter }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+          linter: [cpplint]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ros-tooling/setup-ros@master
+    - uses: ros-tooling/action-ros-lint@master
+      with:
+        distribution: rolling
+        linter: cpplint
+        arguments: "--linelength=100 --filter=-whitespace/newline"
         package-name:
           ros_team_workspace

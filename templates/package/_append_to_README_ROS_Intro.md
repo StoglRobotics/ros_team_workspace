@@ -1,27 +1,28 @@
 
 # Quick Start Instructions
 
-If you are familiar with ROS2, here are the quick-and-dirty build instructions.
+If you are familiar with ROS 2, here are the quick-and-dirty build instructions.
 
   ```
   cd $COLCON_WS
   git clone git@github.com:$NAMESPACE$/$NAME$.git src/$NAME$
-  vcs import src --input src/$NAME$/$NAME$.repos
+  vcs import src --input src/$NAME$/$NAME$.<ros-distro>.repos
   rosdep install --ignore-src --from-paths src -y -r
   colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release    # Faster and more efficient build type
+  cd ..
   ```
 If you end up with missing dependencies, install them using commands from [Setup ROS Workspace](#setup-ros-workspace) section.
 
 # How to use this Package and ROS Introduction
 
  - [Install and Build](#install-and-build)
-   * [Install ROS $Ros_distro$ and Development Tooling](#install-ros-$ROS_DISTRO$-and-development-tooling)
+   * [Install ROS $Ros_distro$ and Development Tooling](#install-ros-$ros_distro$-and-development-tooling)
    * [Setup ROS Workspace](#setup-ros-workspace)
    * [Configure and Build Workspace](#configure-and-build-workspace)
  - [Running Executables](#running-executables)
    * [Using the Local Workspace](#using-the-local-workspace)
  - [Testing and Linting](#testing-and-linting)
- - [Creating a new ROS2 Package](#creating-a-new-ros2-package)
+ - [Creating a new ROS 2 Package](#creating-a-new-ros2-package)
  - [References](#references)
 
 ## Install and Build
@@ -30,19 +31,19 @@ If you end up with missing dependencies, install them using commands from [Setup
 
 These instructions assume you are running Ubuntu 20.04:
 
-1. [Install ROS2 $Ros_distro$](https://index.ros.org/doc/ros2/Installation/$Ros_distro$/Linux-Install-Debians/).
+1. [Install ROS 2 $Ros_distro$](https://index.ros.org/doc/ros2/Installation/$Ros_distro$/Linux-Install-Debians/).
    You can stop following along with the tutorial after you complete the section titled: [Environment setup](https://index.ros.org/doc/ros2/Installation/$Ros_distro$/Linux-Install-Debians/#environment-setup).
    Make sure you setup your environment with:
    ```
-   source /opt/ros/$ROS_DISTRO$/setup.bash
+   source /opt/ros/$ros_distro$/setup.bash
    ```
 
    > **NOTE:** You may want to add that line to your `~/.bashrc`
 
    > **NOTE:** There is also a `zsh` version of the setup script.
 
-1. [Install ROS2 Build Tools](https://index.ros.org/doc/ros2/Installation/$Ros_distro$/Linux-Development-Setup/#install-development-tools-and-ros-tools).
-   You do not need to build ROS2 from source.
+1. [Install ROS 2 Build Tools](https://index.ros.org/doc/ros2/Installation/$Ros_distro$/Linux-Development-Setup/#install-development-tools-and-ros-tools).
+   You do not need to build ROS 2 from source.
    Simply install the tooling under the section titled "Install development tools and ROS tools".
 
 1. Install `ccache`:
@@ -81,7 +82,7 @@ These instructions assume you are running Ubuntu 20.04:
    Sometimes packages do not list all their dependencies so `rosdep` will not install everything.
    If you are getting missing dependency errors, try manually install the following packages:
    ```
-   sudo apt install ros2-foxy-forward_command_controller ros2-foxy-joint_state_controller ros2-foxy-joint_trajectory_controller ros2-foxy-xacro
+   sudo apt install ros2-foxy-forward_command_controller ros2-foxy-joint_state_broadcaster ros2-foxy-joint_trajectory_controller ros2-foxy-xacro
    ```
 
 ### Configure and Build Workspace:
@@ -91,7 +92,7 @@ To configure and build workspace execute following commands:
   colcon build --symlink-install --mixin rel-with-deb-info compile-commands ccache
   ```
 
-## Running Executales
+## Running Executable
 
 See `README.md` files of the packages for information regarding running executables.
 
@@ -134,25 +135,25 @@ To run the tests use following commands:
 
 There are `--mixin` arguments that can be used to control testing with linters, specifically `linters-only` and `linters-skip`.
 
-## Creating a new ROS2 Package
+## Creating a new ROS 2 Package
 
-If you need to create a new ros2 package it is helpful to start with the official boilerplate for a ros2 package.
+If you need to create a new ROS 2 package it is helpful to start with the official boilerplate for a ROS 2 package.
 The command `ros2 pkg` can be used to generate the boilerplate details.
-For example to create a new ros2 package called `example_package` with a node called `example_node` and library called `example_library` use this command:
+For example to create a new ROS 2 package called `example_package` with a node called `example_node` and library called `example_library` use this command:
   ```
   ros2 pkg create --build-type ament_cmake --node-name example_node --library-name example_library example_package
   ```
 
 ## References
 
-Here are some useful references for developing with ROS2:
+Here are some useful references for developing with ROS 2:
 
- - [Official ROS2 Tutorials](https://index.ros.org/doc/ros2/Tutorials/)
+ - [Official ROS 2 Tutorials](https://index.ros.org/doc/ros2/Tutorials/)
    * [Luanchfile](https://index.ros.org/doc/ros2/Tutorials/Launch-Files/Creating-Launch-Files/)
    * [Package](https://index.ros.org/doc/ros2/Tutorials/Creating-Your-First-ROS2-Package/)
    * [Parameters](https://index.ros.org/doc/ros2/Tutorials/Parameters/Understanding-ROS2-Parameters/)
    * [Workspace](https://index.ros.org/doc/ros2/Tutorials/Workspace/Creating-A-Workspace/)
  - [Example ROS packages](https://github.com/ros2/examples)
  - [Colcon Documentation](https://colcon.readthedocs.io/en/released/#)
- - [ROS2 Design Documentation](https://design.ros2.org/)
- - [ROS2 Launch Architecture](https://github.com/ros2/launch/blob/master/launch/doc/source/architecture.rst)
+ - [ROS 2 Design Documentation](https://design.ros2.org/)
+ - [ROS 2 Launch Architecture](https://github.com/ros2/launch/blob/master/launch/doc/source/architecture.rst)

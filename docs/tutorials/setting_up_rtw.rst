@@ -3,8 +3,8 @@ Setting up RosTeamWorkspace
 ============================
 .. _tutorial-setting-up-rtw:
 
-Installation
-""""""""""""""""
+Installation of RosTeamWS
+""""""""""""""""""""""""""
 To start using RosTeamWS framework clone the repository to any location using:
 
 .. code-block:: bash
@@ -45,15 +45,16 @@ Copy ``<PATH TO ros_team_workspace>/templates/.ros_team_ws_rc`` file to your hom
    cp <PATH TO ros_team_workspace>/templates/.ros_team_ws_rc ~/
 
 
-and adjust the following values using your favorite text editor:
+In ``~/.ros_team_ws_rc`` adjust the following values using your favorite text editor:
 
-- ``<PATH TO ros_team_workspace>`` - with the path to the framework folder
+- ``<PATH TO ros_team_workspace>`` to point to the path to the framework folder
 
 .. note::
-  If you have ros installed at another location than /opt/ros/<ros-distro> , please adjust the ALTERNATIVE_ROS_<ROS-DISTRO>_LOCATION variable in the ~/.ros_team_ws_rc to according location.
+  If you have ROS installed at another location than /opt/ros/<ros-distro> , please adjust the ALTERNATIVE_ROS_<ROS-DISTRO>_LOCATION variable in the ``~/.ros_team_ws_rc`` to the according location.
 
 Now you are ready to:
 
-- :ref:`setup your first workspace <uc-setup-workspace>`,
 - :ref:`quick-start <tutorial-quick-start>`,
+- :ref:`setup your first workspace <uc-setup-workspace>`,
+- check how to :ref:`manage multiple workspaces <tutorial-managing-multiple-workspaces>`,
 - or check out one of the :ref:`use-cases <uc-index>`.

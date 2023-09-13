@@ -27,11 +27,11 @@ The general package structure is the following:
 Consult the repository and [ros2_control documentation](https://ros-controls.github.io/control.ros.org/) for more details.
 
 
-## Testing the *fake* robot using ros2_control-framework
+## Testing the *mock* robot using ros2_control-framework
 
 **ATTENTION**: if the package is not build and sourced do this first
 
-1. Start robot's hardware and load controllers (default configuration starts fake hardware)
+1. Start robot's hardware and load controllers (default configuration starts mock hardware)
    ```
    ros2 launch $PKG_NAME$ $ROBOT_NAME$.launch.py
    ```
@@ -60,11 +60,11 @@ to send command to the robot `ForwardCommandController` (direct goals) or `Joint
 The sections below describe their usage.
 
 ### Joint State Controller
-Joint state Controllers provides output of robot's internal states to `/joint_states` and `/dynamic_joint_states` ROS2-topics.
+Joint state Controllers provides output of robot's internal states to `/joint_states` and `/dynamic_joint_states` ROS 2-topics.
 
-In a new terminal with sourced ROS2 environment load, configure and start `joint_state_controller`:
+In a new terminal with sourced ROS 2 environment load, configure and start `joint_state_broadcaster`:
   ```
-  ros2 control load_start_controller joint_state_controller
+  ros2 control load_start_controller joint_state_broadcaster
   ```
 Check if controller is loaded properly:
  ```
@@ -72,7 +72,7 @@ Check if controller is loaded properly:
  ```
 You should get similar response to:
  ```
- joint_state_controller[joint_state_controller/JointStateController] active
+ joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
  ```
 
 Now you should also see your robot represented correctly in the `rviz2`.
@@ -89,7 +89,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ```
    You should get the response:
    ```
-   joint_state_controller[joint_state_controller/JointStateController] active
+   joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
    forward_<controller_type>_controller[forward_command_controller/ForwardCommandController] inactive
    ```
 
@@ -103,7 +103,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ```
    You should get `active` in the response:
    ```
-   joint_state_controller[joint_state_controller/JointStateController] active
+   joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
    forward_<controller_type>_controller[forward_command_controller/ForwardCommandController] active
    ```
 
@@ -111,7 +111,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
 
 3. Send command to the controller, either:
 
-   a. Manually using ros2 cli interface:
+   a. Manually using ROS 2 cli interface:
    ```
    ros2 topic pub /forward_<controller_type>_controller/commands std_msgs/msg/Float64MultiArray "data:
    - 0.5
@@ -138,7 +138,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ```
    You should get `active` in the response:
    ```
-   joint_state_controller[joint_state_controller/JointStateController] active
+   joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
    forward_<controller_type>_controller[forward_command_controller/ForwardCommandController] inactive
    ```
 
@@ -152,7 +152,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ```
    You should get `active` in the response:
    ```
-   joint_state_controller[joint_state_controller/JointStateController] active
+   joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
    joint_trajectory_controller[joint_trajectory_controller/JointTrajectoryController] active
    ```
 

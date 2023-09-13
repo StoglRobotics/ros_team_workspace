@@ -3,7 +3,7 @@ on:
   pull_request:
   push:
     branches:
-      - $ROS_DISTRO$
+      - $ros_distro$
   schedule:
     # Run every day to detect flakiness and broken dependencies
     - cron: '23 5 * * *'

@@ -59,7 +59,7 @@ alias create-new-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/create-new-package.ba
 
 alias setup-repository=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash
 
-alias setup-repository-ci=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ci-config.bash
+alias setup-repository-ci=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository-ci.bash
 
 alias setup-ros-workspace=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ros-workspace.bash
 

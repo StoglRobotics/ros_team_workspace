@@ -16,7 +16,8 @@ source $script_own_dir/../_RosTeamWs_Docker_Defines.bash
 source $script_own_dir/../_Team_Defines.bash
 
 # ros distribution name will be set in $ros_distro
-check_and_set_ros_distro_and_version $1
+# RosTeamWS_WS_DOCKER_SUPPORT is set via .ros_team_ws_rc
+check_and_set_ros_distro_and_version $1 $RosTeamWS_WS_DOCKER_SUPPORT
 
 ws_folder="$2"
 if [ "$2" == "-" ]; then
@@ -55,7 +56,9 @@ if [[ $ros_version == 1 ]]; then
 
   WS_FOLDER_3="$HOME/$ws_folder/$ws_prefix$ros_distro$ws_suffix"
 
-  if [ -d "$WS_FOLDER_0" ]; then
+  if [ -d "$ws_folder" ]; then
+    WS_FOLDER=$ws_folder
+  elif [ -d "$WS_FOLDER_0" ]; then
     WS_FOLDER=$WS_FOLDER_0
   elif [ -d "$WS_FOLDER_1" ]; then
     WS_FOLDER=$WS_FOLDER_1
@@ -63,10 +66,6 @@ if [[ $ros_version == 1 ]]; then
     WS_FOLDER=$WS_FOLDER_3
   else
     print_and_exit "Neither '$WS_FOLDER_0', '$WS_FOLDER_1', nor '$WS_FOLDER_3' exist. Can not find ROS workspace!"
-  fi
-
-  if [ ! -d "$WS_FOLDER" ]; then
-    print_and_exit "'$WS_FOLDER_1' does not exist. Can not find ROS workspace!"
   fi
 
   export ROS_WS=$WS_FOLDER
@@ -93,7 +92,9 @@ elif [[ $ros_version == 2 ]]; then
 
   WS_FOLDER_3="$HOME/$ws_folder/$ws_prefix$ros_distro$ws_suffix"
 
-  if [ -d "$WS_FOLDER_0" ]; then
+  if [ -d "$ws_folder" ]; then
+    WS_FOLDER=$ws_folder
+  elif [ -d "$WS_FOLDER_0" ]; then
     WS_FOLDER=$WS_FOLDER_0
   elif [ -d "$WS_FOLDER_1" ]; then
     WS_FOLDER=$WS_FOLDER_1
