@@ -57,6 +57,8 @@ alias setup-repository=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash
 
 alias setup-repository-ci=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository-ci.bash
 
+alias setup-formatting=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-formatting.bash
+
 alias setup-ros-workspace=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ros-workspace.bash
 
 setup-ros-workspace () {
