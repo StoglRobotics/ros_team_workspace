@@ -143,6 +143,7 @@ sudo apt -y install python3-pip \
   python3-pytest-repeat \
   python3-pytest-rerunfailures \
   python3-rosdep \
+  python3-rosdep2 \
   python3-setuptools \
   python3-vcstool \
   python3-pip \
