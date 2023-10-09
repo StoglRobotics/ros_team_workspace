@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# install_software_20.bash [computer_type:{office, robot, default:basic}]
+# install_software_22.bash [computer_type:{office, robot, default:basic}]
 
 script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 SCRIPT_PATH=$script_own_dir
@@ -55,11 +55,11 @@ fi
 echo "Installing software for $computer_type computers. Press <ENTER> to continue."
 read
 
-ROS_VERSION=melodic
-ROS2_VERSIONS=( "galactic" "rolling" )
+ROS2_VERSIONS=( "humble" "rolling" )
 
 ### CORE TOOLS ###
-sudo apt update sudo apt -y install ca-certificates curl gnupg gnupg2 lsb-release
+sudo apt update
+sudo apt -y install ca-certificates curl gnupg gnupg2 lsb-release
 
 # Nala - better apt frontend
 echo "deb http://deb.volian.org/volian/ scar main" | sudo tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list
@@ -79,12 +79,8 @@ sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen fing
 sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
 
 ### DEVELOPMENT TOOLS ###
-# gh - Github CLI
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-&& sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-&& sudo apt update \
-&& sudo apt -y  install gh
+# gh - Github CLI (it seems that gh needs to be install via apt to get access to .ssh keys)
+sudo apt -y install gh
 gh completion -s bash | tee "$HOME"/.local/share/bash-completion/completions/gh.bash > /dev/null
 
 # visual studio code
@@ -110,12 +106,9 @@ sudo groupadd docker
 sudo usermod -aG docker "$(whoami)"
 
 # VirtualBox
-sudo apt install virtualbox dkms virtualbox-guest-utils virtualbox-ext-pack
+sudo apt -y install virtualbox dkms virtualbox-guest-utils virtualbox-ext-pack
 
 ## ROS
-# ROS Packages
-bash $SCRIPT_PATH/install_software_ros.bash $ROS_VERSION
-
 # ROS2 Packages
 for ROS2_VERSION in "${ROS2_VERSIONS[@]}"
 do
@@ -221,8 +214,6 @@ then
   sudo apt -y install freecad-daily spacenavd
 
   # Tracing
-  sudo apt-add-repository ppa:lttng/stable-2.12
-  sudo apt update
   sudo apt -y install lttng-tools lttng-modules-dkms liblttng-ust-dev
   sudo apt -y install python3-babeltrace python3-lttng python3-lttngust
   sudo usermod -aG tracing "$(whoami)"
@@ -247,6 +238,5 @@ fi
 sudo apt update
 sudo apt -y dist-upgrade
 sudo apt -y autoremove
-
 # log is created somehow
 trash "${RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH}/log/"

@@ -34,6 +34,10 @@ fi
 ## END: Framework definitions adjustable by users
 
 # BEGIN: Define aliases for standard internal functions
+#cd to often used places
+alias cd_ros_team_ws='cd $FRAMEWORK_BASE_PATH'
+alias cd_rtw='cd $FRAMEWORK_BASE_PATH'
+alias cd_rtw_scripts='cd $RosTeamWS_FRAMEWORK_SCRIPTS_PATH'
 
 alias setup_exports=RosTeamWS_setup_exports
 

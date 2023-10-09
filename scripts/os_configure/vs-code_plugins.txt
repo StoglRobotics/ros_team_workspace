@@ -1,0 +1,27 @@
+# This file contains all the plugins which are installed in visual studio code as
+# default. Everything starting with "#" is treated as comment and ignored.
+#
+# !!! SEPARATE EVERY PLUGIN WITH A NEWLINE !!!
+#
+cschlosser.doxdocgen
+eamodio.gitlens
+foxundermoon.shell-format
+jeff-hykin.better-cpp-syntax
+ms-azuretools.vscode-docker
+ms-iot.vscode-ros
+ms-python.python
+ms-python.vscode-pylance
+ms-toolsai.jupyter
+ms-toolsai.jupyter-keymap
+ms-toolsai.jupyter-renderers
+ms-vscode-remote.remote-containers
+ms-vscode-remote.remote-ssh
+ms-vscode-remote.remote-ssh-edit
+ms-vscode-remote.remote-wsl
+ms-vscode.cmake-tools
+ms-vscode.cpptools
+ms-vscode.cpptools-extension-pack
+ms-vscode.cpptools-themes
+streetsidesoftware.code-spell-checker
+timonwong.shellcheck
+twxs.cmake

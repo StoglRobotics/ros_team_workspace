@@ -1,4 +1,5 @@
-# Copyright (c) 2021, Stogl Robotics Consulting UG (haftungsbeschränkt)
+#!/usr/bin/env bash
+# Copyright (c) 2022, Stogl Robotics Consulting UG (haftungsbeschränkt)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +29,14 @@ fi
 # All the possible supported ros distributions supported by rtw
 if [ -z "$rtw_supported_ros_distributions" ]; then
   readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "iron" "rolling")
+fi
+
+# Mapping of ubuntu version and supported ros distributions
+if [ -z "$ubuntu_20_04_supported_ros_distributions" ]; then
+  readonly ubuntu_20_04_supported_ros_distributions=("noetic" "foxy" "galactic" "rolling")
+fi
+if [ -z "$ubuntu_22_04_supported_ros_distributions" ]; then
+  readonly ubuntu_22_04_supported_ros_distributions=("rolling" "humble")
 fi
 
 # This needs to be set for every branch
@@ -349,6 +358,7 @@ function set_framework_default_paths {
   ROS2_CONTROL_CONTROLLER_TEMPLATES="$ROS2_CONTROL_TEMPLATES/controller"
   LICENSE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/licenses"
   DOCKER_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/docker"
+  OS_CONFIGURE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/os_configure"
 }
 
 function is_valid_ros_distribution {
