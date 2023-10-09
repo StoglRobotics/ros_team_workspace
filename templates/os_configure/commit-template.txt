@@ -1,6 +1,0 @@
-subject line
-
-what happened
-
-#Max. line length: 50 tokens
-#remember: KEEP IT SIMPLE STUPID!
