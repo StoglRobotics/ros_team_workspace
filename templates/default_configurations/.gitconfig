@@ -1,0 +1,30 @@
+#[includeIf "gitdir:~/workspace/"]
+#	path = ~/.gituser-work
+#[includeIf "gitdir:~/Documents/"]
+#	path = ~/.gituser-private
+
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+[url "ssh://git@gitlab.com/"]
+	insteadOf = https://gitlab.com/
+
+[core]
+	excludesfile = ~/.gitignore
+[push]
+	default = matching
+[help]
+	autocorrect = 1
+[merge]
+	tool = kompare
+[diff]
+	submodule = log
+[credential]
+	helper = cache --timeout=600
+[commit]
+	gpgsign = true
+[alias]
+	cs = commit --signoff
+	clean-gone = ! "git fetch --all -p && git for-each-ref --format '%(refname:short) %(upstream:track)' | awk '$2 == \"[gone]\" {print $1}' | xargs -r git branch -D"
+	s = status
+[init]
+	defaultBranch = master
