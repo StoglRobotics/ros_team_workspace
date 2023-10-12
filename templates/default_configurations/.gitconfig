@@ -9,6 +9,7 @@
 	insteadOf = https://gitlab.com/
 
 [core]
+	# editor = vim
 	excludesfile = ~/.gitignore
 [push]
 	default = matching
