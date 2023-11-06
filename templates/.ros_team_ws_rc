@@ -18,7 +18,11 @@ source <PATH TO ros_team_workspace>/setup.bash
 
 #export CYCLONEDDS_URI='<CycloneDDS><Domain><General><NetworkInterfaceAddress>ADD_HERE_INTERFACE_NAME</NetworkInterfaceAddress></General></Domain></CycloneDDS>'
 
-export ROS_DOMAIN_ID=0 # Set your Domain ID if you are in a network with multiple computers
+export RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION$  # Default DDS implementation
+
+export ROS_LOCALHOST_ONLY=$ROS_LOCALHOST_ONLY$  # Use ROS 2 only on localhost
+
+export ROS_DOMAIN_ID=$ROS_DOMAIN_ID$  # Set your Domain ID if you are in a network with multiple computers
 
 # needed to execute cppcheck version 2.7 used in pre-commit
 export AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=true

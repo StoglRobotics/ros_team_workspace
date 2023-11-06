@@ -22,18 +22,67 @@ if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
     print_and_exit "Aborting the setup of autosourcing. Exiting..."
 fi
 
+if [ -z ${rtw_file} ]; then
+    RTW_FILE_TEMPLATE_LOCATION="$FRAMEWORK_BASE_PATH/templates/$rtw_file"
+fi
 rtw_file=".ros_team_ws_rc"
 rtw_file_location=~/"$rtw_file"
-template_location="$FRAMEWORK_BASE_PATH/templates/$rtw_file"
 echo "Copying ${rtw_file} to your home folder."
 if ! [ -f "$HOME/$rtw_file" ]; then
-    cp "${template_location}" ~/.
+    cp "${RTW_FILE_TEMPLATE_LOCATION}" ~/.
 else
     new_rtw_file_name="${rtw_file}.bkp-$(ls ${rtw_file_location}* | wc -l)"
     echo ""
     notify_user "${rtw_file} already exists. Moved it to ${new_rtw_file_name}."
     mv "${rtw_file_location}" "$HOME/${new_rtw_file_name}" || { echo "Error: Could not create a copy of already existing ${rtw_file}. Please rename this file and run script again."; return 1; }
-    cp "${template_location}" ~/.
+    cp "${RTW_FILE_TEMPLATE_LOCATION}" ~/.
+fi
+
+if [ -f $TEAM_INTERNAL_ASSETS/setup_auto_sourcing.bash ]; then
+  source $TEAM_INTERNAL_ASSETS/setup_auto_sourcing.bash
+else
+  # Configure default DDS version
+  echo "Which DDS implementation do you want to use? [1]:"
+  echo "(1) Eclipse Cyclone DDS"
+  echo "(2) eProsima Fast DDS"
+  echo "(3) GurumNetworks GurumDDS"
+  echo "(4) RTI Connext"
+  read choice
+  choice=${choice:=1}
+  case "$choice" in
+  "2")
+     rmw_implementation="rmw_fastrtps_cpp"
+     dds_package="ros-<distro>-rmw-fastrtps-cpp"
+     ;;
+  "3")
+     rmw_implementation="rmw_gurumdds_cpp"
+     dds_package="ros-<distro>-rmw-gurumdds-cpp"
+     ;;
+  "4")
+     rmw_implementation="rmw_connextdds"
+     dds_package="ros-<distro>-rmw-connextdds"
+     notify_user "RTI Connext DDS implementation is proprietary software, make sure you have a license before using it. For more information check ROS docs."
+     ;;
+  *)
+     rmw_implementation="rmw_cyclonedds_cpp"
+     dds_package="ros-<distro>-rmw-cyclonedds-cpp"
+  esac
+  notify_user "Using ${rmw_implementation} DDS implementation. Make sure that '${dds_package}' package is installed!"
+  sed -i 's/\$RMW_IMPLEMENTATION\$/'${rmw_implementation}'/g' ~/${rtw_file_location}
+
+  # Configure ROS_LOCALHOST_ONLY
+  user_decision "Do you usually use ROS 2 only on your localhost?"
+  ros_localhost_only=0
+  if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
+    ros_localhost_only=0
+  fi
+  sed -i 's/\$ROS_LOCALHOST_ONLY\$/'${ros_localhost_only}'/g' ~/${rtw_file_location}
+
+  # Configure ROS_DOMAIN_ID
+  echo "Configure your ROS_DOMAIN_ID. This is a number between 0 and 101 (inclusive). Each team member should have them   different to avoid conflicts on the network. Default is '0':"
+  read ros_domain_id
+  ros_domain_id=${ros_domain_id:=0}
+  sed -i 's/\$ROS_DOMAIN_ID\$/'${ros_domain_id}'/g' ~/${rtw_file_location}
 fi
 
 sed -i "s|source <PATH TO ros_team_workspace>/setup.bash|source $FRAMEWORK_BASE_PATH/setup.bash|g" "$rtw_file_location"
