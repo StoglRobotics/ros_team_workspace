@@ -79,34 +79,37 @@ sudo apt -y install neovim ssh git qgit trash-cli htop unrar yakuake screen fing
 sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
 
 ### DEVELOPMENT TOOLS ###
+if [[ "${computer_type}" != "robot" ]]
 # gh - Github CLI (it seems that gh needs to be install via apt to get access to .ssh keys)
-sudo apt -y install gh
-gh completion -s bash | tee "$HOME"/.local/share/bash-completion/completions/gh.bash > /dev/null
+  then
+    sudo apt -y install gh
+    gh completion -s bash | tee "$HOME"/.local/share/bash-completion/completions/gh.bash > /dev/null
 
-# visual studio code
-sudo snap install --classic code
-# install all plugins for visual studio code
-vs_code_plugin_file=$RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH/vs-code_plugins.txt
-while read extension; do
-  # ignore empty lines or lines starting with "#"
-  [[ $extension =~ ^#.* ]] || [ -z "$extension" ] && continue
-  code --install-extension "${extension}"
-done < "${vs_code_plugin_file}"
+  # visual studio code
+  sudo snap install --classic code
+  # install all plugins for visual studio code
+  vs_code_plugin_file=$RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH/vs-code_plugins.txt
+  while read extension;   do
+    # ignore empty lines or lines starting with "#"
+    [[ $extension =~ ^#.* ]] || [ -z "$extension" ] && continue
+    code --install-extension "${extension}"
+  done < "${vs_code_plugin_file}"
 
-# Docker
-sudo apt-get update
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-sudo groupadd docker
-sudo usermod -aG docker "$(whoami)"
+  # Docker
+  sudo apt-get update
+  sudo mkdir -p /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get update
+  sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  sudo groupadd docker
+  sudo usermod -aG docker "$(whoami)"
 
-# VirtualBox
-sudo apt -y install virtualbox dkms virtualbox-guest-utils virtualbox-ext-pack
+  # VirtualBox
+  sudo apt -y install virtualbox dkms virtualbox-guest-utils virtualbox-ext-pack
+fi
 
 ## ROS
 # ROS2 Packages
@@ -145,35 +148,38 @@ sudo apt -y install python3-pip \
   python3-notebook \
 pip3 install --upgrade pip
 
-# setup bash
-cat "$OS_CONFIGURE_TEMPLATES/extend_to_bashrc" >> "$HOME/.bashrc"
-cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_aliases" >> "$HOME/.bash_aliases"
-cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_commands" >> "$HOME/.bash_commands"
+if [[ "${computer_type}" != "robot" ]]
+  # setup bash
+  cat "$OS_CONFIGURE_TEMPLATES/extend_to_bashrc" >> "$HOME/.bashrc"
+  cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_aliases" >> "$HOME/.bash_aliases"
+  cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_commands" >> "$HOME/.bash_commands"
 
-# setup git
-commit_template_path="$HOME/.config/git"
-template_name="commit-template.txt"
-mkdir -p "$commit_template_path"
-cp "$OS_CONFIGURE_TEMPLATES/$template_name" "$commit_template_path/."
+  # setup git
+  commit_template_path="$HOME/.config/git"
+  template_name="commit-template.txt"
+  mkdir -p "$commit_template_path"
+  cp "$OS_CONFIGURE_TEMPLATES/$template_name" "$commit_template_path/."
+fi
 git config --global core.editor "vim"
 git config --global commit.template "$commit_template_path/$template_name"
 
 ### NONE DEVELOPMENT RELATED TOOLS ###
+if [[ "${computer_type}" != "robot" ]]
+  # Dolphin Plugins
+  sudo apt -y install kdesdk-scripts
 
-# Dolphin Plugins
-sudo apt -y install kdesdk-scripts
+  # Nextcloud
+  sudo apt -y install nextcloud-desktop
 
-# Nextcloud
-sudo apt -y install nextcloud-desktop
+  ### BACKPORTS ###
+  # KDE Backports
+  sudo apt-add-repository -y ppa:kubuntu-ppa/backports
+  sudo apt update
+  sudo apt -y dist-upgrade
+  sudo apt -y autoremove
 
-### BACKPORTS ###
-# KDE Backports
-sudo apt-add-repository -y ppa:kubuntu-ppa/backports
-sudo apt update
-sudo apt -y dist-upgrade
-sudo apt -y autoremove
-
-########################## END BASIC SETUP ##########################
+  ########################## END BASIC SETUP ##########################
+fi
 
 if [[ "${computer_type}" != "robot" ]]
 then
@@ -235,8 +241,7 @@ then
 
 fi
 
-sudo apt update
-sudo apt -y dist-upgrade
+sudo nala upgrade
 sudo apt -y autoremove
 # log is created somehow
 trash "${RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH}/log/"
