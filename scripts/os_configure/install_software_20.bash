@@ -184,7 +184,7 @@ sudo apt -y autoremove
 
 if [[ "${computer_type}" != "robot" ]]
 then
-  sudo apt -y install recordmydesktop rdesktop gimp meshlab inkscape pdfposter unrar
+  sudo apt -y install recordmydesktop peek rdesktop gimp meshlab inkscape pdfposter unrar
 fi
 
 if [[ "${computer_type}" == "office" ]]
