@@ -60,10 +60,10 @@ cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot.urdf.xacro" $ROBOT_URDF_XACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.xacro" $ROBOT_MACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro" $ROBOT_MACRO_ROS2_CONTROL
 
-# Copy launch.py file for testing the description
+# Copy launch.xml file for testing the description
 mkdir -p launch
-VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch.py"
-cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.py" $VIEW_ROBOT_LAUNCH
+VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch.xml"
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.xml" $VIEW_ROBOT_LAUNCH
 
 # Copy YAML files
 mkdir -p config
@@ -114,4 +114,4 @@ git commit -m "RosTeamWS: Description files for $ROBOT_NAME generated."
 compile_and_source_package $PKG_NAME
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch.py'${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch.xml'${TERMINAL_COLOR_NC}"

@@ -62,12 +62,12 @@ cp -n $ROS2_CONTROL_TEMPLATES/robot_controllers.yaml $ROBOT_CONTROLLERS_YAML
 cp -n $ROS2_CONTROL_TEMPLATES/test_goal_publishers_config.yaml $ROBOT_FPC_PUB_YAML
 
 # Copy launch files
-ROBOT_LAUNCH="launch/${ROBOT_NAME}.launch.py"
-TEST_FWD_POS_CTRL_LAUNCH="launch/test_forward_position_controller.launch.py"
-TEST_JTC_LAUNCH="launch/test_joint_trajectory_controller.launch.py"
-cp -n $ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch.py ${ROBOT_LAUNCH}
-cp -n $ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch.py $TEST_FWD_POS_CTRL_LAUNCH
-cp -n $ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch.py $TEST_JTC_LAUNCH
+ROBOT_LAUNCH="launch/${ROBOT_NAME}.launch.xml"
+TEST_FWD_POS_CTRL_LAUNCH="launch/test_forward_position_controller.launch.xml"
+TEST_JTC_LAUNCH="launch/test_joint_trajectory_controller.launch.xml"
+cp -n $ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch.xml ${ROBOT_LAUNCH}
+cp -n $ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch.xml $TEST_FWD_POS_CTRL_LAUNCH
+cp -n $ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch.xml $TEST_JTC_LAUNCH
 
 
 # sed all needed files
@@ -113,4 +113,4 @@ git add .
 compile_and_source_package $PKG_NAME
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME ${ROBOT_NAME}.launch.py'${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME ${ROBOT_NAME}.launch.xml'${TERMINAL_COLOR_NC}"

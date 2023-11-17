@@ -1,0 +1,10 @@
+<launch>
+
+  <node pkg="ros2_controllers_test_nodes"
+        exec="publisher_forward_position_controller"
+        name="publisher_forward_position_controller"
+        output="screen">
+    <param from="$(find-pkg-share "$PKG_NAME$")/config/test_goal_publishers_config.yaml" />
+  </node>
+
+</launch>
