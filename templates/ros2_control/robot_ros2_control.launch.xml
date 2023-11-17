@@ -24,23 +24,23 @@
        default="forward_position_controller"
        description="Robot controller to start. Choices are: [forward_position_controller, joint_trajectory_controller]."/>
 
-  <let name="robot_description_content" value="$(command '$(find-exec xacro) $(find-pkg-share $(var description_package))/urdf/$(var description_file).urdf.xacro prefix:=$(var prefix) use_mock_hardware:=$(var use_mock_hardware) mock_sensor_commands:=$(var mock_sensor_commands)')" />
+  <let name="robot_description_content" value="$(command '$(find-exec xacro) $(find-pkg-share $(var description_package))/urdf/$(var description_file).urdf.xacro prefix:=$(var prefix) use_mock_hardware:=$(var use_mock_hardware) mock_sensor_commands:=$(var mock_sensor_commands)')"/>
 
 
   <!--robot_state_pub_node-->
   <node pkg="robot_state_publisher" exec="robot_state_publisher" output="both">
-    <param name="robot_description" value="$(var robot_description_content)" />
+    <param name="robot_description" value="$(var robot_description_content)"/>
   </node>
 
   <!--control_node-->
   <node pkg="controller_manager" exec="ros2_control_node" output="both">
     <param name="robot_description" value="$(var robot_description_content)" />
-    <param from="$(find-pkg-share $(var runtime_config_package))/config/$(var controllers_file).yaml" />
+    <param from="$(find-pkg-share $(var runtime_config_package))/config/$(var controllers_file).yaml"/>
   </node>
 
   <!--rviz_node-->
   <node pkg="rviz2" exec="rviz2" output="log" args="-d $(find-pkg-share $(var description_package))/rviz/$ROBOT_NAME$.rviz"/>
-  
+
   <!--joint_state_braodcaster_spawner-->
   <node pkg="controller_manager" exec="spawner" args="joint_state_broadcaster"/>
 
