@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 from rtwcli.command import CommandExtension
-from rtw_cmds.workspace.verbs import UseVerb
+from rtw_cmds.workspace.verbs import UseVerb, add_cli_workspace_arg
 
 
 class WSAlias(CommandExtension):
@@ -22,8 +23,8 @@ class WSAlias(CommandExtension):
     def __init__(self):
         super().__init__()
 
-    def add_arguments(self, parser, cli_name):
-        pass
+    def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
+        add_cli_workspace_arg(parser)
 
     def main(self, *, parser, args):
         use_verb = UseVerb()
