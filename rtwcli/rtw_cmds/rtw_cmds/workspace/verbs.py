@@ -39,6 +39,7 @@ workspace name prefix is defined as first letters of the path and last folder if
 """
 
 import argparse
+import copy
 import dataclasses
 import datetime
 import os
@@ -349,10 +350,11 @@ def workspace_name_completer(**kwargs) -> List[str]:
     return ws_names
 
 
-def add_cli_workspace_arg(parser: argparse.ArgumentParser):
+def add_cli_workspace_args(parser: argparse.ArgumentParser):
     arg = parser.add_argument(
         "workspace_name",
         help="The workspace name",
+        nargs="?",
     )
     arg.completer = workspace_name_completer
 
@@ -361,14 +363,30 @@ class UseVerb(VerbExtension):
     """Select and source an existing ROS workspace."""
 
     def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
-        add_cli_workspace_arg(parser)
+        add_cli_workspace_args(parser)
 
     def main(self, *, args):
+        workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
+        if not workspaces_config.workspaces:
+            print(f"No workspaces found in config file '{WORKSPACES_PATH}'")
+            return
+
+        ws_names = workspaces_config.get_ws_names()
+
         ws_name = args.workspace_name
         if not ws_name:
-            return "No workspace name provided."
+            ws_name = questionary.autocomplete(
+                "Choose workspace",
+                ws_names,
+                qmark="'Tab' to see all workspaces, type to filter, 'Enter' to select\n",
+                meta_information=copy.deepcopy(workspaces_config.to_dict()[WORKSPACES_KEY]),
+                validate=lambda ws_choice: ws_choice in ws_names,
+                style=questionary.Style([("answer", "bg:ansiwhite")]),
+                match_middle=True,
+            ).ask()
+            if not ws_name:  # Cancelled by user
+                return
 
-        workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
         workspace = workspaces_config.workspaces.get(ws_name)
         if not workspace:
             return f"Workspace '{ws_name}' not found."
