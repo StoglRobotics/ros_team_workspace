@@ -342,9 +342,14 @@ class CreateVerb(VerbExtension):
         parser.add_argument(
             "--ros-distro", type=str, help="ROS distro to use for the workspace.", required=True
         )
-        parser.add_argument("--docker", action="store_true", help="Create a docker workspace.")
         parser.add_argument(
-            "--repos-location-url", type=str, help="URL to the workspace repos files."
+            "--docker", action="store_true", help="Create a docker workspace.", default=False
+        )
+        parser.add_argument(
+            "--repos-location-url",
+            type=str,
+            help="URL to the workspace repos files.",
+            default=None,
         )
         parser.add_argument(
             "--repos-branch",
@@ -353,7 +358,10 @@ class CreateVerb(VerbExtension):
             default="master",
         )
         parser.add_argument(
-            "--disable-nvidia", action="store_true", help="Disable nvidia rocker flag"
+            "--disable-nvidia",
+            action="store_true",
+            help="Disable nvidia rocker flag",
+            default=False,
         )
         parser.add_argument(
             "--ws-repos-file",
@@ -395,7 +403,7 @@ class CreateVerb(VerbExtension):
             "--rtw-repo",
             type=str,
             help="URL to the ros_team_workspace repo.",
-            default="git@github.com:StoglRobotics/ros_team_workspace.git",
+            default="https://github.com/StoglRobotics/ros_team_workspace.git",
         )
         parser.add_argument(
             "--rtw-branch",
@@ -485,6 +493,7 @@ class CreateVerb(VerbExtension):
         if ros_distro not in allowed_ros_distros:
             print(f"'{ros_distro}' is not supported. Allowed distros are: {allowed_ros_distros}")
             return
+        print(f"ROS distro is '{ros_distro}'")
 
         ws_path_abs = os.path.abspath(args.ws_folder)
         src_folder_path_abs = os.path.join(ws_path_abs, "src")
@@ -494,7 +503,7 @@ class CreateVerb(VerbExtension):
             return
 
         ws_name = pathlib.Path(ws_path_abs).name
-        print(f"Workspace name is '{ws_name}'")
+        print(f"Workspace name is '{ws_name}', path: '{ws_path_abs}'")
 
         upstream_ws_path_abs = None
         if args.repos_location_url:
@@ -509,8 +518,6 @@ class CreateVerb(VerbExtension):
                         args.branch,
                         src_folder_path_abs,
                     ],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
                     check=True,
                 )
             except subprocess.CalledProcessError as e:
@@ -530,8 +537,6 @@ class CreateVerb(VerbExtension):
                 try:
                     subprocess.run(
                         ["vcs", "import", "--input", ws_repos_path_abs, "--workers", "1"],
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
                         check=True,
                         cwd=src_folder_path_abs,
                     )
@@ -566,8 +571,6 @@ class CreateVerb(VerbExtension):
                 try:
                     subprocess.run(
                         ["vcs", "import", "--input", upstream_ws_repos_path_abs, "--workers", "1"],
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
                         check=True,
                         cwd=upstream_src_folder_path_abs,
                     )
@@ -586,8 +589,6 @@ class CreateVerb(VerbExtension):
                 try:
                     subprocess.run(
                         ["sudo", "apt", "install", "python3-rocker"],
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
                         check=True,
                     )
                 except subprocess.CalledProcessError as e:
@@ -599,11 +600,11 @@ class CreateVerb(VerbExtension):
             if args.apt_packages:
                 apt_packages_cmd = "RUN apt-get install -y " + " ".join(args.apt_packages)
             else:
-                apt_packages_cmd = ""
+                apt_packages_cmd = "# no apt packages to install"
             if args.python_packages:
                 python_packages_cmd = "RUN pip3 install " + " ".join(args.python_packages)
             else:
-                python_packages_cmd = ""
+                python_packages_cmd = "# no python packages to install"
             base_image = args.base_image.format(ros_distro=ros_distro)
             dockerfile_content = f"""
             FROM {base_image}
@@ -625,6 +626,7 @@ class CreateVerb(VerbExtension):
             )
             docker_client = docker.from_env()
             try:
+                print(f"Building intermediate docker image '{intermediate_image_name}'")
                 docker_client.images.build(
                     path=ws_path_abs,
                     tag=intermediate_image_name,
@@ -634,7 +636,14 @@ class CreateVerb(VerbExtension):
                 print(f"Failed to build docker image: {e}")
                 return
 
-            # create final dockerfile with rocker
+            # check if the intermediate docker image exists
+            try:
+                docker_client.images.get(intermediate_image_name)
+            except (docker.errors.ImageNotFound, docker.errors.APIError) as e:
+                print(f"Failed to get docker image '{intermediate_image_name}': {e}")
+                return
+
+            # create final docker image with rocker
             # overwrite rocker flags for now
             ssh_path_abs = os.path.expanduser("~/.ssh")
             rocker_volumes = [
@@ -664,10 +673,9 @@ class CreateVerb(VerbExtension):
             rocker_cmd.append(" ".join(["--volume"] + rocker_volumes + ["--"]))
             rocker_cmd.append(intermediate_image_name)
             try:
+                print(f"Creating final docker image '{final_image_name}'")
                 subprocess.run(
                     rocker_cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
                     check=True,
                 )
             except subprocess.CalledProcessError as e:
