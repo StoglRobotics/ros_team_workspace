@@ -44,10 +44,13 @@ import dataclasses
 import datetime
 import os
 import pathlib
+from pprint import pprint
 import re
 import shutil
 import subprocess
+import docker
 from typing import Any, Dict, List
+
 
 import questionary
 from rtwcli.command.info import ROS_TEAM_WS_VARIABLES
@@ -58,6 +61,7 @@ from rtwcli.helpers import (
     write_to_yaml_file,
 )
 from rtwcli.verb import VerbExtension
+
 
 WORKSPACES_PATH = os.path.expanduser("~/.ros_team_workspace/workspaces.yaml")
 CURRENT_FILE_DIR = pathlib.Path(__file__).parent.absolute()
@@ -126,6 +130,13 @@ class WorkspacesConfig:
             return []
         return list(self.workspaces.keys())
 
+    def add_workspace(self, ws_name: str, workspace: Workspace) -> bool:
+        if ws_name in self.workspaces:
+            print(f"Workspace '{ws_name}' already exists in the config.")
+            return False
+        self.workspaces[ws_name] = workspace
+        return True
+
 
 def load_workspaces_config_from_yaml_file(file_path: str):
     return WorkspacesConfig.from_dict(load_yaml_file(file_path))
@@ -141,15 +152,9 @@ def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspac
         return False
 
     workspaces_config = load_workspaces_config_from_yaml_file(config_path)
-
-    if ws_name in workspaces_config.get_ws_names():
-        print(
-            f"Workspace name '{ws_name}' is already in the config. "
-            "Duplicate workspace name handling is not implemented yet."
-        )
+    if not workspaces_config.add_workspace(ws_name, workspace):
+        print(f"Failed to add workspace '{ws_name}' to the config.")
         return False
-
-    workspaces_config.workspaces[ws_name] = workspace
 
     # Backup current config file
     current_date = datetime.datetime.now().strftime(BACKUP_DATETIME_FORMAT)
@@ -330,8 +335,466 @@ def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str)
 class CreateVerb(VerbExtension):
     """Create a new ROS workspace."""
 
+    def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
+        parser.add_argument(
+            "--ws-folder", type=str, help="Path to the workspace folder to create.", required=True
+        )
+        parser.add_argument(
+            "--ros-distro", type=str, help="ROS distro to use for the workspace.", required=True
+        )
+        parser.add_argument("--docker", action="store_true", help="Create a docker workspace.")
+        parser.add_argument(
+            "--repos-location-url", type=str, help="URL to the workspace repos files."
+        )
+        parser.add_argument(
+            "--branch", type=str, help="Branch to use for the workspace repos.", default="master"
+        )
+        parser.add_argument(
+            "--disable-nvidia", action="store_true", help="Disable nvidia rocker flag"
+        )
+        parser.add_argument(
+            "--ws-repos-file",
+            type=str,
+            help="Workspace repos file name.",
+            default="{repo_name}.{ros_distro}.repos",
+        )
+        parser.add_argument(
+            "--upstream-ws-repos-file",
+            type=str,
+            help="Upstream workspace repos file name.",
+            default="{repo_name}.{ros_distro}.upstream.repos",
+        )
+        parser.add_argument(
+            "--upstream-ws-name",
+            type=str,
+            help="Name of the upstream workspace to use.",
+            default="{workspace_name}_upstream",
+        )
+        parser.add_argument(
+            "--base-image",
+            type=str,
+            help="Base image to use for the docker workspace.",
+            default="osrf/ros:{ros_distro}-desktop",
+        )
+        parser.add_argument(
+            "--intermediate-image-name",
+            type=str,
+            help="Intermediate image name to use for the docker workspace.",
+            default="rtw_{base_image_name}_intermediate",
+        )
+        parser.add_argument(
+            "--final-image-name",
+            type=str,
+            help="Final image name to use for the docker workspace.",
+            default="rtw_{workspace_name}_final",
+        )
+        parser.add_argument(
+            "--rtw-repo",
+            type=str,
+            help="URL to the ros_team_workspace repo.",
+            default="git@github.com:StoglRobotics/ros_team_workspace.git",
+        )
+        parser.add_argument(
+            "--rtw-branch",
+            type=str,
+            help="Branch to use for the ros_team_workspace repo.",
+            default="master",
+        )
+        parser.add_argument(
+            "--rtw-path",
+            type=str,
+            help="Mount path to use for the ros_team_workspace repo.",
+            default="/opt/ros_team_workspace",
+        )
+        parser.add_argument(
+            "--apt_packages",
+            nargs="*",
+            help="Additional apt packages to install.",
+            default=[
+                "bash-completion",
+                "git",
+                "git-lfs",
+                "iputils-ping",
+                "nano",
+                "python3-colcon-common-extensions",
+                "python3-pip",
+                "python3-vcstool",
+                "sudo",
+                "tmux",
+                "trash-cli",
+                "tree",
+                "vim",
+                "wget",
+            ],
+        )
+        parser.add_argument(
+            "--python_packages",
+            nargs="*",
+            help="Additional python packages to install.",
+            default=["pre-commit"],
+        )
+        parser.add_argument(
+            "--rocker-volumes",
+            nargs="*",
+            help="Rocker volumes to use for the docker workspace. [Will be overwritten as default for now]",
+            default=[
+                "~/.ssh:~/.ssh:ro",
+                "{ws_folder}:{ws_folder}",
+                "{upstream_ws_folder}:{upstream_ws_folder}",  # if upstream ws is used
+            ],
+        )
+        parser.add_argument(
+            "--rocker-flags",
+            nargs="*",
+            help="Additional rocker flags to use for the docker workspace. [Will be overwritten as default for now]",
+            default=[
+                "--image-name {final_image_name}",
+                "--git",
+                "--hostname rtw-{workspace_name}-docker",
+                "--name {final_image_name}-instance",
+                "--nocleanup",
+                "--nvidia",
+                "--user",
+                "--x11",
+            ],
+        )
+
     def main(self, *, args):
-        print("Not implemented yet")
+        # possibilities:
+        # - create local workspace
+        # - create docker workspace
+        # - create local workspace from repos
+        # - create docker workspace from repos
+        # - create local workspace from repos with upstream workspace
+        # - create docker workspace from repos with upstream workspace
+        #
+        # to take into account:
+        # - docker workspace needs to have a local workspace that will be mounted and can only be used to switch to the corresponding docker container
+        # - workspace in docker container should be just a local workspace inside the container
+
+        print("### ARGS ###")
+        pprint(args.__dict__)
+        print("### ARGS ###")
+
+        # check if ros distro is valid
+        ros_distro = args.ros_distro.lower()
+        allowed_ros_distros = ["humble", "rolling"]
+        if ros_distro not in allowed_ros_distros:
+            print(f"'{ros_distro}' is not supported. Allowed distros are: {allowed_ros_distros}")
+            return
+
+        ws_path_abs = os.path.abspath(args.ws_folder)
+        src_folder_path_abs = os.path.join(ws_path_abs, "src")
+        os.makedirs(src_folder_path_abs, exist_ok=True)
+        if os.listdir(src_folder_path_abs):
+            print(f"Workspace src folder '{src_folder_path_abs}' is not empty, cannot proceed.")
+            return
+
+        ws_name = pathlib.Path(ws_path_abs).name
+        print(f"Workspace name is '{ws_name}'")
+
+        upstream_ws_path_abs = None
+        if args.repos_location_url:
+            print("Importing repo from URL")
+            try:
+                subprocess.run(
+                    [
+                        "git",
+                        "clone",
+                        args.repos_location_url,
+                        "--branch",
+                        args.branch,
+                        src_folder_path_abs,
+                    ],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                )
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to clone repo from URL: {e}")
+                return
+
+            # check if repos file exists
+            repo_name = args.repos_location_url.split("/")[-1].split(".")[0]
+            ws_repos_file_name = args.ws_repos_file.format(
+                repo_name=repo_name, ros_distro=ros_distro
+            )
+            ws_repos_path_abs = os.path.join(src_folder_path_abs, ws_repos_file_name)
+            if not os.path.isfile(ws_repos_path_abs):
+                print(f"Repos file '{ws_repos_path_abs}' does not exist. Nothing to import.")
+            else:
+                print(f"Found repos file '{ws_repos_path_abs}'. Importing repos.")
+                try:
+                    subprocess.run(
+                        ["vcs", "import", "--input", ws_repos_path_abs, "--workers", "1"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        check=True,
+                        cwd=src_folder_path_abs,
+                    )
+                except subprocess.CalledProcessError as e:
+                    print(f"Failed to import repos: {e}")
+                    return
+
+            # check if upstream repos file exists
+            upstream_ws_name = args.upstream_ws_name.format(workspace_name=ws_name)
+            upstream_ws_repos_file_name = args.upstream_ws_repos_file.format(
+                repo_name=repo_name, ros_distro=ros_distro
+            )
+            upstream_ws_repos_path_abs = os.path.join(
+                src_folder_path_abs, upstream_ws_repos_file_name
+            )
+            if not os.path.isfile(upstream_ws_repos_path_abs):
+                print(
+                    f"Upstream repos file '{upstream_ws_repos_path_abs}' does not exist. "
+                    "Nothing to import."
+                )
+            else:
+                print(f"Found upstream repos file '{upstream_ws_repos_path_abs}'.")
+                # create upstream workspace
+                upstream_ws_path_abs = os.path.join(ws_path_abs, "..", upstream_ws_name)
+                upstream_src_folder_path_abs = os.path.join(upstream_ws_path_abs, "src")
+                os.makedirs(upstream_src_folder_path_abs, exist_ok=True)
+                if os.listdir(upstream_src_folder_path_abs):
+                    print(
+                        f"Upstream workspace src folder '{upstream_src_folder_path_abs}' is not empty, cannot proceed."
+                    )
+                    return
+                try:
+                    subprocess.run(
+                        ["vcs", "import", "--input", upstream_ws_repos_path_abs, "--workers", "1"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        check=True,
+                        cwd=upstream_src_folder_path_abs,
+                    )
+                except subprocess.CalledProcessError as e:
+                    print(f"Failed to import upstream repos: {e}")
+                    return
+
+        # docker handling: create docker workspace
+        final_image_name = None
+        if args.docker:
+            print("Creating docker workspace")
+
+            # check if rocker is installed
+            if shutil.which("rocker") is None:
+                print("Rocker is not installed. Installing rocker.")
+                try:
+                    subprocess.run(
+                        ["sudo", "apt", "install", "python3-rocker"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        check=True,
+                    )
+                except subprocess.CalledProcessError as e:
+                    print(f"Failed to install rocker: {e}")
+                    return
+
+            # create dockerfile
+            dockerfile_path_abs = os.path.join(ws_path_abs, "Dockerfile")
+            if args.apt_packages:
+                apt_packages_cmd = "RUN apt-get install -y " + " ".join(args.apt_packages)
+            else:
+                apt_packages_cmd = ""
+            if args.python_packages:
+                python_packages_cmd = "RUN pip3 install " + " ".join(args.python_packages)
+            else:
+                python_packages_cmd = ""
+            base_image = args.base_image.format(ros_distro=ros_distro)
+            dockerfile_content = f"""
+            FROM {base_image}
+            RUN apt-get update
+            {apt_packages_cmd}
+            {python_packages_cmd}
+            RUN git clone -b {args.rtw_branch} {args.rtw_repo} {args.rtw_path}
+            RUN cd {args.rtw_path}/rtwcli && pip3 install -r requirements.txt && cd -
+            """
+
+            # create dockerfile
+            if not create_file_and_write(dockerfile_path_abs, content=dockerfile_content):
+                print(f"Failed to create dockerfile '{dockerfile_path_abs}'.")
+                return
+
+            # build intermediate docker image
+            intermediate_image_name = args.intermediate_image_name.format(
+                base_image_name=base_image.replace(":", "_")
+            )
+            docker_client = docker.from_env()
+            try:
+                docker_client.images.build(
+                    path=ws_path_abs,
+                    tag=intermediate_image_name,
+                    rm=True,
+                )
+            except docker.errors.BuildError as e:
+                print(f"Failed to build docker image: {e}")
+                return
+
+            # create final dockerfile with rocker
+            # overwrite rocker flags for now
+            ssh_path_abs = os.path.expanduser("~/.ssh")
+            rocker_volumes = [
+                ssh_path_abs + ":" + ssh_path_abs + ":ro",
+                ws_path_abs,  # mount path is the same
+            ]
+            if upstream_ws_path_abs:
+                rocker_volumes.append(upstream_ws_path_abs)  # mount path is the same
+
+            final_image_name = args.final_image_name.format(workspace_name=ws_name)
+            container_name = final_image_name + "-instance"
+            rocker_flags = [
+                "--image-name " + final_image_name,
+                "--git",
+                "--hostname rtw-" + ws_name + "-docker",
+                "--mode non-interactive",
+                "--name " + container_name,
+                "--nocleanup",
+                "--user",
+                "--x11",
+            ]
+            if not args.disable_nvidia:
+                rocker_flags.append("--nvidia")
+
+            rocker_cmd = ["rocker"]
+            rocker_cmd.extend(rocker_flags)
+            rocker_cmd.append(" ".join(["--volume"] + rocker_volumes + ["--"]))
+            rocker_cmd.append(intermediate_image_name)
+            try:
+                subprocess.run(
+                    rocker_cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                )
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to create final docker image: {e}")
+                return
+
+            # check if the final docker image exists
+            try:
+                docker_client.images.get(final_image_name)
+            except (docker.errors.ImageNotFound, docker.errors.APIError) as e:
+                print(f"Failed to get docker image '{final_image_name}': {e}")
+                return
+
+            try:
+                container = docker_client.containers.get(container_name)
+            except (docker.errors.NotFound, docker.errors.APIError) as e:
+                print(f"Failed to get docker container '{container_name}': {e}")
+                return
+
+            # compile upstream workspace
+            distro_setup_bash_path = "/opt/ros/" + ros_distro + "/setup.bash"
+            if upstream_ws_path_abs:
+                compile_upstream_ws_cmd = [
+                    "cd",
+                    upstream_ws_path_abs,
+                    "&&",
+                    "source",
+                    distro_setup_bash_path,
+                    "&&",
+                    "colcon",
+                    "build",
+                    "--symlink-install",
+                    "--cmake-args",
+                    "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+                ]
+                print(f"Compiling upstream workspace with command '{compile_upstream_ws_cmd}'")
+                try:
+                    container.exec_run("/bin/bash -c {}".format(" ".join(compile_upstream_ws_cmd)))
+                except docker.errors.APIError as e:
+                    print(f"Failed to compile upstream workspace '{upstream_ws_path_abs}': {e}")
+                    return
+
+            # compile main workspace
+            main_setup_bash_path = (
+                upstream_ws_path_abs + "/install/setup.bash"
+                if upstream_ws_path_abs
+                else distro_setup_bash_path
+            )
+            compile_main_ws_cmd = [
+                "cd",
+                ws_path_abs,
+                "&&",
+                "source",
+                main_setup_bash_path,
+                "&&",
+                "colcon",
+                "build",
+                "--symlink-install",
+                "--cmake-args",
+                "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+            ]
+            print(f"Compiling main workspace with command '{compile_main_ws_cmd}'")
+            try:
+                container.exec_run("/bin/bash -c {}".format(" ".join(compile_main_ws_cmd)))
+            except docker.errors.APIError as e:
+                print(f"Failed to compile main workspace '{ws_path_abs}': {e}")
+                return
+
+            # create rtw workspaces file
+            docker_workspaces_config = WorkspacesConfig()
+            docker_workspaces_config.add_workspace(
+                ws_name,
+                Workspace(
+                    distro=ros_distro,
+                    ws_folder=ws_path_abs,
+                    base_ws=upstream_ws_name if upstream_ws_path_abs else None,
+                ),
+            )
+            if upstream_ws_path_abs:
+                docker_workspaces_config.add_workspace(
+                    upstream_ws_name,
+                    Workspace(
+                        distro=ros_distro,
+                        ws_folder=upstream_ws_path_abs,
+                    ),
+                )
+
+            rtw_python_cmd_content = f"""
+            from rtwcli.helpers import write_to_yaml_file
+            write_to_yaml_file({WORKSPACES_PATH}, {docker_workspaces_config.to_dict()})
+            """
+            rtw_python_cmd = ["python3", "-c", rtw_python_cmd_content]
+
+            try:
+                container.exec_run(rtw_python_cmd)
+            except docker.errors.APIError as e:
+                print(f"Failed to create rtw workspaces file: {e}")
+                return
+
+            # use main workspace per default by adding "rtw workspace use {ws_name}" to bashrc
+            modify_bashrc_cmd = f"echo 'rtw workspace use {ws_name}' >> ~/.bashrc"
+            try:
+                container.exec_run(modify_bashrc_cmd)
+            except docker.errors.APIError as e:
+                print(f"Failed to modify bashrc: {e}")
+                return
+
+        # create local upstream workspace
+        if upstream_ws_path_abs:
+            local_upstream_ws = Workspace(
+                ws_folder=upstream_ws_path_abs,
+                distro=ros_distro,
+                ws_docker_support=True if args.docker else False,
+                docker_tag=final_image_name if args.docker else None,
+            )
+            if not update_workspaces_config(WORKSPACES_PATH, upstream_ws_name, local_upstream_ws):
+                print("Failed to update workspaces config with upstream workspace.")
+                return
+
+        # create local main workspace
+        local_main_ws = Workspace(
+            ws_folder=ws_path_abs,
+            distro=ros_distro,
+            ws_docker_support=True if args.docker else False,
+            docker_tag=final_image_name if args.docker else None,
+            base_ws=upstream_ws_name if upstream_ws_path_abs else None,
+        )
+        if not update_workspaces_config(WORKSPACES_PATH, ws_name, local_main_ws):
+            print("Failed to update workspaces config with main workspace.")
+            return
 
 
 def get_workspace_names() -> List[str]:
