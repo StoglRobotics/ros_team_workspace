@@ -347,7 +347,10 @@ class CreateVerb(VerbExtension):
             "--repos-location-url", type=str, help="URL to the workspace repos files."
         )
         parser.add_argument(
-            "--branch", type=str, help="Branch to use for the workspace repos.", default="master"
+            "--repos-branch",
+            type=str,
+            help="Branch to use for the workspace repos.",
+            default="master",
         )
         parser.add_argument(
             "--disable-nvidia", action="store_true", help="Disable nvidia rocker flag"
@@ -398,12 +401,12 @@ class CreateVerb(VerbExtension):
             "--rtw-branch",
             type=str,
             help="Branch to use for the ros_team_workspace repo.",
-            default="master",
+            default="rtw_ws_create",
         )
         parser.add_argument(
             "--rtw-path",
             type=str,
-            help="Mount path to use for the ros_team_workspace repo.",
+            help="Path to clone the ros_team_workspace repo to.",
             default="/opt/ros_team_workspace",
         )
         parser.add_argument(
