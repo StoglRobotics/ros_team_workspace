@@ -37,7 +37,7 @@
       <joint name="${prefix}joint4"/>
       <joint name="${prefix}joint5"/>
       <joint name="${prefix}joint6"/>
-      <joint name="${prefix}joint6"-tool0"/>
+      <joint name="${prefix}joint6-tool0"/>
     </group>
 
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
