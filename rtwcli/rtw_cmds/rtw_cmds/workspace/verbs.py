@@ -91,6 +91,7 @@ class Workspace:
     ws_folder: str
     ws_docker_support: bool = False
     docker_tag: str = None
+    docker_container_name: str = None
     base_ws: str = None
 
     def __post_init__(self):
@@ -101,11 +102,13 @@ class Workspace:
             self.docker_tag = str(self.docker_tag)
         if self.base_ws is not None:
             self.base_ws = str(self.base_ws)
+        if self.docker_container_name is not None:
+            self.docker_container_name = str(self.docker_container_name)
 
 
 @dataclasses.dataclass
 class WorkspacesConfig:
-    workspaces: Dict[str, Workspace]
+    workspaces: Dict[str, Workspace] = dataclasses.field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: Dict[str, Dict[str, dict]]) -> "WorkspacesConfig":
@@ -144,6 +147,27 @@ def load_workspaces_config_from_yaml_file(file_path: str):
 
 def save_workspaces_config(filepath: str, config: WorkspacesConfig):
     return write_to_yaml_file(filepath, config.to_dict())
+
+
+def get_current_workspace() -> Workspace:
+    ws_name = get_current_workspace_name()
+    if not ws_name:
+        return None
+
+    workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
+    if not workspaces_config:
+        return None
+
+    return workspaces_config.workspaces.get(ws_name, None)
+
+
+def get_current_workspace_name() -> str:
+    ros_ws_folder = os.environ.get(WS_FOLDER_ENV_VAR, None)
+    if not ros_ws_folder:
+        print(f"Environment variable '{WS_FOLDER_ENV_VAR}' not set.")
+        return None
+
+    return os.path.basename(ros_ws_folder)
 
 
 def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspace) -> bool:
@@ -332,6 +356,72 @@ def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str)
         return False
 
 
+def vcs_import(
+    repos_file_path: str,
+    path: str,
+    non_existing_ok: bool = True,
+    empty_ok: bool = True,
+    makedirs: bool = True,
+) -> bool:
+    if not os.path.isfile(repos_file_path):
+        print(f"Repos file '{repos_file_path}' does not exist. Nothing to import.")
+        return non_existing_ok
+
+    # check if the file is empty
+    if os.path.getsize(repos_file_path) == 0:
+        print(f"Repos file '{repos_file_path}' is empty. Nothing to import.")
+        return empty_ok
+
+    print(f"Found non-empty repos file '{repos_file_path}', importing repos.")
+    try:
+        if makedirs:
+            os.makedirs(path, exist_ok=True)
+        subprocess.run(
+            ["vcs", "import", "--input", repos_file_path, "--workers", "1"],
+            check=True,
+            cwd=path,
+        )
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to import repos: {e}")
+        return False
+
+
+def git_clone(url: str, branch: str, path: str) -> bool:
+    try:
+        subprocess.run(
+            ["git", "clone", url, "--branch", branch, path],
+            check=True,
+        )
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to clone repo from URL '{url}': {e}")
+        return False
+
+
+def get_compile_cmd(
+    ws_path_abs: str,
+    distro: str,
+    setup_bash_path: str = None,
+    distro_setup_bash_format: str = "/opt/ros/{distro}/setup.bash",
+) -> List[str]:
+    distro_setup_bash_path = distro_setup_bash_format.format(distro=distro)
+    compile_ws_cmd = [
+        "cd",
+        ws_path_abs,
+        "&&",
+        "source",
+        distro_setup_bash_path if not setup_bash_path else setup_bash_path,
+        "&&",
+        "colcon",
+        "build",
+        "--symlink-install",
+        "--cmake-args",
+        "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+    ]
+    return compile_ws_cmd
+
+
 class CreateVerb(VerbExtension):
     """Create a new ROS workspace."""
 
@@ -340,7 +430,11 @@ class CreateVerb(VerbExtension):
             "--ws-folder", type=str, help="Path to the workspace folder to create.", required=True
         )
         parser.add_argument(
-            "--ros-distro", type=str, help="ROS distro to use for the workspace.", required=True
+            "--ros-distro",
+            type=str,
+            help="ROS distro to use for the workspace.",
+            required=True,
+            choices=["humble", "rolling"],
         )
         parser.add_argument(
             "--docker", action="store_true", help="Create a docker workspace.", default=False
@@ -464,7 +558,7 @@ class CreateVerb(VerbExtension):
                 "--hostname rtw-{workspace_name}-docker",
                 "--name {final_image_name}-instance",
                 "--nocleanup",
-                "--nvidia",
+                "--nvidia gpus",
                 "--user",
                 "--x11",
             ],
@@ -487,13 +581,7 @@ class CreateVerb(VerbExtension):
         pprint(args.__dict__)
         print("### ARGS ###")
 
-        # check if ros distro is valid
-        ros_distro = args.ros_distro.lower()
-        allowed_ros_distros = ["humble", "rolling"]
-        if ros_distro not in allowed_ros_distros:
-            print(f"'{ros_distro}' is not supported. Allowed distros are: {allowed_ros_distros}")
-            return
-        print(f"ROS distro is '{ros_distro}'")
+        print(f"ROS distro is '{args.ros_distro}'")
 
         ws_path_abs = os.path.abspath(args.ws_folder)
         src_folder_path_abs = os.path.join(ws_path_abs, "src")
@@ -508,75 +596,33 @@ class CreateVerb(VerbExtension):
         upstream_ws_path_abs = None
         if args.repos_location_url:
             print("Importing repo from URL")
-            try:
-                subprocess.run(
-                    [
-                        "git",
-                        "clone",
-                        args.repos_location_url,
-                        "--branch",
-                        args.branch,
-                        src_folder_path_abs,
-                    ],
-                    check=True,
-                )
-            except subprocess.CalledProcessError as e:
-                print(f"Failed to clone repo from URL: {e}")
+            if not git_clone(args.repos_location_url, args.repos_branch, src_folder_path_abs):
+                print(f"Failed to clone repo from URL '{args.repos_location_url}'.")
                 return
 
-            # check if repos file exists
+            # import repos
             repo_name = args.repos_location_url.split("/")[-1].split(".")[0]
             ws_repos_file_name = args.ws_repos_file.format(
-                repo_name=repo_name, ros_distro=ros_distro
+                repo_name=repo_name, ros_distro=args.ros_distro
             )
             ws_repos_path_abs = os.path.join(src_folder_path_abs, ws_repos_file_name)
-            if not os.path.isfile(ws_repos_path_abs):
-                print(f"Repos file '{ws_repos_path_abs}' does not exist. Nothing to import.")
-            else:
-                print(f"Found repos file '{ws_repos_path_abs}'. Importing repos.")
-                try:
-                    subprocess.run(
-                        ["vcs", "import", "--input", ws_repos_path_abs, "--workers", "1"],
-                        check=True,
-                        cwd=src_folder_path_abs,
-                    )
-                except subprocess.CalledProcessError as e:
-                    print(f"Failed to import repos: {e}")
-                    return
+            if not vcs_import(ws_repos_path_abs, src_folder_path_abs):
+                print(f"Failed to import repos from '{ws_repos_path_abs}'.")
+                return
 
             # check if upstream repos file exists
             upstream_ws_name = args.upstream_ws_name.format(workspace_name=ws_name)
             upstream_ws_repos_file_name = args.upstream_ws_repos_file.format(
-                repo_name=repo_name, ros_distro=ros_distro
+                repo_name=repo_name, ros_distro=args.ros_distro
             )
             upstream_ws_repos_path_abs = os.path.join(
                 src_folder_path_abs, upstream_ws_repos_file_name
             )
-            if not os.path.isfile(upstream_ws_repos_path_abs):
-                print(
-                    f"Upstream repos file '{upstream_ws_repos_path_abs}' does not exist. "
-                    "Nothing to import."
-                )
-            else:
-                print(f"Found upstream repos file '{upstream_ws_repos_path_abs}'.")
-                # create upstream workspace
-                upstream_ws_path_abs = os.path.join(ws_path_abs, "..", upstream_ws_name)
-                upstream_src_folder_path_abs = os.path.join(upstream_ws_path_abs, "src")
-                os.makedirs(upstream_src_folder_path_abs, exist_ok=True)
-                if os.listdir(upstream_src_folder_path_abs):
-                    print(
-                        f"Upstream workspace src folder '{upstream_src_folder_path_abs}' is not empty, cannot proceed."
-                    )
-                    return
-                try:
-                    subprocess.run(
-                        ["vcs", "import", "--input", upstream_ws_repos_path_abs, "--workers", "1"],
-                        check=True,
-                        cwd=upstream_src_folder_path_abs,
-                    )
-                except subprocess.CalledProcessError as e:
-                    print(f"Failed to import upstream repos: {e}")
-                    return
+            upstream_ws_path_abs = os.path.join(ws_path_abs, "..", upstream_ws_name)
+            upstream_src_folder_path_abs = os.path.join(upstream_ws_path_abs, "src")
+            if not vcs_import(upstream_ws_repos_path_abs, upstream_src_folder_path_abs):
+                print(f"Failed to import upstream repos from '{upstream_ws_repos_path_abs}'.")
+                return
 
         # docker handling: create docker workspace
         final_image_name = None
@@ -605,7 +651,7 @@ class CreateVerb(VerbExtension):
                 python_packages_cmd = "RUN pip3 install " + " ".join(args.python_packages)
             else:
                 python_packages_cmd = "# no python packages to install"
-            base_image = args.base_image.format(ros_distro=ros_distro)
+            base_image = args.base_image.format(ros_distro=args.ros_distro)
             dockerfile_content = f"""
             FROM {base_image}
             RUN apt-get update
@@ -643,6 +689,73 @@ class CreateVerb(VerbExtension):
                 print(f"Failed to get docker image '{intermediate_image_name}': {e}")
                 return
 
+            has_ws_packages = True if os.listdir(src_folder_path_abs) else False
+            has_upstream_ws_packages = False
+            if upstream_ws_path_abs and os.listdir(upstream_src_folder_path_abs):
+                has_upstream_ws_packages = True
+            if not has_ws_packages and not has_upstream_ws_packages:
+                print("No packages found in the workspaces. No dependencies to install.")
+                rocker_base_image_name = intermediate_image_name
+            else:
+                # Install package dependencies with rosdep and create a new Docker image
+                print("Installing ROS package dependencies with rosdep.")
+
+                # Start a container from the intermediate image to install dependencies
+                try:
+                    deps_volumes = {}
+                    deps_ws_mount_path = "/root/ws"
+                    deps_upstream_ws_mount_path = "/root/upstream_ws"
+                    if has_ws_packages:
+                        deps_volumes[ws_path_abs] = {"bind": deps_ws_mount_path, "mode": "rw"}
+                    if has_upstream_ws_packages:
+                        deps_volumes[upstream_ws_path_abs] = {
+                            "bind": deps_upstream_ws_mount_path,
+                            "mode": "rw",
+                        }
+                    intermediate_container = docker_client.containers.run(
+                        intermediate_image_name,
+                        "/bin/bash",
+                        detach=True,
+                        remove=True,
+                        tty=True,
+                        volumes=deps_volumes,
+                    )
+                except (
+                    docker.errors.ContainerError,
+                    docker.errors.ImageNotFound,
+                    docker.errors.APIError,
+                ) as e:
+                    print(f"Failed to create intermediate docker container: {e}")
+                    return
+
+                # Update rosdep and install dependencies
+                rosdep_cmd = (
+                    "rosdep update && rosdep install --from-paths /root/ws/src --ignore-src -r -y"
+                )
+                deps_cmd = "echo 'Installing dependencies' && "
+                if has_upstream_ws_packages:
+                    deps_cmd += f" cd {deps_upstream_ws_mount_path} && {rosdep_cmd} && cd - "
+                if has_ws_packages:
+                    deps_cmd += f" cd {deps_ws_mount_path} && {rosdep_cmd} && cd - "
+
+                deps_cmd_exec = f"/bin/bash -c {deps_cmd}"
+                print(f"Sending cmd '{deps_cmd_exec}' to container '{intermediate_image_name}'")
+
+                try:
+                    intermediate_container.exec_run(deps_cmd_exec, stream=True)
+                except docker.errors.APIError as e:
+                    print(f"Failed to install dependencies: {e}")
+                    return
+
+                # Commit the container to create a new Docker image with dependencies installed
+                rocker_base_image_name = intermediate_image_name + "-deps"
+                try:
+                    print(f"Committing container '{intermediate_image_name}'")
+                    intermediate_container.commit(rocker_base_image_name)
+                except docker.errors.APIError as e:
+                    print(f"Failed to commit container '{intermediate_image_name}': {e}")
+                    return
+
             # create final docker image with rocker
             # overwrite rocker flags for now
             ssh_path_abs = os.path.expanduser("~/.ssh")
@@ -655,31 +768,39 @@ class CreateVerb(VerbExtension):
 
             final_image_name = args.final_image_name.format(workspace_name=ws_name)
             container_name = final_image_name + "-instance"
-            rocker_flags = [
-                "--image-name " + final_image_name,
-                "--git",
-                "--hostname rtw-" + ws_name + "-docker",
-                "--mode non-interactive",
-                "--name " + container_name,
-                "--nocleanup",
-                "--user",
-                "--x11",
-            ]
-            if not args.disable_nvidia:
-                rocker_flags.append("--nvidia")
 
-            rocker_cmd = ["rocker"]
-            rocker_cmd.extend(rocker_flags)
-            rocker_cmd.append(" ".join(["--volume"] + rocker_volumes + ["--"]))
-            rocker_cmd.append(intermediate_image_name)
+            # rocker flags have order, see rocker --help
+            rocker_flags = ["--nocleanup", "--git"]
+            rocker_flags.extend(["--hostname", f"rtw-{ws_name}-docker"])
+            rocker_flags.extend(["--name", f"{container_name}"])
+
+            if not args.disable_nvidia:
+                rocker_flags.extend(["--nvidia", "gpus"])
+
+            rocker_flags.append("--user")
+
+            if rocker_volumes:
+                rocker_flags.append("--volume")
+                rocker_flags.extend(rocker_volumes)
+
+            rocker_flags.append("--x11")
+            rocker_flags.extend(["--mode", "interactive"])
+            rocker_flags.extend(["--image-name", f"{final_image_name}"])
+
+            rocker_cmd = ["rocker"] + rocker_flags + [rocker_base_image_name]
+            rocker_cmd_str = " ".join(rocker_cmd)
+
             try:
-                print(f"Creating final docker image '{final_image_name}'")
+                print(
+                    f"Creating final image '{final_image_name}' and container '{container_name}'"
+                    f"with command '{rocker_cmd_str}'"
+                )
                 subprocess.run(
                     rocker_cmd,
                     check=True,
                 )
             except subprocess.CalledProcessError as e:
-                print(f"Failed to create final docker image: {e}")
+                print(f"Failed to create final docker image and container: {e}")
                 return
 
             # check if the final docker image exists
@@ -689,79 +810,77 @@ class CreateVerb(VerbExtension):
                 print(f"Failed to get docker image '{final_image_name}': {e}")
                 return
 
+            # check if the docker container exists
             try:
+                print(f"Checking if docker container '{container_name}' exists")
                 container = docker_client.containers.get(container_name)
             except (docker.errors.NotFound, docker.errors.APIError) as e:
                 print(f"Failed to get docker container '{container_name}': {e}")
                 return
 
-            # compile upstream workspace
-            distro_setup_bash_path = "/opt/ros/" + ros_distro + "/setup.bash"
-            if upstream_ws_path_abs:
-                compile_upstream_ws_cmd = [
-                    "cd",
-                    upstream_ws_path_abs,
-                    "&&",
-                    "source",
-                    distro_setup_bash_path,
-                    "&&",
-                    "colcon",
-                    "build",
-                    "--symlink-install",
-                    "--cmake-args",
-                    "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
-                ]
-                print(f"Compiling upstream workspace with command '{compile_upstream_ws_cmd}'")
+            # start docker container if not running
+            if container.status != "running":
+                print(f"Starting docker container '{container_name}'")
                 try:
-                    container.exec_run("/bin/bash -c {}".format(" ".join(compile_upstream_ws_cmd)))
+                    container.start()
+                except docker.errors.APIError as e:
+                    print(f"Failed to start docker container '{container_name}': {e}")
+                    return
+            else:
+                print(f"Docker container '{container_name}' is already running.")
+
+            # compile upstream workspace
+            if upstream_ws_path_abs:
+                compile_upstream_ws_cmd = get_compile_cmd(upstream_ws_path_abs, args.ros_distro)
+                print(f"Compiling upstream workspace with command '{compile_upstream_ws_cmd}'")
+                compile_upstream_ws_cmd_exec = "/bin/bash -c {}".format(
+                    " ".join(compile_upstream_ws_cmd)
+                )
+                print(
+                    f"Sending command '{compile_upstream_ws_cmd_exec}' to container '{container_name}'"
+                )
+                try:
+                    container.exec_run(compile_upstream_ws_cmd_exec, stream=True)
                 except docker.errors.APIError as e:
                     print(f"Failed to compile upstream workspace '{upstream_ws_path_abs}': {e}")
                     return
 
             # compile main workspace
             main_setup_bash_path = (
-                upstream_ws_path_abs + "/install/setup.bash"
-                if upstream_ws_path_abs
-                else distro_setup_bash_path
+                upstream_ws_path_abs + "/install/setup.bash" if upstream_ws_path_abs else None
             )
-            compile_main_ws_cmd = [
-                "cd",
+            compile_main_ws_cmd = get_compile_cmd(
                 ws_path_abs,
-                "&&",
-                "source",
-                main_setup_bash_path,
-                "&&",
-                "colcon",
-                "build",
-                "--symlink-install",
-                "--cmake-args",
-                "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
-            ]
+                args.ros_distro,
+                setup_bash_path=main_setup_bash_path,
+            )
             print(f"Compiling main workspace with command '{compile_main_ws_cmd}'")
+            compile_main_ws_cmd_exec = "/bin/bash -c {}".format(" ".join(compile_main_ws_cmd))
+            print(f"Sending command '{compile_main_ws_cmd_exec}' to container '{container_name}'")
             try:
-                container.exec_run("/bin/bash -c {}".format(" ".join(compile_main_ws_cmd)))
+                container.exec_run(compile_main_ws_cmd_exec, stream=True)
             except docker.errors.APIError as e:
                 print(f"Failed to compile main workspace '{ws_path_abs}': {e}")
                 return
 
             # create rtw workspaces file
             docker_workspaces_config = WorkspacesConfig()
-            docker_workspaces_config.add_workspace(
-                ws_name,
-                Workspace(
-                    distro=ros_distro,
-                    ws_folder=ws_path_abs,
-                    base_ws=upstream_ws_name if upstream_ws_path_abs else None,
-                ),
-            )
             if upstream_ws_path_abs:
                 docker_workspaces_config.add_workspace(
                     upstream_ws_name,
                     Workspace(
-                        distro=ros_distro,
+                        distro=args.ros_distro,
                         ws_folder=upstream_ws_path_abs,
                     ),
                 )
+            docker_workspaces_config.add_workspace(
+                ws_name,
+                Workspace(
+                    distro=args.ros_distro,
+                    ws_folder=ws_path_abs,
+                    base_ws=upstream_ws_name if upstream_ws_path_abs else None,
+                ),
+            )
 
             rtw_python_cmd_content = f"""
             from rtwcli.helpers import write_to_yaml_file
@@ -770,7 +889,7 @@ class CreateVerb(VerbExtension):
             rtw_python_cmd = ["python3", "-c", rtw_python_cmd_content]
 
             try:
-                container.exec_run(rtw_python_cmd)
+                container.exec_run(rtw_python_cmd, stream=True)
             except docker.errors.APIError as e:
                 print(f"Failed to create rtw workspaces file: {e}")
                 return
@@ -778,7 +897,7 @@ class CreateVerb(VerbExtension):
             # use main workspace per default by adding "rtw workspace use {ws_name}" to bashrc
             modify_bashrc_cmd = f"echo 'rtw workspace use {ws_name}' >> ~/.bashrc"
             try:
-                container.exec_run(modify_bashrc_cmd)
+                container.exec_run(modify_bashrc_cmd, stream=True)
             except docker.errors.APIError as e:
                 print(f"Failed to modify bashrc: {e}")
                 return
@@ -787,9 +906,10 @@ class CreateVerb(VerbExtension):
         if upstream_ws_path_abs:
             local_upstream_ws = Workspace(
                 ws_folder=upstream_ws_path_abs,
-                distro=ros_distro,
+                distro=args.ros_distro,
                 ws_docker_support=True if args.docker else False,
                 docker_tag=final_image_name if args.docker else None,
+                docker_container_name=container_name if args.docker else None,
             )
             if not update_workspaces_config(WORKSPACES_PATH, upstream_ws_name, local_upstream_ws):
                 print("Failed to update workspaces config with upstream workspace.")
@@ -798,10 +918,11 @@ class CreateVerb(VerbExtension):
         # create local main workspace
         local_main_ws = Workspace(
             ws_folder=ws_path_abs,
-            distro=ros_distro,
+            distro=args.ros_distro,
             ws_docker_support=True if args.docker else False,
             docker_tag=final_image_name if args.docker else None,
             base_ws=upstream_ws_name if upstream_ws_path_abs else None,
+            docker_container_name=container_name if args.docker else None,
         )
         if not update_workspaces_config(WORKSPACES_PATH, ws_name, local_main_ws):
             print("Failed to update workspaces config with main workspace.")
