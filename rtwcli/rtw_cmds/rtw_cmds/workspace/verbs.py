@@ -48,10 +48,10 @@ from pprint import pprint
 import re
 import shutil
 import subprocess
-import sys
+import tempfile
+import textwrap
 import docker
 from typing import Any, Dict, List
-
 
 import questionary
 from rtwcli.command.info import ROS_TEAM_WS_VARIABLES
@@ -84,6 +84,9 @@ F_DISTRO = "distro"
 F_DOCKER_TAG = "docker_tag"
 F_WS_DOCKER_SUPPORT = "ws_docker_support"
 F_WS_FOLDER = "ws_folder"
+
+SKEL_BASHRC_PATH = "/etc/skel/.bashrc"
+BASHRC_PATH = os.path.expanduser("~/.bashrc")
 
 
 @dataclasses.dataclass
@@ -362,7 +365,6 @@ def vcs_import(
     path: str,
     non_existing_ok: bool = True,
     empty_ok: bool = True,
-    makedirs: bool = True,
 ) -> bool:
     if not os.path.isfile(repos_file_path):
         print(f"Repos file '{repos_file_path}' does not exist. Nothing to import.")
@@ -374,17 +376,9 @@ def vcs_import(
         return empty_ok
 
     print(f"Found non-empty repos file '{repos_file_path}', importing repos.")
-    try:
-        if makedirs:
-            os.makedirs(path, exist_ok=True)
-        subprocess.run(
-            ["vcs", "import", "--input", repos_file_path, "--workers", "1"],
-            check=True,
-            cwd=path,
-        )
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to import repos: {e}")
+    vcs_import_cmd = ["vcs", "import", "--input", repos_file_path, "--workers", "1"]
+    if not run_command(vcs_import_cmd, cwd=path):
+        print(f"Failed to import repos from '{repos_file_path}'.")
         return False
 
 
@@ -423,34 +417,64 @@ def get_compile_cmd(
     return compile_ws_cmd
 
 
-def run_docker_command(container_name, command) -> bool:
-    docker_exec_command = f"docker exec {container_name} {command}"
-    print(f"Running command: '{docker_exec_command}'")
+def run_command(command, cwd: str = None, ignore_codes=None) -> bool:
+    print(f"Running command: '{command}'")
     try:
-        result = subprocess.run(docker_exec_command, shell=True, text=True)
-        if result.returncode != 0:
-            print(f"Command '{docker_exec_command}' failed with exit code {result.returncode}")
-            return False
+        subprocess.run(command, check=True, cwd=cwd)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Command '{command}' failed with exit code {e.returncode}")
+        if ignore_codes and e.returncode in ignore_codes:
+            return True
     except Exception as e:
-        print(f"Command '{docker_exec_command}' failed: {e}")
-        return False
-
-    return True
+        print(f"Command '{command}' failed: {e}")
+    return False
 
 
-def stop_docker_container(container_name) -> bool:
-    docker_stop_command = f"docker stop {container_name}"
-    print(f"Stopping docker container '{container_name}' with command: '{docker_stop_command}'")
-    try:
-        result = subprocess.run(docker_stop_command, shell=True, text=True)
-        if result.returncode != 0:
-            print(f"Command '{docker_stop_command}' failed with exit code {result.returncode}")
+def create_temp_file(content: str = None) -> str:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        if content:
+            tmp_file.write(content.encode("utf-8"))
+        return tmp_file.name
+
+
+def docker_cp(container_name: str, src_path: str, dest_path: str, make_dirs: bool = True) -> bool:
+    if make_dirs:
+        # docker_make_dirs_command = (
+        #     f"docker exec {container_name} mkdir -p {os.path.dirname(dest_path)}"
+        # )
+        docker_make_dirs_command = [
+            "docker",
+            "exec",
+            container_name,
+            "mkdir",
+            "-p",
+            os.path.dirname(dest_path),
+        ]
+        if not run_command(docker_make_dirs_command):
             return False
-    except Exception as e:
-        print(f"Command '{docker_stop_command}' failed: {e}")
-        return False
+    # docker_cp_command = f"docker cp {src_path} {container_name}:{dest_path}"
+    docker_cp_command = ["docker", "cp", src_path, f"{container_name}:{dest_path}"]
+    return run_command(docker_cp_command)
 
-    return True
+
+def docker_exec(container_name: str, command: str) -> bool:
+    # docker_exec_command = f"docker exec {container_name} {command}"
+    docker_exec_command = [
+        "docker",
+        "exec",
+        container_name,
+        "bash",
+        "-c",
+        command,
+    ]
+    return run_command(docker_exec_command)
+
+
+def docker_stop(container_name: str) -> bool:
+    # docker_stop_command = f"docker stop {container_name}"
+    docker_stop_command = ["docker", "stop", container_name]
+    return run_command(docker_stop_command)
 
 
 class CreateVerb(VerbExtension):
@@ -655,6 +679,7 @@ class CreateVerb(VerbExtension):
                     "Not creating upstream workspace."
                 )
             else:
+                # make upstream ws path parallel to the ws path
                 upstream_ws_path_abs = os.path.normpath(
                     os.path.join(ws_path_abs, "..", upstream_ws_name)
                 )
@@ -749,16 +774,6 @@ class CreateVerb(VerbExtension):
 
                 # Start a container from the intermediate image to install dependencies
                 try:
-                    # deps_volumes = {}
-                    # deps_ws_mount_path = "/root/ws"
-                    # deps_upstream_ws_mount_path = "/root/upstream_ws"
-                    # if has_ws_packages:
-                    #     deps_volumes[ws_path_abs] = {"bind": deps_ws_mount_path, "mode": "rw"}
-                    # if has_upstream_ws_packages:
-                    #     deps_volumes[upstream_ws_path_abs] = {
-                    #         "bind": deps_upstream_ws_mount_path,
-                    #         "mode": "rw",
-                    #     }
                     deps_volumes = []
                     if has_ws_packages:
                         deps_volumes.append(f"{ws_path_abs}:{ws_path_abs}")
@@ -791,10 +806,9 @@ class CreateVerb(VerbExtension):
 
                 deps_cmd_exec = f"/bin/bash -c '{deps_cmd}'"
                 print(f"Sending cmd '{deps_cmd_exec}' to container '{intermediate_container.id}'")
-
-                if not run_docker_command(intermediate_container.id, deps_cmd_exec):
+                if not docker_exec(intermediate_container.id, deps_cmd_exec):
                     print("Failed to install dependencies.")
-                    stop_docker_container(intermediate_container.id)
+                    docker_stop(intermediate_container.id)
                     return
 
                 # compile upstream workspace
@@ -803,49 +817,34 @@ class CreateVerb(VerbExtension):
                         upstream_ws_path_abs, args.ros_distro
                     )
                     print(f"Compiling upstream workspace with command '{compile_upstream_ws_cmd}'")
-                    compile_upstream_ws_cmd_exec = "/bin/bash -c {}".format(
+                    compile_upstream_ws_cmd_exec = "/bin/bash -c '{}'".format(
                         " ".join(compile_upstream_ws_cmd)
                     )
                     print(
                         f"Sending command '{compile_upstream_ws_cmd_exec}' "
-                        f"to container '{intermediate_image_name}'"
+                        f"to container '{intermediate_container.id}'"
                     )
-                    # try:
-                    #     intermediate_container.exec_run(compile_upstream_ws_cmd_exec, stream=True)
-                    # except docker.errors.APIError as e:
-                    #     print(
-                    #         f"Failed to compile upstream workspace '{upstream_ws_path_abs}': {e}"
-                    #     )
-                    #     return
-
-                    try:
-                        exit_code, output_stream = intermediate_container.exec_run(
-                            compile_upstream_ws_cmd_exec, stream=True, demux=True
-                        )
-                        for stdout_line, stderr_line in output_stream:
-                            if stdout_line:
-                                print(stdout_line.decode().strip())
-                            if stderr_line:
-                                print(stderr_line.decode().strip(), file=sys.stderr)
-
-                        if exit_code != 0:
-                            print(f"Failed to compile upstream workspace, exit code: {exit_code}")
-                    except docker.errors.APIError as e:
-                        print(f"Failed to compile upstream workspace: {e}")
-                        stop_docker_container(intermediate_container.id)
+                    if not docker_exec(intermediate_container.id, compile_upstream_ws_cmd_exec):
+                        print("Failed to compile upstream workspace.")
+                        docker_stop(intermediate_container.id)
                         return
 
                     # change upstream workspace folder permissions
                     change_upstream_ws_permissions_cmd = (
                         f"chown -R {os.getuid()}:{os.getgid()} {upstream_ws_path_abs}"
                     )
-                    try:
-                        intermediate_container.exec_run(
-                            change_upstream_ws_permissions_cmd, stream=True
-                        )
-                    except docker.errors.APIError as e:
-                        print(f"Failed to change upstream workspace folder permissions: {e}")
-                        stop_docker_container(intermediate_container.id)
+                    change_upstream_ws_permissions_cmd_exec = "/bin/bash -c '{}'".format(
+                        change_upstream_ws_permissions_cmd
+                    )
+                    print(
+                        f"Sending command '{change_upstream_ws_permissions_cmd_exec}' "
+                        f"to container '{intermediate_container.id}'"
+                    )
+                    if not docker_exec(
+                        intermediate_container.id, change_upstream_ws_permissions_cmd_exec
+                    ):
+                        print("Failed to change upstream workspace folder permissions.")
+                        docker_stop(intermediate_container.id)
                         return
 
                 # compile main workspace
@@ -858,27 +857,32 @@ class CreateVerb(VerbExtension):
                     setup_bash_path=main_setup_bash_path,
                 )
                 print(f"Compiling main workspace with command '{compile_main_ws_cmd}'")
-                compile_main_ws_cmd_exec = "/bin/bash -c {}".format(" ".join(compile_main_ws_cmd))
+                compile_main_ws_cmd_exec = "/bin/bash -c '{}'".format(
+                    " ".join(compile_main_ws_cmd)
+                )
                 print(
                     f"Sending command '{compile_main_ws_cmd_exec}' "
-                    f"to container '{intermediate_image_name}'"
+                    f"to container '{intermediate_container.id}'"
                 )
-                try:
-                    intermediate_container.exec_run(compile_main_ws_cmd_exec, stream=True)
-                except docker.errors.APIError as e:
-                    print(f"Failed to compile main workspace '{ws_path_abs}': {e}")
-                    stop_docker_container(intermediate_container.id)
+                if not docker_exec(intermediate_container.id, compile_main_ws_cmd_exec):
+                    print("Failed to compile main workspace.")
+                    docker_stop(intermediate_container.id)
                     return
 
                 # change main workspace folder permissions
                 change_main_ws_permissions_cmd = (
                     f"chown -R {os.getuid()}:{os.getgid()} {ws_path_abs}"
                 )
-                try:
-                    intermediate_container.exec_run(change_main_ws_permissions_cmd, stream=True)
-                except docker.errors.APIError as e:
-                    print(f"Failed to change main workspace folder permissions: {e}")
-                    stop_docker_container(intermediate_container.id)
+                change_main_ws_permissions_cmd_exec = "/bin/bash -c '{}'".format(
+                    change_main_ws_permissions_cmd
+                )
+                print(
+                    f"Sending command '{change_main_ws_permissions_cmd_exec}' "
+                    f"to container '{intermediate_container.id}'"
+                )
+                if not docker_exec(intermediate_container.id, change_main_ws_permissions_cmd_exec):
+                    print("Failed to change main workspace folder permissions.")
+                    docker_stop(intermediate_container.id)
                     return
 
                 # create rtw workspaces file
@@ -900,26 +904,44 @@ class CreateVerb(VerbExtension):
                     ),
                 )
 
-                rtw_python_cmd_content = f"""
-                from rtwcli.helpers import write_to_yaml_file
-                write_to_yaml_file({WORKSPACES_PATH}, {docker_workspaces_config.to_dict()})
-                """
-                rtw_python_cmd = ["python3", "-c", rtw_python_cmd_content]
+                temp_rtw_file = create_temp_file()
+                if not save_workspaces_config(temp_rtw_file, docker_workspaces_config):
+                    print("Failed to create rtw workspaces file.")
+                    docker_stop(intermediate_container.id)
+                    return
 
-                try:
-                    intermediate_container.exec_run(rtw_python_cmd, stream=True)
-                except docker.errors.APIError as e:
-                    print(f"Failed to create rtw workspaces file: {e}")
-                    stop_docker_container(intermediate_container.id)
+                if not docker_cp(intermediate_container.id, temp_rtw_file, WORKSPACES_PATH):
+                    print("Failed to copy rtw workspaces file to container.")
+                    docker_stop(intermediate_container.id)
                     return
 
                 # use main workspace per default by adding "rtw workspace use {ws_name}" to bashrc
-                modify_bashrc_cmd = f"echo 'rtw workspace use {ws_name}' >> ~/.bashrc"
-                try:
-                    intermediate_container.exec_run(modify_bashrc_cmd, stream=True)
-                except docker.errors.APIError as e:
-                    print(f"Failed to modify bashrc: {e}")
-                    stop_docker_container(intermediate_container.id)
+                # first read the default bashrc
+                with open(SKEL_BASHRC_PATH) as file:
+                    default_bashrc_content = file.read()
+
+                extra_bashrc_content = textwrap.dedent(
+                    f"""
+                    # source rtw
+                    . {args.rtw_path}/setup.bash
+
+                    # automatically source RosTeamWorkspace if the .ros_team_ws file is present
+                    if [ -f ~/.ros_team_ws_rc ]; then
+                        . ~/.ros_team_ws_rc
+                    fi
+
+                    # automatically use the main workspace
+                    rtw workspace use {ws_name}
+                    """
+                )
+
+                # write the default bashrc with the extra content to the container
+                temp_bashrc_file = create_temp_file(
+                    content=default_bashrc_content + extra_bashrc_content
+                )
+                if not docker_cp(intermediate_container.id, temp_bashrc_file, BASHRC_PATH):
+                    print("Failed to copy bashrc file to container.")
+                    docker_stop(intermediate_container.id)
                     return
 
                 # Commit the container to create a new Docker image with dependencies installed
@@ -932,23 +954,24 @@ class CreateVerb(VerbExtension):
                     intermediate_container.commit(rocker_base_image_name)
                 except docker.errors.APIError as e:
                     print(f"Failed to commit container '{intermediate_image_name}': {e}")
-                    stop_docker_container(intermediate_container.id)
+                    docker_stop(intermediate_container.id)
                     return
 
-                stop_docker_container(intermediate_container.id)
+                docker_stop(intermediate_container.id)
+
+            final_image_name = args.final_image_name.format(workspace_name=ws_name)
+            final_container_name = final_image_name + "-instance"
 
             # create final docker image with rocker
             # overwrite rocker flags for now
             ssh_path_abs = os.path.expanduser("~/.ssh")
             rocker_volumes = [
                 ssh_path_abs + ":" + ssh_path_abs + ":ro",
-                ws_path_abs,  # mount path is the same
+                ws_path_abs + ":" + ws_path_abs,
             ]
             if has_upstream_ws:
-                rocker_volumes.append(upstream_ws_path_abs)  # mount path is the same
-
-            final_image_name = args.final_image_name.format(workspace_name=ws_name)
-            final_container_name = final_image_name + "-instance"
+                rocker_volumes.append(upstream_ws_path_abs + ":" + upstream_ws_path_abs)
+            rocker_volumes.append("--")
 
             # rocker flags have order, see rocker --help
             rocker_flags = ["--nocleanup", "--git"]
@@ -971,45 +994,15 @@ class CreateVerb(VerbExtension):
             rocker_cmd = ["rocker"] + rocker_flags + [rocker_base_image_name]
             rocker_cmd_str = " ".join(rocker_cmd)
 
-            try:
-                print(
-                    f"Creating final image '{final_image_name}' "
-                    f"and final container '{final_container_name}' "
-                    f"with command '{rocker_cmd_str}'"
-                )
-                subprocess.run(
-                    rocker_cmd,
-                    check=True,
-                )
-            except subprocess.CalledProcessError as e:
-                print(f"Failed to create final docker image and container: {e}")
+            print(
+                f"Creating final image '{final_image_name}' "
+                f"and final container '{final_container_name}' "
+                f"with command '{rocker_cmd_str}'"
+            )
+
+            if not run_command(rocker_cmd):
+                print(f"Failed to create final image '{final_image_name}' with rocker.")
                 return
-
-            # # check if the final docker image exists
-            # try:
-            #     docker_client.images.get(final_image_name)
-            # except (docker.errors.ImageNotFound, docker.errors.APIError) as e:
-            #     print(f"Failed to get docker image '{final_image_name}': {e}")
-            #     return
-
-            # # check if the docker container exists
-            # try:
-            #     print(f"Checking if docker container '{container_name}' exists")
-            #     container = docker_client.containers.get(container_name)
-            # except (docker.errors.NotFound, docker.errors.APIError) as e:
-            #     print(f"Failed to get docker container '{container_name}': {e}")
-            #     return
-
-            # # start docker container if not running
-            # if container.status != "running":
-            #     print(f"Starting docker container '{container_name}'")
-            #     try:
-            #         container.start()
-            #     except docker.errors.APIError as e:
-            #         print(f"Failed to start docker container '{container_name}': {e}")
-            #         return
-            # else:
-            #     print(f"Docker container '{container_name}' is already running.")
 
         # create local upstream workspace
         if has_upstream_ws:
