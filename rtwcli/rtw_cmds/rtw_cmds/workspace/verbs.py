@@ -690,6 +690,7 @@ class CreateVerb(VerbExtension):
 
         # docker handling: create docker workspace
         final_image_name = None
+        has_rocker_error = False
         if args.docker:
             print("Creating docker workspace")
 
@@ -921,6 +922,9 @@ class CreateVerb(VerbExtension):
                         . ~/.ros_team_ws_rc
                     fi
 
+                    # Stogl Robotics custom setup for nice colors and showing ROS workspace
+                    . {args.rtw_path}/scripts/configuration/terminal_coloring.bash
+
                     # automatically use the main workspace
                     rtw workspace use {ws_name}
                     """
@@ -990,8 +994,15 @@ class CreateVerb(VerbExtension):
                 f"with command '{rocker_cmd_str}'"
             )
 
-            if not run_command(rocker_cmd):
-                print(f"Failed to create final image '{final_image_name}' with rocker.")
+            has_rocker_error = not run_command(rocker_cmd)
+
+        # ask the user to still save ws config even if there was a rocker error
+        if has_rocker_error:
+            still_save_config = questionary.confirm(
+                "There was an error with rocker. Do you want to save the workspace config?"
+            ).ask()
+            if not still_save_config:
+                print("Not saving the workspace config.")
                 return
 
         # create local upstream workspace
