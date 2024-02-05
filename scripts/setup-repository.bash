@@ -46,8 +46,22 @@ if [ -z "$LICENSE" ]; then
   exit 0
 fi
 
+echo "Select the main branch name:"
+echo "  (1) main (default)"
+echo "  (2) master"
+echo "  (3) ${ros_distro}"
+echo "  (other) user input"
+read -rp "Your choice: " choice
+
+case "$choice" in
+1) branch="main" ;;
+2) branch="master" ;;
+3) branch="${ros_distro}" ;;
+*) read -rp "Enter branch name: " branch ;;
+esac
+
 git init
-git checkout -b $ros_distro
+git checkout -b "$branch"
 git add .
 git commit -m "RosTeamWS: package created with initial files"
 
@@ -66,10 +80,9 @@ case "$choice" in
 "1")
   mkdir -p .github/workflows
 
-  cp -n $PACKAGE_TEMPLATES/pkg_name.repos $PKG_NAME.repos
-  ln -s $PKG_NAME.repos $PKG_NAME.ci.repos
-  echo "NOTE: To enable CI from source, uncomment it manually in '.github/workflows/ci-build.yml'"
-  cp -n $PACKAGE_TEMPLATES/README.md.github README.md
+  cp -n "${PACKAGE_TEMPLATES}/pkg_name.repos" "${PKG_NAME}.${ros_distro}.upstream.repos"
+  cp -n "${PACKAGE_TEMPLATES}/pkg_name.repos" "${PKG_NAME}.${ros_distro}.repos"
+  cp -n "${PACKAGE_TEMPLATES}/README.md.github" README.md
   repository="github"
   ;;
 "2")
@@ -95,7 +108,7 @@ fi
 if [[ -f "$PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md" ]]; then
   # Ask if add How-to-use and ROS-Intro
   read -p "Do you want to append description on 'How-to-use and ROS-Intro' to the README? (y/n) [n]" choice
-  choice=${choice="n"}
+  choice=${choice:-"n"}
 
   case "$choice" in
   "y")
