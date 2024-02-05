@@ -60,6 +60,11 @@ case "$choice" in
 *) read -rp "Enter branch name: " branch ;;
 esac
 
+user_decision "Do you want to add a predefined gitignore file to the package?"
+if [[ " ${positive_answers[*]} " =~ " ${user_answer} " ]]; then
+  cp -n "${PACKAGE_TEMPLATES}/.gitignore" ".gitignore"
+fi
+
 git init
 git checkout -b "$branch"
 git add .
