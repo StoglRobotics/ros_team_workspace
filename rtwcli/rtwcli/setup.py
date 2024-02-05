@@ -38,7 +38,7 @@ commands and verbs.""",
     tests_require=["pytest"],
     entry_points={
         "rtwcli.command": [
-            "extension_points =" " rtwcli.command.extension_points:ExtensionPointsCommand",
+            "extension_points = rtwcli.command.extension_points:ExtensionPointsCommand",
             "extensions = rtwcli.command.extensions:ExtensionsCommand",
             "info = rtwcli.command.info:InfoCommand",
         ],
