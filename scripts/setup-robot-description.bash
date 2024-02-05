@@ -28,33 +28,29 @@ if [ -z "$ROBOT_NAME" ]; then
   print_and_exit "ERROR: You should provide robot name! Nothing to do 😯" "$usage"
 fi
 
-LAUNCH_FILE_TYPE=$2
-if [[ "$LAUNCH_FILE_TYPE" != "xml" && "$LAUNCH_FILE_TYPE" != "python" && "$LAUNCH_FILE_TYPE" != "py" ]]; then
-  echo "Invalid LAUNCH_FILE_TYPE:{""${LAUNCH_FILE_TYPE}""}. Choose from the following options:"
-  echo "1. xml"
-  echo "2. python"
+echo "Which launchfiles should be added? Choose from the following options:"
+echo "1) xml"
+echo "2) python"
+echo "3) both"
 
-  read -p "Enter your choice (1 or 2): " choice
+read -p "Enter your choice:" choice
 
-  case $choice in
-  1)
-    LAUNCH_FILE_TYPE="xml"
-    ;;
-  2)
-    LAUNCH_FILE_TYPE="py"
-    ;;
-  *)
-    echo "Invalid choice. Exiting."
-    exit 1
-    ;;
-  esac
-fi
-# If LAUNCH_FILE_TYPE is "python", set it to "py"
-if [[ "$LAUNCH_FILE_TYPE" == "python" ]]; then
-  LAUNCH_FILE_TYPE="py"
-fi
-# prepand "." to its a valid file extension
-LAUNCH_FILE_TYPE=".$LAUNCH_FILE_TYPE"
+LAUNCH_FILE_TYPES=()
+
+case $choice in
+1)
+  LAUNCH_FILE_TYPES+=(".xml")
+  ;;
+2)
+  LAUNCH_FILE_TYPES+=(".py")
+  ;;
+3)
+  LAUNCH_FILE_TYPES+=(".xml" ".py")
+  ;;
+*)
+  print_and_exit "Invalid choice. Exiting."
+  ;;
+esac
 
 if [ ! -f "package.xml" ]; then
   print_and_exit "ERROR: 'package.xml' not found. You should execute this script at the top level of your package folder. Nothing to do 😯" "$usage"
@@ -88,10 +84,20 @@ cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot.urdf.xacro" $ROBOT_URDF_XACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.xacro" $ROBOT_MACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro" $ROBOT_MACRO_ROS2_CONTROL
 
-# Copy launch file for testing the description
-mkdir -p launch
-VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch${LAUNCH_FILE_TYPE}"
-cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch${LAUNCH_FILE_TYPE}" $VIEW_ROBOT_LAUNCH
+# Copy launch files for testing the description
+for file_type in "${LAUNCH_FILE_TYPES[@]}"; do
+  mkdir -p launch
+  VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch${file_type}"
+  cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch${file_type}" $VIEW_ROBOT_LAUNCH
+
+  # sed all needed files
+  FILES_TO_SED=($ROBOT_URDF_XACRO $ROBOT_MACRO $ROBOT_MACRO_ROS2_CONTROL $VIEW_ROBOT_LAUNCH)
+
+  for SED_FILE in "${FILES_TO_SED[@]}"; do
+    sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
+    sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
+  done
+done
 
 # Copy YAML files
 mkdir -p config
@@ -101,14 +107,6 @@ touch config/.gitkeep
 mkdir -p rviz
 ROBOT_RVIZ="rviz/${ROBOT_NAME}.rviz"
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot.rviz" $ROBOT_RVIZ
-
-# sed all needed files
-FILES_TO_SED=($ROBOT_URDF_XACRO $ROBOT_MACRO $ROBOT_MACRO_ROS2_CONTROL $VIEW_ROBOT_LAUNCH)
-
-for SED_FILE in "${FILES_TO_SED[@]}"; do
-  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
-done
 
 # Add dependencies if they not exist
 DEP_PKGS=("xacro" "rviz2" "robot_state_publisher" "joint_state_publisher_gui")
@@ -139,4 +137,4 @@ fi
 compile_and_source_package $PKG_NAME
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch${LAUNCH_FILE_TYPE}'${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch${LAUNCH_FILE_TYPES[*]}'${TERMINAL_COLOR_NC}"

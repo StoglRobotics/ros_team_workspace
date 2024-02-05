@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-usage="setup-robot-bringup ROBOT_NAME DESCRIPTION_PKG_NAME LAUNCH_FILE_TYPE"
+usage="setup-robot-bringup ROBOT_NAME DESCRIPTION_PKG_NAME"
 
 # Load Framework defines
 script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
@@ -31,33 +31,29 @@ if [ -z "$DESCR_PKG_NAME" ]; then
   print_and_exit "ERROR: You should provide description package name! Nothing to do 😯" "$usage"
 fi
 
-LAUNCH_FILE_TYPE=$3
-if [[ "$LAUNCH_FILE_TYPE" != "xml" && "$LAUNCH_FILE_TYPE" != "python" && "$LAUNCH_FILE_TYPE" != "py" ]]; then
-  echo "Invalid LAUNCH_FILE_TYPE:{""${LAUNCH_FILE_TYPE}""}. Choose from the following options:"
-  echo "1. xml"
-  echo "2. python"
+echo "Which launchfiles should be added? Choose from the following options:"
+echo "1) xml"
+echo "2) python"
+echo "3) both"
 
-  read -p "Enter your choice (1 or 2): " choice
+read -p "Enter your choice:" choice
 
-  case $choice in
-  1)
-    LAUNCH_FILE_TYPE="xml"
-    ;;
-  2)
-    LAUNCH_FILE_TYPE="py"
-    ;;
-  *)
-    echo "Invalid choice. Exiting."
-    exit 1
-    ;;
-  esac
-fi
-# If LAUNCH_FILE_TYPE is "python", set it to "py"
-if [[ "$LAUNCH_FILE_TYPE" == "python" ]]; then
-  LAUNCH_FILE_TYPE="py"
-fi
-# prepand "." to its a valid file extension
-LAUNCH_FILE_TYPE=".$LAUNCH_FILE_TYPE"
+LAUNCH_FILE_TYPES=()
+
+case $choice in
+1)
+  LAUNCH_FILE_TYPES+=(".xml")
+  ;;
+2)
+  LAUNCH_FILE_TYPES+=(".py")
+  ;;
+3)
+  LAUNCH_FILE_TYPES+=(".xml" ".py")
+  ;;
+*)
+  print_and_exit "Invalid choice. Exiting."
+  ;;
+esac
 
 if [ ! -f "package.xml" ]; then
   print_and_exit "ERROR: 'package.xml' not found. You should execute this script at the top level of your package folder. Nothing to do 😯" "$usage"
@@ -89,21 +85,26 @@ cp -n $ROS2_CONTROL_TEMPLATES/robot_controllers.yaml $ROBOT_CONTROLLERS_YAML
 cp -n $ROS2_CONTROL_TEMPLATES/test_goal_publishers_config.yaml $ROBOT_FPC_PUB_YAML
 
 # Copy launch files
-ROBOT_LAUNCH="launch/${ROBOT_NAME}.launch${LAUNCH_FILE_TYPE}"
-TEST_FWD_POS_CTRL_LAUNCH="launch/test_forward_position_controller.launch${LAUNCH_FILE_TYPE}"
-TEST_JTC_LAUNCH="launch/test_joint_trajectory_controller.launch${LAUNCH_FILE_TYPE}"
-cp -n "$ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch${LAUNCH_FILE_TYPE}" ${ROBOT_LAUNCH}
-cp -n "$ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch${LAUNCH_FILE_TYPE}" $TEST_FWD_POS_CTRL_LAUNCH
-cp -n "$ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch${LAUNCH_FILE_TYPE}" $TEST_JTC_LAUNCH
+for file_type in "${LAUNCH_FILE_TYPES[@]}"; do
+  # Construct the file paths
+  ROBOT_LAUNCH="launch/${ROBOT_NAME}.launch${file_type}"
+  TEST_FWD_POS_CTRL_LAUNCH="launch/test_forward_position_controller.launch${file_type}"
+  TEST_JTC_LAUNCH="launch/test_joint_trajectory_controller.launch${file_type}"
 
-# sed all needed files
-FILES_TO_SED=($ROBOT_LAUNCH $TEST_FWD_POS_CTRL_LAUNCH $TEST_JTC_LAUNCH)
+  # Copy the templates to the destination with the specified file type
+  cp -n "$ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch${file_type}" "${ROBOT_LAUNCH}"
+  cp -n "$ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch${file_type}" "${TEST_FWD_POS_CTRL_LAUNCH}"
+  cp -n "$ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch${file_type}" "${TEST_JTC_LAUNCH}"
 
-for SED_FILE in "${FILES_TO_SED[@]}"; do
-  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$RUNTIME_CONFIG_PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
-  sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
+  # sed all needed files
+  FILES_TO_SED=($ROBOT_LAUNCH $TEST_FWD_POS_CTRL_LAUNCH $TEST_JTC_LAUNCH)
+
+  for SED_FILE in "${FILES_TO_SED[@]}"; do
+    sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
+    sed -i "s/\\\$RUNTIME_CONFIG_PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
+    sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
+    sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
+  done
 done
 
 # package.xml: Add dependencies if they not exist
@@ -136,4 +137,4 @@ fi
 compile_and_source_package $PKG_NAME
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME ${ROBOT_NAME}.launch${LAUNCH_FILE_TYPE}'${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME ${ROBOT_NAME}.launch${LAUNCH_FILE_TYPES[*]}'${TERMINAL_COLOR_NC}"
