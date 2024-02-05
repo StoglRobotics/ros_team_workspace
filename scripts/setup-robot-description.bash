@@ -135,9 +135,6 @@ fi
 
 #TODO: Set license
 
-git add .
-git commit -m "RosTeamWS: Description files for $ROBOT_NAME generated."
-
 # Compile and add new package the to the path
 compile_and_source_package $PKG_NAME
 
