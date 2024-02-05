@@ -200,11 +200,7 @@ read -p "${RAW_TERMINAL_COLOR_BROWN}Do you want to setup formatting using pre-co
 formatting=${formatting:="no"}
 
 if  [[ "$formatting" == "yes" ]]; then
-  cp -n ${PACKAGE_TEMPLATES}/.clang-format .
-  cp -n ${PACKAGE_TEMPLATES}/.pre-commit-config.yaml .
-  touch ".codespell-ignore-words.txt"
-  pre-commit install
-  pre-commit autoupdate
+  $RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-formatting.bash
 fi
 
 echo ""

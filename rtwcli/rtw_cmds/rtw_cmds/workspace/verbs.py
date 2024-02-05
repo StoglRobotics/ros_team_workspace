@@ -38,6 +38,7 @@ workspace name prefix is defined as first letters of the path and last folder if
 - /home/daniela/workspace/mojin/pid_ws -> hdw_mojin__pid_ws
 """
 
+import argparse
 import copy
 import dataclasses
 import datetime
@@ -333,35 +334,63 @@ class CreateVerb(VerbExtension):
         print("Not implemented yet")
 
 
+def get_workspace_names() -> List[str]:
+    """Retrieve a list of workspace names from the YAML file."""
+    if not os.path.isfile(WORKSPACES_PATH):
+        return []
+    workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
+    return workspaces_config.get_ws_names()
+
+
+def workspace_name_completer(**kwargs) -> List[str]:
+    """Callable returning a list of workspace names."""
+    ws_names = get_workspace_names()
+    if not ws_names:
+        return ["NO_WORKSPACES_FOUND"]
+    return ws_names
+
+
+def add_cli_workspace_args(parser: argparse.ArgumentParser):
+    arg = parser.add_argument(
+        "workspace_name",
+        help="The workspace name",
+        nargs="?",
+    )
+    arg.completer = workspace_name_completer
+
+
 class UseVerb(VerbExtension):
     """Select and source an existing ROS workspace."""
 
-    def main(self, *, args):
-        if not os.path.isfile(WORKSPACES_PATH):
-            print(
-                "No workspaces are available as the workspaces config file "
-                f"'{WORKSPACES_PATH}' does not exist"
-            )
-            return
+    def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
+        add_cli_workspace_args(parser)
 
+    def main(self, *, args):
         workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
         if not workspaces_config.workspaces:
             print(f"No workspaces found in config file '{WORKSPACES_PATH}'")
             return
 
         ws_names = workspaces_config.get_ws_names()
-        ws_name = questionary.autocomplete(
-            "Choose workspace",
-            ws_names,
-            qmark="'Tab' to see all workspaces\n",
-            meta_information=copy.deepcopy(workspaces_config.to_dict()[WORKSPACES_KEY]),
-            validate=lambda ws_choice: ws_choice in ws_names,
-            style=questionary.Style([("answer", "bg:ansiwhite")]),
-        ).ask()
-        if not ws_name:  # Cancelled by user
-            return
 
-        workspace = workspaces_config.workspaces[ws_name]
+        ws_name = args.workspace_name
+        if not ws_name:
+            ws_name = questionary.autocomplete(
+                "Choose workspace",
+                ws_names,
+                qmark="'Tab' to see all workspaces, type to filter, 'Enter' to select\n",
+                meta_information=copy.deepcopy(workspaces_config.to_dict()[WORKSPACES_KEY]),
+                validate=lambda ws_choice: ws_choice in ws_names,
+                style=questionary.Style([("answer", "bg:ansiwhite")]),
+                match_middle=True,
+            ).ask()
+            if not ws_name:  # Cancelled by user
+                return
+
+        workspace = workspaces_config.workspaces.get(ws_name)
+        if not workspace:
+            return f"Workspace '{ws_name}' not found."
+
         print(f"Workspace data: {workspace}")
 
         script_content = create_bash_script_content_for_using_ws(
@@ -370,8 +399,9 @@ class UseVerb(VerbExtension):
         tmp_file = f"/tmp/ros_team_workspace/wokspace_{os.getppid()}.bash"
         print(f"Following text will be written into file '{tmp_file}':\n{script_content}")
         if not create_file_and_write(tmp_file, content=script_content):
-            print(f"Failed to write workspace data to a file {tmp_file}.")
-            return
+            return f"Failed to write workspace data to a file {tmp_file}."
+
+        print(f"Using workspace '{ws_name}'")
 
 
 class PortAllVerb(VerbExtension):

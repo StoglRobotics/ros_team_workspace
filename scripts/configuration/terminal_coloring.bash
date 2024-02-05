@@ -59,7 +59,7 @@ if [ -n "$SSH_CLIENT" ]; then text="-ssh-session"
 fi
 
 function get_gitbranch {
-  echo `git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+  git branch --show-current 2> /dev/null
 }
 
 function parse_git_bracket {
@@ -71,7 +71,7 @@ function parse_git_bracket {
 function set_git_color {
   if [[ "$(get_gitbranch)" != '' ]]; then
     # Get the status of the repo and chose a color accordingly
-    local STATUS=`LANG=en_GB git status 2>&1`
+    local STATUS=$(LANG=en_GB LANGUAGE=en git status 2>&1)
     if [[ "$STATUS" != *'working tree clean'* ]]; then
       # red if need to commit
       color=${TERMINAL_COLOR_RED}

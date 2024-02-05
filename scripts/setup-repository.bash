@@ -91,10 +91,13 @@ case "$choice" in
   exit 0
 esac
 
-cp -n $PACKAGE_TEMPLATES/.clang-format .
-cp -n $PACKAGE_TEMPLATES/.pre-commit-config.yaml .
-pre-commit install
-pre-commit autoupdate
+# Setting up formatting
+read -p "${RAW_TERMINAL_COLOR_BROWN}Do you want to setup formatting using pre-commit?${RAW_TERMINAL_COLOR_NC} (yes/no) [no]: " formatting
+formatting=${formatting:="no"}
+
+if  [[ "$formatting" == "yes" ]]; then
+  $RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-formatting.bash
+fi
 
 
 # This functionality is not provided in all framework versions
