@@ -520,10 +520,10 @@ class CreateVerb(VerbExtension):
             default="master",
         )
         parser.add_argument(
-            "--repos-skip-existing",
+            "--repos-no-skip-existing",
             action="store_true",
             help="Parse this flag to vcs import to not overwrite existing packages.",
-            default=True,
+            default=False,
         )
         parser.add_argument(
             "--disable-nvidia",
@@ -671,7 +671,9 @@ class CreateVerb(VerbExtension):
             )
             ws_repos_path_abs = os.path.join(repo_path_abs, ws_repos_file_name)
             if not vcs_import(
-                ws_repos_path_abs, src_folder_path_abs, skip_existing=args.repos_skip_existing
+                ws_repos_path_abs,
+                src_folder_path_abs,
+                skip_existing=not args.repos_no_skip_existing,
             ):
                 print(f"Failed to import repos from '{ws_repos_path_abs}'.")
                 return
@@ -696,7 +698,7 @@ class CreateVerb(VerbExtension):
                 if not vcs_import(
                     upstream_ws_repos_path_abs,
                     upstream_src_folder_path_abs,
-                    skip_existing=args.repos_skip_existing,
+                    skip_existing=not args.repos_no_skip_existing,
                 ):
                     print(f"Failed to import upstream repos from '{upstream_ws_repos_path_abs}'.")
                     return
