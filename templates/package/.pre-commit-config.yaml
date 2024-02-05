@@ -41,6 +41,9 @@ repos:
       - id: trailing-whitespace
         exclude_types: [rst]
       - id: fix-byte-order-marker
+      - id: shell-lint
+      - id: shellcheck
+      - id: shfmt
 
 
   # Python hooks
