@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 
 cd $FRAMEWORK_BASE_PATH
@@ -26,10 +26,8 @@ git pull --rebase origin
 
 source setup.bash
 
-
 # Revert state
 git stash pop
-
 
 ## Update variables with "exports"
 ros_team_ws_file_name=".ros_team_ws_rc"

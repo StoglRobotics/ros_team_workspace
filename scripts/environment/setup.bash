@@ -10,7 +10,7 @@ usage='setup.bash "ros_distro" "workspace_folder" "ros_ws_prefix" "ros_ws_suffix
 # read -p "Starting..."
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../_RosTeamWs_Defines.bash
 source $script_own_dir/../_RosTeamWs_Docker_Defines.bash
 source $script_own_dir/../_Team_Defines.bash
@@ -73,7 +73,6 @@ if [[ $ros_version == 1 ]]; then
 
   echo ""
   echo "RosTeamWS: Sourced file: $WS_FOLDER/devel/setup.bash"
-
 
 elif [[ $ros_version == 2 ]]; then
 

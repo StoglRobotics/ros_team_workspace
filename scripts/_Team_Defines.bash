@@ -52,7 +52,6 @@ alias setup_ros2_exports=RosTeamWS_setup_ros2_exports
 alias setup_ros2_aliases=RosTeamWS_setup_ros2_aliases
 # END: Define aliases for standard functions
 
-
 # BEGIN: Define aliases for standard scripts
 # Change those to your custom ones you would like to use.
 alias create-new-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/create-new-package.bash
@@ -65,7 +64,7 @@ alias setup-formatting=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-formatting.bash
 
 alias setup-ros-workspace=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-ros-workspace.bash
 
-setup-ros-workspace () {
+setup-ros-workspace() {
   source "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-ros-workspace.bash
   create_workspace "$@"
 }

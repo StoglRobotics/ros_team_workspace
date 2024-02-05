@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2022 Manuel Muth (Stogl Robotics Consulting)
+# Copyright 2022 Manual Muth (Stogl Robotics Consulting)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 
 user_decision "Do you want to automatically source RosTeamWs? This is going to add a .ros_team_ws file to your home directory. Additionally your .bashrc is modified to automatically source RosTeamWs."
@@ -32,7 +32,10 @@ else
     new_rtw_file_name="${rtw_file}.bkp-$(ls ${rtw_file_location}* | wc -l)"
     echo ""
     notify_user "${rtw_file} already exists. Moved it to ${new_rtw_file_name}."
-    mv "${rtw_file_location}" "$HOME/${new_rtw_file_name}" || { echo "Error: Could not create a copy of already existing ${rtw_file}. Please rename this file and run script again."; return 1; }
+    mv "${rtw_file_location}" "$HOME/${new_rtw_file_name}" || {
+        echo "Error: Could not create a copy of already existing ${rtw_file}. Please rename this file and run script again."
+        return 1
+    }
     cp "${template_location}" ~/.
 fi
 
@@ -61,15 +64,14 @@ else
     fi
 fi
 
-
 echo "Updating your .bashrc file."
 bashrc_location=~/.bashrc
-if ! ( grep -q '\..*\.ros_team_ws_rc' $bashrc_location || grep -q 'source.*\.ros_team_ws_rc' $bashrc_location ); then
-    echo "" >> $bashrc_location
-    echo "# automatically source RosTeamWorkspace if the .ros_team_ws file is present in your home folder." >> $bashrc_location
-    echo "if [ -f ~/.ros_team_ws_rc ]; then" >> $bashrc_location
-    echo "    . ~/.ros_team_ws_rc" >> $bashrc_location
-    echo "fi" >> $bashrc_location
+if ! (grep -q '\..*\.ros_team_ws_rc' $bashrc_location || grep -q 'source.*\.ros_team_ws_rc' $bashrc_location); then
+    echo "" >>$bashrc_location
+    echo "# automatically source RosTeamWorkspace if the .ros_team_ws file is present in your home folder." >>$bashrc_location
+    echo "if [ -f ~/.ros_team_ws_rc ]; then" >>$bashrc_location
+    echo "    . ~/.ros_team_ws_rc" >>$bashrc_location
+    echo "fi" >>$bashrc_location
 fi
 
 notify_user "Done! Please open a new terminal now."

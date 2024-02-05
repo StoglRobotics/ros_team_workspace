@@ -19,7 +19,7 @@
 usage="setup-robot-description ROBOT_NAME"
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 check_and_set_ros_distro_and_version ${ROS_DISTRO}
 
@@ -34,7 +34,7 @@ fi
 PKG_NAME="$(grep -Po '(?<=<name>).*?(?=</name>)' package.xml | sed -e 's/[[:space:]]//g')"
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up description configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '`pwd`'.${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up description configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '$(pwd)'.${TERMINAL_COLOR_NC}"
 echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name.${TERMINAL_COLOR_NC}"
 read
 
@@ -86,7 +86,7 @@ done
 DEP_PKGS=("xacro" "rviz2" "robot_state_publisher" "joint_state_publisher_gui")
 
 for DEP_PKG in "${DEP_PKGS[@]}"; do
-  if `grep -q $DEP_PKG package.xml`; then
+  if $(grep -q $DEP_PKG package.xml); then
     echo "'$DEP_PKG' is already listed in package.xml"
   else
     append_to_string="<buildtool_depend>ament_cmake<\/buildtool_depend>"
@@ -100,7 +100,7 @@ sed -i "s/$preppend_to_string/install\(\\n  DIRECTORY config launch meshes rviz 
 
 # extend README with general instructions
 if [ -f README.md ]; then
-  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >> README.md
+  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >>README.md
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
   sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
 fi

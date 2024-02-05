@@ -16,7 +16,7 @@ sudo mkdir -p $main_dir
 
 # Create maintainers group and add current user to it
 sudo groupadd -r -g 700 rws-maintainers
-sudo usermod -a -G rws-maintainers `whoami`
+sudo usermod -a -G rws-maintainers $(whoami)
 
 sudo mkdir -p $FRAMEWORK_REPO_PATH/src
 sudo chown -R root:rws-maintainers $FRAMEWORK_REPO_PATH
@@ -25,7 +25,7 @@ cd $FRAMEWORK_REPO_PATH/src
 
 ## TODO: Correct this form here to use configuration from the GitHub repository
 
-vcs import src < $REMOTE_FRAMEWORK_PATH/src/.rosinstall
+vcs import src <$REMOTE_FRAMEWORK_PATH/src/.rosinstall
 bash $SCRIPT_PATH/update_IPR_Framework.bash $ros_distro
 
 cd $FRAMEWORK_BASE_PATH

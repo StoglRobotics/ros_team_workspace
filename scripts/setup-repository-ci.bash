@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 usage='setup-repository-ci.bash "repo_name" "repo_namespace" ["first_package second_package ..."]'
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 
 repo_name=$1
@@ -41,7 +40,7 @@ read -p "${RAW_TERMINAL_COLOR_BROWN}Are you setting CI for private repository?${
 private=${private:="no"}
 
 CI_FORMAT="ci-format"
-if  [[ "$private" == "yes" ]]; then
+if [[ "$private" == "yes" ]]; then
   CI_FORMAT="ci-format-private"
 fi
 
@@ -59,7 +58,6 @@ CI_SEMI_BINARY_BUILD_MAIN="semi-binary-build-main"
 CI_SEMI_BINARY_BUILD_TESTING="semi-binary-build-testing"
 CI_SOURCE_BUILD="source-build"
 CI_RHEL_BINARY_BUILD="rhel-binary-build"
-
 
 # Lists for different generation stages
 CI_GENERAL_FILES=(
@@ -111,7 +109,6 @@ for CI_FILE in "${CI_GENERAL_FILES[@]}"; do
 
 done
 
-
 some_ros_distro=${default_ros_distro}
 some_branch=${default_branch}
 
@@ -146,17 +143,17 @@ while true; do
   cp -n ${PACKAGE_TEMPLATES}/README.md.github README.md
 
   if ! grep -q "## Build status" README.md; then
-    cat ${PACKAGE_TEMPLATES}/_append_to_README_build_status.md >> README.md
+    cat ${PACKAGE_TEMPLATES}/_append_to_README_build_status.md >>README.md
   fi
 
   # Get line with "### Explanation of different build types"
-  TEST_LINE=`awk '$1 == "###" && $2 == "Explanation" && $5 == "build" { print NR }' README.md`
+  TEST_LINE=$(awk '$1 == "###" && $2 == "Explanation" && $5 == "build" { print NR }' README.md)
   let CUT_LINE=$TEST_LINE-1
-  head -$CUT_LINE README.md >> $TMP_FILE
-  cat ${PACKAGE_TEMPLATES}/_append_to_README_build_status_table.md >> $TMP_FILE
+  head -$CUT_LINE README.md >>$TMP_FILE
+  cat ${PACKAGE_TEMPLATES}/_append_to_README_build_status_table.md >>$TMP_FILE
 
   # Update .github/workflows/README.md file
-  cat ${PACKAGE_TEMPLATES}/_append_to_workflows_README_build_status_table.md > $TMP_FILE_2
+  cat ${PACKAGE_TEMPLATES}/_append_to_workflows_README_build_status_table.md >$TMP_FILE_2
 
   # SED temp files
   FILES_TO_UPDATE=("$TMP_FILE" "$TMP_FILE_2")
@@ -169,12 +166,12 @@ while true; do
   done
 
   # append to readme files
-  tail -n +$CUT_LINE README.md >> $TMP_FILE
+  tail -n +$CUT_LINE README.md >>$TMP_FILE
   mv $TMP_FILE README.md
 
-  cat ${PACKAGE_TEMPLATES}/_append_to_README_build_status.md >> $TMP_FILE_2
+  cat ${PACKAGE_TEMPLATES}/_append_to_README_build_status.md >>$TMP_FILE_2
 
-  cat $TMP_FILE_2 >> .github/workflows/README.md
+  cat $TMP_FILE_2 >>.github/workflows/README.md
   rm $TMP_FILE_2
 
   echo ""
@@ -188,8 +185,8 @@ while true; do
     break
   fi
 
-  echo "" > $TMP_FILE
-  echo "" > $TMP_FILE_2
+  echo "" >$TMP_FILE
+  echo "" >$TMP_FILE_2
 
   read -p "${RAW_TERMINAL_COLOR_BROWN}Name of the ROS distro? ${RAW_TERMINAL_COLOR_NC}" some_ros_distro
   read -p "${RAW_TERMINAL_COLOR_BROWN}Name of the repository branch?: ${RAW_TERMINAL_COLOR_NC}" some_branch
@@ -199,7 +196,7 @@ done
 read -p "${RAW_TERMINAL_COLOR_BROWN}Do you want to setup formatting using pre-commit?${RAW_TERMINAL_COLOR_NC} (yes/no) [no]: " formatting
 formatting=${formatting:="no"}
 
-if  [[ "$formatting" == "yes" ]]; then
+if [[ "$formatting" == "yes" ]]; then
   $RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-formatting.bash
 fi
 

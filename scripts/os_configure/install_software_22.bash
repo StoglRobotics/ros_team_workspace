@@ -15,7 +15,7 @@
 
 # install_software_22.bash [computer_type:{office, robot, default:basic}]
 
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 SCRIPT_PATH=$script_own_dir
 source "${SCRIPT_PATH}"/../../setup.bash
 
@@ -32,21 +32,20 @@ if ! [[ " ${supported_computer_types[*]} " =~ " ${computer_type} " ]]; then
   echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} basic    -Standard pc. Basic utilities like development utilities (git, vscode, ...) and some additional tools."
   echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} office   -Used for office pcs. Basic utilities, additional tools and office related stuff."
   echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION} robot    -Used for robot platforms. Basic utilities like development utilities (git, vscode, ...)."
-  select computer_type in basic office robot;
-  do
+  select computer_type in basic office robot; do
     case "$computer_type" in
-          basic)
-              computer_type="basic"
-              break
-            ;;
-          office)
-              computer_type="office"
-              break
-            ;;
-          robot)
-              computer_type="robot"
-              break
-            ;;
+    basic)
+      computer_type="basic"
+      break
+      ;;
+    office)
+      computer_type="office"
+      break
+      ;;
+    robot)
+      computer_type="robot"
+      break
+      ;;
     esac
   done
   echo -n -e "${TERMINAL_COLOR_NC}"
@@ -55,7 +54,7 @@ fi
 echo "Installing software for $computer_type computers. Press <ENTER> to continue."
 read
 
-ROS2_VERSIONS=( "humble" "rolling" )
+ROS2_VERSIONS=("humble" "rolling")
 
 ### CORE TOOLS ###
 sudo apt update
@@ -63,7 +62,7 @@ sudo apt -y install ca-certificates curl gnupg gnupg2 lsb-release
 
 # Nala - better apt frontend
 echo "deb http://deb.volian.org/volian/ scar main" | sudo tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list
-wget -qO - https://deb.volian.org/volian/scar.key | sudo tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg > /dev/null
+wget -qO - https://deb.volian.org/volian/scar.key | sudo tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg >/dev/null
 sudo apt update
 sudo apt -y install nala
 nala --install-completion bash
@@ -81,7 +80,7 @@ sudo apt -y install libxml2-dev libvlc-dev libmuparser-dev libudev-dev
 ### DEVELOPMENT TOOLS ###
 # gh - Github CLI (it seems that gh needs to be install via apt to get access to .ssh keys)
 sudo apt -y install gh
-gh completion -s bash | tee "$HOME"/.local/share/bash-completion/completions/gh.bash > /dev/null
+gh completion -s bash | tee "$HOME"/.local/share/bash-completion/completions/gh.bash >/dev/null
 
 # visual studio code
 sudo snap install --classic code
@@ -91,7 +90,7 @@ while read extension; do
   # ignore empty lines or lines starting with "#"
   [[ $extension =~ ^#.* ]] || [ -z "$extension" ] && continue
   code --install-extension "${extension}"
-done < "${vs_code_plugin_file}"
+done <"${vs_code_plugin_file}"
 
 # Docker
 sudo apt-get update
@@ -99,7 +98,7 @@ sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 sudo apt-get update
 sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo groupadd docker
@@ -110,8 +109,7 @@ sudo apt -y install virtualbox dkms virtualbox-guest-utils virtualbox-ext-pack
 
 ## ROS
 # ROS2 Packages
-for ROS2_VERSION in "${ROS2_VERSIONS[@]}"
-do
+for ROS2_VERSION in "${ROS2_VERSIONS[@]}"; do
   bash $SCRIPT_PATH/install_software_ros2.bash $ROS2_VERSION
 done
 
@@ -143,12 +141,12 @@ sudo apt -y install python3-pip \
   python3-virtualenv \
   python3-virtualenvwrapper \
   python3-notebook \
-pip3 install --upgrade pip
+  pip3 install --upgrade pip
 
 # setup bash
-cat "$OS_CONFIGURE_TEMPLATES/extend_to_bashrc" >> "$HOME/.bashrc"
-cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_aliases" >> "$HOME/.bash_aliases"
-cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_commands" >> "$HOME/.bash_commands"
+cat "$OS_CONFIGURE_TEMPLATES/extend_to_bashrc" >>"$HOME/.bashrc"
+cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_aliases" >>"$HOME/.bash_aliases"
+cat "$OS_CONFIGURE_TEMPLATES/extend_to_bash_commands" >>"$HOME/.bash_commands"
 
 # setup git
 commit_template_path="$HOME/.config/git"
@@ -175,13 +173,11 @@ sudo apt -y autoremove
 
 ########################## END BASIC SETUP ##########################
 
-if [[ "${computer_type}" != "robot" ]]
-then
+if [[ "${computer_type}" != "robot" ]]; then
   sudo apt -y install recordmydesktop rdesktop gimp meshlab inkscape pdfposter unrar
 fi
 
-if [[ "${computer_type}" == "office" ]]
-then
+if [[ "${computer_type}" == "office" ]]; then
 
   ### CRYPTOPGRAPHY AND PASSWORD MANAGEMENT ###
   # Cryptography
@@ -205,7 +201,7 @@ then
   ### ADDITIONAL DEVELOPMENT TOOLS ###
   # Code optimization and profiling
   sudo apt -y install valgrind kcachegrind hotspot heaptrack-gui
-  sudo apt -y install linux-tools-generic linux-cloud-tools-generic  # Kernel tools
+  sudo apt -y install linux-tools-generic linux-cloud-tools-generic # Kernel tools
 
   sudo apt -y install flac
 

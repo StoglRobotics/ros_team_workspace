@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 SCRIPT_PATH=$script_own_dir
 source "$SCRIPT_PATH"/../../setup.bash
 
@@ -24,8 +24,7 @@ fi
 sudo apt update
 
 ROS_DISTRO=$1
-if [ -z "$1" ]
-then
+if [ -z "$1" ]; then
   ROS_DISTRO=noetic
   echo "Ros version not provided! Using default distribution \"${ROS_DISTRO}\""
   echo "Press <ENTER> to continue..."

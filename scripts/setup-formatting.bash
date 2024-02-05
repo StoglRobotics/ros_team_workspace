@@ -17,11 +17,10 @@
 #
 # Author: Dr. Denis Stogl
 
-
 usage='setup-formatting.bash'
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 
 # Setting up formatting

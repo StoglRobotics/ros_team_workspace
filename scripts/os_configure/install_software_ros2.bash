@@ -14,13 +14,12 @@
 # limitations under the License.
 
 # based on https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Development-Setup/
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 SCRIPT_PATH=$script_own_dir
 source "$SCRIPT_PATH"/../../setup.bash
 
 ROS_DISTRO=$1
-if [ -z "$1" ]
-then
+if [ -z "$1" ]; then
   ROS_DISTRO=${ROS_DISTRO}
   echo "ROS 2 version not specified! Using default distribution \"${ROS_DISTRO}\""
   echo "Press <ENTER> to continue..."
@@ -29,7 +28,7 @@ fi
 
 if [[ ! -f "/etc/apt/sources.list.d/ros2.list" ]]; then
   sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list >/dev/null
 fi
 sudo apt update
 

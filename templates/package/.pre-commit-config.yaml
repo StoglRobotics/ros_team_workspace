@@ -45,13 +45,8 @@ repos:
   - repo: https://github.com/syntaqx/git-hooks
     rev: v0.0.18
     hooks:
-    -   id: shellcheck
     -   id: shfmt
-
-  - repo: https://github.com/detailyang/pre-commit-shell
-    rev: 1.0.5
-    hooks:
-    - id: shell-lint
+    -   id: shell-lint
 
   # Python hooks
   - repo: https://github.com/asottile/pyupgrade
