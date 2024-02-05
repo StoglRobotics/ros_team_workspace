@@ -16,10 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-usage="setup-robot-description ROBOT_NAME"
+usage="setup-robot-description ROBOT_NAME LAUNCH_FILE_TYPE"
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 check_and_set_ros_distro_and_version ${ROS_DISTRO}
 
@@ -28,13 +28,41 @@ if [ -z "$ROBOT_NAME" ]; then
   print_and_exit "ERROR: You should provide robot name! Nothing to do 😯" "$usage"
 fi
 
+LAUNCH_FILE_TYPE=$2
+if [[ "$LAUNCH_FILE_TYPE" != "xml" && "$LAUNCH_FILE_TYPE" != "python" && "$LAUNCH_FILE_TYPE" != "py" ]]; then
+  echo "Invalid LAUNCH_FILE_TYPE:{""${LAUNCH_FILE_TYPE}""}. Choose from the following options:"
+  echo "1. xml"
+  echo "2. python"
+
+  read -p "Enter your choice (1 or 2): " choice
+
+  case $choice in
+  1)
+    LAUNCH_FILE_TYPE="xml"
+    ;;
+  2)
+    LAUNCH_FILE_TYPE="py"
+    ;;
+  *)
+    echo "Invalid choice. Exiting."
+    exit 1
+    ;;
+  esac
+fi
+# If LAUNCH_FILE_TYPE is "python", set it to "py"
+if [[ "$LAUNCH_FILE_TYPE" == "python" ]]; then
+  LAUNCH_FILE_TYPE="py"
+fi
+# prepand "." to its a valid file extension
+LAUNCH_FILE_TYPE=".$LAUNCH_FILE_TYPE"
+
 if [ ! -f "package.xml" ]; then
   print_and_exit "ERROR: 'package.xml' not found. You should execute this script at the top level of your package folder. Nothing to do 😯" "$usage"
 fi
 PKG_NAME="$(grep -Po '(?<=<name>).*?(?=</name>)' package.xml | sed -e 's/[[:space:]]//g')"
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up description configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '`pwd`'.${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up description configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '$(pwd)'.${TERMINAL_COLOR_NC}"
 echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name.${TERMINAL_COLOR_NC}"
 read
 
@@ -60,10 +88,10 @@ cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot.urdf.xacro" $ROBOT_URDF_XACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.xacro" $ROBOT_MACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro" $ROBOT_MACRO_ROS2_CONTROL
 
-# Copy launch.xml file for testing the description
+# Copy launch file for testing the description
 mkdir -p launch
-VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch.xml"
-cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.xml" $VIEW_ROBOT_LAUNCH
+VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch${LAUNCH_FILE_TYPE}"
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch${LAUNCH_FILE_TYPE}" $VIEW_ROBOT_LAUNCH
 
 # Copy YAML files
 mkdir -p config
@@ -86,7 +114,7 @@ done
 DEP_PKGS=("xacro" "rviz2" "robot_state_publisher" "joint_state_publisher_gui")
 
 for DEP_PKG in "${DEP_PKGS[@]}"; do
-  if `grep -q $DEP_PKG package.xml`; then
+  if $(grep -q $DEP_PKG package.xml); then
     echo "'$DEP_PKG' is already listed in package.xml"
   else
     append_to_string="<buildtool_depend>ament_cmake<\/buildtool_depend>"
@@ -100,7 +128,7 @@ sed -i "s/$preppend_to_string/install\(\\n  DIRECTORY config launch meshes rviz 
 
 # extend README with general instructions
 if [ -f README.md ]; then
-  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >> README.md
+  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >>README.md
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
   sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
 fi
@@ -114,4 +142,4 @@ git commit -m "RosTeamWS: Description files for $ROBOT_NAME generated."
 compile_and_source_package $PKG_NAME
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch.xml'${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch${LAUNCH_FILE_TYPE}'${TERMINAL_COLOR_NC}"
