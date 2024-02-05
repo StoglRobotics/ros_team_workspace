@@ -365,6 +365,7 @@ def vcs_import(
     path: str,
     non_existing_ok: bool = True,
     empty_ok: bool = True,
+    makedirs: bool = True,
 ) -> bool:
     if not os.path.isfile(repos_file_path):
         print(f"Repos file '{repos_file_path}' does not exist. Nothing to import.")
@@ -376,22 +377,16 @@ def vcs_import(
         return empty_ok
 
     print(f"Found non-empty repos file '{repos_file_path}', importing repos.")
+
+    if makedirs:
+        os.makedirs(path, exist_ok=True)
+
     vcs_import_cmd = ["vcs", "import", "--input", repos_file_path, "--workers", "1"]
-    if not run_command(vcs_import_cmd, cwd=path):
-        print(f"Failed to import repos from '{repos_file_path}'.")
-        return False
+    return run_command(vcs_import_cmd, cwd=path)
 
 
 def git_clone(url: str, branch: str, path: str) -> bool:
-    try:
-        subprocess.run(
-            ["git", "clone", url, "--branch", branch, path],
-            check=True,
-        )
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to clone repo from URL '{url}': {e}")
-        return False
+    return run_command(["git", "clone", url, "--branch", branch, path])
 
 
 def get_compile_cmd(
@@ -417,10 +412,10 @@ def get_compile_cmd(
     return compile_ws_cmd
 
 
-def run_command(command, cwd: str = None, ignore_codes=None) -> bool:
+def run_command(command, shell: bool = False, cwd: str = None, ignore_codes=None) -> bool:
     print(f"Running command: '{command}'")
     try:
-        subprocess.run(command, check=True, cwd=cwd)
+        subprocess.run(command, shell=shell, check=True, cwd=cwd)
         return True
     except subprocess.CalledProcessError as e:
         print(f"Command '{command}' failed with exit code {e.returncode}")
@@ -453,13 +448,11 @@ def docker_cp(container_name: str, src_path: str, dest_path: str, make_dirs: boo
         ]
         if not run_command(docker_make_dirs_command):
             return False
-    # docker_cp_command = f"docker cp {src_path} {container_name}:{dest_path}"
     docker_cp_command = ["docker", "cp", src_path, f"{container_name}:{dest_path}"]
     return run_command(docker_cp_command)
 
 
 def docker_exec(container_name: str, command: str) -> bool:
-    # docker_exec_command = f"docker exec {container_name} {command}"
     docker_exec_command = [
         "docker",
         "exec",
@@ -472,9 +465,7 @@ def docker_exec(container_name: str, command: str) -> bool:
 
 
 def docker_stop(container_name: str) -> bool:
-    # docker_stop_command = f"docker stop {container_name}"
-    docker_stop_command = ["docker", "stop", container_name]
-    return run_command(docker_stop_command)
+    return run_command(["docker", "stop", container_name])
 
 
 class CreateVerb(VerbExtension):
@@ -564,7 +555,7 @@ class CreateVerb(VerbExtension):
             "--rtw-path",
             type=str,
             help="Path to clone the ros_team_workspace repo to.",
-            default="/opt/ros_team_workspace",
+            default=os.path.expanduser("~/ros_team_workspace"),
         )
         parser.add_argument(
             "--apt_packages",
@@ -971,7 +962,6 @@ class CreateVerb(VerbExtension):
             ]
             if has_upstream_ws:
                 rocker_volumes.append(upstream_ws_path_abs + ":" + upstream_ws_path_abs)
-            rocker_volumes.append("--")
 
             # rocker flags have order, see rocker --help
             rocker_flags = ["--nocleanup", "--git"]
@@ -1047,7 +1037,7 @@ def workspace_name_completer(**kwargs) -> List[str]:
     return ws_names
 
 
-def add_cli_workspace_args(parser: argparse.ArgumentParser):
+def add_rtw_workspace_use_args(parser: argparse.ArgumentParser):
     arg = parser.add_argument(
         "workspace_name",
         help="The workspace name",
@@ -1060,7 +1050,7 @@ class UseVerb(VerbExtension):
     """Select and source an existing ROS workspace."""
 
     def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
-        add_cli_workspace_args(parser)
+        add_rtw_workspace_use_args(parser)
 
     def main(self, *, args):
         workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
