@@ -220,14 +220,6 @@ if [[ $ros_version == 1 ]]; then
 elif [[ $ros_version == 2 ]]; then
   ros2 pkg create --package-format 3 --description "$PKG_DESCRIPTION" --license "$LICENSE" --build-type "$BUILD_TYPE" --maintainer-email "$MAINTAINER_EMAIL" --maintainer-name "$MAINTAINER_NAME" $PKG_NAME
 
-  if [[ "$BUILD_TYPE" == "ament_cmake" || "$BUILD_TYPE" == "cmake" ]]; then
-    # remove all in between the if(BUILD_TESTING) and endif() block
-    # this usually contains linting stuff which we don't want for the tests
-    cd $PKG_NAME || print_and_exit "create-new-package internal error. cannot change dir to src/$PKG_NAME."
-    sed -i '/if(BUILD_TESTING)/,/endif()/ { /if(BUILD_TESTING)/b; /endif()/b; d; }' CMakeLists.txt
-    cd "-" || exit
-  fi
-
   ## Until it is corrected upstream
   if [[ "$PKG_TYPE" == "$package_type_metapackage_option" ]]; then
     cd $PKG_NAME
