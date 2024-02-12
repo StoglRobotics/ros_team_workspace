@@ -221,10 +221,12 @@ elif [[ $ros_version == 2 ]]; then
   ros2 pkg create --package-format 3 --description "$PKG_DESCRIPTION" --license "$LICENSE" --build-type "$BUILD_TYPE" --maintainer-email "$MAINTAINER_EMAIL" --maintainer-name "$MAINTAINER_NAME" $PKG_NAME
 
   # set compile options
-  cd $PKG_NAME || print_and_exit "create-new-package internal error. cannot change dir to src/$PKG_NAME."
-  sed -i -E 's/^[[:blank:]]*if\(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"\)$/if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")/' CMakeLists.txt
-  sed -i -E 's/^[[:blank:]]*add_compile_options\(-Wall -Wextra -Wpedantic\)$/  add_compile_options(-Wall -Wextra -Werror=conversion -Werror=unused-but-set-variable -Werror=return-type -Werror=shadow)/' CMakeLists.txt
-  cd "-" || exit
+  if [[ "$BUILD_TYPE" == "ament_cmake" || "$BUILD_TYPE" == "cmake" ]]; then
+    cd $PKG_NAME || print_and_exit "create-new-package internal error. cannot change dir to src/$PKG_NAME."
+    sed -i -E 's/^[[:blank:]]*if\(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"\)$/if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")/' CMakeLists.txt
+    sed -i -E 's/^[[:blank:]]*add_compile_options\(-Wall -Wextra -Wpedantic\)$/  add_compile_options(-Wall -Wextra -Werror=conversion -Werror=unused-but-set-variable -Werror=return-type -Werror=shadow)/' CMakeLists.txt
+    cd "-" || exit
+  fi
 
   ## Until it is corrected upstream
   if [[ "$PKG_TYPE" == "$package_type_metapackage_option" ]]; then
