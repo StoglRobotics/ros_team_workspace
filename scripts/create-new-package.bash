@@ -220,6 +220,20 @@ if [[ $ros_version == 1 ]]; then
 elif [[ $ros_version == 2 ]]; then
   ros2 pkg create --package-format 3 --description "$PKG_DESCRIPTION" --license "$LICENSE" --build-type "$BUILD_TYPE" --maintainer-email "$MAINTAINER_EMAIL" --maintainer-name "$MAINTAINER_NAME" $PKG_NAME
 
+  if [[ "$BUILD_TYPE" == "ament_cmake" || "$BUILD_TYPE" == "cmake" ]]; then
+    cd $PKG_NAME || print_and_exit "create-new-package internal error. cannot change dir to src/$PKG_NAME."
+    # remove auto lint stuff:
+    # 1) remove all the lint dependencies in package.xml
+    sed -i '/<test_depend>ament_lint_auto<\/test_depend>/d; /<test_depend>ament_lint_common<\/test_depend>/d' package.xml
+    # remove multiple newlines
+    awk '!NF { if (!blank++) print; next } { blank=0; print }' package.xml >tmp_file && mv tmp_file package.xml
+    # 2) remove all in between the if(BUILD_TESTING) and endif() block
+    # this usually contains linting stuff which we don't want for the tests
+    sed -i '/if(BUILD_TESTING)/,/endif()/ { /if(BUILD_TESTING)/b; /endif()/b; d; }' CMakeLists.txt
+    awk '!NF { if (!blank++) print; next } { blank=0; print }' CMakeLists.txt >tmp_file && mv tmp_file CMakeLists.txt
+    cd "-" || exit
+  fi
+
   ## Until it is corrected upstream
   if [[ "$PKG_TYPE" == "$package_type_metapackage_option" ]]; then
     cd $PKG_NAME
