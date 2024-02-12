@@ -89,7 +89,11 @@ done
 
 # Add all the exec depend packages
 DEPENDENCIES=("joint_state_publisher_gui" "robot_state_publisher" "rviz2" "xacro")
-PREVIOUS_STRING="<buildtool_depend>ament_cmake<\/buildtool_depend>"
+# append to last exec_depend or if non is found to buildtool_depend
+PREVIOUS_STRING=$(grep -E "^\s*<exec_depend>" package.xml | tail -n 1)
+if [ -z "$PREVIOUS_STRING" ]; then
+  PREVIOUS_STRING="<buildtool_depend>ament_cmake<\/buildtool_depend>"
+fi
 DEPEND_TAG="exec_depend"
 for DEP_PKG in "${DEPENDENCIES[@]}"; do
   # Check if the current package is already listed in the package.xml file
@@ -97,7 +101,7 @@ for DEP_PKG in "${DEPENDENCIES[@]}"; do
     echo "'$DEP_PKG' is already listed in package.xml"
   else
     # Check if the previous string starts with <buildtool_depend>
-    if [[ "$PREVIOUS_STRING" != \<$DEPEND_TAG* ]]; then
+    if [[ ! "$PREVIOUS_STRING" =~ ^\s*\<$DEPEND_TAG.* ]]; then
       # If the previous string starts with different tag, add 2 newline characters after it to start new block
       newline="\n\n"
     else
@@ -111,7 +115,11 @@ done
 
 # Add all the test depend packages
 DEPENDENCIES=("ament_cmake_pytest" "launch_testing_ament_cmake" "launch_testing_ros" "liburdfdom-tools" "xacro")
-PREVIOUS_STRING="<test_depend>ament_lint_common</test_depend>"
+# append to last exec_depend or if non is found to buildtool_depend
+PREVIOUS_STRING=$(grep -E "^\s*<test_depend>" package.xml | tail -n 1)
+if [ -z "$PREVIOUS_STRING" ]; then
+  PREVIOUS_STRING="<exec_depend>xacro</exec_depend>"
+fi
 DEPEND_TAG="test_depend"
 for DEP_PKG in "${DEPENDENCIES[@]}"; do
   # Check if the current package is already listed in the package.xml file
@@ -119,7 +127,7 @@ for DEP_PKG in "${DEPENDENCIES[@]}"; do
     echo "'$DEP_PKG' is already listed in package.xml"
   else
     # Check if the previous string starts with <buildtool_depend>
-    if [[ "$PREVIOUS_STRING" != \<$DEPEND_TAG* ]]; then
+    if [[ ! "$PREVIOUS_STRING" =~ ^\s*\<$DEPEND_TAG.* ]]; then
       # If the previous string starts with different tag, add 2 newline characters after it to start new block
       newline="\n\n"
     else
