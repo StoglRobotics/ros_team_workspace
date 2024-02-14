@@ -14,6 +14,8 @@
 
 
 import os
+import subprocess
+import tempfile
 from typing import Any
 
 import yaml
@@ -65,3 +67,56 @@ def create_file_and_write(file_path: str, content: str) -> bool:
     except OSError as e:
         print(f"Failed to write to a file. Error: {e}", e)
         return False
+
+
+def run_command(command, shell: bool = False, cwd: str = None, ignore_codes=None) -> bool:
+    print(f"Running command: '{command}'")
+    try:
+        subprocess.run(command, shell=shell, check=True, cwd=cwd)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Command '{command}' failed with exit code {e.returncode}")
+        if ignore_codes and e.returncode in ignore_codes:
+            return True
+    except Exception as e:
+        print(f"Command '{command}' failed: {e}")
+    return False
+
+
+def create_temp_file(content: str = None) -> str:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        if content:
+            tmp_file.write(content.encode("utf-8"))
+        return tmp_file.name
+
+
+def vcs_import(
+    repos_file_path: str,
+    path: str,
+    non_existing_ok: bool = True,
+    empty_ok: bool = True,
+    makedirs: bool = True,
+    skip_existing: bool = False,
+) -> bool:
+    if not os.path.isfile(repos_file_path):
+        print(f"Repos file '{repos_file_path}' does not exist. Nothing to import.")
+        return non_existing_ok
+
+    # check if the file is empty
+    if os.path.getsize(repos_file_path) == 0:
+        print(f"Repos file '{repos_file_path}' is empty. Nothing to import.")
+        return empty_ok
+
+    print(f"Found non-empty repos file '{repos_file_path}', importing repos.")
+
+    if makedirs:
+        os.makedirs(path, exist_ok=True)
+
+    vcs_import_cmd = ["vcs", "import", "--input", repos_file_path, "--workers", "1"]
+    if skip_existing:
+        vcs_import_cmd.append("--skip-existing")
+    return run_command(vcs_import_cmd, cwd=path)
+
+
+def git_clone(url: str, branch: str, path: str) -> bool:
+    return run_command(["git", "clone", url, "--branch", branch, path])
