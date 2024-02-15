@@ -30,20 +30,20 @@ check_and_set_ros_distro_and_version ${ROS_DISTRO}
 
 PKG_NAME=$1
 if [ -z "$1" ]; then
-  echo "You should provide package name!"
-  exit 0
+  get_user_input_confirmed "You did not provide a package/repository name. Please enter the name of the package/repository:"
+  PKG_NAME=$RTW_USER_INPUT
 fi
 
 PKG_DESCRIPTION=$2
 if [ -z "$2" ]; then
-  echo "You should provide package description!"
-  exit 0
+  get_user_input_confirmed "You did not provide a description of the package. Please enter a description:"
+  PKG_DESCRIPTION=$RTW_USER_INPUT
 fi
 
 LICENSE=$3
 if [ -z "$LICENSE" ]; then
-  echo "No package LICENSE defined! Using 'Propriatery' as default."
-  exit 0
+  let_user_select_license
+  LICENSE="${RTW_USER_SELECTED_LICENSE}"
 fi
 
 echo "Select the main branch name:"
