@@ -356,11 +356,11 @@ get_user_input_confirmed() {
     read user_input
 
     # Print user input and ask for confirmation
-    echo -e "${TERMINAL_COLOR_USER_NOTICE}You entered: \"${user_input}\", is this correct? [yes/no] (ctrl-c to cancel)${TERMINAL_COLOR_NC}"
+    echo -e "${TERMINAL_COLOR_USER_NOTICE}You entered: \"${user_input}\", is this correct? (yes/no) [yes]${TERMINAL_COLOR_NC}"
     read confirm
 
     # Check confirmation
-    if [ "$confirm" = "yes" ]; then
+    if [ "$confirm" = "yes" ] || [ -z "$confirm" ]; then
       confirmed=true
     else
       confirmed=false
