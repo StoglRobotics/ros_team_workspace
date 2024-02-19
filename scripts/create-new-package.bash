@@ -143,49 +143,8 @@ else
 fi
 echo -e "${TERMINAL_COLOR_USER_NOTICE}The name '$MAINTAINER_NAME' and email address '$MAINTAINER_EMAIL' will be used as maintainer info!${TERMINAL_COLOR_NC}"
 
-
-# License options for a multiple choice
-license_user_input_option="user input"
-licence_team_option="Current team license standard: '${TEAM_LICENSE}'"
-licence_proprietary="Proprietary License - Stogl Robotics"
-
-if [[ $ros_version == 1 ]]; then
-  supported_licenses=""
-elif [[ $ros_version == 2 ]]; then
-  supported_licenses=$(ros2 pkg create dummy --license "?")
-  supported_licenses=${supported_licenses#"Supported licenses:"}
-fi
-license_options=("$license_user_input_option" "$licence_team_option" "$licence_proprietary")
-license_options+=($supported_licenses)
-
-echo ""
-echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}How do you want to licence your package? ${TERMINAL_COLOR_NC}"
-select licence_option in "${license_options[@]}";
-do
-  case "$licence_option" in
-        "$license_user_input_option")
-            read -p "Enter your licence: " LICENSE
-            break
-          ;;
-        "$licence_team_option")
-            LICENSE="$TEAM_LICENSE"
-            break
-          ;;
-        "$licence_proprietary")
-            read -p "Enter name of license (e.g. 'Propriatery License'): " NAME_OF_LICENSE
-            YEAR=$(date +'%Y')
-            LICENSE=$(<"${LICENSE_TEMPLATES}/proprietary_company_header.txt")
-            LICENSE=$(echo "${LICENSE}" | sed -e "s/\\\$YEAR\\\$/${YEAR}/g; s/\\\$NAME_ON_LICENSE\\\$/${NAME_OF_LICENSE}/g")
-            break
-          ;;
-        *)
-            LICENSE="$licence_option"
-            break
-          ;;
-  esac
-done
-echo -e "${TERMINAL_COLOR_USER_NOTICE}The licence '$LICENSE' will be used! ($) ${TERMINAL_COLOR_NC}"
-
+let_user_select_license
+LICENSE="${RTW_USER_SELECTED_LICENSE}"
 
 # BUILD_TYPE
 ros2_build_type_ament_cmake_option="ament_cmake"

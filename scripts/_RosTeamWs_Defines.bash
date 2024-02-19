@@ -343,6 +343,71 @@ function user_confirmation {
   read
 }
 
+get_user_input_confirmed() {
+  local msg="$1"
+  local confirmed=false
+  local user_input=""
+
+  while [ "$confirmed" != "true" ]; do
+    # Print message
+    echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}$msg${TERMINAL_COLOR_NC}"
+
+    # Get user input
+    read user_input
+
+    # Print user input and ask for confirmation
+    echo -e "${TERMINAL_COLOR_USER_NOTICE}You entered: \"${user_input}\", is this correct? (yes/no) [yes]${TERMINAL_COLOR_NC}"
+    read confirm
+
+    # Check confirmation
+    if [ "$confirm" = "yes" ] || [ -z "$confirm" ]; then
+      confirmed=true
+    else
+      confirmed=false
+    fi
+  done
+  export RTW_USER_INPUT="${user_input}"
+  # Return user input
+}
+
+let_user_select_license() {
+  # License options for a multiple choice
+  local license_user_input_option="user input"
+  local licence_team_option="Current team license standard: ['$TEAM_LICENSE']"
+  local supported_licenses=""
+  local license=""
+
+  if [[ $ros_version == 1 ]]; then
+    supported_licenses=""
+  elif [[ $ros_version == 2 ]]; then
+    supported_licenses=$(ros2 pkg create dummy --license "?")
+    supported_licenses=${supported_licenses#"Supported licenses:"}
+  fi
+  local license_options=("$license_user_input_option" "$licence_team_option")
+  license_options+=($supported_licenses)
+
+  echo ""
+  echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}How do you want to licence your package? ${TERMINAL_COLOR_NC}"
+  select licence_option in "${license_options[@]}"; do
+    case "$licence_option" in
+    "$license_user_input_option")
+      read -p "Enter your licence: " license
+      break
+      ;;
+    "$licence_team_option")
+      license="$TEAM_LICENSE"
+      break
+      ;;
+    *)
+      license="$licence_option"
+      break
+      ;;
+    esac
+  done
+  echo -e "${TERMINAL_COLOR_USER_NOTICE}The licence '$license' will be used! ($) ${TERMINAL_COLOR_NC}"
+  export RTW_USER_SELECTED_LICENSE="${license}"
+}
+
 function set_framework_default_paths {
   FRAMEWORK_NAME="ros_team_workspace"
   # readlink prints resolved symbolic links or canonical file names -> the "dir/dir_2/.." becomes "dir"
