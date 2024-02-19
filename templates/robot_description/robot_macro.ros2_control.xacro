@@ -132,7 +132,7 @@
       <gazebo reference="world">
       </gazebo>
       <gazebo>
-        <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+        <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
           <parameters>${simulation_controllers}</parameters>
           <controller_manager_node_name>${prefix}controller_manager</controller_manager_node_name>
         </plugin>
