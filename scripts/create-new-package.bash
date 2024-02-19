@@ -146,14 +146,16 @@ echo -e "${TERMINAL_COLOR_USER_NOTICE}The name '$MAINTAINER_NAME' and email addr
 
 # License options for a multiple choice
 license_user_input_option="user input"
-licence_team_option="Current team license standard: ['$TEAM_LICENSE']"
+licence_team_option="Current team license standard: '${TEAM_LICENSE}'"
+licence_proprietary="Proprietary License - Stogl Robotics"
+
 if [[ $ros_version == 1 ]]; then
   supported_licenses=""
 elif [[ $ros_version == 2 ]]; then
   supported_licenses=$(ros2 pkg create dummy --license "?")
   supported_licenses=${supported_licenses#"Supported licenses:"}
 fi
-license_options=("$license_user_input_option" "$licence_team_option")
+license_options=("$license_user_input_option" "$licence_team_option" "$licence_proprietary")
 license_options+=($supported_licenses)
 
 echo ""
@@ -167,6 +169,13 @@ do
           ;;
         "$licence_team_option")
             LICENSE="$TEAM_LICENSE"
+            break
+          ;;
+        "$licence_proprietary")
+            read -p "Enter name of license (e.g. 'Propriatery License'): " NAME_OF_LICENSE
+            YEAR=$(date +'%Y')
+            LICENSE=$(<"${LICENSE_TEMPLATES}/proprietary_company_header.txt")
+            LICENSE=$(echo "${LICENSE}" | sed -e "s/\\\$YEAR\\\$/${YEAR}/g; s/\\\$NAME_ON_LICENSE\\\$/${NAME_OF_LICENSE}/g")
             break
           ;;
         *)
