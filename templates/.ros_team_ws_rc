@@ -14,10 +14,11 @@ TEAM_PRIVATE_CONFIG_PATH=""
 # set this to the location of RosTeamWorkspace
 source <PATH TO ros_team_workspace>/setup.bash
 
-# User specific setup / variables
+# User specific setup/variables
 
 #export CYCLONEDDS_URI='<CycloneDDS><Domain><General><NetworkInterfaceAddress>ADD_HERE_INTERFACE_NAME</NetworkInterfaceAddress></General></Domain></CycloneDDS>'
 
+export ROS_AUTOMATIC_DISCOVERY_RANGE="LOCALHOST"  # Doc: https://docs.ros.org/en/rolling/Tutorials/Advanced/Improved-Dynamic-Discovery.html
 export ROS_DOMAIN_ID=0 # Set your Domain ID if you are in a network with multiple computers
 
 # needed to execute cppcheck version 2.7 used in pre-commit

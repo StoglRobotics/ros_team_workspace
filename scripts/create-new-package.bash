@@ -222,7 +222,10 @@ elif [[ $ros_version == 2 ]]; then
 
   if [[ "$BUILD_TYPE" == "ament_cmake" || "$BUILD_TYPE" == "cmake" ]]; then
     cd $PKG_NAME || print_and_exit "create-new-package internal error. cannot change dir to src/$PKG_NAME."
-    # remove auto lint stuff:
+    # set compile options - add more compilation flags to escalate warnings
+    sed -i -E 's/^[[:blank:]]*if\(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"\)$/if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")/' CMakeLists.txt
+    sed -i -E 's/^[[:blank:]]*add_compile_options\(-Wall -Wextra -Wpedantic\)$/  add_compile_options(-Wall -Wextra -Werror=conversion -Werror=unused-but-set-variable -Werror=return-type -Werror=shadow)/' CMakeLists.txt
+    # Remove auto lint stuff:
     # 1) remove all the lint dependencies in package.xml
     sed -i '/<test_depend>ament_lint_auto<\/test_depend>/d; /<test_depend>ament_lint_common<\/test_depend>/d' package.xml
     # remove multiple newlines
