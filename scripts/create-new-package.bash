@@ -220,11 +220,20 @@ if [[ $ros_version == 1 ]]; then
 elif [[ $ros_version == 2 ]]; then
   ros2 pkg create --package-format 3 --description "$PKG_DESCRIPTION" --license "$LICENSE" --build-type "$BUILD_TYPE" --maintainer-email "$MAINTAINER_EMAIL" --maintainer-name "$MAINTAINER_NAME" $PKG_NAME
 
-  # set compile options
   if [[ "$BUILD_TYPE" == "ament_cmake" || "$BUILD_TYPE" == "cmake" ]]; then
     cd $PKG_NAME || print_and_exit "create-new-package internal error. cannot change dir to src/$PKG_NAME."
+    # set compile options - add more compilation flags to escalate warnings
     sed -i -E 's/^[[:blank:]]*if\(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"\)$/if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")/' CMakeLists.txt
     sed -i -E 's/^[[:blank:]]*add_compile_options\(-Wall -Wextra -Wpedantic\)$/  add_compile_options(-Wall -Wextra -Werror=conversion -Werror=unused-but-set-variable -Werror=return-type -Werror=shadow)/' CMakeLists.txt
+    # Remove auto lint stuff:
+    # 1) remove all the lint dependencies in package.xml
+    sed -i '/<test_depend>ament_lint_auto<\/test_depend>/d; /<test_depend>ament_lint_common<\/test_depend>/d' package.xml
+    # remove multiple newlines
+    awk '!NF { if (!blank++) print; next } { blank=0; print }' package.xml >tmp_file && mv tmp_file package.xml
+    # 2) remove all in between the if(BUILD_TESTING) and endif() block
+    # this usually contains linting stuff which we don't want for the tests
+    sed -i '/if(BUILD_TESTING)/,/endif()/ { /if(BUILD_TESTING)/b; /endif()/b; d; }' CMakeLists.txt
+    awk '!NF { if (!blank++) print; next } { blank=0; print }' CMakeLists.txt >tmp_file && mv tmp_file CMakeLists.txt
     cd "-" || exit
   fi
 
