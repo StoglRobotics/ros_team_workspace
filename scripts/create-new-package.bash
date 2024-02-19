@@ -172,7 +172,7 @@ do
             break
           ;;
         "$licence_proprietary")
-            read -p "Enter name of license (e.g. Company Name): " NAME_OF_LICENSE
+            read -p "Enter name of license (e.g. 'Propriatery License'): " NAME_OF_LICENSE
             YEAR=$(date +'%Y')
             LICENSE=$(<"${LICENSE_TEMPLATES}/proprietary_company_header.txt")
             LICENSE=$(echo "${LICENSE}" | sed -e "s/\\\$YEAR\\\$/${YEAR}/g; s/\\\$NAME_ON_LICENSE\\\$/${NAME_OF_LICENSE}/g")
