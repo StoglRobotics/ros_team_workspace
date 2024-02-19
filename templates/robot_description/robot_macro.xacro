@@ -7,8 +7,8 @@
     <!-- LINKS -->
     <!-- base link -->
     <link name="${prefix}base_link">
-      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
-           to get more realistic behaviour-->
+      <!-- Default inertial for Gazebo - copy and edit block from 'common.xacro'
+           to get more realistic behavior -->
       <xacro:default_inertial/>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -27,8 +27,8 @@
     </link>
     <!-- link 1 -->
     <link name="${prefix}link1">
-      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
-           to get more realistic behaviour-->
+      <!-- Default inertial for Gazebo - copy and edit block from 'common.xacro'
+           to get more realistic behavior -->
       <xacro:default_inertial/>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -47,8 +47,8 @@
     </link>
     <!-- link 2 -->
     <link name="${prefix}link2">
-      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
-           to get more realistic behaviour-->
+      <!-- Default inertial for Gazebo - copy and edit block from 'common.xacro'
+           to get more realistic behavior-->
       <xacro:default_inertial/>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -67,8 +67,8 @@
     </link>
     <!-- link 3 -->
     <link name="${prefix}link3">
-      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
-           to get more realistic behaviour-->
+      <!-- Default inertial for Gazebo - copy and edit block from 'common.xacro'
+           to get more realistic behavior-->
       <xacro:default_inertial/>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -87,8 +87,8 @@
     </link>
     <!-- link 4 -->
     <link name="${prefix}link4">
-      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
-           to get more realistic behaviour-->
+      <!-- Default inertial for Gazebo - copy and edit block from 'common.xacro'
+           to get more realistic behavior-->
       <xacro:default_inertial/>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -107,8 +107,8 @@
     </link>
     <!-- link 5 -->
     <link name="${prefix}link5">
-      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
-           to get more realistic behaviour-->
+      <!-- Default inertial for Gazebo - copy and edit block from 'common.xacro'
+           to get more realistic behavior-->
       <xacro:default_inertial/>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -127,8 +127,8 @@
     </link>
     <!-- link 6 -->
     <link name="${prefix}link6">
-      <!-- Default inertial for Gazebo/Ingnition - copy and edit block from 'common.xacro'
-           to get more realistic behaviour-->
+      <!-- Default inertial for Gazebo - copy and edit block from 'common.xacro'
+           to get more realistic behavior-->
       <xacro:default_inertial/>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
