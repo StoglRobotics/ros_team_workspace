@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 #
+# Source of this file is https://github.com/StoglRobotics/ros_team_workspace repository.
 # Author: Dr. Denis
 #
 
