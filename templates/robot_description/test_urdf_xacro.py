@@ -27,6 +27,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Author: Lukas Sackewitz
+#
+# This file was taken from https://github.com/UniversalRobots/Universal_Robots_ROS2_Description
 
 import os
 import shutil
