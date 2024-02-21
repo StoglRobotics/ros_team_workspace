@@ -19,6 +19,8 @@ If you end up with missing dependencies, install them using commands from [Setup
 
 # How to use this Package and ROS Introduction
 
+ - [Workflow With Docker](#workflow-with-docker)
+   * [Quick Start Using ROS with Docker (ros_team_workspace)](#quick-start-using-ros-with-docker-ros_team_workspace)
  - [Install and Build](#install-and-build)
    * [Install ROS $Ros_distro$ and Development Tooling](#install-ros-$Ros_distro$-and-development-tooling)
    * [Setup ROS Workspace](#setup-ros-workspace)
@@ -28,6 +30,26 @@ If you end up with missing dependencies, install them using commands from [Setup
  - [Testing and Linting](#testing-and-linting)
  - [Creating a new ROS 2 Package](#creating-a-new-ros2-package)
  - [References](#references)
+
+## Workflow With [Docker](https://docs.docker.com/)
+
+> **NOTE:** If you do not use Docker in the current workflow you can skip this section and jump to [Install and Build](#install-and-build)
+
+We usually use a separate [Docker](https://docs.docker.com/) container for each of the projects/workspaces we work on. A tool which simplifies the creation of Docker based workspaces it [ros_team_workspace](https://github.com/StoglRobotics/ros_team_workspace/tree/master). Besides ton of documentation on [ROS](https://docs.ros.org/en/rolling/index.html) and [Docker](https://docs.docker.com/) that can be found in internet, the [ros_team_workspace tool](https://github.com/StoglRobotics/ros_team_workspace/tree/master) and its [documentation](https://rtw.stoglrobotics.de/master/index.html) targeted towards developers.
+
+Installation of docker depends on the operating system you are using. Instructions can be found here: [Windows](https://docs.docker.com/desktop/install/windows-install/), [Mac](https://docs.docker.com/desktop/install/mac-install/) and [Linux](https://docs.docker.com/desktop/install/linux-install/).
+
+### Quick Start Using ROS with Docker (ros_team_workspace)
+
+You can easily [setup a new Docker based workspace](https://github.com/StoglRobotics/ros_team_workspace/tree/master) with:
+```
+setup-ros-workspace-docker WS_FOLDER_NAME ROS_DISTRO
+```
+and then after sourcing the new workspace with the `_WS_FOLDER_NAME` command, you can switch to the workspace with the:
+```
+rtw_switch_to_docker
+```
+command.
 
 ## Install and Build
 
