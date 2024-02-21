@@ -19,7 +19,7 @@
 usage="setup-robot-description ROBOT_NAME"
 
 # Load Framework defines
-script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 source $script_own_dir/../setup.bash
 
 check_and_set_ros_distro_and_version ${ROS_DISTRO}
@@ -144,7 +144,7 @@ done
 preppend_to_string="if(BUILD_TESTING)"
 sed -i "s/$preppend_to_string/install\(\\n  DIRECTORY config launch meshes rviz urdf test\\n  DESTINATION share\/\$\{PROJECT_NAME\}\\n\)\\n\\n$preppend_to_string/g" CMakeLists.txt
 # Add the test
-lines_to_append="  find_package(ament_cmake_pytest REQUIRED)\n  ament_add_pytest_test(test_${ROBOT_NAME}_urdf_xacro ${ROBOT_TEST_FILE})"
+lines_to_append="  find_package(ament_cmake_pytest REQUIRED)\n\n  ament_add_pytest_test(test_${ROBOT_NAME}_urdf_xacro ${ROBOT_TEST_FILE})"
 # Define the search pattern
 pattern='if(BUILD_TESTING)'
 # Use sed to find the pattern and append the lines after it in CMakeLists.txt
@@ -152,7 +152,7 @@ sed -i "/$pattern/a$lines_to_append" CMakeLists.txt
 
 # extend README with general instructions
 if [ -f README.md ]; then
-  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >>README.md
+  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >> README.md
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
   sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
 fi
