@@ -15,19 +15,15 @@ limitations under the License.
 
 
 Source of this file are templates in https://github.com/StoglRobotics/ros_team_workspace repository.
-
-Author: Dr. Denis
 -->
 
 <launch>
   <arg name="description_package"
        default="$PKG_NAME$"
-       description="Description package of the dte_ea_1000. Usually the argument is not set,
-        it enables use of a custom description."/>
+       description="Description package of the dte_ea_1000. Usually the argument is not set, it enables use of a custom description."/>
   <arg name="prefix"
        default=""
-       description="Prefix of the joint names, useful for multi-robot setup. If changed than also joint
-        names in the controllers' configuration have to be updated."/>
+       description="Prefix of the joint names, useful for multi-robot setup. If changed than also joint names in the controllers' configuration have to be updated."/>
 
   <let name="robot_description_content" value="$(command '$(find-exec xacro) $(find-pkg-share $(var description_package))/urdf/$ROBOT_NAME$.urdf.xacro prefix:=$(var prefix)')" />
 

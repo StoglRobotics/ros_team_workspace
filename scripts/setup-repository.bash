@@ -16,40 +16,52 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 usage='setup-repository.bash PKG_NAME PKG_DESCRIPTION LICENSE'
 #
 
 echo ""
-echo "Your path is `pwd`. Is this your package folder to setup repository?"
+echo "Your path is $(pwd). Is this your package folder to setup repository?"
 read -p "If so press <ENTER> otherwise <CTRL>+C and start the script again from your source folder."
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 check_and_set_ros_distro_and_version ${ROS_DISTRO}
 
 PKG_NAME=$1
 if [ -z "$1" ]; then
-  echo "You should provide package name!"
-  exit 0
+  get_user_input_confirmed "You did not provide a package/repository name. Please enter the name of the package/repository:"
+  PKG_NAME=$RTW_USER_INPUT
 fi
 
 PKG_DESCRIPTION=$2
 if [ -z "$2" ]; then
-  echo "You should provide package description!"
-  exit 0
+  get_user_input_confirmed "You did not provide a description of the package. Please enter a description:"
+  PKG_DESCRIPTION=$RTW_USER_INPUT
 fi
 
 LICENSE=$3
 if [ -z "$LICENSE" ]; then
-  echo "No package LICENSE defined! Using 'Propriatery' as default."
-  exit 0
+  let_user_select_license
+  LICENSE="${RTW_USER_SELECTED_LICENSE}"
 fi
 
+echo "Select the main branch name:"
+echo "  (1) main (default)"
+echo "  (2) master"
+echo "  (3) ${ros_distro}"
+echo "  (other) user input"
+read -rp "Your choice: " choice
+
+case "$choice" in
+1) branch="main" ;;
+2) branch="master" ;;
+3) branch="${ros_distro}" ;;
+*) read -rp "Enter branch name: " branch ;;
+esac
 
 git init
-git checkout -b $ros_distro
+git checkout -b "$branch"
 git add .
 git commit -m "RosTeamWS: package created with initial files"
 
@@ -66,53 +78,46 @@ choice=${choice:=1}
 repository=""
 case "$choice" in
 "1")
-   mkdir -p .github/workflows
-   CI_FILES_TO_COPY_AND_SED=("ci-build" "ci-format") # TODO(denis): Check if also "ci-lint" ?
+  mkdir -p .github/workflows
 
-   for CI_FILE in "${CI_FILES_TO_COPY_AND_SED[@]}"; do
-     cp -n $PACKAGE_TEMPLATES/CI-github_${CI_FILE}.yml .github/workflows/${CI_FILE}.yml
-     sed -i 's/\$NAME\$/'${PKG_NAME}'/g' .github/workflows/${CI_FILE}.yml
-     sed -i 's/\$ROS_DISTRO\$/'${ros_distro}'/g' .github/workflows/${CI_FILE}.yml
-   done
-
-   cp -n $PACKAGE_TEMPLATES/pkg_name.repos $PKG_NAME.repos
-   ln -s $PKG_NAME.repos $PKG_NAME.ci.repos
-   echo "NOTE: To enable CI from source, uncomment it manually in '.github/workflows/ci-build.yml'"
-   cp -n $PACKAGE_TEMPLATES/README.md.github README.md
-   repository="github"
-   ;;
+  cp -n "${PACKAGE_TEMPLATES}/pkg_name.repos" "${PKG_NAME}.${ros_distro}.upstream.repos"
+  cp -n "${PACKAGE_TEMPLATES}/pkg_name.repos" "${PKG_NAME}.${ros_distro}.repos"
+  cp -n "${PACKAGE_TEMPLATES}/README.md.github" README.md
+  repository="github"
+  ;;
 "2")
   cp -n $PACKAGE_TEMPLATES/.gitlab-ci.yml .
   cp -n $PACKAGE_TEMPLATES/.ci.repos .
   repository="gitlab"
-   ;;
+  ;;
 *)
   echo "Invalid input! Exiting..."
   exit 0
+  ;;
 esac
 
 # Setting up formatting
 read -p "${RAW_TERMINAL_COLOR_BROWN}Do you want to setup formatting using pre-commit?${RAW_TERMINAL_COLOR_NC} (yes/no) [no]: " formatting
 formatting=${formatting:="no"}
 
-if  [[ "$formatting" == "yes" ]]; then
+if [[ "$formatting" == "yes" ]]; then
   $RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-formatting.bash
 fi
-
 
 # This functionality is not provided in all framework versions
 if [[ -f "$PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md" ]]; then
   # Ask if add How-to-use and ROS-Intro
   read -p "Do you want to append description on 'How-to-use and ROS-Intro' to the README? (y/n) [n]" choice
-  choice=${choice="n"}
+  choice=${choice:-"n"}
 
   case "$choice" in
   "y")
-    cat $PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md >> README.md
+    cat $PACKAGE_TEMPLATES/_append_to_README_ROS_Intro.md >>README.md
     echo "Description is appended."
     ;;
   "n")
     echo "Description not appended."
+    ;;
   esac
 fi
 
@@ -129,16 +134,15 @@ sed -i 's/\$NAMESPACE\$/'${NAMESPACE}'/g' README.md
 
 # Check if it is metapackage
 if [[ ! -f "package.xml" ]]; then
-  echo "" >> README.md
-  echo "" >> README.md
-  echo "### Packages in \`${PKG_NAME}\` metapackage" >> README.md
-  echo "" >> README.md
-  echo "" >> README.md
+  echo "" >>README.md
+  echo "" >>README.md
+  echo "### Packages in \`${PKG_NAME}\` metapackage" >>README.md
+  echo "" >>README.md
+  echo "" >>README.md
 fi
 
 git add .
 git commit -m "RosTeamWS: added CI configuration"
-
 
 read -p "Does repository hold open source project (y/n) [n]: " open_source
 open_source=${open_source="n"}
@@ -151,10 +155,11 @@ case "$open_source" in
   # TODO: maybe use "-i,  --input-file=DATEI  in local or external FILE" option?
   wget -O LICENSE https://www.apache.org/licenses/LICENSE-2.0.txt
   # TODO: Add contributing file
-#   OS-Apache-CONTRIBUTING.md
+  #   OS-Apache-CONTRIBUTING.md
   ;;
 "n")
   echo "Not open source repository"
+  ;;
 esac
 
 read -p "Does repository hold documentation (y/n) [n]: " documentation
@@ -176,8 +181,8 @@ case "$documentation" in
   ;;
 "n")
   echo "Docs folder not added"
+  ;;
 esac
-
 
 echo ""
 echo "FINISHED: Please create $repository repository manually on $TEAM_REPOSITORY_SERVER/$NAMESPACE/$PKG_NAME add follow the explanation to push existing repository from command line."
