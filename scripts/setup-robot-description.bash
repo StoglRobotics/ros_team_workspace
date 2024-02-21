@@ -186,7 +186,7 @@ sed -i "/$pattern/a$lines_to_append" CMakeLists.txt
 
 # extend README with general instructions
 if [ ! -f README.md ]; then
-  cat ${PKG_NAME}\n\n > README.md
+  echo "${PKG_NAME}\n\n" > README.md
 fi
 
 cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >> README.md
