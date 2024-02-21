@@ -1,4 +1,7 @@
 
+Descriptions, meshes, and visualization files for the robots and environments. Corresponding launch and test files are also stored here.
+
+The structure and files in this package are generated using [RosTeamWorkspace script setup-robot-description](https://rtw.stoglrobotics.de/master/use-cases/ros_packages/setup_robot_description_package.html). You can use the same script to generate initial files for other robots.
 
 ## General details about robot description packages
 
@@ -40,10 +43,18 @@ The general package structure is the following:
 1. Go to the root of your workspace folder (there where `src`, `build`, `install` and `log` files are).
 2. Install the package by calling `colcon build --symlink-install --packages-select $PKG_NAME$`
 3. (Re-)Source environment `source install/setup.bash`
-4. Launch description test:
-   ```
-   ros2 launch $PKG_NAME$ test_$ROBOT_NAME$_description.launch.py
-   ```
+
+
+> **NOTE:** If you use [RosTeamWorkspace (RTW)](https://rtw.stoglrobotics.de) than instead of the previous three steps, use `cb $PKG_NAME$` command.
+
+Now, launch description test:
+```
+ros2 launch $PKG_NAME$ view_$ROBOT_NAME$.launch.xml
+```
+or
+```
+ros2 launch $PKG_NAME$ view_$ROBOT_NAME$.launch.py
+```
 
 If there are no issues with the description, two windows are opened: `rviz2` and `Joint State Publisher`.
 Rviz2 visualizes the robot's state and Joint state Publisher to changes joint values using sliders or generates random but valid configurations.
