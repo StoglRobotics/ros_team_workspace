@@ -375,6 +375,7 @@ let_user_select_license() {
   local license_user_input_option="user input"
   local licence_team_option="Current team license standard: ['$TEAM_LICENSE']"
   local supported_licenses=""
+  licence_proprietary="Proprietary License - Stogl Robotics"
   local license=""
 
   if [[ $ros_version == 1 ]]; then
@@ -383,7 +384,7 @@ let_user_select_license() {
     supported_licenses=$(ros2 pkg create dummy --license "?")
     supported_licenses=${supported_licenses#"Supported licenses:"}
   fi
-  local license_options=("$license_user_input_option" "$licence_team_option")
+  license_options=("$license_user_input_option" "$licence_team_option" "$licence_proprietary")
   license_options+=($supported_licenses)
 
   echo ""
@@ -396,6 +397,13 @@ let_user_select_license() {
       ;;
     "$licence_team_option")
       license="$TEAM_LICENSE"
+      break
+      ;;
+    "$licence_proprietary")
+      read -p "Enter name of license (e.g. 'Propriatery License'): " NAME_OF_LICENSE
+      YEAR=$(date +'%Y')
+      license=$(<"${LICENSE_TEMPLATES}/proprietary_company_header.txt")
+      license=$(echo "${license}" | sed -e "s/\\\$YEAR\\\$/${YEAR}/g; s/\\\$NAME_ON_LICENSE\\\$/${NAME_OF_LICENSE}/g")
       break
       ;;
     *)
