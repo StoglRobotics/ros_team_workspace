@@ -63,8 +63,10 @@ cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro" $ROBOT_MACRO
 
 # Copy launch.py file for testing the description
 mkdir -p launch
-VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch.xml"
-cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.xml" $VIEW_ROBOT_LAUNCH
+VIEW_ROBOT_LAUNCH_XML="launch/view_${ROBOT_NAME}.launch.xml"
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.xml" $VIEW_ROBOT_LAUNCH_XML
+VIEW_ROBOT_LAUNCH_PY="launch/view_${ROBOT_NAME}.launch.xml"
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.xml" $VIEW_ROBOT_LAUNCH_XML
 
 # Copy YAML files
 mkdir -p config
@@ -81,7 +83,7 @@ ROBOT_TEST_FILE="test/${ROBOT_NAME}_test_urdf_xacro.py"
 cp -n "${ROBOT_DESCRIPTION_TEMPLATES}/test_urdf_xacro.py" $ROBOT_TEST_FILE
 
 # sed all needed files
-FILES_TO_SED=($ROBOT_URDF_XACRO $ROBOT_MACRO $ROBOT_MACRO_ROS2_CONTROL $VIEW_ROBOT_LAUNCH $ROBOT_TEST_FILE)
+FILES_TO_SED=($ROBOT_URDF_XACRO $ROBOT_MACRO $ROBOT_MACRO_ROS2_CONTROL $VIEW_ROBOT_LAUNCH_XML $ROBOT_TEST_FILE)
 for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
   sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
@@ -151,11 +153,13 @@ pattern='if(BUILD_TESTING)'
 sed -i "/$pattern/a$lines_to_append" CMakeLists.txt
 
 # extend README with general instructions
-if [ -f README.md ]; then
-  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >> README.md
-  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
-  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
+if [ ! -f README.md ]; then
+  cat ${PKG_NAME}\n\n > README.md
 fi
+
+cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >> README.md
+sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
+sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
 
 #TODO: Set license
 

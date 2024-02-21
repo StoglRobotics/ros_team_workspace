@@ -1,3 +1,4 @@
+# Copyright (c) 2024, Stogl Robotics Consulting UG (haftungsbeschränkt) (template)
 # Copyright (c) 2022 FZI Forschungszentrum Informatik
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,10 +26,13 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+
+#
+# Source of this file is https://github.com/StoglRobotics/ros_team_workspace repository.
+# Modified from tests in https://github.com/UniversalRobots/Universal_Robots_ROS2_Description
 #
 # Author: Lukas Sackewitz
-#
-# Modifed from tests in https://github.com/UniversalRobots/Universal_Robots_ROS2_Description
+# Author (template): Manuel Muth
 
 import os
 import shutil
