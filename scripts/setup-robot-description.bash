@@ -16,10 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-usage="setup-robot-description ROBOT_NAME"
+usage="setup-robot-description ROBOT_NAME LAUNCH_FILE_TYPE"
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 check_and_set_ros_distro_and_version ${ROS_DISTRO}
 
@@ -28,13 +28,37 @@ if [ -z "$ROBOT_NAME" ]; then
   print_and_exit "ERROR: You should provide robot name! Nothing to do 😯" "$usage"
 fi
 
+echo "Which launchfiles should be added? Choose from the following options:"
+echo "1) xml"
+echo "2) python"
+echo "3) both"
+
+read -p "Enter your choice:" choice
+
+LAUNCH_FILE_TYPES=()
+
+case $choice in
+1)
+  LAUNCH_FILE_TYPES+=(".xml")
+  ;;
+2)
+  LAUNCH_FILE_TYPES+=(".py")
+  ;;
+3)
+  LAUNCH_FILE_TYPES+=(".xml" ".py")
+  ;;
+*)
+  print_and_exit "Invalid choice. Exiting."
+  ;;
+esac
+
 if [ ! -f "package.xml" ]; then
   print_and_exit "ERROR: 'package.xml' not found. You should execute this script at the top level of your package folder. Nothing to do 😯" "$usage"
 fi
 PKG_NAME="$(grep -Po '(?<=<name>).*?(?=</name>)' package.xml | sed -e 's/[[:space:]]//g')"
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up description configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '`pwd`'.${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up description configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '$(pwd)'.${TERMINAL_COLOR_NC}"
 echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name.${TERMINAL_COLOR_NC}"
 read
 
@@ -60,10 +84,20 @@ cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot.urdf.xacro" $ROBOT_URDF_XACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.xacro" $ROBOT_MACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro" $ROBOT_MACRO_ROS2_CONTROL
 
-# Copy launch.py file for testing the description
-mkdir -p launch
-VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch.py"
-cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch.py" $VIEW_ROBOT_LAUNCH
+# Copy launch files for testing the description
+for file_type in "${LAUNCH_FILE_TYPES[@]}"; do
+  mkdir -p launch
+  VIEW_ROBOT_LAUNCH="launch/view_${ROBOT_NAME}.launch${file_type}"
+  cp -n "$ROBOT_DESCRIPTION_TEMPLATES/view_robot.launch${file_type}" $VIEW_ROBOT_LAUNCH
+
+  # sed all needed files
+  FILES_TO_SED=($ROBOT_URDF_XACRO $ROBOT_MACRO $ROBOT_MACRO_ROS2_CONTROL $VIEW_ROBOT_LAUNCH)
+
+  for SED_FILE in "${FILES_TO_SED[@]}"; do
+    sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
+    sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
+  done
+done
 
 # Copy YAML files
 mkdir -p config
@@ -74,19 +108,11 @@ mkdir -p rviz
 ROBOT_RVIZ="rviz/${ROBOT_NAME}.rviz"
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot.rviz" $ROBOT_RVIZ
 
-# sed all needed files
-FILES_TO_SED=($ROBOT_URDF_XACRO $ROBOT_MACRO $ROBOT_MACRO_ROS2_CONTROL $VIEW_ROBOT_LAUNCH)
-
-for SED_FILE in "${FILES_TO_SED[@]}"; do
-  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
-done
-
 # Add dependencies if they not exist
 DEP_PKGS=("xacro" "rviz2" "robot_state_publisher" "joint_state_publisher_gui")
 
 for DEP_PKG in "${DEP_PKGS[@]}"; do
-  if `grep -q $DEP_PKG package.xml`; then
+  if $(grep -q $DEP_PKG package.xml); then
     echo "'$DEP_PKG' is already listed in package.xml"
   else
     append_to_string="<buildtool_depend>ament_cmake<\/buildtool_depend>"
@@ -100,18 +126,15 @@ sed -i "s/$preppend_to_string/install\(\\n  DIRECTORY config launch meshes rviz 
 
 # extend README with general instructions
 if [ -f README.md ]; then
-  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >> README.md
+  cat $ROBOT_DESCRIPTION_TEMPLATES/append_to_README.md >>README.md
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
   sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
 fi
 
 #TODO: Set license
 
-git add .
-git commit -m "RosTeamWS: Description files for $ROBOT_NAME generated."
-
 # Compile and add new package the to the path
 compile_and_source_package $PKG_NAME
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch.py'${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME view_${ROBOT_NAME}.launch${LAUNCH_FILE_TYPES[*]}'${TERMINAL_COLOR_NC}"

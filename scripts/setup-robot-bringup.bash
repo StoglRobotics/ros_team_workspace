@@ -17,7 +17,7 @@
 usage="setup-robot-bringup ROBOT_NAME DESCRIPTION_PKG_NAME"
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 check_and_set_ros_distro_and_version "${ROS_DISTRO}"
 
@@ -31,14 +31,37 @@ if [ -z "$DESCR_PKG_NAME" ]; then
   print_and_exit "ERROR: You should provide description package name! Nothing to do 😯" "$usage"
 fi
 
+echo "Which launchfiles should be added? Choose from the following options:"
+echo "1) xml"
+echo "2) python"
+echo "3) both"
+
+read -p "Enter your choice:" choice
+
+LAUNCH_FILE_TYPES=()
+
+case $choice in
+1)
+  LAUNCH_FILE_TYPES+=(".xml")
+  ;;
+2)
+  LAUNCH_FILE_TYPES+=(".py")
+  ;;
+3)
+  LAUNCH_FILE_TYPES+=(".xml" ".py")
+  ;;
+*)
+  print_and_exit "Invalid choice. Exiting."
+  ;;
+esac
+
 if [ ! -f "package.xml" ]; then
   print_and_exit "ERROR: 'package.xml' not found. You should execute this script at the top level of your package folder. Nothing to do 😯" "$usage"
 fi
 PKG_NAME="$(grep -Po '(?<=<name>).*?(?=</name>)' package.xml | sed -e 's/[[:space:]]//g')"
 
-
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up bringup configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '`pwd`' with robot description package '$DESCR_PKG_NAME'.${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up bringup configuration for robot '$ROBOT_NAME' in package '$PKG_NAME' in folder '$(pwd)' with robot description package '$DESCR_PKG_NAME'.${TERMINAL_COLOR_NC}"
 echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name.${TERMINAL_COLOR_NC}"
 read
 
@@ -46,7 +69,7 @@ read
 RM_FOLDERS=("include" "src")
 
 for FOLDER in "${RM_FOLDERS[@]}"; do
-  if [[ -d $FOLDER && ! "$(ls -A $FOLDER )" ]]; then
+  if [[ -d $FOLDER && ! "$(ls -A $FOLDER)" ]]; then
     rm -r $FOLDER
   fi
 done
@@ -62,29 +85,33 @@ cp -n $ROS2_CONTROL_TEMPLATES/robot_controllers.yaml $ROBOT_CONTROLLERS_YAML
 cp -n $ROS2_CONTROL_TEMPLATES/test_goal_publishers_config.yaml $ROBOT_FPC_PUB_YAML
 
 # Copy launch files
-ROBOT_LAUNCH="launch/${ROBOT_NAME}.launch.py"
-TEST_FWD_POS_CTRL_LAUNCH="launch/test_forward_position_controller.launch.py"
-TEST_JTC_LAUNCH="launch/test_joint_trajectory_controller.launch.py"
-cp -n $ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch.py ${ROBOT_LAUNCH}
-cp -n $ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch.py $TEST_FWD_POS_CTRL_LAUNCH
-cp -n $ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch.py $TEST_JTC_LAUNCH
+for file_type in "${LAUNCH_FILE_TYPES[@]}"; do
+  # Construct the file paths
+  ROBOT_LAUNCH="launch/${ROBOT_NAME}.launch${file_type}"
+  TEST_FWD_POS_CTRL_LAUNCH="launch/test_forward_position_controller.launch${file_type}"
+  TEST_JTC_LAUNCH="launch/test_joint_trajectory_controller.launch${file_type}"
 
+  # Copy the templates to the destination with the specified file type
+  cp -n "$ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch${file_type}" "${ROBOT_LAUNCH}"
+  cp -n "$ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch${file_type}" "${TEST_FWD_POS_CTRL_LAUNCH}"
+  cp -n "$ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch${file_type}" "${TEST_JTC_LAUNCH}"
 
-# sed all needed files
-FILES_TO_SED=($ROBOT_LAUNCH $TEST_FWD_POS_CTRL_LAUNCH $TEST_JTC_LAUNCH)
+  # sed all needed files
+  FILES_TO_SED=($ROBOT_LAUNCH $TEST_FWD_POS_CTRL_LAUNCH $TEST_JTC_LAUNCH)
 
-for SED_FILE in "${FILES_TO_SED[@]}"; do
-  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$RUNTIME_CONFIG_PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
-  sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
+  for SED_FILE in "${FILES_TO_SED[@]}"; do
+    sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
+    sed -i "s/\\\$RUNTIME_CONFIG_PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
+    sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
+    sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
+  done
 done
 
 # package.xml: Add dependencies if they not exist
 DEP_PKGS=("xacro" "rviz2" "ros2_controllers_test_nodes" "robot_state_publisher" "joint_trajectory_controller" "joint_state_broadcaster" "forward_command_controller" "controller_manager" "$DESCR_PKG_NAME")
 
 for DEP_PKG in "${DEP_PKGS[@]}"; do
-  if `grep -q $DEP_PKG package.xml`; then
+  if $(grep -q $DEP_PKG package.xml); then
     echo "'$DEP_PKG' is already listed in package.xml"
   else
     append_to_string="<buildtool_depend>ament_cmake<\/buildtool_depend>"
@@ -98,7 +125,7 @@ sed -i "s/$prepend_to_string/install\(\\n  DIRECTORY config launch\\n  DESTINATI
 
 # extend README with general instructions
 if [ -f README.md ]; then
-  cat $ROS2_CONTROL_TEMPLATES/append_to_README.md >> README.md
+  cat $ROS2_CONTROL_TEMPLATES/append_to_README.md >>README.md
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
   sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
   sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
@@ -106,11 +133,8 @@ fi
 
 # TODO: Add license checks
 
-git add .
-# git commit -m "RosTeamWS: Bringup files for $ROBOT_NAME generated."
-
 # Compile and add new package the to the path
 compile_and_source_package $PKG_NAME
 
 echo ""
-echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME ${ROBOT_NAME}.launch.py'${TERMINAL_COLOR_NC}"
+echo -e "${TERMINAL_COLOR_USER_NOTICE}FINISHED: You can test the configuration by executing 'ros2 launch $PKG_NAME ${ROBOT_NAME}.launch${LAUNCH_FILE_TYPES[*]}'${TERMINAL_COLOR_NC}"
