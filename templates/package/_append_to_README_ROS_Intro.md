@@ -20,9 +20,9 @@ If you end up with missing dependencies, install them using commands from [Setup
 # How to use this Package and ROS Introduction
 
  - [Workflow With Docker](#workflow-with-docker)
-   * [Quick Start Using ROS with Docker (ros_team_workspace)](#quick-start-using-ros-with-docker-ros_team_workspace)
+   * [Quick Start Using ROS with Docker (RosTeamWorkspace)](#quick-start-using-ros-with-docker-rosteamworkspace)
  - [Install and Build](#install-and-build)
-   * [Install ROS $Ros_distro$ and Development Tooling](#install-ros-$Ros_distro$-and-development-tooling)
+   * [Install ROS $Ros_distro$ and Development Tooling](#install-ros-$ROS_DISTRO$-and-development-tooling)
    * [Setup ROS Workspace](#setup-ros-workspace)
    * [Configure and Build Workspace](#configure-and-build-workspace)
  - [Running Executables](#running-executables)
