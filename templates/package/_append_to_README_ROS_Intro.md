@@ -5,8 +5,12 @@ If you are familiar with ROS 2, here are the quick-and-dirty build instructions.
 
   ```
   cd $COLCON_WS
+  sudo apt-get update
+  sudo apt-get upgrade
   git clone git@github.com:$NAMESPACE$/$NAME$.git src/$NAME$
-  vcs import src --input src/$NAME$/$NAME$.<ros-distro>.repos
+  vcs import src --input src/$NAME$/$NAME$.$ROS_DISTRO$.repos
+  vcs import src --input src/$NAME$/$NAME$.$ROS_DISTRO$.upstream.repos
+  source /opt/ros/$ROS_DISTRO$/setup.bash
   rosdep install --ignore-src --from-paths src -y -r
   colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release    # Faster and more efficient build type
   cd ..
@@ -15,8 +19,10 @@ If you end up with missing dependencies, install them using commands from [Setup
 
 # How to use this Package and ROS Introduction
 
+ - [Workflow With Docker](#workflow-with-docker)
+   * [Quick Start Using ROS with Docker (RosTeamWorkspace)](#quick-start-using-ros-with-docker-rosteamworkspace)
  - [Install and Build](#install-and-build)
-   * [Install ROS $Ros_distro$ and Development Tooling](#install-ros-$ros_distro$-and-development-tooling)
+   * [Install ROS $Ros_distro$ and Development Tooling](#install-ros-$ROS_DISTRO$-and-development-tooling)
    * [Setup ROS Workspace](#setup-ros-workspace)
    * [Configure and Build Workspace](#configure-and-build-workspace)
  - [Running Executables](#running-executables)
@@ -24,6 +30,28 @@ If you end up with missing dependencies, install them using commands from [Setup
  - [Testing and Linting](#testing-and-linting)
  - [Creating a new ROS 2 Package](#creating-a-new-ros2-package)
  - [References](#references)
+
+## Workflow With [Docker](https://docs.docker.com/)
+
+> **NOTE:** If you do not use Docker in the current workflow you can skip this section and jump to [Install and Build](#install-and-build)
+
+We usually use a separate [Docker](https://docs.docker.com/) container for each of the projects/workspaces we work on.
+An internal tool from [Stogl Robotics](https://stoglrobotics.de) called [Ros Team Workspace (RTW)](https://rtw.stoglrobotics.de) simplifies the creation and work with  Docker based workspaces.
+The tool is targeted toward developers.
+
+Installation of docker depends on the operating system you are using. Instructions can be found here: [Windows](https://docs.docker.com/desktop/install/windows-install/), [Mac](https://docs.docker.com/desktop/install/mac-install/) and [Linux](https://docs.docker.com/desktop/install/linux-install/).
+
+### Quick Start Using ROS with Docker (ros_team_workspace)
+
+Using [Ros Team Workspace (RTW)](https://rtw.stoglrobotics.de) you can easily with the following command:
+```
+setup-ros-workspace-docker WS_FOLDER_NAME ROS_DISTRO
+```
+and then after sourcing the new workspace with the `_WS_FOLDER_NAME` command, you can switch to the workspace with the:
+```
+rtw_switch_to_docker
+```
+command.
 
 ## Install and Build
 
@@ -35,7 +63,7 @@ These instructions assume you are running Ubuntu 20.04:
    You can stop following along with the tutorial after you complete the section titled: [Environment setup](https://index.ros.org/doc/ros2/Installation/$Ros_distro$/Linux-Install-Debians/#environment-setup).
    Make sure you setup your environment with:
    ```
-   source /opt/ros/$ros_distro$/setup.bash
+   source /opt/ros/$ROS_DISTRO$/setup.bash
    ```
 
    > **NOTE:** You may want to add that line to your `~/.bashrc`
@@ -62,27 +90,28 @@ These instructions assume you are running Ubuntu 20.04:
 
 1. Create a colcon workspace:
    ```
-   export COLCON_WS=~/workspace/ros_ws_foxy
+   export COLCON_WS=~/workspace/ros_ws_$ROS_DISTRO$
    mkdir -p $COLCON_WS/src
    ```
 
-   > **NOTE:** Feel free to change `~/workspace/ros_ws_foxy` to whatever absolute path you want.
+   > **NOTE:** Feel free to change `~/workspace/ros_ws_$ROS_DISTRO$` to whatever absolute path you want.
 
    > **NOTE:** Over time you will probably have multiple ROS workspaces, so it makes sense to them all in a subfolder.
-     Also, it is good practice to put the ROS version in the name of the workspace, for different tests you could just add a suffix to the base name `ros_ws_foxy`.
+     Also, it is good practice to put the ROS version in the name of the workspace, for different tests you could just add a suffix to the base name `ros_ws_$ROS_DISTRO$`.
 
 1. Download the required repositories and install package dependencies:
    ```
    cd $COLCON_WS
    git clone git@github.com:$NAMESPACE$/$NAME$.git src/$NAME$
-   vcs import src --input src/$NAME$/$NAME$.<ros_distro>.repos
+   vcs import src --input src/$NAME$/$NAME$.$ROS_DISTRO$.repos
+   vcs import src --input src/$NAME$/$NAME$.$ROS_DISTRO$.repos
    rosdep install --ignore-src --from-paths src -y -r       # install also is there are unreleased packages
    ```
 
    Sometimes packages do not list all their dependencies so `rosdep` will not install everything.
    If you are getting missing dependency errors, try manually install the following packages:
    ```
-   sudo apt install ros2-foxy-forward_command_controller ros2-foxy-joint_state_broadcaster ros2-foxy-joint_trajectory_controller ros2-foxy-xacro
+   sudo apt install ros2-$ROS_DISTRO$-forward_command_controller ros2-$ROS_DISTRO$-joint_state_broadcaster ros2-$ROS_DISTRO$-joint_trajectory_controller ros2-$ROS_DISTRO$-xacro
    ```
 
 ### Configure and Build Workspace:
