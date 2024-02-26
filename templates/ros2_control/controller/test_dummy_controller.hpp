@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//
+// Source of this file are templates in
+// [RosTeamWorkspace](https://github.com/StoglRobotics/ros_team_workspace) repository.
+//
+
 #ifndef TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_
 #define TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CONTROLLER_HPP_
 
