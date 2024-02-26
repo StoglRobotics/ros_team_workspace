@@ -33,7 +33,7 @@ Consult the repository and [ros2_control documentation](https://ros-controls.git
 
 1. Start robot's hardware and load controllers (default configuration starts mock hardware)
    ```
-   ros2 launch $PKG_NAME$ $ROBOT_NAME$.launch.py
+   ros2 launch $PKG_NAME$ $ROBOT_NAME$.launch.xml
    ```
 
 2. Open another terminal and check if your hardware is loaded properly:
