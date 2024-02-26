@@ -80,10 +80,12 @@ mkdir -p $F_NAME
 ROBOT_URDF_XACRO="urdf/${ROBOT_NAME}.urdf.xacro"
 ROBOT_MACRO="urdf/${ROBOT_NAME}/${ROBOT_NAME}_macro.xacro"
 ROBOT_MACRO_ROS2_CONTROL="urdf/${ROBOT_NAME}/${ROBOT_NAME}_macro.ros2_control.xacro"
-cp -n "$ROBOT_DESCRIPTION_TEMPLATES/common.xacro" urdf/common.xacro
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot.urdf.xacro" $ROBOT_URDF_XACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.xacro" $ROBOT_MACRO
 cp -n "$ROBOT_DESCRIPTION_TEMPLATES/robot_macro.ros2_control.xacro" $ROBOT_MACRO_ROS2_CONTROL
+mkdir -p urdf/common
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/inertials.xacro" urdf/common/inertials.xacro
+cp -n "$ROBOT_DESCRIPTION_TEMPLATES/materials.xacro" urdf/common/materials.xacro
 
 # Copy launch files for testing the description
 for file_type in "${LAUNCH_FILE_TYPES[@]}"; do
