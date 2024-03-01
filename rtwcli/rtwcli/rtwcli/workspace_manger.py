@@ -23,6 +23,7 @@ import questionary
 from rtwcli.constants import (
     BACKUP_DATETIME_FORMAT,
     F_BASE_WS,
+    F_DOCKER_CONTAINER_NAME,
     F_DOCKER_TAG,
     F_WS_DOCKER_SUPPORT,
     ROS_TEAM_WS_PREFIX,
@@ -161,28 +162,6 @@ def extract_workspaces_from_bash_script(script_path: str) -> Dict[str, dict]:
     return workspaces_dict
 
 
-def generate_workspace_name(ws_path: str, excl_prev_folders=["workspace"]) -> str:
-    """Generate workspace name based on the folder letters."""
-    ws_path_folders = ws_path.split(os.path.sep)[1:]
-    ws_name = ws_path_folders[-1]
-    new_ws_name_prefix = ""
-    num_folders = len(ws_path_folders)
-
-    if num_folders > 1:  # /folder1/my_ws
-        # First letters of the folders, except for the last two
-        new_ws_name_prefix += "".join([folder[0] for folder in ws_path_folders[:-2]])
-        prev_folder = ws_path_folders[-2]
-        if prev_folder not in excl_prev_folders:
-            if new_ws_name_prefix:
-                new_ws_name_prefix += "_"
-            new_ws_name_prefix += prev_folder
-        else:
-            new_ws_name_prefix += prev_folder[0]
-
-    new_ws_name = "__".join([new_ws_name_prefix, ws_name])
-    return new_ws_name
-
-
 def env_var_to_workspace_var(env_var: str, env_var_value: str) -> str:
     ws_var = env_var.replace(ROS_TEAM_WS_PREFIX, "").lower()
     if env_var_value == "false":
@@ -233,6 +212,8 @@ def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str)
         workspace_data_to_port[F_DOCKER_TAG] = None
     if F_BASE_WS not in workspace_data_to_port:
         workspace_data_to_port[F_BASE_WS] = None
+    if F_DOCKER_CONTAINER_NAME not in workspace_data_to_port:
+        workspace_data_to_port[F_DOCKER_CONTAINER_NAME] = None
 
     # validate workspace fields
     if not workspace_data_to_port[F_WS_DOCKER_SUPPORT]:

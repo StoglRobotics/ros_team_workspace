@@ -36,6 +36,15 @@ F_DISTRO = "distro"
 F_DOCKER_TAG = "docker_tag"
 F_WS_DOCKER_SUPPORT = "ws_docker_support"
 F_WS_FOLDER = "ws_folder"
+F_DOCKER_CONTAINER_NAME = "docker_container_name"
 
 SKEL_BASHRC_PATH = "/etc/skel/.bashrc"
 BASHRC_PATH = os.path.expanduser("~/.bashrc")
+
+ROS_TEAM_WS_ENV_VARIABLES = [
+    "RosTeamWS_BASE_WS",
+    "RosTeamWS_DISTRO",
+    "RosTeamWS_WS_FOLDER",
+    "RosTeamWS_WS_DOCKER_SUPPORT",
+    "RosTeamWS_DOCKER_TAG",
+]
