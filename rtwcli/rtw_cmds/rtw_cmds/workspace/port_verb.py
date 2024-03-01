@@ -31,7 +31,7 @@ from rtwcli.workspace_manger import (
 
 
 class PortVerb(VerbExtension):
-    """Port the currently sourced ROS workspace by creating the corresponding config."""
+    """Port workspace(s) by creating the corresponding config entry."""
 
     def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
         parser.add_argument(

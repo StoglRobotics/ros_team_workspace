@@ -21,7 +21,7 @@ setup(
     name=package_name,
     version="0.2.0",
     packages=find_packages(exclude=["test"]),
-    install_requires=["rtwcli", "rocker"],
+    install_requires=["rtwcli"],
     zip_safe=True,
     keywords=[],
     classifiers=[
