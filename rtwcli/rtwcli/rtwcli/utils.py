@@ -22,6 +22,11 @@ import yaml
 
 
 def create_file_if_not_exists(file_path: str) -> bool:
+    """
+    Create a file if it does not exist.
+
+    Return True if the file exists or was created successfully.
+    """
     if os.path.isfile(file_path):
         return True
 
@@ -39,6 +44,11 @@ def create_file_if_not_exists(file_path: str) -> bool:
 
 
 def load_yaml_file(file_path: str) -> Any:
+    """
+    Load a YAML file and return its content.
+
+    Return None if the file does not exist or an error occurred.
+    """
     try:
         with open(file_path) as file:
             return yaml.safe_load(file)
@@ -48,6 +58,7 @@ def load_yaml_file(file_path: str) -> Any:
 
 
 def write_to_yaml_file(file_path: str, yaml_data: Any) -> bool:
+    """Write data to a YAML file. Return True if the data was written successfully."""
     try:
         with open(file_path, "w") as file:
             yaml.dump(yaml_data, file)
@@ -58,6 +69,11 @@ def write_to_yaml_file(file_path: str, yaml_data: Any) -> bool:
 
 
 def create_file_and_write(file_path: str, content: str) -> bool:
+    """
+    Create a file if it does not exist and write the given content to it.
+
+    Return True if the file was created and the content was written successfully.
+    """
     if not create_file_if_not_exists(file_path):
         return False
     try:
@@ -70,6 +86,7 @@ def create_file_and_write(file_path: str, content: str) -> bool:
 
 
 def run_command(command, shell: bool = False, cwd: str = None, ignore_codes=None) -> bool:
+    """Run a command and return True if it was successful."""
     print(f"Running command: '{command}'")
     try:
         subprocess.run(command, shell=shell, check=True, cwd=cwd)
@@ -84,6 +101,7 @@ def run_command(command, shell: bool = False, cwd: str = None, ignore_codes=None
 
 
 def create_temp_file(content: str = None) -> str:
+    """Create a temporary file and return its path."""
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
         if content:
             tmp_file.write(content.encode("utf-8"))
@@ -98,6 +116,7 @@ def vcs_import(
     makedirs: bool = True,
     skip_existing: bool = False,
 ) -> bool:
+    """Import repositories from a file using vcs. Return True if the import was successful."""
     if not os.path.isfile(repos_file_path):
         print(f"Repos file '{repos_file_path}' does not exist. Nothing to import.")
         return non_existing_ok
@@ -119,4 +138,9 @@ def vcs_import(
 
 
 def git_clone(url: str, branch: str, path: str) -> bool:
+    """
+    Clone a git repository with the given branch to the given path.
+
+    Return True if the clone was successful.
+    """
     return run_command(["git", "clone", url, "--branch", branch, path])

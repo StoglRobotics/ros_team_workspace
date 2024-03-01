@@ -38,6 +38,8 @@ from rtwcli.utils import create_file_if_not_exists, load_yaml_file, write_to_yam
 
 @dataclasses.dataclass
 class Workspace:
+    """A dataclass representing a workspace."""
+
     distro: str
     ws_folder: str
     ws_docker_support: bool = False
@@ -59,6 +61,8 @@ class Workspace:
 
 @dataclasses.dataclass
 class WorkspacesConfig:
+    """A dataclass representing a workspaces configuration."""
+
     workspaces: Dict[str, Workspace] = dataclasses.field(default_factory=dict)
 
     @classmethod
@@ -93,14 +97,17 @@ class WorkspacesConfig:
 
 
 def load_workspaces_config_from_yaml_file(file_path: str):
+    """Load a WorkspacesConfig from a YAML file."""
     return WorkspacesConfig.from_dict(load_yaml_file(file_path))
 
 
 def save_workspaces_config(filepath: str, config: WorkspacesConfig):
+    """Save a WorkspacesConfig to a YAML file."""
     return write_to_yaml_file(filepath, config.to_dict())
 
 
 def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspace) -> bool:
+    """Update the workspaces config with a new workspace."""
     if not create_file_if_not_exists(config_path):
         print("Could not create workspaces config file. Cannot proceed with porting.")
         return False
@@ -126,6 +133,7 @@ def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspac
 
 
 def get_current_workspace() -> Workspace:
+    """Retrieve the current workspace from the workspaces config."""
     ws_name = get_current_workspace_name()
     if not ws_name:
         return None
@@ -138,6 +146,7 @@ def get_current_workspace() -> Workspace:
 
 
 def get_current_workspace_name() -> str:
+    """Retrieve the current workspace name from the environment variable."""
     ros_ws_folder = os.environ.get(WS_FOLDER_ENV_VAR, None)
     if not ros_ws_folder:
         print(f"Environment variable '{WS_FOLDER_ENV_VAR}' not set.")
@@ -147,6 +156,7 @@ def get_current_workspace_name() -> str:
 
 
 def extract_workspaces_from_bash_script(script_path: str) -> Dict[str, dict]:
+    """Extract workspaces from a bash script."""
     with open(script_path) as file:
         data = file.read()
 
@@ -163,6 +173,7 @@ def extract_workspaces_from_bash_script(script_path: str) -> Dict[str, dict]:
 
 
 def env_var_to_workspace_var(env_var: str, env_var_value: str) -> str:
+    """Convert an environment variable to a workspace variable."""
     ws_var = env_var.replace(ROS_TEAM_WS_PREFIX, "").lower()
     if env_var_value == "false":
         ws_var_value = False
@@ -174,6 +185,7 @@ def env_var_to_workspace_var(env_var: str, env_var_value: str) -> str:
 
 
 def workspace_var_to_env_var(ws_var: str, ws_var_value: Any) -> str:
+    """Convert a workspace variable to an environment variable."""
     env_var = ROS_TEAM_WS_PREFIX + ws_var.upper()
     if type(ws_var_value) == bool:
         env_var_value = str(ws_var_value).lower()
@@ -185,7 +197,7 @@ def workspace_var_to_env_var(ws_var: str, ws_var_value: Any) -> str:
 def create_bash_script_content_for_using_ws(
     workspace: Workspace, use_workspace_script_path: str
 ) -> str:
-    """Create a bash script content string using the workspace information."""
+    """Create a bash script content for using a workspace."""
     bash_script_content = "#!/bin/bash\n"
 
     ws_data = dataclasses.asdict(workspace)
@@ -201,10 +213,12 @@ def create_bash_script_content_for_using_ws(
 
 
 def get_expected_ws_field_names() -> List[str]:
+    """Return a list of expected workspace field names."""
     return [field.name for field in dataclasses.fields(Workspace)]
 
 
 def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str) -> bool:
+    """Try to port a workspace."""
     # set workspace missing fields to default values
     if F_WS_DOCKER_SUPPORT not in workspace_data_to_port:
         workspace_data_to_port[F_WS_DOCKER_SUPPORT] = False
@@ -274,6 +288,7 @@ def get_compile_cmd(
     setup_bash_path: str = None,
     distro_setup_bash_format: str = "/opt/ros/{distro}/setup.bash",
 ) -> List[str]:
+    """Return a compile command for the given workspace."""
     distro_setup_bash_path = distro_setup_bash_format.format(distro=distro)
     compile_ws_cmd = [
         "cd",
@@ -292,7 +307,7 @@ def get_compile_cmd(
 
 
 def get_workspace_names() -> List[str]:
-    """Retrieve a list of workspace names from the YAML file."""
+    """Return a list of workspace names."""
     if not os.path.isfile(WORKSPACES_PATH):
         return []
     workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
@@ -300,7 +315,7 @@ def get_workspace_names() -> List[str]:
 
 
 def workspace_name_completer(**kwargs) -> List[str]:
-    """Callable returning a list of workspace names."""
+    """Return a list of workspace names for autocompletion."""
     ws_names = get_workspace_names()
     if not ws_names:
         return ["NO_WORKSPACES_FOUND"]
