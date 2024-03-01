@@ -23,9 +23,11 @@ import questionary
 from rtwcli.constants import BASHRC_PATH, SKEL_BASHRC_PATH, WORKSPACES_PATH
 from rtwcli.docker_utils import (
     change_docker_path_permissions,
+    docker_build,
     docker_cp,
     docker_exec_bash_cmd,
     docker_stop,
+    is_docker_tag_valid,
 )
 from rtwcli.utils import (
     create_file_and_write,
@@ -311,23 +313,13 @@ class CreateVerb(VerbExtension):
             intermediate_image_name = args.intermediate_image_name.format(
                 base_image_name=base_image.replace(":", "_")
             )
-            docker_client = docker.from_env()
-            try:
-                print(f"Building intermediate docker image '{intermediate_image_name}'")
-                docker_client.images.build(
-                    path=ws_path_abs,
-                    tag=intermediate_image_name,
-                    rm=True,
-                )
-            except docker.errors.BuildError as e:
-                print(f"Failed to build docker image: {e}")
+            if not docker_build(ws_path_abs, intermediate_image_name):
+                print(f"Failed to build intermediate docker image '{intermediate_image_name}'.")
                 return
 
             # check if the intermediate docker image exists
-            try:
-                docker_client.images.get(intermediate_image_name)
-            except (docker.errors.ImageNotFound, docker.errors.APIError) as e:
-                print(f"Failed to get docker image '{intermediate_image_name}': {e}")
+            if not is_docker_tag_valid(intermediate_image_name):
+                print(f"Intermediate docker image '{intermediate_image_name}' does not exist.")
                 return
 
             has_ws_packages = True if os.listdir(src_folder_path_abs) else False
@@ -341,13 +333,14 @@ class CreateVerb(VerbExtension):
                 print("Installing ROS package dependencies with rosdep.")
 
                 # Start a container from the intermediate image to install dependencies
+                deps_volumes = []
+                if has_ws_packages:
+                    deps_volumes.append(f"{ws_path_abs}:{ws_path_abs}")
+                if has_upstream_ws_packages:
+                    deps_volumes.append(f"{upstream_ws_path_abs}:{upstream_ws_path_abs}")
+                print(f"Creating intermediate docker container with volumes: {deps_volumes}")
                 try:
-                    deps_volumes = []
-                    if has_ws_packages:
-                        deps_volumes.append(f"{ws_path_abs}:{ws_path_abs}")
-                    if has_upstream_ws_packages:
-                        deps_volumes.append(f"{upstream_ws_path_abs}:{upstream_ws_path_abs}")
-                    print(f"Creating intermediate docker container with volumes: {deps_volumes}")
+                    docker_client = docker.from_env()
                     intermediate_container = docker_client.containers.run(
                         intermediate_image_name,
                         "/bin/bash",
