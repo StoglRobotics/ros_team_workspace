@@ -190,6 +190,12 @@ if [ ! -e "$ws_inited_check_file" ] && [ ! -d "$ws_folder/src" ]; then
     cd ~/ || { echo "Could switch back to $HOME"; return 1;}
 fi
 
+# setup environment for communication with ssh-agent
+# this is needed so that by default ssh-add commands are working
+if [ -z "$SSH_AUTH_SOCK" ] ; then
+  eval $(ssh-agent)
+fi
+
 # source ros_team_ws_rc automatically
 if [ -f ~/.ros_team_ws_rc ]; then
     . ~/.ros_team_ws_rc
