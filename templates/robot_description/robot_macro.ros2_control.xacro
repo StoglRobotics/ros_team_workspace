@@ -4,10 +4,10 @@
   <xacro:macro name="$ROBOT_NAME$_ros2_control" params="
                name
                prefix
-               use_mock_hardware:=^|false
-               mock_sensor_commands:=^|false
-               sim_gazebo_classic:=^|false
-               sim_gazebo:=^|false
+               use_mock_hardware:=false
+               mock_sensor_commands:=false
+               sim_gazebo_classic:=false
+               sim_gazebo:=false
                simulation_controllers"
                >
 
