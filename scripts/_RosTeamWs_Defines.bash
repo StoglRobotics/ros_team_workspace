@@ -164,11 +164,13 @@ function RosTeamWS_setup_ros2_aliases {
 
 # COLCON
   alias cb="colcon_build"
+  alias ccb="colcon_console_cohesion_build"
   alias cbd="colcon_build_debug"
   alias cbr="colcon_build_release"
   alias cbup="colcon_build_up_to"
 
   alias ct="colcon_test"
+  alias cnt="colcon_no_test_build"
   alias ctup="colcon_test_up_to"
 
   alias ctres="colcon_test_results"
@@ -216,23 +218,31 @@ function colcon_helper_ros2_up_to {
 }
 
 function colcon_build {
-  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo"  "$*"
+  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"  "$*"
+}
+
+function colcon_console_cohesion_build {
+  colcon_helper_ros2 "colcon build --symlink-install --event-handlers console_cohesion+ --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"  "$*"
 }
 
 function colcon_build_up_to {
-  colcon_helper_ros2_up_to "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo" "$*"
+  colcon_helper_ros2_up_to "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON" "$*"
 }
 
 function colcon_build_debug {
-  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug" "$*"
+  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON" "$*"
 }
 
 function colcon_build_release {
-  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release" "$*"
+  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON" "$*"
 }
 
 function colcon_test {
   colcon_helper_ros2 "colcon test" "$*"
+}
+
+function colcon_no_test_build {
+  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --cmake-args -DBUILD_TESTING=OFF"  "$*"
 }
 
 function colcon_test_up_to {
