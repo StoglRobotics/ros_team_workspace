@@ -14,7 +14,7 @@
 
 import os
 
-from rtwcli.utils import run_command
+from rtwcli.utils import create_file_if_not_exists, run_command
 import docker
 
 
@@ -116,3 +116,66 @@ def change_docker_path_permissions(
     group = group_in if group_in else os.getgid()
     print(f"Changing permissions of the path '{path}' to '{user}:{group}' in '{container_name}'.")
     return docker_exec_bash_cmd(container_name, f"chown -R {user}:{group} {path}")
+
+
+def fix_missing_xauth_file(
+    container_name: str,
+    mounts_attr: str = "Mounts",
+    source_key: str = "Source",
+    xauth_file_ext: str = ".xauth",
+) -> bool:
+    """Fix missing xauth file for the given container."""
+    try:
+        docker_client = docker.from_env()
+        container = docker_client.containers.get(container_name)
+    except (docker.errors.NotFound, docker.errors.APIError) as e:
+        print(f"Failed to get docker container '{container_name}': {e}")
+        return False
+
+    if not container:
+        print(f"Container object is None for container '{container_name}'.")
+        return False
+
+    if not container.attrs:
+        print(f"Container attributes are None for container '{container_name}'.")
+        return False
+
+    if mounts_attr not in container.attrs:
+        print(
+            f"Container attributes do not contain '{mounts_attr}' for container '{container_name}'."
+        )
+        return False
+
+    xauth_file_abs_path = None
+    for mount in container.attrs[mounts_attr]:
+        if source_key in mount and xauth_file_ext in mount[source_key]:
+            xauth_file_abs_path = mount[source_key]
+            print(
+                f"Found {xauth_file_ext} file '{xauth_file_abs_path}' for container '{container_name}'."
+            )
+            break
+
+    if not xauth_file_abs_path:
+        print(f"Failed to find {xauth_file_ext} file for container '{container_name}'.")
+        return False
+
+    if os.path.isfile(xauth_file_abs_path):
+        print(f"File '{xauth_file_abs_path}' already exists.")
+        return True
+
+    if os.path.isdir(xauth_file_abs_path):
+        print(f"Path '{xauth_file_abs_path}' is a directory, removing it.")
+        os.rmdir(xauth_file_abs_path)
+
+    if not create_file_if_not_exists(xauth_file_abs_path):
+        print(f"Failed to create file '{xauth_file_abs_path}'.")
+        return False
+
+    cmd = f"xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f {xauth_file_abs_path} nmerge -"
+
+    if not run_command(cmd, shell=True):
+        print(f"Failed to run command '{cmd}'. File '{xauth_file_abs_path}' will be removed.")
+        os.remove(xauth_file_abs_path)
+        return False
+
+    return True
