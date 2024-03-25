@@ -10,7 +10,7 @@
 
 > [!NOTE]
 > If `rtw` command is not available, then add this to `~/.bashrc`:
-> `export PATH=${PATH}:~/.local/bin`
+> `export PATH=${PATH}:${HOME}/.local/bin`
 
 ## porting workspace
 
