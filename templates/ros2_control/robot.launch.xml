@@ -1,0 +1,43 @@
+<!--
+Copyright (c) 2024, Stogl Robotics Consulting UG (haftungsbeschränkt)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Source of this file are templates in
+[RosTeamWorkspace](https://github.com/StoglRobotics/ros_team_workspace) repository.
+
+Authors: Dr. Denis
+-->
+
+<launch>
+  <arg name="use_mock_hardware"
+       default="false"
+       description="Starting MockHW for offline testing instead of the real HW."/>
+
+  <include file="$(find-pkg-share $RUNTIME_CONFIG_PKG_NAME$)/launch/$ROBOT_NAME$_control.launch.xml" >
+     <arg name="use_mock_hardware" value="$(var use_mock_hardware)" />
+     <arg name="mock_sensor_commands" value="false" />
+     <arg name="sim_gazebo" value="false" />
+     <arg name="launch_rviz" value="false" />
+  </include>
+
+  <!-- Activate rviz only if working with MockHW, usually on the development PC -->
+  <include file="$(find-pkg-share $RUNTIME_CONFIG_PKG_NAME$)/launch/$ROBOT_NAME$_moveit.launch.py" >
+     <arg name="sim_time" value="false" />
+     <arg name="launch_rviz" value="$(var use_mock_hardware)" />
+  </include>
+
+  <!-- ADD HERE OTHER COMPONENTS FOR THE SCENARIO -->
+
+</launch>

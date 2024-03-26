@@ -5,11 +5,11 @@
 
 To test the mock hardware with standard controllers we first start the bringup with the mock hardware enabled:
 ```
-ros2 launch dte_ea_bringup dte_ea_1000.launch.xml use_mock_hardware:=true
+ros2 launch $PKG_NAME$ $ROBOT_NAME$_control.launch.xml use_mock_hardware:=true
 ```
 In a second terminal we then publish goals for the jtc:
 ```
-ros2 launch dte_ea_bringup test_joint_trajectory_controller.launch.xml
+ros2 launch $PKG_NAME$ test_joint_trajectory_controller.launch.xml
 ```
 
 After stopping the goal publisher, you can deactivate `JointTrajectoryController`, and activate `ForwardPositionController`:
@@ -18,5 +18,5 @@ ros2 control switch_controllers --activate forward_position_controller --deactiv
 ```
 After successful controller switch, start goal publisher for another controller:
 ```
-ros2 launch dte_ea_bringup test_forward_position_controller.launch.xml
+ros2 launch $PKG_NAME$ test_forward_position_controller.launch.xml
 ```

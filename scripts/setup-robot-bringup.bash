@@ -88,16 +88,20 @@ cp -n $ROS2_CONTROL_TEMPLATES/test_goal_publishers_config.yaml $ROBOT_FPC_PUB_YA
 for file_type in "${LAUNCH_FILE_TYPES[@]}"; do
   # Construct the file paths
   ROBOT_LAUNCH="launch/${ROBOT_NAME}.launch${file_type}"
+  ROBOT_CONTROL_LAUNCH="launch/${ROBOT_NAME}_control.launch${file_type}"
   TEST_FWD_POS_CTRL_LAUNCH="launch/test_forward_position_controller.launch${file_type}"
   TEST_JTC_LAUNCH="launch/test_joint_trajectory_controller.launch${file_type}"
 
   # Copy the templates to the destination with the specified file type
-  cp -n "$ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch${file_type}" "${ROBOT_LAUNCH}"
+  if [ -f "$ROS2_CONTROL_TEMPLATES/robot.launch${file_type}" ]; then  # only .xml for now
+    cp -n "$ROS2_CONTROL_TEMPLATES/robot.launch${file_type}" "${ROBOT_LAUNCH}"
+  fi
+  cp -n "$ROS2_CONTROL_TEMPLATES/robot_ros2_control.launch${file_type}" "${ROBOT_CONTROL_LAUNCH}"
   cp -n "$ROS2_CONTROL_TEMPLATES/test_forward_position_controller.launch${file_type}" "${TEST_FWD_POS_CTRL_LAUNCH}"
   cp -n "$ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch${file_type}" "${TEST_JTC_LAUNCH}"
 
   # sed all needed files
-  FILES_TO_SED=($ROBOT_LAUNCH $TEST_FWD_POS_CTRL_LAUNCH $TEST_JTC_LAUNCH)
+  FILES_TO_SED=($ROBOT_CONTROL_LAUNCH $TEST_FWD_POS_CTRL_LAUNCH $TEST_JTC_LAUNCH)
 
   for SED_FILE in "${FILES_TO_SED[@]}"; do
     sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
@@ -123,13 +127,25 @@ done
 prepend_to_string="if(BUILD_TESTING)"
 sed -i "s/$prepend_to_string/install\(\\n  DIRECTORY config launch\\n  DESTINATION share\/\$\{PROJECT_NAME\}\\n\)\\n\\n$prepend_to_string/g" CMakeLists.txt
 
-# extend README with general instructions
-if [ -f README.md ]; then
-  cat $ROS2_CONTROL_TEMPLATES/append_to_README.md >>README.md
-  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
-  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
-  sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
+# extend main README with general instructions
+if [ -f ../README.md ]; then
+  cat $ROS2_CONTROL_TEMPLATES/append_to_MAIN_README.md >> ../README.md
+  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" ../README.md
+  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" ../README.md
+  sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" ../README.md
+else
+  echo "No README.md in parent directory found, skipping adding short bringup info."
 fi
+
+# extend package README with general instructions
+if [ -f README.md ]; then
+  echo "#${PKG_NAME}\n\n" > README.md
+fi
+
+cat $ROS2_CONTROL_TEMPLATES/append_to_README.md >>README.md
+sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
+sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
+sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" README.md
 
 # TODO: Add license checks
 
