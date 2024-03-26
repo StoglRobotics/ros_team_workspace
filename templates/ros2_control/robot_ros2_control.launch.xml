@@ -42,6 +42,12 @@ Authors: Riyan Jose, Manuel Muth, Dr. Denis
   <arg name="mock_sensor_commands"
        default="false"
        description="Enable mock command interfaces for sensors used for simple simulations. Used only if 'use_mock_hardware' parameter is true."/>
+  <arg name="sim_gazebo"
+       default="false"
+       description="Use Gazebo simulation or not."/>
+  <arg name="launch_rviz"
+       default="true"
+       description="Launch RViz?"/>
   <arg name="robot_controller"
        default="forward_position_controller"
        description="Robot controller to start. Choices are: [forward_position_controller, joint_trajectory_controller]."/>
@@ -49,30 +55,45 @@ Authors: Riyan Jose, Manuel Muth, Dr. Denis
        default="forward_position_controller"
        description="Robot controller to start inactive. Choices are: [forward_position_controller, joint_trajectory_controller]."/>
 
-  <let name="robot_description_content" value="$(command '$(find-exec xacro) $(find-pkg-share $(var description_package))/urdf/$(var description_file).urdf.xacro prefix:=$(var prefix) use_mock_hardware:=$(var use_mock_hardware) mock_sensor_commands:=$(var mock_sensor_commands)')"/>
+  <let name="robot_controllers" value="$(find-pkg-share $(var runtime_config_package))/config/$(var controllers_file).yaml" />
 
-
-  <!--robot_state_pub_node-->
-  <node pkg="robot_state_publisher" exec="robot_state_publisher" output="both">
-    <param name="robot_description" value="$(var robot_description_content)"/>
-  </node>
+  <include file="$(find-pkg-share $(var description_package))/launch/$ROBOT_NAME$_description.launch.xml" >
+     <arg name="prefix" value="$(var prefix)" />
+     <arg name="use_mock_hardware" value="$(var use_mock_hardware)" />
+     <arg name="mock_sensor_commands" value="$(var mock_sensor_commands)" />
+     <arg name="sim_gazebo" value="$(var sim_gazebo)" />
+     <arg name="simulation_controllers" value="$(var robot_controllers)" />
+     <arg name="launch_rviz" value="false" />
+  </include>
 
   <!--control_node-->
-  <node pkg="controller_manager" exec="ros2_control_node" output="both">
-    <param name="robot_description" value="$(var robot_description_content)" />
-    <param from="$(find-pkg-share $(var runtime_config_package))/config/$(var controllers_file).yaml"/>
+  <let name="start_controller_manager" value="false" if="$(var sim_gazebo)"/>
+  <let name="start_controller_manager" value="true" unless="$(var sim_gazebo)"/>
+  <node if="$(var start_controller_manager)" pkg="controller_manager" exec="ros2_control_node" output="both">
+       <param from="$(var robot_controllers)"/>
+       <remap from="~/robot_description" to="/robot_description"/>
   </node>
 
   <!--rviz_node-->
-  <node pkg="rviz2" exec="rviz2" output="log" args="-d $(find-pkg-share $(var description_package))/rviz/$ROBOT_NAME$.rviz"/>
+  <let name="start_rviz" value="true" if="$(var launch_rviz)"/>
+  <let name="start_rviz" value="false" unless="$(var launch_rviz)"/>
+  <node if="$(var start_rviz)" pkg="rviz2" exec="rviz2" output="log" args="-d $(find-pkg-share $(var description_package))/rviz/$ROBOT_NAME$.rviz">
+       <param name="use_sim_time" value="$(var sim_gazebo)" />
+  </node>
 
   <!--joint_state_braodcaster_spawner-->
-  <node pkg="controller_manager" exec="spawner" args="joint_state_broadcaster"/>
+  <node pkg="controller_manager" exec="spawner" args="joint_state_broadcaster">
+   <param name="use_sim_time" value="$(var sim_gazebo)" />
+  </node>
 
   <!--robot_controller_spawner-->
-  <node pkg="controller_manager" exec="spawner" args="$(var robot_controller)"/>
+  <node pkg="controller_manager" exec="spawner" args="$(var robot_controller)">
+     <param name="use_sim_time" value="$(var sim_gazebo)" />
+  </node>
 
   <!--robot_controller_spawner-->
-  <node pkg="controller_manager" exec="spawner" args="$(var inactive_robot_controller) --inactive"/>
+  <node pkg="controller_manager" exec="spawner" args="$(var inactive_robot_controller) --inactive">
+     <param name="use_sim_time" value="$(var sim_gazebo)" />
+  </node>
 
 </launch>
