@@ -86,12 +86,12 @@ Authors: Riyan Jose, Manuel Muth, Dr. Denis
    <param name="use_sim_time" value="$(var sim_gazebo)" />
   </node>
 
-  <!--robot_controller_spawner-->
+  <!-- active robot controller spawner -->
   <node pkg="controller_manager" exec="spawner" args="$(var robot_controller)">
      <param name="use_sim_time" value="$(var sim_gazebo)" />
   </node>
 
-  <!--robot_controller_spawner-->
+  <!-- inactive robot controller spawner -->
   <node pkg="controller_manager" exec="spawner" args="$(var inactive_robot_controller) --inactive">
      <param name="use_sim_time" value="$(var sim_gazebo)" />
   </node>

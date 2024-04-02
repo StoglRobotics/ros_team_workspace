@@ -6,7 +6,7 @@
 
 
   <!-- ATTTTTTEEEEENNNNNNNTTTTTIIIIIIOOOOOOONNNNNN -->
-  <!-- If you are dealing with a mobile robot, remove fixing it t the world!! -->
+  <!-- If you are dealing with a mobile robot, remove fixing it to the world!! -->
 
   <xacro:macro name="$ROBOT_NAME$" params="prefix parent *origin">
     <!-- LINKS -->
