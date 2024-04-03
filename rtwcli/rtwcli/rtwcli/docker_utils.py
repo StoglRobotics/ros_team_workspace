@@ -165,7 +165,14 @@ def fix_missing_xauth_file(
 
     if os.path.isdir(xauth_file_abs_path):
         print(f"Path '{xauth_file_abs_path}' is a directory, removing it.")
-        os.rmdir(xauth_file_abs_path)
+        try:
+            os.rmdir(xauth_file_abs_path)
+        except OSError as e:
+            print(f"Failed to remove directory '{xauth_file_abs_path}': {e}")
+            print("========================================")
+            print("Please remove it manually and try again.")
+            print("========================================")
+            return False
 
     if not create_file_if_not_exists(xauth_file_abs_path):
         print(f"Failed to create file '{xauth_file_abs_path}'.")
