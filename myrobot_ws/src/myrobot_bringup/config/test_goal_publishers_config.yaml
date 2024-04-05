@@ -1,0 +1,57 @@
+# Copyright (c) 20224 Stogl Robotics Consulting UG (haftungsbeschränkt)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#
+# Source of this file are templates in
+# [RosTeamWorkspace](https://github.com/StoglRobotics/ros_team_workspace) repository.
+#
+
+publisher_forward_position_controller:
+  ros__parameters:
+
+    controller_name: "forward_position_controller"
+    wait_sec_between_publish: 5
+
+    goal_names: ["pos1", "pos2", "pos3", "pos4"]
+    pos1: [0.785, 0.785, 0.785, 0.785, 0.785, 0.785]
+    pos2: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    pos3: [-0.785, -0.785, -0.785, -0.785, -0.785, -0.785]
+    pos4: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+
+publisher_joint_trajectory_controller:
+  ros__parameters:
+
+    controller_name: "joint_trajectory_controller"
+    wait_sec_between_publish: 6
+    repeat_the_same_goal: 1 # useful to simulate continuous inputs
+
+    goal_time_from_start: 3.0
+    goal_names: ["pos1", "pos2", "pos3", "pos4"]
+    pos1:
+      positions: [0.785, 0.785, 0.785, 0.785, 0.785, 0.785]
+    pos2:
+      positions: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    pos3:
+      positions: [-0.785, -0.785, -0.785, -0.785, -0.785, -0.785]
+    pos4:
+      positions: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
