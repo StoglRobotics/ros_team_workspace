@@ -17,6 +17,7 @@ def launch_setup(context, *args, **kwargs):
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     mock_sensor_commands = LaunchConfiguration("mock_sensor_commands")
     use_sim_time = LaunchConfiguration("use_sim_time")
+    logging_severity = LaunchConfiguration("severity")
 
     # -------------------------------------------------------#
     #               MoveIt2 MoveGroup setup                  #
@@ -68,6 +69,7 @@ def launch_setup(context, *args, **kwargs):
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
+        arguments=["--ros-args", "--log-level", logging_severity],
         parameters=[
             robot_description,
             robot_description_semantic,
@@ -84,7 +86,7 @@ def launch_setup(context, *args, **kwargs):
         package="rviz2",
         executable="rviz2",
         output="log",
-        arguments=["-d", rviz_config],
+        arguments=["-d", rviz_config, "--ros-args", "--log-level", "WARN"],
         parameters=[
             robot_description,
             robot_description_semantic,
@@ -164,6 +166,14 @@ def generate_launch_description():
             "use_sim_time",
             default_value="false",
             description="Use simulation clock instead of world clock",
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "severity",
+            default_value="INFO",
+            choices=["INFO", "WARN", "ERROR", "DEBUG", "FATAL"],
+            description="Logging level for the nodes",
         )
     )
 
