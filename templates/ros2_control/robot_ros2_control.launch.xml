@@ -46,7 +46,7 @@ Authors: Riyan Jose, Manuel Muth, Dr. Denis
        default="joint_trajectory_controller"
        description="Robot controller to start. Choices are: [forward_position_controller, joint_trajectory_controller]."/>
   <arg name="inactive_robot_controller"
-       default="forward_position_controller"
+       default="joint_trajectory_controller"
        description="Robot controller to start inactive. Choices are: [forward_position_controller, joint_trajectory_controller]."/>
 
   <let name="robot_description_content" value="$(command '$(find-exec xacro) $(find-pkg-share $(var description_package))/urdf/$(var description_file).urdf.xacro prefix:=$(var prefix) use_mock_hardware:=$(var use_mock_hardware) mock_sensor_commands:=$(var mock_sensor_commands)')"/>
