@@ -1,6 +1,3 @@
-import os
-import yaml
-
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
@@ -43,8 +40,6 @@ def launch_setup(context, *args, **kwargs):
             " ",
         ]
     )
-    robot_description = {"robot_description": robot_description_content.perform(context)}
-
     # SRDF
     robot_description_semantic_content = Command(
         [
@@ -53,14 +48,13 @@ def launch_setup(context, *args, **kwargs):
             PathJoinSubstitution(
                 [FindPackageShare(moveit_package), "srdf", semantic_description_file]
             ),
-            
         ]
     )
-    robot_description_semantic = {"robot_description_semantic": robot_description_semantic_content.perform(context)}
 
-    other_configs = PathJoinSubstitution(
-        [FindPackageShare(moveit_package), "config", "all.yaml"]
-    )
+    robot_description = {"robot_description": robot_description_content.perform(context)}
+    robot_description_semantic = {"robot_description_semantic": robot_description_semantic_content.perform(context)}
+    planning_config = PathJoinSubstitution([FindPackageShare(moveit_package), "config", "ompl_planning.yaml"])
+    move_group_config = PathJoinSubstitution([FindPackageShare(moveit_package), "config", "move_group.yaml"])
 
     # -------------------------------------------------------#
     #                 Move Group Node                        #
@@ -73,7 +67,8 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
             robot_description,
             robot_description_semantic,
-            other_configs,
+            planning_config,
+            move_group_config,
             {"use_sim_time": use_sim_time},
         ],
     )
@@ -90,7 +85,9 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
             robot_description,
             robot_description_semantic,
-            other_configs
+            planning_config,
+            move_group_config,
+            {"use_sim_time": use_sim_time},
         ],
     )
 
