@@ -5,19 +5,8 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import OpaqueFunction
-
-def load_yaml(package_name, file_path):
-    package_path = get_package_share_directory(package_name)
-    absolute_file_path = os.path.join(package_path, file_path)
-
-    try:
-        with open(absolute_file_path) as file:
-            return yaml.safe_load(file)
-    except OSError:  # parent of IOError, OSError *and* WindowsError where available
-        return None
 
 def launch_setup(context, *args, **kwargs):
     description_package = LaunchConfiguration("description_package")
@@ -27,9 +16,10 @@ def launch_setup(context, *args, **kwargs):
     prefix = LaunchConfiguration("prefix")
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     mock_sensor_commands = LaunchConfiguration("mock_sensor_commands")
+    use_sim_time = LaunchConfiguration("use_sim_time")
 
     # -------------------------------------------------------#
-    #               MoveIt2 MoveGroup setup                 #
+    #               MoveIt2 MoveGroup setup                  #
     # -------------------------------------------------------#
 
     # URDF
@@ -67,35 +57,10 @@ def launch_setup(context, *args, **kwargs):
     )
     robot_description_semantic = {"robot_description_semantic": robot_description_semantic_content.perform(context)}
 
-    # kinematics    
-    kinematics_yaml = load_yaml("myrobot_moveit", "config/kinematics.yaml")
-    robot_description_kinematics = {"robot_description_kinematics": kinematics_yaml}
-    
-    # limits
-    limits_yaml = load_yaml("myrobot_moveit", "config/joint_limits.yaml")
-    robot_description_planning = {"robot_description_planning": limits_yaml}
-   
-    # planning
-    ompl_planning_plugin_yaml = load_yaml("myrobot_moveit", "config/ompl_planning.yaml")
-    ompl_planning_pipeline_config = {"move_group": ompl_planning_plugin_yaml}
+    other_configs = PathJoinSubstitution(
+        [FindPackageShare(moveit_package), "config", "all.yaml"]
+    )
 
-    # load Moveit2 controllers
-    moveit_controllers = load_yaml("myrobot_moveit", "config/moveit_controllers.yaml")
-
-    # configure PlanningSceneMonitor
-    planning_scene_monitor_parameters = {
-        "publish_planning_scene": True,
-        "publish_geometry_updates": True,
-        "publish_state_updates": True,
-        "publish_transforms_updates": True,
-    }
-
-    # Load  ExecuteTaskSolutionCapability so we can execute found solutions in simulation
-    move_group_capabilities = {
-        "capabilities": "move_group/MoveGroupExecuteTrajectoryAction"
-    }
-
-    # Start the actual move_group node/action server
     # -------------------------------------------------------#
     #                 Move Group Node                        #
     # -------------------------------------------------------#
@@ -106,33 +71,24 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
             robot_description,
             robot_description_semantic,
-            robot_description_kinematics,
-            robot_description_planning,
-            ompl_planning_pipeline_config,
-            moveit_controllers,
-            planning_scene_monitor_parameters,
-            move_group_capabilities
+            other_configs,
+            {"use_sim_time": use_sim_time},
         ],
     )
     
     # RViz
-    rviz_directory = os.path.join(
-        get_package_share_directory(
-            f"{moveit_package.perform(context)}"
-        ), "rviz"
+    rviz_config = PathJoinSubstitution(
+        [FindPackageShare(moveit_package), "rviz", "moveit.rviz"]
     )
-    rviz_config = os.path.join(rviz_directory, "moveit.rviz")
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
-        name="rviz2",
         output="log",
         arguments=["-d", rviz_config],
         parameters=[
             robot_description,
             robot_description_semantic,
-            robot_description_kinematics,
-            ompl_planning_pipeline_config,
+            other_configs
         ],
     )
 
@@ -201,6 +157,13 @@ def generate_launch_description():
             default_value="false",
             description="Enable mock command interfaces for sensors used for simple simulations. \
             Used only if 'use_mock_hardware' parameter is true.",
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "use_sim_time",
+            default_value="false",
+            description="Use simulation clock instead of world clock",
         )
     )
 
