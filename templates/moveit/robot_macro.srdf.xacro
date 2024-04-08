@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
-  <xacro:macro name="myrobot_srdf" params="prefix">
+  <xacro:macro name="$ROBOT_NAME$_srdf" params="prefix">
         <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
-        <group name="myrobot_manipulator">
+        <group name="${prefix}$ROBOT_NAME$_manipulator">
             <chain base_link="${prefix}base_link" tip_link="${prefix}tool0"/>
         </group>
         <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->

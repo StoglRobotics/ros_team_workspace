@@ -105,7 +105,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "description_package",
-            default_value="myrobot_description",
+            default_value="$DESCR_PKG_NAME$",
             description="Package with the robot URDF/XACRO files. \
         Usually the argument is not set, it enables use of a custom setup.",
         )
@@ -113,7 +113,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "description_file",
-            default_value="myrobot.urdf.xacro",
+            default_value="$ROBOT_NAME$.urdf.xacro",
             description="URDF/XACRO description file \
         Usually the argument is not set, it enables use of a custom setup.",
         )
@@ -121,7 +121,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "moveit_package",
-            default_value="myrobot_moveit",
+            default_value="$PKG_NAME$",
             description="MoveIt config package with robot SRDF/XACRO files. \
         Usually the argument is not set, it enables use of a custom setup.",
         )
@@ -129,7 +129,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "semantic_description_file",
-            default_value="myrobot.srdf.xacro",
+            default_value="$ROBOT_NAME$.srdf.xacro",
             description="MoveIt SRDF/XACRO description file with the robot.. \
         Usually the argument is not set, it enables use of a custom setup.",
         )
