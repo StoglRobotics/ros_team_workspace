@@ -130,7 +130,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "semantic_description_file",
             default_value="$ROBOT_NAME$.srdf.xacro",
-            description="MoveIt SRDF/XACRO description file with the robot.. \
+            description="MoveIt SRDF/XACRO description file with the robot. \
         Usually the argument is not set, it enables use of a custom setup.",
         )
     )
@@ -170,7 +170,7 @@ def generate_launch_description():
             "severity",
             default_value="INFO",
             choices=["INFO", "WARN", "ERROR", "DEBUG", "FATAL"],
-            description="Logging level for the nodes",
+            description="Logging level for the nodes.",
         )
     )
 
