@@ -139,7 +139,12 @@ done
 prepend_to_string="if(BUILD_TESTING)"
 sed -i "s/$prepend_to_string/install\(\\n  DIRECTORY config launch rviz srdf\\n  DESTINATION share\/\$\{PROJECT_NAME\}\\n\)\\n\\n$prepend_to_string/g" CMakeLists.txt
 
-# TODO: add README with general instructions
+# extend README with general instructions
+if [ -f README.md ]; then
+  cat $MOVEIT_TEMPLATES/append_to_README.md >>README.md
+  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" README.md
+  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
+fi
 
 # TODO: Add license checks
 
