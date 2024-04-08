@@ -105,15 +105,15 @@ for file_type in "${LAUNCH_FILE_TYPES[@]}"; do
 
   # Copy the templates to the destination with the specified file type
   cp -n "$MOVEIT_TEMPLATES/moveit.launch${file_type}" "${MOVEIT_LAUNCH}"
-done
 
-# sed all needed files
-FILES_TO_SED=($MOVEIT_LAUNCH $ROBOT_SRDF $ROBOT_SRDF_MACRO $MOVE_GROUP_CONFIG_YAML $OMPL_PLANNING_CONFIG_YAML)
+  # sed all needed files
+  FILES_TO_SED=($MOVEIT_LAUNCH $ROBOT_SRDF $ROBOT_SRDF_MACRO $MOVE_GROUP_CONFIG_YAML $OMPL_PLANNING_CONFIG_YAML)
 
-for SED_FILE in "${FILES_TO_SED[@]}"; do
-  sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
-  sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
+  for SED_FILE in "${FILES_TO_SED[@]}"; do
+    sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
+    sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
+    sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
+  done
 done
 
 # package.xml: Add dependencies if they not exist
