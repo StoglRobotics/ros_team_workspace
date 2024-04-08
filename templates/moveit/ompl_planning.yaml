@@ -12,7 +12,7 @@
         - default_planning_response_adapters/AddTimeOptimalParameterization
         - default_planning_response_adapters/ValidateSolution
         - default_planning_response_adapters/DisplayMotionPath
-      myrobot_manipulator:
+      $ROBOT_NAME$_manipulator:
         planner_configs:
           SBLkConfigDefault:
             type: geometric::SBL

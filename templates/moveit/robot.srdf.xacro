@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot xmlns:xacro="http://wiki.ros.org/xacro" name="myrobot">
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="$ROBOT_NAME$">
 
   <xacro:arg name="prefix" default="" />
 
-  <xacro:include filename="$(find myrobot_moveit)/srdf/myrobot_macro.srdf.xacro"/>
+  <xacro:include filename="$(find $PKG_NAME$)/srdf/$ROBOT_NAME$_macro.srdf.xacro"/>
 
-  <xacro:myrobot_srdf prefix="$(arg prefix)"/>
+  <xacro:$ROBOT_NAME$_srdf prefix="$(arg prefix)"/>
 
 </robot>

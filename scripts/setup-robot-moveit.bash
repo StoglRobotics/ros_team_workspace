@@ -112,7 +112,6 @@ FILES_TO_SED=($MOVEIT_LAUNCH $ROBOT_SRDF $ROBOT_SRDF_MACRO)
 
 for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
-  sed -i "s/\\\$MOVEIT_CONFIG_PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
   sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" $SED_FILE
   sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
 done
