@@ -17,8 +17,8 @@
 // [RosTeamWorkspace](https://github.com/StoglRobotics/ros_team_workspace) repository.
 //
 
-#ifndef TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CHAINABLE_CONTROLLER_HPP_
-#define TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CHAINABLE_CONTROLLER_HPP_
+#ifndef TEST_DUMMY_CHAINABLE_CONTROLLER_HPP_
+#define TEST_DUMMY_CHAINABLE_CONTROLLER_HPP_
 
 #include <chrono>
 #include <limits>
@@ -128,7 +128,7 @@ public:
 
     command_publisher_node_ = std::make_shared<rclcpp::Node>("command_publisher");
     command_publisher_ = command_publisher_node_->create_publisher<ControllerReferenceMsg>(
-      "/test_dummy_controller/commands", rclcpp::SystemDefaultsQoS());
+      "/test_dummy_controller/reference", rclcpp::SystemDefaultsQoS());
 
     service_caller_node_ = std::make_shared<rclcpp::Node>("service_caller");
     slow_control_service_client_ = service_caller_node_->create_client<ControllerModeSrvType>(
@@ -142,7 +142,12 @@ public:
 protected:
   void SetUpController(const std::string controller_name = "test_dummy_controller")
   {
-    ASSERT_EQ(controller_->init(controller_name), controller_interface::return_type::OK);
+    auto options = rclcpp::NodeOptions()
+                     .allow_undeclared_parameters(false)
+                     .automatically_declare_parameters_from_overrides(false);
+    ASSERT_EQ(
+      controller_->init(controller_name, "", 0, "", options),
+      controller_interface::return_type::OK);
 
     std::vector<hardware_interface::LoanedCommandInterface> command_ifs;
     command_itfs_.reserve(joint_command_values_.size());
@@ -278,4 +283,4 @@ protected:
   rclcpp::Client<ControllerModeSrvType>::SharedPtr slow_control_service_client_;
 };
 
-#endif  // TEMPLATES__ROS2_CONTROL__CONTROLLER__TEST_DUMMY_CHAINABLE_CONTROLLER_HPP_
+#endif  // TEST_DUMMY_CHAINABLE_CONTROLLER_HPP_
