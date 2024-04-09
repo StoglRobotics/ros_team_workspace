@@ -51,6 +51,7 @@ class CreateVerb(VerbExtension):
     """Create a new ROS workspace."""
 
     def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
+        parser.formatter_class = argparse.ArgumentDefaultsHelpFormatter
         parser.add_argument(
             "--ws-folder", type=str, help="Path to the workspace folder to create.", required=True
         )
@@ -188,6 +189,7 @@ class CreateVerb(VerbExtension):
                 "--git",
                 "--hostname rtw-{workspace_name}-docker",
                 "--name {final_image_name}-instance",
+                "--network host",
                 "--nocleanup",
                 "--nvidia gpus",
                 "--user",
@@ -527,6 +529,7 @@ class CreateVerb(VerbExtension):
             rocker_flags = ["--nocleanup", "--git"]
             rocker_flags.extend(["--hostname", f"rtw-{ws_name}-docker"])
             rocker_flags.extend(["--name", f"{final_container_name}"])
+            rocker_flags.extend(["--network", "host"])
 
             if not args.disable_nvidia:
                 rocker_flags.extend(["--nvidia", "gpus"])
