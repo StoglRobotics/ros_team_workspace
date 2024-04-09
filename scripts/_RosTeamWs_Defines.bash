@@ -164,7 +164,7 @@ function RosTeamWS_setup_ros2_aliases {
 
 # COLCON
   alias cb="colcon_build"
-  alias ccb="colcon_console_cohesion_build"
+  alias cccb="colcon_console_cohesion_build"
   alias cbd="colcon_build_debug"
   alias cbr="colcon_build_release"
   alias cbup="colcon_build_up_to"
