@@ -385,7 +385,7 @@ create_workspace_docker () {
     echo "RUN apt update -y && apt install -y wget" >> $DOCKER_FILE
     echo "RUN echo \"deb [arch=amd64,arm64,armhf] http://deb.volian.org/volian/ scar main\" | tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list" >> $DOCKER_FILE
     echo "RUN wget -qO - https://deb.volian.org/volian/scar.key | tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg > /dev/null" >> $DOCKER_FILE
-    echo "RUN apt update -y && apt install -y nala-legacy" >> $DOCKER_FILE
+    # echo "RUN apt update -y && apt install -y nala-legacy" >> $DOCKER_FILE
 
     # Add last part
     let CUT_LINE=$TEST_LINE+2
