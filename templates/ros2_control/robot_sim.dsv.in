@@ -1,0 +1,4 @@
+# Explanation of env-hooks can be found here: https://github.com/ros-simulation/gazebo_ros_pkgs/wiki/ROS-2-Migration:-Gazebo-ROS-Paths#env-hooks
+
+prepend-non-duplicate;IGN_GAZEBO_RESOURCE_PATH;share/
+prepend-non-duplicate;IGN_GAZEBO_MODEL_PATH;share/
