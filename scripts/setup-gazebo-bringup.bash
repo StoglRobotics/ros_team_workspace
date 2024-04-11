@@ -18,13 +18,6 @@
 ## This script is run in setup-robot-bringup in case the user wants a gazebo starting point.
 ##
 
-# Create env hook folder
-mkdir -p hooks
-
-# Copy env hook file
-GAZEBO_ENV_HOOK="hooks/${ROBOT_NAME}_sim.dsv.in"
-cp -n $ROS2_CONTROL_TEMPLATES/robot_sim.dsv.in $GAZEBO_ENV_HOOK
-
 # Copy launch files
 GAZEBO_LAUNCH="launch/${ROBOT_NAME}_sim.launch.py"
 cp -n "$ROS2_CONTROL_TEMPLATES/robot_ros2_control_sim.launch.py" "${GAZEBO_LAUNCH}"
@@ -48,10 +41,3 @@ for DEP_PKG in "${DEP_PKGS[@]}"; do
     sed -i "s/$append_to_string/$append_to_string\\n\\n  <exec_depend>${DEP_PKG}<\/exec_depend>/g" package.xml
   fi
 done
-
-# CMakeLists.txt: Add install paths of the files
-prepend_to_string="ament_package()"
-sed -i "/$prepend_to_string/i\
-# Explanation of env-hooks can be found here: https://github.com/ros-simulation/gazebo_ros_pkgs/wiki/ROS-2-Migration:-Gazebo-ROS-Paths#env-hooks\\n\
-# tldr: enables gazebo to find meshes in this package.\\n\
-ament_environment_hooks(\"\${CMAKE_CURRENT_SOURCE_DIR}/hooks/${ROBOT_NAME}_sim.dsv.in\")\\n" CMakeLists.txt

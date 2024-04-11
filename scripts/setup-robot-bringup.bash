@@ -66,7 +66,7 @@ echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise 
 read
 
 # Remove include and src folders - in this package should be no source
-RM_FOLDERS=("include" "src")
+RM_FOLDERS=("include/$PKG_NAME" "include" "src")
 
 for FOLDER in "${RM_FOLDERS[@]}"; do
   if [[ -d $FOLDER && ! "$(ls -A $FOLDER)" ]]; then

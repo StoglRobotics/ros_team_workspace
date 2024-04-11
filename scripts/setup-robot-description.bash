@@ -63,6 +63,15 @@ echo -e "${TERMINAL_COLOR_USER_NOTICE}ATTENTION: Setting up description configur
 echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise <CTRL>+C and start the script again from the package folder and/or with correct robot name.${TERMINAL_COLOR_NC}"
 read
 
+# Remove include and src folders - in this package should be no source
+RM_FOLDERS=("include/$PKG_NAME" "include" "src")
+
+for FOLDER in "${RM_FOLDERS[@]}"; do
+  if [[ -d $FOLDER && ! "$(ls -A $FOLDER)" ]]; then
+    rm -r $FOLDER
+  fi
+done
+
 # Create folders for meshes
 F_NAME="meshes/${ROBOT_NAME}/collision"
 mkdir -p $F_NAME
@@ -185,6 +194,18 @@ lines_to_append="  find_package(ament_cmake_pytest REQUIRED)\n\n  ament_add_pyte
 pattern='if(BUILD_TESTING)'
 # Use sed to find the pattern and append the lines after it in CMakeLists.txt
 sed -i "/$pattern/a$lines_to_append" CMakeLists.txt
+
+
+## Expose mesh files to gazebo
+mkdir -p hooks
+GAZEBO_ENV_HOOK="hooks/${ROBOT_NAME}_sim.dsv.in"
+cp -n $ROBOT_DESCRIPTION_TEMPLATES/robot_sim.dsv.in $GAZEBO_ENV_HOOK
+# CMakeLists.txt: Add env hook
+prepend_to_string="ament_package()"
+sed -i "/$prepend_to_string/i\
+# Explanation of env-hooks can be found here: https://github.com/ros-simulation/gazebo_ros_pkgs/wiki/ROS-2-Migration:-Gazebo-ROS-Paths#env-hooks\\n\
+# tldr: enables gazebo to find meshes in this package.\\n\
+ament_environment_hooks(\"\${CMAKE_CURRENT_SOURCE_DIR}/hooks/${ROBOT_NAME}_sim.dsv.in\")\\n" CMakeLists.txt
 
 # extend README with general instructions
 if [ ! -f README.md ]; then
