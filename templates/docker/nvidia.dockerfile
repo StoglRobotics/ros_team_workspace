@@ -27,8 +27,8 @@ ENV LC_ALL en_US.UTF-8
 RUN locale
 
 # install nala and upgrade
-# RUN apt update -y
-# RUN apt upgrade -y
+# RUN apt update -y && apt install -y nala
+# RUN nala upgrade -y
 
 # Nvidia variables
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
