@@ -186,7 +186,7 @@
     </joint>
     <!-- joint 2 -->
     <joint name="${prefix}joint2" type="revolute">
-      <origin xyz="0 0 0.3" rpy="${pi/2} 0 0" />
+      <origin xyz="0 0 0.3" rpy="${pi/2} ${pi/2} 0" />
       <parent link="${prefix}link1" />
       <child link="${prefix}link2" />
       <axis xyz="0 0 1" />
