@@ -23,3 +23,8 @@ source your workspace: `_<ws_name>`
 port config: `rtw wokspace port`
 
 test porting: `rtw wokspace use`
+
+
+## For converting https to ssh:
+> [!NOTE]
+> `git config --global url."git@github.com:".insteadOf "https://github.com/"`
