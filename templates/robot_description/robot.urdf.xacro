@@ -18,8 +18,11 @@
 
   <!-- Load robot's macro with parameters -->
   <!-- set prefix if multiple robots are used -->
-  <xacro:$ROBOT_NAME$ prefix="$(arg prefix)" parent="world" >
-    <origin xyz="0 0 0.15" rpy="0 0 0" />   <!-- to prevent clipping in ground plane in simulation -->
+  <xacro:$ROBOT_NAME$ 
+    prefix="$(arg prefix)" 
+    parent="world"
+    sim_gazebo="$(arg sim_gazebo)">
+    <origin xyz="0 0 0.15" rpy="0 0 0" />          <!-- position robot in the world -->
   </xacro:$ROBOT_NAME$>
 
   <xacro:$ROBOT_NAME$_ros2_control
