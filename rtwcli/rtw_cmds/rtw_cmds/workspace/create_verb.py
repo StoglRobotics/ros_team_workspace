@@ -186,6 +186,7 @@ class CreateVerb(VerbExtension):
             help="Additional rocker flags to use for the docker workspace. [Will be overwritten as default for now]",
             default=[
                 "--image-name {final_image_name}",
+                "--pull",
                 "--git",
                 "--hostname rtw-{workspace_name}-docker",
                 "--name {final_image_name}-instance",
@@ -526,7 +527,7 @@ class CreateVerb(VerbExtension):
                 rocker_volumes.append(upstream_ws_path_abs + ":" + upstream_ws_path_abs)
 
             # rocker flags have order, see rocker --help
-            rocker_flags = ["--nocleanup", "--git"]
+            rocker_flags = ["--nocleanup", "--pull", "--git"]
             rocker_flags.extend(["--hostname", f"rtw-{ws_name}-docker"])
             rocker_flags.extend(["--name", f"{final_container_name}"])
             rocker_flags.extend(["--network", "host"])
