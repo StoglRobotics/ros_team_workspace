@@ -15,8 +15,10 @@
 import os
 import pathlib
 
+ROS_TEAM_WS_GIT_HTTPS_URL = "https://github.com/StoglRobotics/ros_team_workspace.git"
 
-WORKSPACES_PATH = os.path.expanduser("~/.ros_team_workspace/workspaces.yaml")
+ROS_TEAM_WS_PATH = os.path.expanduser("~/.ros_team_workspace")
+WORKSPACES_PATH = os.path.join(ROS_TEAM_WS_PATH, "workspaces.yaml")
 CURRENT_FILE_DIR = pathlib.Path(__file__).parent.absolute()
 USE_WORKSPACE_SCRIPT_PATH = os.path.normpath(
     CURRENT_FILE_DIR / ".." / ".." / ".." / "scripts" / "environment" / "setup.bash"
@@ -24,9 +26,7 @@ USE_WORKSPACE_SCRIPT_PATH = os.path.normpath(
 WORKSPACES_KEY = "workspaces"
 ROS_TEAM_WS_RC_PATH = os.path.expanduser("~/.ros_team_ws_rc")
 BACKUP_DATETIME_FORMAT = "%Y-%m-%d_%H-%M-%S-%f"
-WORKSPACES_PATH_BACKUP_FORMAT = os.path.expanduser(
-    "~/.ros_team_workspace/bkp/workspaces_bkp_{}.yaml"
-)
+WORKSPACES_PATH_BACKUP_FORMAT = os.path.join(ROS_TEAM_WS_PATH, "bkp", "workspaces_bkp_{}.yaml")
 WS_FOLDER_ENV_VAR = "RosTeamWS_WS_FOLDER"
 ROS_TEAM_WS_PREFIX = "RosTeamWS_"
 

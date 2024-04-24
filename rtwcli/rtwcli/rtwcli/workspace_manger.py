@@ -285,17 +285,23 @@ def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str)
 def get_compile_cmd(
     ws_path_abs: str,
     distro: str,
-    setup_bash_path: str = None,
+    upstream_ws_abs_path: str = None,
     distro_setup_bash_format: str = "/opt/ros/{distro}/setup.bash",
+    upstream_ws_setup_bash_format: str = "{upstream_ws_abs_path}/install/setup.bash",
 ) -> List[str]:
     """Return a compile command for the given workspace."""
-    distro_setup_bash_path = distro_setup_bash_format.format(distro=distro)
+    if upstream_ws_abs_path:
+        setup_bash_path = upstream_ws_setup_bash_format.format(
+            upstream_ws_abs_path=upstream_ws_abs_path
+        )
+    else:
+        setup_bash_path = distro_setup_bash_format.format(distro=distro)
     compile_ws_cmd = [
         "cd",
         ws_path_abs,
         "&&",
         "source",
-        distro_setup_bash_path if not setup_bash_path else setup_bash_path,
+        setup_bash_path,
         "&&",
         "colcon",
         "build",
