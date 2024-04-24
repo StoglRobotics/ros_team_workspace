@@ -649,7 +649,7 @@ class CreateVerb(VerbExtension):
                             f"{create_args.upstream_ws_abs_path}"
                         )
 
-    def setup_rtw_in_intermediate_container(
+    def setup_rtw_in_intermediate_image(
         self, create_args: CreateVerbArgs, intermediate_container: Any
     ):
         # create rtw workspaces file
@@ -750,6 +750,20 @@ class CreateVerb(VerbExtension):
 
         return rocker_flags
 
+    def execute_rocker_cmd(self, create_args: CreateVerbArgs) -> bool:
+        rocker_flags = self.generate_rocker_flags(create_args)
+        rocker_base_image_name = create_args.intermediate_image_name
+        rocker_cmd = ["rocker"] + rocker_flags + [rocker_base_image_name]
+        rocker_cmd_str = " ".join(rocker_cmd)
+
+        print(
+            f"Creating final image '{create_args.final_image_name}' "
+            f"and container '{create_args.container_name}' "
+            f"with command '{rocker_cmd_str}'"
+        )
+
+        return run_command(rocker_cmd)
+
     def main(self, *, args):
         args_dict = vars(args)
         valid_fields = {field.name for field in fields(CreateVerbArgs)}
@@ -775,23 +789,11 @@ class CreateVerb(VerbExtension):
         self.execute_ws_cmds(create_args, ws_cmds, intermediate_container.id)
 
         if create_args.docker:
-            self.setup_rtw_in_intermediate_container(create_args, intermediate_container)
-
-            rocker_flags = self.generate_rocker_flags(create_args)
-            rocker_base_image_name = create_args.intermediate_image_name
-            rocker_cmd = ["rocker"] + rocker_flags + [rocker_base_image_name]
-            rocker_cmd_str = " ".join(rocker_cmd)
-
-            print(
-                f"Creating final image '{create_args.final_image_name}' "
-                f"and container '{create_args.container_name}' "
-                f"with command '{rocker_cmd_str}'"
-            )
-
-            # ask the user to still save ws config even if there was a rocker error
-            if not run_command(rocker_cmd):
+            self.setup_rtw_in_intermediate_image(create_args, intermediate_container)
+            if not self.execute_rocker_cmd(create_args):
+                # ask the user to still save ws config even if there was a rocker error
                 still_save_config = questionary.confirm(
-                    "There was an error with rocker. Do you want to save the workspace config?"
+                    "Rocker command failed. Do you still want to save the workspace config?"
                 ).ask()
                 if not still_save_config:
                     exit("Not saving the workspace config.")
