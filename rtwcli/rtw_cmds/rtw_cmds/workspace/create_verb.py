@@ -41,6 +41,7 @@ from rtwcli.utils import (
     create_file_and_write,
     create_temp_file,
     git_clone,
+    run_bash_command,
     run_command,
     vcs_import,
 )
@@ -50,6 +51,7 @@ from rtwcli.workspace_manger import (
     Workspace,
     WorkspacesConfig,
     get_compile_cmd,
+    get_workspace_names,
     save_workspaces_config,
     update_workspaces_config,
 )
@@ -167,7 +169,7 @@ class CreateVerbArgs:
         os.makedirs(self.upstream_ws_src_abs_path, exist_ok=True)
 
         if os.listdir(self.upstream_ws_src_abs_path):
-            self.handle_non_empty_src_folder("Upstream workspace")
+            self.handle_non_empty_src_folder("Upstream workspace", self.upstream_ws_src_abs_path)
 
         if not vcs_import(
             self.upstream_ws_repos_file_abs_path,
@@ -242,10 +244,10 @@ class CreateVerbArgs:
                 f"Upstream ws repos file '{self.upstream_ws_repos_file_abs_path}' does not exist."
             )
 
-    def handle_non_empty_src_folder(self, ws_type: str):
+    def handle_non_empty_src_folder(self, ws_type: str, ws_src_path: str):
         # ask the user to still create the workspace even if the src folder is not empty
         still_create_ws = questionary.confirm(
-            f"{ws_type} src folder '{self.ws_src_abs_path}' is not empty. "
+            f"{ws_type} src folder '{ws_src_path}' is not empty. "
             "Do you still want to proceed and create the workspace?"
         ).ask()
         if not still_create_ws:
@@ -288,7 +290,7 @@ class CreateVerbArgs:
         os.makedirs(self.ws_src_abs_path, exist_ok=True)
 
         if os.listdir(self.ws_src_abs_path):
-            self.handle_non_empty_src_folder("Main workspace")
+            self.handle_non_empty_src_folder("Main workspace", self.ws_src_abs_path)
 
         if self.repos_location_url:
             self.handle_repos()
@@ -509,7 +511,7 @@ class CreateVerb(VerbExtension):
 
     def build_intermediate_docker_image(self, create_args: CreateVerbArgs):
         # create intermediate dockerfile
-        dockerfile_content = self.generate_intermediate_dockerfile_content()
+        dockerfile_content = self.generate_intermediate_dockerfile_content(create_args)
         if not create_file_and_write(
             create_args.intermediate_dockerfile_abs_path, content=dockerfile_content
         ):
@@ -520,7 +522,9 @@ class CreateVerb(VerbExtension):
 
         # build intermediate docker image
         if not docker_build(
-            create_args.intermediate_dockerfile_abs_path, create_args.intermediate_image_name
+            create_args.intermediate_image_name,
+            create_args.intermediate_dockerfile_save_folder,
+            create_args.intermediate_dockerfile_abs_path,
         ):
             raise RuntimeError(
                 "Failed to build intermediate docker image "
@@ -567,19 +571,13 @@ class CreateVerb(VerbExtension):
             create_args.upstream_ws_src_abs_path
         )
 
-        rosdep_cmds = [["rosdep", "update"]]
-        rosdep_install_cmd_base = [
-            "rosdep",
-            "install",
-            "-i",
-            "-r",
-            "-y",
-            "--from-paths",
-        ]
+        rosdep_cmds = [["apt-get", "update"], ["rosdep", "update"]]
+        rosdep_install_cmd_base = ["rosdep", "install", "-i", "-r", "-y", "--from-paths"]
         if has_upstream_ws_packages:
             rosdep_cmds.append(rosdep_install_cmd_base + [create_args.upstream_ws_src_abs_path])
         if has_ws_packages:
             rosdep_cmds.append(rosdep_install_cmd_base + [create_args.ws_src_abs_path])
+        rosdep_cmds.append(["rm", "-rf", "/var/lib/apt/lists/*"])
 
         compile_cmds = []
         if create_args.has_upstream_ws:
@@ -611,7 +609,7 @@ class CreateVerb(VerbExtension):
                     else:
                         print(f"Failed to execute ws command '{ws_cmd_str}'")
             else:
-                if not run_command(ws_cmd):
+                if not run_bash_command(ws_cmd_str):
                     if create_args.raise_on_ws_cmd_error:
                         raise RuntimeError(f"Failed to execute ws command '{ws_cmd_str}'")
                     else:
@@ -725,7 +723,8 @@ class CreateVerb(VerbExtension):
 
     def generate_rocker_flags(self, create_args: CreateVerbArgs) -> List[str]:
         # rocker flags have order, see rocker --help
-        rocker_flags = ["--nocleanup", "--pull", "--git"]
+        # rocker_flags = ["--nocleanup", "--pull", "--git"]
+        rocker_flags = ["--nocleanup", "--git"]
         rocker_flags.extend(["--hostname", f"rtw-{create_args.ws_name}-docker"])
         rocker_flags.extend(["--name", f"{create_args.container_name}"])
         rocker_flags.extend(["--network", "host"])
@@ -775,6 +774,13 @@ class CreateVerb(VerbExtension):
         pprint(create_args)
         print("### CREATE ARGS ###")
 
+        ws_names = get_workspace_names()
+        if create_args.ws_name in ws_names:
+            raise RuntimeError(
+                f"Workspace with name '{create_args.ws_name}' already exists. "
+                "Overwriting existing workspaces is not supported yet."
+            )
+
         if create_args.docker:
             self.build_intermediate_docker_image(create_args)
 
@@ -786,7 +792,7 @@ class CreateVerb(VerbExtension):
         print("### WS CMDS ###")
         pprint(ws_cmds)
         print("### WS CMDS ###")
-        self.execute_ws_cmds(create_args, ws_cmds, intermediate_container.id)
+        self.execute_ws_cmds(create_args, ws_cmds, intermediate_container)
 
         if create_args.docker:
             self.setup_rtw_in_intermediate_image(create_args, intermediate_container)

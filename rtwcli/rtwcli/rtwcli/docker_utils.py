@@ -28,9 +28,14 @@ def is_docker_tag_valid(tag: str) -> bool:
         return False
 
 
-def docker_build(dockerfile_path: str, tag: str) -> bool:
+def docker_build(tag: str, dockerfile_path: str, file: str = None, pull: bool = True) -> bool:
     """Build a docker image with the given tag from the given dockerfile path."""
-    docker_build_command = ["docker", "build", "-t", tag, dockerfile_path]
+    docker_build_command = ["docker", "build", "-t", tag]
+    if pull:
+        docker_build_command.append("--pull")
+    if file:
+        docker_build_command.extend(["-f", file])
+    docker_build_command.append(dockerfile_path)
     return run_command(docker_build_command)
 
 

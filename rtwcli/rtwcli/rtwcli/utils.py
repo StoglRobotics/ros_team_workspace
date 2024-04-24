@@ -100,6 +100,11 @@ def run_command(command, shell: bool = False, cwd: str = None, ignore_codes=None
     return False
 
 
+def run_bash_command(command: str, shell: bool = False, cwd: str = None) -> bool:
+    """Run a bash command and return True if it was successful."""
+    return run_command(["bash", "-c", command], shell=shell, cwd=cwd)
+
+
 def create_temp_file(content: str = None) -> str:
     """Create a temporary file and return its path."""
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
