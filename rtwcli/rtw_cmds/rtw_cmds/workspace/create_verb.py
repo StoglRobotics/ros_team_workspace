@@ -112,7 +112,7 @@ class CreateVerbArgs:
     intermediate_dockerfile_name: str = None
     intermediate_dockerfile_save_folder: str = None
     has_upstream_ws: bool = False
-    raise_on_ws_cmd_error: bool = True
+    ignore_ws_cmd_error: bool = False
 
     @property
     def ws_name(self) -> str:
@@ -455,6 +455,12 @@ class CreateVerb(VerbExtension):
             ),
             default=None,
         )
+        parser.add_argument(
+            "--ignore-ws-cmd-error",
+            action="store_true",
+            help="Ignore errors when executing workspace commands (rosdep install, colcon build).",
+            default=False,
+        )
 
     def generate_intermediate_dockerfile_content(self, create_args: CreateVerbArgs) -> str:
         if create_args.apt_packages:
@@ -601,51 +607,41 @@ class CreateVerb(VerbExtension):
         for ws_cmd in ws_cmds:
             print(f"Running ws command: {ws_cmd}")
             ws_cmd_str = " ".join(ws_cmd)
+            error_msg = f"Failed to execute ws command '{ws_cmd_str}'"
             if create_args.docker:
                 if not docker_exec_bash_cmd(intermediate_container.id, ws_cmd_str):
-                    if create_args.raise_on_ws_cmd_error:
-                        docker_stop(intermediate_container.id)
-                        raise RuntimeError(f"Failed to execute ws command '{ws_cmd_str}'")
+                    if create_args.ignore_ws_cmd_error:
+                        print(error_msg)
                     else:
-                        print(f"Failed to execute ws command '{ws_cmd_str}'")
+                        docker_stop(intermediate_container.id)
+                        raise RuntimeError(error_msg)
             else:
                 if not run_bash_command(ws_cmd_str):
-                    if create_args.raise_on_ws_cmd_error:
-                        raise RuntimeError(f"Failed to execute ws command '{ws_cmd_str}'")
+                    if create_args.ignore_ws_cmd_error:
+                        print(error_msg)
                     else:
-                        print(f"Failed to execute ws command '{ws_cmd_str}'")
+                        raise RuntimeError(error_msg)
 
-        if create_args.docker:
-            print("Changing workspace folder permissions in the intermediate container.")
+    def change_ws_folder_permissions(
+        self, create_args: CreateVerbArgs, intermediate_container: Any
+    ):
+        print("Changing workspace folder permissions in the intermediate container.")
+        if not change_docker_path_permissions(intermediate_container.id, create_args.ws_abs_path):
+            docker_stop(intermediate_container.id)
+            raise RuntimeError(
+                "Failed to change permissions for the main workspace folder "
+                f"{create_args.ws_abs_path}"
+            )
+
+        if create_args.has_upstream_ws:
             if not change_docker_path_permissions(
-                intermediate_container.id, create_args.ws_abs_path
+                intermediate_container.id, create_args.upstream_ws_abs_path
             ):
-                if create_args.raise_on_ws_cmd_error:
-                    docker_stop(intermediate_container.id)
-                    raise RuntimeError(
-                        "Failed to change permissions for the main workspace folder "
-                        f"{create_args.ws_abs_path}"
-                    )
-                else:
-                    print(
-                        "Failed to change permissions for the main workspace folder "
-                        f"{create_args.ws_abs_path}"
-                    )
-            if create_args.has_upstream_ws:
-                if not change_docker_path_permissions(
-                    intermediate_container.id, create_args.upstream_ws_abs_path
-                ):
-                    if create_args.raise_on_ws_cmd_error:
-                        docker_stop(intermediate_container.id)
-                        raise RuntimeError(
-                            "Failed to change permissions for the upstream workspace folder "
-                            f"{create_args.upstream_ws_abs_path}"
-                        )
-                    else:
-                        print(
-                            "Failed to change permissions for the upstream workspace folder "
-                            f"{create_args.upstream_ws_abs_path}"
-                        )
+                docker_stop(intermediate_container.id)
+                raise RuntimeError(
+                    "Failed to change permissions for the upstream workspace folder "
+                    f"{create_args.upstream_ws_abs_path}"
+                )
 
     def setup_rtw_in_intermediate_image(
         self, create_args: CreateVerbArgs, intermediate_container: Any
@@ -795,6 +791,7 @@ class CreateVerb(VerbExtension):
         self.execute_ws_cmds(create_args, ws_cmds, intermediate_container)
 
         if create_args.docker:
+            self.change_ws_folder_permissions(create_args, intermediate_container)
             self.setup_rtw_in_intermediate_image(create_args, intermediate_container)
             if not self.execute_rocker_cmd(create_args):
                 # ask the user to still save ws config even if there was a rocker error
