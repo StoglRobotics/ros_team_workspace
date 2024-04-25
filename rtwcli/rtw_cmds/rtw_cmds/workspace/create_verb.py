@@ -577,13 +577,13 @@ class CreateVerb(VerbExtension):
             create_args.upstream_ws_src_abs_path
         )
 
-        rosdep_cmds = [["apt-get", "update"], ["rosdep", "update"]]
+        rosdep_cmds = [["sudo", "apt-get", "update"], ["rosdep", "update"]]
         rosdep_install_cmd_base = ["rosdep", "install", "-i", "-r", "-y", "--from-paths"]
         if has_upstream_ws_packages:
             rosdep_cmds.append(rosdep_install_cmd_base + [create_args.upstream_ws_src_abs_path])
         if has_ws_packages:
             rosdep_cmds.append(rosdep_install_cmd_base + [create_args.ws_src_abs_path])
-        rosdep_cmds.append(["rm", "-rf", "/var/lib/apt/lists/*"])
+        rosdep_cmds.append(["sudo", "rm", "-rf", "/var/lib/apt/lists/*"])
 
         compile_cmds = []
         if create_args.has_upstream_ws:
