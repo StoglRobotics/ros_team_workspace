@@ -25,7 +25,6 @@ import questionary
 from rtwcli.constants import (
     BASHRC_PATH,
     ROS_TEAM_WS_GIT_HTTPS_URL,
-    ROS_TEAM_WS_PATH,
     SKEL_BASHRC_PATH,
     WORKSPACES_PATH,
 )
@@ -62,6 +61,7 @@ DEFAULT_INTERMEDIATE_IMAGE_NAME_FORMAT = "rtw_{base_image_name}_intermediate"
 DEFAULT_FINAL_IMAGE_NAME_FORMAT = "rtw_{workspace_name}_final"
 DEFAULT_CONTAINER_NAME_FORMAT = "{final_image_name}-instance"
 DEFAULT_RTW_DOCKER_BRANCH = "rtw_ws_create"
+DEFAULT_RTW_DOCKER_PATH = os.path.expanduser("~/ros_team_workspace")
 DEFAULT_UPSTREAM_WS_NAME_FORMAT = "{workspace_name}_upstream"
 DEFAULT_WS_REPOS_FILE_FORMAT = "{repo_name}.{ros_distro}.repos"
 DEFAULT_UPSTREAM_WS_REPOS_FILE_FORMAT = "{repo_name}.{ros_distro}.upstream.repos"
@@ -419,7 +419,7 @@ class CreateVerb(VerbExtension):
             "--rtw-docker-clone-abs-path",
             type=str,
             help="Absolute path to clone the ros_team_workspace repo for the docker workspace.",
-            default=ROS_TEAM_WS_PATH,
+            default=DEFAULT_RTW_DOCKER_PATH,
         )
         parser.add_argument(
             "--apt_packages",
