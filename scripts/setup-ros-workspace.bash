@@ -10,10 +10,10 @@ if [ -z "$ros_distributions_20_04" ]; then
   readonly ros_distributions_20_04=("noetic" "foxy" "galactic")
 fi
 if [ -z "$ros_distributions_22_04" ]; then
-  readonly ros_distributions_22_04=("humble" "iron" "rolling")
+  readonly ros_distributions_22_04=("humble" "iron")
 fi
 if [ -z "$ros_distributions_22_and_24_04" ]; then
-  readonly ros_distributions_22_and_24_04=()
+  readonly ros_distributions_22_and_24_04=("rolling")
 fi
 
 ubuntu_20_04_version="ubuntu:20.04"
@@ -43,8 +43,8 @@ select_normal_or_nvidia_docker() {
       ubuntu_version="ubuntu20.04"
     elif [[ "$ubuntu_version" == "${ubuntu_22_04_version}" ]]; then
       ubuntu_version="ubuntu22.04"
-    else
-      print_and_exit "Something went wrong. The Ubuntu version ${ubuntu_version} should be supported by nvidia but somehow it's not."
+    elif [[ "$ubuntu_version" == "${ubuntu_24_04_version}" ]]; then
+      print_and_exit "${ubuntu_version} support by nvidia not released. Hopefully will come soon."
     fi
     ubuntu_version_tag=${ubuntu_version_tag}_nvidia
     docker_file="nvidia.dockerfile"

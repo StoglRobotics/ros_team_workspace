@@ -44,10 +44,11 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r
 
 # install ROS:ROS_DUMMY_VERSION and things needed for ros development, DEBIAN_FRONTEND is needed to ignore interactive keyboard layout setting while install
 RUN nala update && DEBIAN_FRONTEND=noniteractive nala install -y ros-ROS_DUMMY_VERSION-desktop python3-colcon-common-extensions python3-vcstool
+RUN apt install -y python3-rosdep && rosdep init
 
 # setup ros_team_ws
 RUN git clone -b ROS_TEAM_WS_DUMMY_BRANCH https://github.com/StoglRobotics/ros_team_workspace.git /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/
-RUN cd /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/rtwcli && pip3 install -r requirements.txt && cd -
+RUN cd /opt/RosTeamWS/ros_ws_ROS_DUMMY_VERSION/src/ros_team_workspace/rtwcli && python3 -m pip install -r requirements.txt && cd -
 
 # setup standard .bashrc
 COPY bashrc ${home}/.bashrc
@@ -66,9 +67,5 @@ RUN mkdir -p ${home} && \
 
 #switch to user
 USER ${user}
-RUN python3 -m pip3 install pre-commit
-RUN python3 -m pip3 install -U rosdep
-USER root
-RUN rosdep init
-USER ${user}
+RUN python3 -m pip install pre-commit
 WORKDIR ${home}
