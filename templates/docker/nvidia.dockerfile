@@ -35,7 +35,6 @@ ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPA
 
 # Install basic utilities
 RUN nala update && nala install -y git git-lfs nano sudo tmux tree vim iputils-ping wget bash-completion pip trash-cli
-RUN pip install pre-commit
 
 # install ROS:ROS_DUMMY_VERSION dependencies
 RUN nala install -y curl gnupg gnupg2 lsb-release software-properties-common && apt-add-repository universe
@@ -71,5 +70,10 @@ RUN mkdir -p ${home} && \
   chown ${uid}:${gid} -R ${home}
 
 #switch to user
+USER ${user}
+RUN python3 -m pip3 install pre-commit
+RUN python3 -m pip3 install -U rosdep
+USER root
+RUN rosdep init
 USER ${user}
 WORKDIR ${home}

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load Framework defines
-setup_ws_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+setup_ws_script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $setup_ws_script_own_dir/../setup.bash
 source $setup_ws_script_own_dir/docker/_RosTeamWs_Docker_Defines.bash
 
@@ -10,16 +10,18 @@ if [ -z "$ros_distributions_20_04" ]; then
   readonly ros_distributions_20_04=("noetic" "foxy" "galactic")
 fi
 if [ -z "$ros_distributions_22_04" ]; then
-  readonly ros_distributions_22_04=("humble" "iron")
+  readonly ros_distributions_22_04=("humble" "iron" "rolling")
 fi
-if [ -z "$ros_distributions_20_and_22_04" ]; then
-  readonly ros_distributions_20_and_22_04=("rolling")
+if [ -z "$ros_distributions_22_and_24_04" ]; then
+  readonly ros_distributions_22_and_24_04=()
 fi
 
 ubuntu_20_04_version="ubuntu:20.04"
 ubuntu_20_04_tag="ubuntu_20_04"
 ubuntu_22_04_version="ubuntu:22.04"
 ubuntu_22_04_tag="ubuntu_22_04"
+ubuntu_24_04_version="ubuntu:24.04"
+ubuntu_24_04_tag="ubuntu_24_04"
 
 select_normal_or_nvidia_docker() {
   # setup Dockerfile: set correct docker version
@@ -49,12 +51,12 @@ select_normal_or_nvidia_docker() {
     notify_user "NOTE: Make sure that you have setup nvidia-drivers to support this!"
     notify_user "To abort press <CTRL>+<C>, to continue press <ENTER>."
     read
+    ;;
   esac
-
 
 }
 
-check_user_input () {
+check_user_input() {
   ws_path="$1"
   if [ -z "$ws_path" ] || [[ "$ws_path" == "-" ]]; then
     ws_path="workspace"
@@ -71,7 +73,25 @@ check_user_input () {
 
   if [ "$use_docker" == true ]; then
     # according to selected ros distro the ubuntu version is selected.
-    if [[ " ${ros_distributions_20_04[*]} " =~ " ${ros_distro} " ]]; then
+    if [[ " ${ros_distributions_22_and_24_04[*]} " =~ " ${ros_distro} " ]]; then
+      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}'$ros_distro' is currently supported on multiple versions of Ubuntu. Which version of ubuntu would you like to choose:"
+      select ubuntu_version in Ubuntu_22_04 Ubuntu_24_04; do
+        case "$ubuntu_version" in
+        Ubuntu_22_04)
+          ubuntu_version=${ubuntu_22_04_version}
+          ubuntu_version_tag=${ubuntu_22_04_tag}
+          break
+          ;;
+        Ubuntu_24_04)
+          ubuntu_version=${ubuntu_24_04_version}
+          ubuntu_version_tag=${ubuntu_24_04_tag}
+          break
+          ;;
+        esac
+      done
+      echo -n -e "${TERMINAL_COLOR_NC}"
+      select_normal_or_nvidia_docker
+    elif [[ " ${ros_distributions_20_04[*]} " =~ " ${ros_distro} " ]]; then
       ubuntu_version=${ubuntu_20_04_version}
       ubuntu_version_tag=${ubuntu_20_04_tag}
       user_decision "The ros distribution ${ros_distro} is currently only on ${ubuntu_version} supported! Continue?"
@@ -87,38 +107,19 @@ check_user_input () {
         print_and_exit "Aborting creation of new docker workspace. Exiting..."
       fi
       select_normal_or_nvidia_docker
-    elif [[ " ${ros_distributions_20_and_22_04[*]} " =~ " ${ros_distro} " ]]; then
-      echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}'$ros_distro' is currently supported on multiple versions of Ubuntu. Which version of ubuntu would you like to choose:"
-      select ubuntu_version in Ubuntu_20_04 Ubuntu_22_04;
-      do
-        case "$ubuntu_version" in
-              Ubuntu_20_04)
-                  ubuntu_version=${ubuntu_20_04_version}
-                  ubuntu_version_tag=${ubuntu_20_04_tag}
-                  break
-                ;;
-              Ubuntu_22_04)
-                  ubuntu_version=${ubuntu_22_04_version}
-                  ubuntu_version_tag=${ubuntu_22_04_tag}
-                  break
-                ;;
-        esac
-      done
-      echo -n -e "${TERMINAL_COLOR_NC}"
-      select_normal_or_nvidia_docker
     else
       print_and_exit "The selected ros distribution ${ros_distro} is not supported for docker workspaces!"
     fi
   fi
 }
 
-setup_new_workspace () {
+setup_new_workspace() {
   ros_distro_base_workspace_source_path="/opt/ros/$ros_distro/setup.bash"
 
-#   # TODO: Write this automatically from the user's definitions
-#   echo "Please choose which workspace should be basis for yours:"
-#   echo "(0) <Use current sourced workspace> (or if non sourced, source '${ros_distro_base_workspace_source_path}')"
-#   read choice
+  #   # TODO: Write this automatically from the user's definitions
+  #   echo "Please choose which workspace should be basis for yours:"
+  #   echo "(0) <Use current sourced workspace> (or if non sourced, source '${ros_distro_base_workspace_source_path}')"
+  #   read choice
 
   # TODO(destogl): This is only temporarily solution until we offer different base-workspaces support (above commented lines)
   choice="0"
@@ -140,6 +141,7 @@ setup_new_workspace () {
     ;;
   *)
     print_and_exit "No workspace chosen! Exiting..."
+    ;;
   esac
 
   base_ws_path=""
@@ -206,7 +208,7 @@ setup_ros_team_ws_file() {
     print_and_exit "Not specified if docker should be used. Cannot setup workspace defines."
   fi
   local use_docker=$2
-    if [ -z "$2" ]; then
+  if [ -z "$2" ]; then
     print_and_exit "Not specified if ros_teamws_file is for docker. Cannot setup workspace defines."
   fi
   local is_docker_rtw_file=$3
@@ -230,7 +232,7 @@ setup_ros_team_ws_file() {
       old_alias_line_number=$(grep -n "OLD_${alias_name}=OLD_${fun_name}" "$ros_team_ws_file" | grep -Eo '^[^:]+')
       # uncomment
       if ! [ -z "$old_alias_line_number" ]; then
-          sed -i "${old_alias_line_number},${old_alias_line_number}s|^|#|g" "$ros_team_ws_file"
+        sed -i "${old_alias_line_number},${old_alias_line_number}s|^|#|g" "$ros_team_ws_file"
       fi
     else
       print_and_exit "No $ros_team_ws_file found! Please first setup auto sourcing with the \"setup-auto-sourcing\" command."
@@ -253,21 +255,20 @@ setup_ros_team_ws_file() {
     source_path_rtw=" source $FRAMEWORK_BASE_PATH/scripts/environment/setup.bash \"\$RosTeamWS_DISTRO\" \"\$RosTeamWS_WS_FOLDER\""
   fi
 
-  echo "" >> "$ros_team_ws_file"
-  echo "$fun_name () {" >> "$ros_team_ws_file"
-  echo "  RosTeamWS_BASE_WS=\"${base_ws}\"" >> "$ros_team_ws_file"
-  echo "  RosTeamWS_DISTRO=\"${chosen_ros_distro}\"" >> "$ros_team_ws_file"
-  echo "  RosTeamWS_WS_FOLDER=\"${new_workspace_location}\"" >> "$ros_team_ws_file"
-  echo "  RosTeamWS_WS_DOCKER_SUPPORT=\"${docker_support}\"" >> "$ros_team_ws_file"
-  echo "  RosTeamWS_DOCKER_TAG=\"${docker_image_tag}\"" >> "$ros_team_ws_file"
-  echo "$source_path_rtw" >> "$ros_team_ws_file"
-  echo "}" >> "$ros_team_ws_file"
-  echo "alias $alias_name=$fun_name" >> "$ros_team_ws_file"
+  echo "" >>"$ros_team_ws_file"
+  echo "$fun_name () {" >>"$ros_team_ws_file"
+  echo "  RosTeamWS_BASE_WS=\"${base_ws}\"" >>"$ros_team_ws_file"
+  echo "  RosTeamWS_DISTRO=\"${chosen_ros_distro}\"" >>"$ros_team_ws_file"
+  echo "  RosTeamWS_WS_FOLDER=\"${new_workspace_location}\"" >>"$ros_team_ws_file"
+  echo "  RosTeamWS_WS_DOCKER_SUPPORT=\"${docker_support}\"" >>"$ros_team_ws_file"
+  echo "  RosTeamWS_DOCKER_TAG=\"${docker_image_tag}\"" >>"$ros_team_ws_file"
+  echo "$source_path_rtw" >>"$ros_team_ws_file"
+  echo "}" >>"$ros_team_ws_file"
+  echo "alias $alias_name=$fun_name" >>"$ros_team_ws_file"
 
 }
 
-source_and_update_ws()
-{
+source_and_update_ws() {
   if [ -z "$1" ]; then
     print_and_exit "No ros_team_ws_file given."
   fi
@@ -284,12 +285,12 @@ source_and_update_ws()
   fi
 }
 
-setup_docker_files () {
+setup_docker_files() {
   echo "Not implemented"
 }
 
 # workspace folder is relative to your home
-create_workspace () {
+create_workspace() {
   local usage="setup-ros-workspace create_workspace WS_FOLDER ROS_DISTRO"
   local use_docker=false
 
@@ -306,7 +307,7 @@ create_workspace () {
   echo -e "${RTW_COLOR_NOTIFY_USER}Finished creating new workspace: Please open a new terminal and execute '$alias_name'${TERMINAL_COLOR_NC} (if you have setup auto sourcing)."
 }
 
-create_workspace_docker () {
+create_workspace_docker() {
   local usage="setup-ros-workspace-docker WS_FOLDER ROS_DISTRO"
   local use_docker=true
 
@@ -315,14 +316,14 @@ create_workspace_docker () {
   local chosen_ros_distro=$ros_distro # need to store, ros_distro gets overwritten while creating workspace...
   # check if selected chosen_ros_distro is supported, before we start creating a new workspace
   local docker_ros_distro_name
-  if [[ -v "map_to_docker_ros_distro_name[$chosen_ros_distro]" ]];then
+  if [[ -v "map_to_docker_ros_distro_name[$chosen_ros_distro]" ]]; then
     # first get name for creating correct ros distro in docker
     docker_ros_distro_name=${map_to_docker_ros_distro_name["$chosen_ros_distro"]}
   else
     print_and_exit "For $chosen_ros_distro does no docker container exist."
   fi
   local rtw_branch_for_ros_distro
-  if [[ -v "ros_distro_to_rtw_branch[$docker_ros_distro_name]" ]];then
+  if [[ -v "ros_distro_to_rtw_branch[$docker_ros_distro_name]" ]]; then
     rtw_branch_for_ros_distro=${ros_distro_to_rtw_branch["$docker_ros_distro_name"]}
   else
     print_and_exit "For $docker_ros_distro_name does no RosTeamWorkspace branch exist."
@@ -351,8 +352,8 @@ create_workspace_docker () {
   local docker_ws_path
   docker_ws_path="${new_workspace_location}"
   sed -i "s|DUMMY_WS_FOLDER|${docker_ws_path}|g" "$ws_docker_folder/bashrc"
-  echo "" >> "$ws_docker_folder/bashrc"
-  echo "$alias_name" >> "$ws_docker_folder/bashrc"
+  echo "" >>"$ws_docker_folder/bashrc"
+  echo "$alias_name" >>"$ws_docker_folder/bashrc"
 
   cp "$DOCKER_TEMPLATES/$docker_file" "$ws_docker_folder/Dockerfile"
   sed -i "s/UBUNTU_DUMMY_VERSION/${ubuntu_version}/g" "$ws_docker_folder/Dockerfile"
@@ -364,32 +365,32 @@ create_workspace_docker () {
 
     # Add ROS 1 repositories
     mv $DOCKER_FILE "$TMP_FILE"
-    TEST_LINE=`awk '$1 == "#" && $2 == "ROS2" && $3 == "repository" { print NR }' $TMP_FILE`  # get line before `# ROS2 repository`
+    TEST_LINE=$(awk '$1 == "#" && $2 == "ROS2" && $3 == "repository" { print NR }' $TMP_FILE) # get line before `# ROS2 repository`
     let CUT_LINE=$TEST_LINE-1
-    head -$CUT_LINE $TMP_FILE > $DOCKER_FILE
+    head -$CUT_LINE $TMP_FILE >$DOCKER_FILE
 
-    echo "# ROS repository" >> $DOCKER_FILE
-    echo "RUN echo \"deb [arch=\$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros/ubuntu \$(lsb_release -sc) main\" | tee /etc/apt/sources.list.d/ros.list > /dev/null" >> $DOCKER_FILE
-    echo "" >> $DOCKER_FILE
+    echo "# ROS repository" >>$DOCKER_FILE
+    echo "RUN echo \"deb [arch=\$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros/ubuntu \$(lsb_release -sc) main\" | tee /etc/apt/sources.list.d/ros.list > /dev/null" >>$DOCKER_FILE
+    echo "" >>$DOCKER_FILE
 
     # Add last part
     let CUT_LINE=$TEST_LINE+0
-    tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
+    tail -n +$CUT_LINE $TMP_FILE >>$DOCKER_FILE
 
     # Add repositories for Nala
     mv $DOCKER_FILE "$TMP_FILE"
-    TEST_LINE=`awk '$1 == "#" && $2 == "install" && $3 == "nala" { print NR }' $TMP_FILE`  # get line before `# install nala and upgrade` dependency
+    TEST_LINE=$(awk '$1 == "#" && $2 == "install" && $3 == "nala" { print NR }' $TMP_FILE) # get line before `# install nala and upgrade` dependency
     let CUT_LINE=$TEST_LINE-0
-    head -$CUT_LINE $TMP_FILE > $DOCKER_FILE
+    head -$CUT_LINE $TMP_FILE >$DOCKER_FILE
 
-    echo "RUN apt update -y && apt install -y wget" >> $DOCKER_FILE
-    echo "RUN echo \"deb [arch=amd64,arm64,armhf] http://deb.volian.org/volian/ scar main\" | tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list" >> $DOCKER_FILE
-    echo "RUN wget -qO - https://deb.volian.org/volian/scar.key | tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg > /dev/null" >> $DOCKER_FILE
-    echo "RUN apt update -y && apt install -y nala-legacy" >> $DOCKER_FILE
+    echo "RUN apt update -y && apt install -y wget" >>$DOCKER_FILE
+    echo "RUN echo \"deb [arch=amd64,arm64,armhf] http://deb.volian.org/volian/ scar main\" | tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list" >>$DOCKER_FILE
+    echo "RUN wget -qO - https://deb.volian.org/volian/scar.key | tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg > /dev/null" >>$DOCKER_FILE
+    echo "RUN apt update -y && apt install -y nala-legacy" >>$DOCKER_FILE
 
     # Add last part
     let CUT_LINE=$TEST_LINE+2
-    tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
+    tail -n +$CUT_LINE $TMP_FILE >>$DOCKER_FILE
 
     # Cleanup temp files
     rm $TMP_FILE

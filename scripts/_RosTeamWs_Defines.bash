@@ -31,14 +31,6 @@ if [ -z "$rtw_supported_ros_distributions" ]; then
   readonly rtw_supported_ros_distributions=("noetic" "foxy" "galactic" "humble" "iron" "rolling")
 fi
 
-# Mapping of ubuntu version and supported ros distributions
-if [ -z "$ubuntu_20_04_supported_ros_distributions" ]; then
-  readonly ubuntu_20_04_supported_ros_distributions=("noetic" "foxy" "galactic" "rolling")
-fi
-if [ -z "$ubuntu_22_04_supported_ros_distributions" ]; then
-  readonly ubuntu_22_04_supported_ros_distributions=("rolling" "humble")
-fi
-
 # This needs to be set for every branch
 # Check the set_supported_versions functions below and update as fit.
 RTW_BRANCH_ROS_DISTRO="rolling"
@@ -70,11 +62,11 @@ function set_supported_versions {
   *)
     print_and_exit "FATAL: the RTW_BRANCH_ROS_DISTRO in the _RosTeamWs_Defines.bash is set to a not supported ros distribution. This should never happen. Please set to the correct branch name which can be either of:${rtw_supported_ros_distributions}."
     ;;
-esac
+  esac
 
 }
 function RosTeamWS_script_own_dir {
-  echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+  echo "$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 }
 
 function RosTeamWS_setup_exports {
@@ -125,7 +117,7 @@ function RosTeamWS_setup_exports {
 # TODO(denis): add this into setup.bash
 function RosTeamWS_setup_aliases {
 
-# ROS
+  # ROS
   alias rosd="cd \$ROS_WS"
   alias rosds="cd \$ROS_WS/src"
   alias rosdb="cd \$ROS_WS/build"
@@ -135,21 +127,20 @@ function RosTeamWS_setup_aliases {
 
 function RosTeamWS_setup_ros1_exports {
 
-export ROSCONSOLE_FORMAT='[${severity}] [${walltime}: ${logger}] [${node}@${file}.${function}:${line}]: ${message}'
-export ROSCONSOLE_CONFIG_FILE='~/workspace/ros_ws/rosconsole.config'
+  export ROSCONSOLE_FORMAT='[${severity}] [${walltime}: ${logger}] [${node}@${file}.${function}:${line}]: ${message}'
+  export ROSCONSOLE_CONFIG_FILE='~/workspace/ros_ws/rosconsole.config'
 
 }
 
 function RosTeamWS_setup_ros1_aliases {
 
-# ROS
+  # ROS
   alias rosdd="cd \$ROS_WS/devel"
 
-# Catkin
+  # Catkin
   alias cb="catkin build"
 
 }
-
 
 function RosTeamWS_setup_ros2_exports {
 
@@ -159,10 +150,10 @@ function RosTeamWS_setup_ros2_exports {
 
 function RosTeamWS_setup_ros2_aliases {
 
-# ROS
+  # ROS
   alias rosdi="cd \$ROS_WS/install"
 
-# COLCON
+  # COLCON
   alias cb="colcon_build"
   alias cbd="colcon_build_debug"
   alias cbr="colcon_build_release"
@@ -178,7 +169,6 @@ function RosTeamWS_setup_ros2_aliases {
 
   alias crm="colcon_remove"
 }
-
 
 ## some colcon helpers
 function colcon_helper_ros2 {
@@ -216,7 +206,7 @@ function colcon_helper_ros2_up_to {
 }
 
 function colcon_build {
-  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo"  "$*"
+  colcon_helper_ros2 "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo" "$*"
 }
 
 function colcon_build_up_to {
@@ -327,8 +317,7 @@ function user_decision {
   echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}${TERMINAL_COLOR_NC} [${rtw_accepted_answers[*]}]"
   read user_answer
 
-  while ! $(is_accepted_user_answer "$user_answer");
-  do
+  while ! $(is_accepted_user_answer "$user_answer"); do
     echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}${decision}${TERMINAL_COLOR_NC} ${TERMINAL_COLOR_USER_NOTICE}Please type one of the following:${TERMINAL_COLOR_NC} [${rtw_accepted_answers[*]}]"
     read user_answer
   done
@@ -435,8 +424,8 @@ function set_framework_default_paths {
 }
 
 function is_valid_ros_distribution {
-    local ros_distribution=$1
-    declare -a supported_ros_versions=("${!2}")
+  local ros_distribution=$1
+  declare -a supported_ros_versions=("${!2}")
 
   if [[ " ${supported_ros_versions[*]} " =~ " ${ros_distribution} " ]]; then
     return
@@ -454,14 +443,13 @@ function check_ros_distro {
   fi
 
   # check if the given distribution is a distribution supported by rtw
-  while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@];
-  do
+  while ! is_valid_ros_distribution "$ros_distro" rtw_supported_ros_distributions[@]; do
     if [ -z "$ros_distro" ]; then
       echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}No ROS distribution provided. Please choose either of the following:${rtw_supported_ros_distributions[*]}"
     else
       echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ROS distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please choose either of the following:${rtw_supported_ros_distributions[*]}"
     fi
-      read ros_distro
+    read ros_distro
   done
 
   # inside docker container we don't need to check if ros distro is present on system
@@ -493,27 +481,27 @@ function set_ros_version_for_distro {
   local ros_distribution=$1
 
   case $ros_distribution in
-    noetic)
-      ros_version=1
-      ;;
-    foxy)
-      ros_version=2
-      ;;
-    galactic)
-      ros_version=2
-      ;;
-    humble)
-      ros_version=2
-      ;;
-    iron)
-      ros_version=2
-      ;;
-    rolling)
-      ros_version=2
-      ;;
-    *)
-      print_and_exit "FATAL: For the chosen ros distribution ${ros_distribution} there is no ros version."
-      ;;
+  noetic)
+    ros_version=1
+    ;;
+  foxy)
+    ros_version=2
+    ;;
+  galactic)
+    ros_version=2
+    ;;
+  humble)
+    ros_version=2
+    ;;
+  iron)
+    ros_version=2
+    ;;
+  rolling)
+    ros_version=2
+    ;;
+  *)
+    print_and_exit "FATAL: For the chosen ros distribution ${ros_distribution} there is no ros version."
+    ;;
   esac
 }
 
@@ -551,11 +539,14 @@ function compile_and_source_package {
     if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
       print_and_exit "Aborting. Not the correct workspace sourced. Please source the correct workspace folder and compile manually."
     fi
-  # set ROS_WS ourselves, as other functions need it later and will fail/use wrong path otherwise
-  export ROS_WS="$sourced_ws_dirname"
+    # set ROS_WS ourselves, as other functions need it later and will fail/use wrong path otherwise
+    export ROS_WS="$sourced_ws_dirname"
   fi
 
-  cd "$ROS_WS" || { print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."; return 1; }
+  cd "$ROS_WS" || {
+    print_and_exit "Could not change directory to workspace:\"$ROS_WS\". Check your workspace names in .ros_team_ws_rc and try again."
+    return 1
+  }
 
   colcon_build_up_to $pkg_name
   source install/setup.bash
