@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.7.1-base-UBUNTU_DUMMY_VERSION
+FROM nvidia/cuda:12.4.1-base-UBUNTU_DUMMY_VERSION
 
 #Arguments maybe add defaults?
 ARG user
