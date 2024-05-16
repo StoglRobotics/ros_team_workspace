@@ -217,7 +217,7 @@ def env_var_to_workspace_var(env_var: str, env_var_value: str) -> str:
 
 def workspace_var_to_env_var(ws_var: str, ws_var_value: Any) -> str:
     env_var = ROS_TEAM_WS_PREFIX + ws_var.upper()
-    if type(ws_var_value) == bool:
+    if type(ws_var_value) is bool:
         env_var_value = str(ws_var_value).lower()
     else:
         env_var_value = ws_var_value
