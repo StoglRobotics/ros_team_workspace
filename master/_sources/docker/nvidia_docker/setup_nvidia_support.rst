@@ -180,7 +180,7 @@ If you get any error follow the next steps to be sure that the expected version 
 4. If you have issues with the graphics after restart do the following:
 
    1. Close your eyes and breathe slowely in and out at least once :)
-   2. You probably didn't install everything properly so the open-source ``noveau`` driver is used which is not adequate for this scenario.
+   2. You probably didn't install everything properly so the open-source ``nouveau`` driver is used which is not adequate for this scenario.
    3. Use ``<CTRL> + <ALT> + <F2-3-4...>`` keys to switch to a linux terminal.
    4. Login there and execute ``ubuntu-drivers`` command to install missing drivers.
    5. Now restart again and everything should work properly.
