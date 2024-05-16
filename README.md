@@ -21,7 +21,7 @@ Its main goal is to optimize the workflow of development teams and focus more on
 
 This package targets the following stakeholders:
 
-* **Robotic Companies** to have a unified, overview repository of their use-cases, enable across-teams re-use of ROS packages, and to define "standardized" development structure.
+* **Robotic Companies** to have a unified, overview repository of their use-cases, enable across-teams reuse of ROS packages, and to define "standardized" development structure.
 * **Robotic Consultants** to simplify ROS packages' management and provide open and documented package-structure for their customers.
 * **R&D Departments** to propagate the packages across their development stages by keeping simple access and sharing policy.
 * **Research Labs** to organize their work across research groups and reduce onboarding time for new students.
