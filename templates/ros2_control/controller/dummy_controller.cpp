@@ -205,7 +205,7 @@ controller_interface::CallbackReturn DummyClassName::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   // TODO(anyone): if you have to manage multiple interfaces that need to be sorted check
-  // `on_activate` method in `JointTrajectoryController` for examplary use of
+  // `on_activate` method in `JointTrajectoryController` for exemplary use of
   // `controller_interface::get_ordered_interfaces` helper function
 
   // Set default value in command

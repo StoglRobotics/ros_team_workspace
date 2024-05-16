@@ -1,1 +1,23 @@
 docs/_build/*
+
+# Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# temporary files
+*~
+
+# Visual Studio
+.vscode/*
+
+# Kate
+*.kate-swp
+
+# Vim temporary swap files.
+*.swp
+
+# Merge files.
+*.orig
+*.rej

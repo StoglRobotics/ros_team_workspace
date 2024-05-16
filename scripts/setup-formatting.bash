@@ -27,7 +27,7 @@ source $script_own_dir/../setup.bash
 # Setting up formatting
 cp -n ${PACKAGE_TEMPLATES}/.clang-format .
 cp -n ${PACKAGE_TEMPLATES}/.pre-commit-config.yaml .
-touch ".codespell-ignore-words.txt"
+cp -n ${PACKAGE_TEMPLATES}/.codespell-ignore-words.txt .
 pre-commit install
 pre-commit autoupdate
 
