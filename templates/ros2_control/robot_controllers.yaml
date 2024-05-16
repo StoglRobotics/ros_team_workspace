@@ -67,6 +67,11 @@ joint_trajectory_controller:                  # delete entry if controller is no
       - joint5
       - joint6
 
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+
     state_publish_rate: 50.0 # Defaults to 50
     action_monitor_rate: 20.0 # Defaults to 20
 
