@@ -4,7 +4,7 @@ ROS-Robot Package structure
 
 This document proposes guidelines for the structure of ROS packages in larger details than provided by `ROS Enhancement Proposals (REPs) <https://github.com/ros-infrastructure/rep>`_
 
-**NOTE**: All the proposal here are the resuls of authors' personal experiences. Saying that, if you don't like some of it, you are free to change what you want and need (and hopefully propose it as PR).
+**NOTE**: All the proposal here are the results of authors' personal experiences. Saying that, if you don't like some of it, you are free to change what you want and need (and hopefully propose it as PR).
 
 Package structure for Robot support in ROS
 ------------------------------------------

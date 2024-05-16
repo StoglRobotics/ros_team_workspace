@@ -17,7 +17,7 @@
 docker_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 source $docker_script_own_dir/../_RosTeamWs_Defines.bash
 
-# assoziative array which maps the chosen rosdistro to the name which is used to install the corresponding
+# associative array which maps the chosen rosdistro to the name which is used to install the corresponding
 # ros distribution inside docker
 declare -r -A map_to_docker_ros_distro_name=( ["noetic"]="noetic" ["foxy"]="foxy" ["galactic"]="galactic" ["rolling"]="rolling" ["humble"]="humble" ["iron"]="iron")
 declare -r -A ros_distro_to_rtw_branch=( ["noetic"]="master" ["foxy"]="foxy" ["galactic"]="master" ["rolling"]="master" ["humble"]="master" ["iron"]="master")

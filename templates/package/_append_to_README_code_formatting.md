@@ -20,4 +20,4 @@ pre-commit run -a
 
 **NOTE**: make sure that you have sources your ROS workspace before running `pre-commit` because it uses some office ROS 2 `ament_*` formatters.
 
-Sometimes there might a need to avoid formatting of a certain commit. If so add `-n` flag to your `git commit` command to skip the `pre-commit` chekcs.
+Sometimes there might a need to avoid formatting of a certain commit. If so add `-n` flag to your `git commit` command to skip the `pre-commit` checks.
