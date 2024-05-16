@@ -17,9 +17,9 @@ The general package structure is the following:
 │   ├── <robot_name>_forward_position_publisher.yaml  # Setup test publisher for forward position controller
 │   └── <robot_name>_joint_trajectory_publisher.yaml  # Setup test publisher for joint trajectory controller
 └── launch/
-    ├── <robot_name>.launch.py                     # Robot's default launch file
-    ├── test_forward_position_controller.launch.py # Start test publisher for forward position controller
-    └── test_joint_trajectory_controller.launch.py # Start test publisher for joint trajectory controller
+    ├── <robot_name>.launch.xml                      # Robot's default launch file
+    ├── test_forward_position_controller.launch.xml  # Start test publisher for forward position controller
+    └── test_joint_trajectory_controller.launch.xml  # Start test publisher for joint trajectory controller
 
 ```
 
@@ -33,7 +33,7 @@ Consult the repository and [ros2_control documentation](https://ros-controls.git
 
 1. Start robot's hardware and load controllers (default configuration starts mock hardware)
    ```
-   ros2 launch $PKG_NAME$ $ROBOT_NAME$.launch.xml
+   ros2 launch $PKG_NAME$ $ROBOT_NAME$_control.launch.xml
    ```
 
 2. Open another terminal and check if your hardware is loaded properly:
@@ -54,13 +54,37 @@ Consult the repository and [ros2_control documentation](https://ros-controls.git
 
 ## Loading Controllers
 
-To move the robot you should load and start contorllers.
-To get feedback about robot's state `JointStateController` is used.
-to send command to the robot `ForwardCommandController` (direct goals) or `JointTrajectoryController` (interpolates trajectory).
+To move the robot you should load and start controllers.
+Check below the controller's setup for different components.
+
+### Mobile base
+
+To move the *differential drive* mobile robot [`DiffDriveController`](https://control.ros.org/master/doc/ros2_controllers/diff_drive_controller/doc/userdoc.html) controller is used.
+
+#### Differential Drive Controller
+Diff Drive Controller provides calculation of inverse kinematics for differential drive kinematics, by receiving velocity commands in Cartesian space and sending them to the hardware in joint space.
+In general it provides support for input velocities with (`geometry_msgs/TwistStamped`) and without (`geometry_msgs/Twist`) time stamp.
+
+  **NOTE**: As of today, February 2024, when the controller is used with Nav2, the input without timestamp should be used and you should set `use_stamped_vel` parameter to false. (It is expected that from ROS 2 Jazzy stamped version and new message `VelocityStamped` will be used!).
+
+To test the configuration of the DiffDriveController and movement of the robot use either.
+
+1. `teleop twist keyboard`:
+   ```
+   ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap /cmd_vel:=/diff_drive_controller/cmd_vel_unstamped
+   ```
+
+2. RQT-plugin `robot steering`. When you open it set the publish topic to `/diff_drive_controller/cmd_vel_unstamped`
+
+
+### Arms
+
+To get feedback about robot's state [`JointStateBroadcaster`](https://control.ros.org/master/doc/ros2_controllers/joint_state_broadcaster/doc/userdoc.html) is used.
+To send command to the robot [`ForwardCommandController`](https://control.ros.org/master/doc/ros2_controllers/forward_command_controller/doc/userdoc.html) (direct goals) or [`JointTrajectoryController`](https://control.ros.org/master/doc/ros2_controllers/joint_trajectory_controller/doc/userdoc.html) (interpolates trajectory).
 The sections below describe their usage.
 
-### Joint State Controller
-Joint state Controllers provides output of robot's internal states to `/joint_states` and `/dynamic_joint_states` ROS 2-topics.
+#### Joint State Broadcaster
+Joint State Broadcaster provides output of robot's internal states to `/joint_states` and `/dynamic_joint_states` ROS 2-topics.
 
 In a new terminal with sourced ROS 2 environment load, configure and start `joint_state_broadcaster`:
   ```
@@ -77,7 +101,7 @@ You should get similar response to:
 
 Now you should also see your robot represented correctly in the `rviz2`.
 
-### Using Forward Command Controllers
+#### Using Forward Command Controllers
 
 1. If you want to test hardware with `ForwardCommandController` first load and configure it. Controller types are e.g., "position", "velocity", and depend on configured names in the [`config/$ROBOT_NAME$_controllers.yaml`](config/$ROBOT_NAME$_controllers.yaml):
    ```
@@ -123,7 +147,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    ```
    b. Or you can start demo node which sends two goals every 5 seconds in a loop (**Only with position controller!**):
    ```
-   ros2 launch $PKG_NAME$ test_forward_position_controller.launch.py
+   ros2 launch $PKG_NAME$ test_forward_position_controller.launch.xml
    ```
 
 ### Using JointTrajectoryController (**Not working yet!**)
@@ -158,7 +182,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
 
 3. Send command to the controller using test node:
    ```
-   ros2 launch ros2_control_demo_robot test_joint_trajectory_controller.launch.py
+   ros2 launch ros2_control_demo_robot test_joint_trajectory_controller.launch.xml
    ```
 
 **NOTE**: You can switch contorllers (step 1 and 2) also with one command:
