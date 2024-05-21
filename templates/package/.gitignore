@@ -7,7 +7,7 @@ __pycache__/
 # temporary files
 *~
 
-# Visual Studio 
+# Visual Studio
 .vscode/*
 
 # Kate
