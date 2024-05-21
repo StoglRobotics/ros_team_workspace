@@ -21,7 +21,16 @@
 
 namespace dummy_package_namespace
 {
-DummyNode::DummyNode(const std::string & node_name) : rclcpp::Node(node_name) {}
+DummyNode::DummyNode(const std::string & node_name) : rclcpp::Node(node_name)
+{
+  param_listener_ = std::make_shared<dummy_node::ParamListener>(get_node_parameters_interface());
+
+  params_ = param_listener_->get_params();
+
+  RCLCPP_INFO(
+    get_logger(), "Initializing node '%s' with 'perfect_number' param '%s'.", node_name.c_str(),
+    params_.perfect_number.c_str());
+}
 
 }  // namespace dummy_package_namespace
 
