@@ -301,7 +301,7 @@ if [[ "$package_configured" == "no" ]]; then
   sed -i "s/$append_to_string/$append_to_string\\n\\n  <build_depend>generate_parameter_library<\/build_depend>/g" package.xml
 
   # CMakeLists.txt & package.xml: Add dependencies if they not exist
-  DEP_PKGS=("std_srvs" "realtime_tools" "rclcpp_lifecycle" "rclcpp" "pluginlib" "hardware_interface" "controller_interface" "control_msgs")
+  DEP_PKGS=$PKG_DEPS
 
   for DEP_PKG in "${DEP_PKGS[@]}"; do
     # package.xml
