@@ -203,11 +203,11 @@ class CreateVerbArgs:
     def handle_repos(self):
         if not self.ws_repos_file_name:
             self.ws_repos_file_name = DEFAULT_WS_REPOS_FILE_FORMAT.format(
-                repo_name=self.repos_containing_repository_url, ros_distro=self.ros_distro
+                repo_name=self.repos_containing_repository_name, ros_distro=self.ros_distro
             )
         if not self.upstream_ws_repos_file_name:
             self.upstream_ws_repos_file_name = DEFAULT_UPSTREAM_WS_REPOS_FILE_FORMAT.format(
-                repo_name=self.repos_containing_repository_url, ros_distro=self.ros_distro
+                repo_name=self.repos_containing_repository_name, ros_distro=self.ros_distro
             )
 
         if not git_clone(
