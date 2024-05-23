@@ -92,7 +92,7 @@ class CreateVerbArgs:
     ws_abs_path: str
     ros_distro: str
     docker: bool = False
-    repos_location_url: str = None
+    repos_containing_repository_url: str = None
     repos_branch: str = None
     repos_no_skip_existing: bool = False
     disable_nvidia: bool = False
@@ -131,14 +131,14 @@ class CreateVerbArgs:
         return os.path.join(self.upstream_ws_abs_path, "src")
 
     @property
-    def repos_location_repo_name(self) -> str:
-        if not self.repos_location_url:
+    def repos_containing_repository_name(self) -> str:
+        if not self.repos_containing_repository_url:
             return None
-        return self.repos_location_url.split("/")[-1].split(".")[0]
+        return self.repos_containing_repository_url.split("/")[-1].split(".")[0]
 
     @property
     def repos_clone_abs_path(self) -> str:
-        return os.path.join(self.ws_src_abs_path, self.repos_location_repo_name)
+        return os.path.join(self.ws_src_abs_path, self.repos_containing_repository_name)
 
     @property
     def ws_repos_file_abs_path(self) -> str:
@@ -203,21 +203,23 @@ class CreateVerbArgs:
     def handle_repos(self):
         if not self.ws_repos_file_name:
             self.ws_repos_file_name = DEFAULT_WS_REPOS_FILE_FORMAT.format(
-                repo_name=self.repos_location_repo_name, ros_distro=self.ros_distro
+                repo_name=self.repos_containing_repository_url, ros_distro=self.ros_distro
             )
         if not self.upstream_ws_repos_file_name:
             self.upstream_ws_repos_file_name = DEFAULT_UPSTREAM_WS_REPOS_FILE_FORMAT.format(
-                repo_name=self.repos_location_repo_name, ros_distro=self.ros_distro
+                repo_name=self.repos_containing_repository_url, ros_distro=self.ros_distro
             )
 
-        if not git_clone(self.repos_location_url, self.repos_branch, self.repos_clone_abs_path):
+        if not git_clone(
+            self.repos_containing_repository_url, self.repos_branch, self.repos_clone_abs_path
+        ):
             raise RuntimeError(
-                f"Failed to clone repo='{self.repos_location_url}', "
+                f"Failed to clone repo='{self.repos_containing_repository_url}', "
                 f"branch='{self.repos_branch}', path='{self.repos_clone_abs_path}'"
             )
 
         print(
-            f"Successfully cloned repo='{self.repos_location_url}', "
+            f"Successfully cloned repo='{self.repos_containing_repository_url}', "
             f"branch='{self.repos_branch}', path='{self.repos_clone_abs_path}'"
         )
 
@@ -292,10 +294,10 @@ class CreateVerbArgs:
         if os.listdir(self.ws_src_abs_path):
             self.handle_non_empty_src_folder("Main workspace", self.ws_src_abs_path)
 
-        if self.repos_location_url:
+        if self.repos_containing_repository_url:
             self.handle_repos()
         else:
-            print("No repos location URL provided. Not importing any repos.")
+            print("No repos containing repository URL provided. Not importing any repos.")
 
 
 class CreateVerb(VerbExtension):
@@ -317,7 +319,7 @@ class CreateVerb(VerbExtension):
             "--docker", action="store_true", help="Create a docker workspace.", default=False
         )
         parser.add_argument(
-            "--repos-location-url",
+            "--repos-containing-repository-url",
             type=str,
             help="URL to the workspace repos files.",
             default=None,
