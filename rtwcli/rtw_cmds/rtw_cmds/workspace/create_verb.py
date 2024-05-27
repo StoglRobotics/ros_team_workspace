@@ -57,7 +57,6 @@ from rtwcli.workspace_manger import (
 
 
 DEFAULT_BASE_IMAGE_NAME_FORMAT = "osrf/ros:{ros_distro}-desktop"
-DEFAULT_INTERMEDIATE_IMAGE_NAME_FORMAT = "rtw_{base_image_name}_intermediate"
 DEFAULT_FINAL_IMAGE_NAME_FORMAT = "rtw_{workspace_name}_final"
 DEFAULT_CONTAINER_NAME_FORMAT = "{final_image_name}-instance"
 DEFAULT_RTW_DOCKER_BRANCH = "rtw_ws_create"
@@ -100,7 +99,6 @@ class CreateVerbArgs:
     upstream_ws_repos_file_name: str = None
     upstream_ws_name: str = None
     base_image_name: str = None
-    intermediate_image_name: str = None
     final_image_name: str = None
     container_name: str = None
     rtw_docker_repo_url: str = None
@@ -266,10 +264,6 @@ class CreateVerbArgs:
             self.base_image_name = DEFAULT_BASE_IMAGE_NAME_FORMAT.format(
                 ros_distro=self.ros_distro
             )
-        if not self.intermediate_image_name:
-            self.intermediate_image_name = DEFAULT_INTERMEDIATE_IMAGE_NAME_FORMAT.format(
-                base_image_name=self.base_image_name.replace(":", "_")
-            )
         if not self.final_image_name:
             self.final_image_name = DEFAULT_FINAL_IMAGE_NAME_FORMAT.format(
                 workspace_name=self.ws_name
@@ -375,15 +369,6 @@ class CreateVerb(VerbExtension):
             help=(
                 "Base image to use for the docker workspace. If not provided, "
                 f"default format is used: {DEFAULT_BASE_IMAGE_NAME_FORMAT}"
-            ),
-            default=None,
-        )
-        parser.add_argument(
-            "--intermediate-image-name",
-            type=str,
-            help=(
-                "Intermediate image name to use for the docker workspace. If not provided, "
-                f"default format is used: {DEFAULT_INTERMEDIATE_IMAGE_NAME_FORMAT}"
             ),
             default=None,
         )
@@ -530,20 +515,19 @@ class CreateVerb(VerbExtension):
 
         # build intermediate docker image
         if not docker_build(
-            create_args.intermediate_image_name,
+            create_args.final_image_name,
             create_args.intermediate_dockerfile_save_folder,
             create_args.intermediate_dockerfile_abs_path,
         ):
             raise RuntimeError(
-                "Failed to build intermediate docker image "
-                f"'{create_args.intermediate_image_name}'"
+                "Failed to build intermediate docker image for "
+                f"'{create_args.final_image_name}'"
             )
 
         # check if the intermediate docker image exists
-        if not is_docker_tag_valid(create_args.intermediate_image_name):
+        if not is_docker_tag_valid(create_args.final_image_name):
             raise RuntimeError(
-                f"Intermediate docker image '{create_args.intermediate_image_name}' "
-                "does not exist."
+                f"Intermediate docker image '{create_args.final_image_name}' " "does not exist."
             )
 
     def run_intermediate_container(self, create_args: CreateVerbArgs) -> Any:
@@ -557,7 +541,7 @@ class CreateVerb(VerbExtension):
         try:
             docker_client = docker.from_env()
             intermediate_container = docker_client.containers.run(
-                create_args.intermediate_image_name,
+                create_args.final_image_name,
                 "/bin/bash",
                 detach=True,
                 remove=True,
@@ -711,7 +695,7 @@ class CreateVerb(VerbExtension):
 
         print(f"Committing container '{intermediate_container.id}'")
         try:
-            intermediate_container.commit(create_args.intermediate_image_name)
+            intermediate_container.commit(create_args.final_image_name)
         except docker.errors.APIError as e:
             docker_stop(intermediate_container.id)
             raise RuntimeError(f"Failed to commit container '{intermediate_container.id}': {e}")
@@ -721,8 +705,7 @@ class CreateVerb(VerbExtension):
 
     def generate_rocker_flags(self, create_args: CreateVerbArgs) -> List[str]:
         # rocker flags have order, see rocker --help
-        # rocker_flags = ["--nocleanup", "--pull", "--git"]
-        rocker_flags = ["--nocleanup", "--git"]
+        rocker_flags = ["--nocache", "--nocleanup", "--git"]
         rocker_flags.extend(["--hostname", f"rtw-{create_args.ws_name}-docker"])
         rocker_flags.extend(["--name", f"{create_args.container_name}"])
         rocker_flags.extend(["--network", "host"])
@@ -749,7 +732,7 @@ class CreateVerb(VerbExtension):
 
     def execute_rocker_cmd(self, create_args: CreateVerbArgs) -> bool:
         rocker_flags = self.generate_rocker_flags(create_args)
-        rocker_base_image_name = create_args.intermediate_image_name
+        rocker_base_image_name = create_args.final_image_name
         rocker_cmd = ["rocker"] + rocker_flags + [rocker_base_image_name]
         rocker_cmd_str = " ".join(rocker_cmd)
 
