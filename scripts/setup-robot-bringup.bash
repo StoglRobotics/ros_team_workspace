@@ -16,8 +16,8 @@
 
 usage="setup-robot-bringup ROBOT_NAME DESCRIPTION_PKG_NAME"
 
-# Load Framework defines
-script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+  # Load Framework defines
+  script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../setup.bash
 check_and_set_ros_distro_and_version "${ROS_DISTRO}"
 
@@ -66,7 +66,7 @@ echo -e "${TERMINAL_COLOR_USER_CONFIRMATION}If correct press <ENTER>, otherwise 
 read
 
 # Remove include and src folders - in this package should be no source
-RM_FOLDERS=("include" "src")
+RM_FOLDERS=("include/$PKG_NAME" "include" "src")
 
 for FOLDER in "${RM_FOLDERS[@]}"; do
   if [[ -d $FOLDER && ! "$(ls -A $FOLDER)" ]]; then
@@ -130,6 +130,13 @@ if [ -f README.md ]; then
   sed -i "s/\\\$ROBOT_NAME\\\$/${ROBOT_NAME}/g" README.md
   sed -i "s/\\\$DESCR_PKG_NAME\\\$/${DESCR_PKG_NAME}/g" $SED_FILE
 fi
+
+# ask about gazebo setup
+echo -e "\nDo you wish to add gazebo launch file? y/n"
+read -p "> " add_gazebo_bringup
+if [ $add_gazebo_bringup == "y" ]; then
+  source $script_own_dir/setup-gazebo-bringup.bash
+fi  
 
 # TODO: Add license checks
 

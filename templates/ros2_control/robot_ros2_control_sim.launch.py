@@ -75,14 +75,6 @@ def generate_launch_description():
         have to be updated.",
         )
     )
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "robot_controller",
-            default_value="forward_position_controller",
-            choices=["forward_position_controller", "joint_trajectory_controller"],
-            description="Robot controller to start.",
-        )
-    )
 
     # Initialize Arguments
     runtime_config_package = LaunchConfiguration("runtime_config_package")
@@ -90,7 +82,6 @@ def generate_launch_description():
     description_package = LaunchConfiguration("description_package")
     description_file = LaunchConfiguration("description_file")
     prefix = LaunchConfiguration("prefix")
-    robot_controller = LaunchConfiguration("robot_controller")
 
     robot_controllers = PathJoinSubstitution(
         [FindPackageShare(runtime_config_package), "config", controllers_file]
@@ -111,12 +102,6 @@ def generate_launch_description():
             " ",
             "prefix:=",
             prefix,
-            " ",
-            "use_mock_hardware:=false",
-            " ",
-            "mock_sensor_commands:=false",
-            " ",
-            "sim_gazebo_classic:=false",
             " ",
             "sim_gazebo:=true",
             " ",
@@ -144,16 +129,15 @@ def generate_launch_description():
     # Gazebo nodes
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [FindPackageShare("ros_ign_gazebo"), "/launch", "/ign_gazebo.launch.py"]
+            [FindPackageShare("ros_gz_sim"), "/launch", "/gz_sim.launch.py"]
         ),
-        launch_arguments={"ign_args": " -r -v 3 empty.sdf"}.items(),
+        launch_arguments={"gz_args": " -r -v 3 empty.sdf"}.items(),
     )
 
     # Spawn robot
     gazebo_spawn_robot = Node(
-        package="ros_ign_gazebo",
+        package="ros_gz_sim",
         executable="create",
-        name="spawn_rrbot",
         arguments=["-name", "$ROBOT_NAME$", "-topic", "robot_description"],
         output="screen",
     )
@@ -164,7 +148,7 @@ def generate_launch_description():
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
-    robot_controllers = [robot_controller]
+    robot_controllers = ["joint_trajectory_controller"]
     robot_controller_spawners = []
     for controller in robot_controllers:
         robot_controller_spawners += [

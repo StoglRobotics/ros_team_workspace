@@ -16,6 +16,8 @@ The general package structure is the following:
 ├── [setup.cfg]                                    # if amend_python is used
 ├── config/                                        # general YAML files for a robot
 │   └── <robot_name>_<someting_specific>.yaml
+├── hooks/                                         # environment hook which exposes mesh files to gazebo
+│   └── <robot_name>_sim.dsv.in
 ├── launch/                                        # launch files related to testing robots' description
 │   └── test_<robot_name>_description.launch.py
 ├── meshes/                                        # meshes used in <robot_name>_macro.urdf.xacro

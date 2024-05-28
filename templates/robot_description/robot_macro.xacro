@@ -4,7 +4,22 @@
   <xacro:include filename="$(find $PKG_NAME$)/urdf/common/inertials.xacro" />
   <xacro:include filename="$(find $PKG_NAME$)/urdf/common/materials.xacro" />
 
-  <xacro:macro name="$ROBOT_NAME$" params="prefix parent *origin">
+  <xacro:macro name="$ROBOT_NAME$" params="prefix parent sim_gazebo *origin">
+    
+    <!-- determine pathing for gazebo resources -->
+    <xacro:if value="${sim_gazebo}">
+      <xacro:property
+        name="file_prefix"
+        value="file://$(find $PKG_NAME$)"
+        />
+    </xacro:if>
+    <xacro:unless value="${sim_gazebo}">
+      <xacro:property
+        name="file_prefix"
+        value="package://$PKG_NAME$"
+      />
+    </xacro:unless>
+
     <!-- LINKS -->
     <!-- base link -->
     <link name="${prefix}base_link">
@@ -15,7 +30,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.3" radius="0.3" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/base_link.dae" /> -->
+<!--          <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/visual/base_link.dae"-->
         </geometry>
         <material name="black"/>
       </visual>
@@ -23,7 +38,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.3" radius="0.3" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/base_link.stl" /> -->
+<!--          <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/collision/base_link.stl" />-->
         </geometry>
       </collision>
     </link>
@@ -36,7 +51,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.3" radius="0.15" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link1.dae" /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/visual/link1.dae" /> -->
         </geometry>
         <material name="blue"/>
       </visual>
@@ -44,7 +59,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.3" radius="0.15" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link1.stl" /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/collision/link1.stl" /> -->
         </geometry>
         <material name="green"/>
       </collision>
@@ -58,7 +73,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.8" radius="0.15" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link2.dae" /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/visual/link2.dae" /> -->
         </geometry>
         <material name="grey"/>
       </visual>
@@ -66,7 +81,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.8" radius="0.15" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link2.stl"  /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/collision/link2.stl"  /> -->
         </geometry>
       </collision>
     </link>
@@ -79,7 +94,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.5" radius="0.10" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link3.dae" /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/visual/link3.dae" /> -->
         </geometry>
         <material name="orange"/>
       </visual>
@@ -87,7 +102,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.5" radius="0.10" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link3.stl"  /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/collision/link3.stl"  /> -->
         </geometry>
       </collision>
     </link>
@@ -100,7 +115,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.1" radius="0.2" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link4.dae" /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/visual/link4.dae" /> -->
         </geometry>
         <material name="brown"/>
       </visual>
@@ -108,7 +123,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.1" radius="0.2" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link4.stl"  /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/collision/link4.stl"  /> -->
         </geometry>
       </collision>
     </link>
@@ -121,7 +136,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.2" radius="0.1" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link5.dae" /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/visual/link5.dae" /> -->
         </geometry>
         <material name="red"/>
       </visual>
@@ -129,7 +144,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.2" radius="0.1" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link5.stl" /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/collision/link5.stl" /> -->
         </geometry>
       </collision>
     </link>
@@ -142,7 +157,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.05" radius="0.1" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link6.dae" /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/visual/link6.dae" /> -->
         </geometry>
         <material name="white"/>
       </visual>
@@ -150,7 +165,7 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <cylinder length="0.05" radius="0.1" />
-<!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link6.stl" /> -->
+<!--           <mesh filename="${file_prefix}/meshes/$ROBOT_NAME$/collision/link6.stl" /> -->
         </geometry>
       </collision>
     </link>
@@ -186,7 +201,7 @@
     </joint>
     <!-- joint 2 -->
     <joint name="${prefix}joint2" type="revolute">
-      <origin xyz="0 0 0.3" rpy="${pi/2} 0 0" />
+      <origin xyz="0 0 0.3" rpy="${pi/2} ${pi/2} 0" />
       <parent link="${prefix}link1" />
       <child link="${prefix}link2" />
       <axis xyz="0 0 1" />
