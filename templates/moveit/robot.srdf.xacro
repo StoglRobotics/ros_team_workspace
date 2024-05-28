@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2024, Stogl Robotics Consulting UG (haftungsbeschränkt)
 
@@ -15,8 +16,6 @@ limitations under the License.
 
 Source of this file are templates in https://github.com/StoglRobotics/ros_team_workspace repository.
 -->
-
-<?xml version="1.0" encoding="UTF-8"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="$ROBOT_NAME$">
 
   <xacro:arg name="prefix" default="" />
