@@ -87,7 +87,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "robot_controller",
-            default_value="forward_position_controller",
+            default_value="joint_trajectory_controller",
             choices=["forward_position_controller", "joint_trajectory_controller"],
             description="Robot controller to start.",
         )
@@ -200,9 +200,11 @@ def generate_launch_description():
         delay_robot_controller_spawners_after_joint_state_broadcaster_spawner += [
             RegisterEventHandler(
                 event_handler=OnProcessExit(
-                    target_action=robot_controller_spawners[i - 1]
-                    if i > 0
-                    else joint_state_broadcaster_spawner,
+                    target_action=(
+                        robot_controller_spawners[i - 1]
+                        if i > 0
+                        else joint_state_broadcaster_spawner
+                    ),
                     on_exit=[controller],
                 )
             )
@@ -214,9 +216,11 @@ def generate_launch_description():
         delay_inactive_robot_controller_spawners_after_joint_state_broadcaster_spawner += [
             RegisterEventHandler(
                 event_handler=OnProcessExit(
-                    target_action=inactive_robot_controller_spawners[i - 1]
-                    if i > 0
-                    else robot_controller_spawners[-1],
+                    target_action=(
+                        inactive_robot_controller_spawners[i - 1]
+                        if i > 0
+                        else robot_controller_spawners[-1]
+                    ),
                     on_exit=[controller],
                 )
             )

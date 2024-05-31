@@ -8,6 +8,10 @@
 
 `setup-auto-sourcing`
 
+> [!NOTE]
+> If `rtw` command is not available, then add this to `~/.bashrc`:
+> `export PATH=${PATH}:~/.local/bin`
+
 ## porting workspace
 
 add explicit export to variables: `bash ros_team_workspace/scripts/update-rtw.bash`
