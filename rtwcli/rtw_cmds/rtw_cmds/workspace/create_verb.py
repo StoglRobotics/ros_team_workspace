@@ -104,6 +104,7 @@ class CreateVerbArgs:
     base_image_name: str = None
     final_image_name: str = None
     container_name: str = None
+    standalone: bool = False
     rtw_docker_repo_url: str = None
     rtw_docker_branch: str = None
     rtw_docker_clone_abs_path: str = None
@@ -405,6 +406,12 @@ class CreateVerb(VerbExtension):
             default=None,
         )
         parser.add_argument(
+            "--standalone",
+            action="store_true",
+            help="Make the Docker image standalone by copying workspace data into the image.",
+            default=False,
+        )
+        parser.add_argument(
             "--rtw-docker-repo-url",
             type=str,
             help="URL to the ros_team_workspace repo for the docker workspace.",
@@ -516,6 +523,36 @@ class CreateVerb(VerbExtension):
             ]
         )
 
+        # Copy the workspace data into the Docker image if standalone is enabled
+        if create_args.standalone:
+            # ws_source_path = os.path.join("../..", create_args.ws_name)
+            # ws_source_path = create_args.ws_abs_path
+            ws_source_path = create_args.ws_name
+            copy_workspace_cmd = "\n".join(
+                [
+                    # f"RUN mkdir -p {create_args.ws_abs_path}",
+                    # f"ADD {create_args.ws_abs_path} {create_args.ws_abs_path}",
+                    # f"RUN ls -l {ws_source_path}",
+                    f"ADD {ws_source_path} {create_args.ws_abs_path}",
+                ]
+            )
+            if create_args.has_upstream_ws:
+                # upstream_ws_source_path = os.path.join("../..", create_args.upstream_ws_name)
+                # upstream_ws_source_path = create_args.upstream_ws_abs_path
+                upstream_ws_source_path = create_args.upstream_ws_name
+                copy_upstream_workspace_cmd = "\n".join(
+                    [
+                        # f"RUN mkdir -p {create_args.upstream_ws_abs_path}",
+                        # f"ADD {create_args.upstream_ws_abs_path} {create_args.upstream_ws_abs_path}",
+                        f"ADD {upstream_ws_source_path} {create_args.upstream_ws_abs_path}",
+                    ]
+                )
+            else:
+                copy_upstream_workspace_cmd = "# no upstream workspace to copy"
+        else:
+            copy_workspace_cmd = "# no workspace data copied"
+            copy_upstream_workspace_cmd = "# no upstream workspace to copy"
+
         return textwrap.dedent(
             f"""
             FROM {create_args.base_image_name}
@@ -524,6 +561,8 @@ class CreateVerb(VerbExtension):
             {python_packages_cmd}
             {rtw_clone_cmd}
             {rtw_install_cmd}
+            {copy_workspace_cmd}
+            {copy_upstream_workspace_cmd}
             RUN rm -rf /var/lib/apt/lists/*
             """
         )
@@ -542,7 +581,7 @@ class CreateVerb(VerbExtension):
         # build intermediate docker image
         if not docker_build(
             create_args.final_image_name,
-            create_args.intermediate_dockerfile_save_folder,
+            os.path.join(create_args.intermediate_dockerfile_save_folder, "../.."),
             create_args.intermediate_dockerfile_abs_path,
         ):
             raise RuntimeError(
@@ -557,11 +596,14 @@ class CreateVerb(VerbExtension):
             )
 
     def run_intermediate_container(self, create_args: CreateVerbArgs) -> Any:
-        volumes = [f"{create_args.ws_abs_path}:{create_args.ws_abs_path}"]
-        if create_args.has_upstream_ws:
-            volumes.append(
-                f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path}"
-            )
+        if create_args.standalone:
+            volumes = []  # No volumes needed for standalone
+        else:
+            volumes = [f"{create_args.ws_abs_path}:{create_args.ws_abs_path}"]
+            if create_args.has_upstream_ws:
+                volumes.append(
+                    f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path}"
+                )
 
         print(f"Creating intermediate docker container with volumes: {volumes}")
         try:
@@ -767,11 +809,12 @@ class CreateVerb(VerbExtension):
         # rocker volumes
         rocker_flags.append("--volume")
         rocker_flags.append(f"{create_args.ssh_abs_path}:{create_args.ssh_abs_path}:ro")
-        rocker_flags.append(f"{create_args.ws_abs_path}:{create_args.ws_abs_path}")
-        if create_args.has_upstream_ws:
-            rocker_flags.append(
-                f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path}"
-            )
+        if not create_args.standalone:
+            rocker_flags.append(f"{create_args.ws_abs_path}:{create_args.ws_abs_path}")
+            if create_args.has_upstream_ws:
+                rocker_flags.append(
+                    f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path}"
+                )
 
         rocker_flags.append("--x11tmp")
         rocker_flags.extend(["--mode", "interactive"])
