@@ -19,6 +19,7 @@ import os
 import pathlib
 from pprint import pprint
 import shutil
+import subprocess
 import textwrap
 from typing import Any, List
 import questionary
@@ -84,6 +85,7 @@ DEFAULT_PYTHON_PACKAGES = ["pre-commit"]
 DEFAULT_SSH_ABS_PATH = os.path.expanduser("~/.ssh")
 DEFAULT_INTERMEDIATE_DOCKERFILE_NAME = "Dockerfile"
 DEFAULT_INTERMEDIATE_DOCKERFILE_SAVE_FOLDER_FORMAT = "{ws_folder}/docker"
+DISPLAY_MANAGER_WAYLAND = "wayland"
 
 
 @dataclass
@@ -151,6 +153,17 @@ class CreateVerbArgs:
         return os.path.join(
             self.intermediate_dockerfile_save_folder, self.intermediate_dockerfile_name
         )
+
+    @property
+    def display_manager(self) -> str:
+        # Command to get the display manager type
+        cmd = "loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}'"
+        result = subprocess.run(["bash", "-c", cmd], capture_output=True, text=True)
+
+        # Capture the output and remove any trailing newlines or spaces
+        display_manager = result.stdout.strip()
+
+        return display_manager
 
     def handle_main_ws_repos(self):
         if not vcs_import(
@@ -706,6 +719,21 @@ class CreateVerb(VerbExtension):
     def generate_rocker_flags(self, create_args: CreateVerbArgs) -> List[str]:
         # rocker flags have order, see rocker --help
         rocker_flags = ["--nocache", "--nocleanup", "--git"]
+
+        rocker_flags.extend(["-e", "QT_QPA_PLATFORM=xcb"])
+        if not create_args.disable_nvidia:
+            rocker_flags.extend(["-e", "__GLX_VENDOR_LIBRARY_NAME=nvidia"])
+            rocker_flags.extend(["-e", "__NV_PRIME_RENDER_OFFLOAD=1"])
+        if create_args.display_manager == DISPLAY_MANAGER_WAYLAND:
+            waylad_display = os.environ.get("WAYLAND_DISPLAY", None)
+            if not waylad_display:
+                raise RuntimeError("WAYLAND_DISPLAY is not set.")
+            rocker_flags.extend(["-e", "XDG_RUNTIME_DIR=/tmp"])
+            rocker_flags.extend(["-e", f"WAYLAND_DISPLAY={waylad_display}"])
+            rocker_flags.extend(
+                ["-v", f"{os.environ['XDG_RUNTIME_DIR']}/{waylad_display}:/tmp/{waylad_display}"]
+            )
+
         rocker_flags.extend(["--hostname", f"rtw-{create_args.ws_name}-docker"])
         rocker_flags.extend(["--name", f"{create_args.container_name}"])
         rocker_flags.extend(["--network", "host"])
@@ -754,6 +782,8 @@ class CreateVerb(VerbExtension):
         print("### CREATE ARGS ###")
         pprint(create_args)
         print("### CREATE ARGS ###")
+        if create_args.display_manager == DISPLAY_MANAGER_WAYLAND:
+            print(f"Wayland display manager detected: '{create_args.display_manager}'")
 
         ws_names = get_workspace_names()
         if create_args.ws_name in ws_names:
