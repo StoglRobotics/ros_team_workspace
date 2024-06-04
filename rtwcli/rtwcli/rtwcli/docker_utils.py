@@ -28,9 +28,13 @@ def is_docker_tag_valid(tag: str) -> bool:
         return False
 
 
-def docker_build(tag: str, dockerfile_path: str, file: str = None, pull: bool = True) -> bool:
+def docker_build(
+    tag: str, dockerfile_path: str, file: str = None, pull: bool = True, no_cache: bool = True
+) -> bool:
     """Build a docker image with the given tag from the given dockerfile path."""
     docker_build_command = ["docker", "build", "-t", tag]
+    if no_cache:
+        docker_build_command.append("--no-cache")
     if pull:
         docker_build_command.append("--pull")
     if file:

@@ -57,7 +57,7 @@ from rtwcli.workspace_manger import (
 )
 
 
-DEFAULT_BASE_IMAGE_NAME_FORMAT = "osrf/ros:{ros_distro}-desktop"
+DEFAULT_BASE_IMAGE_NAME_FORMAT = "osrf/ros:{ros_distro}-desktop-{ubuntu_codename}"
 DEFAULT_FINAL_IMAGE_NAME_FORMAT = "rtw_{workspace_name}_final"
 DEFAULT_CONTAINER_NAME_FORMAT = "{final_image_name}-instance"
 DEFAULT_RTW_DOCKER_BRANCH = "rtw_ws_create"
@@ -92,6 +92,7 @@ DISPLAY_MANAGER_WAYLAND = "wayland"
 class CreateVerbArgs:
     ws_abs_path: str
     ros_distro: str
+    ubuntu_codename: str
     docker: bool = False
     repos_containing_repository_url: str = None
     repos_branch: str = None
@@ -275,7 +276,7 @@ class CreateVerbArgs:
         # docker related attributes
         if not self.base_image_name:
             self.base_image_name = DEFAULT_BASE_IMAGE_NAME_FORMAT.format(
-                ros_distro=self.ros_distro
+                ros_distro=self.ros_distro, ubuntu_codename=self.ubuntu_codename
             )
         if not self.final_image_name:
             self.final_image_name = DEFAULT_FINAL_IMAGE_NAME_FORMAT.format(
@@ -321,6 +322,13 @@ class CreateVerb(VerbExtension):
             help="ROS distro to use for the workspace.",
             required=True,
             choices=["humble", "rolling"],
+        )
+        parser.add_argument(
+            "--ubuntu-codename",
+            type=str,
+            help="Ubuntu codename to use for the base image.",
+            required=True,
+            choices=["jammy", "noble"],
         )
         parser.add_argument(
             "--docker", action="store_true", help="Create a docker workspace.", default=False
@@ -471,7 +479,19 @@ class CreateVerb(VerbExtension):
             apt_packages_cmd = "# no apt packages to install"
 
         if create_args.python_packages:
-            python_packages_cmd = "RUN pip3 install " + " ".join(create_args.python_packages)
+            # hack to install system-wide python packages
+            mv_externally_managed_cmd = textwrap.dedent(
+                """
+                RUN python_version=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')") \
+                    && echo "Python version is $python_version" \
+                    && externally_managed_file_path="/usr/lib/python${python_version}/EXTERNALLY-MANAGED" \
+                    && if [ -f "$externally_managed_file_path" ]; then mv "$externally_managed_file_path" "$externally_managed_file_path.old"; fi
+                """
+            )
+
+            python_packages_cmd = mv_externally_managed_cmd + " ".join(
+                ["RUN", "pip3", "install", "-U", "-I"] + create_args.python_packages
+            )
         else:
             python_packages_cmd = "# no python packages to install"
 
@@ -577,7 +597,15 @@ class CreateVerb(VerbExtension):
         )
 
         rosdep_cmds = [["sudo", "apt-get", "update"], ["rosdep", "update"]]
-        rosdep_install_cmd_base = ["rosdep", "install", "-i", "-r", "-y", "--from-paths"]
+        rosdep_install_cmd_base = [
+            "rosdep",
+            "install",
+            "-i",
+            "-r",
+            "-y",
+            f"--rosdistro={create_args.ros_distro}",
+            "--from-paths",
+        ]
         if has_upstream_ws_packages:
             rosdep_cmds.append(rosdep_install_cmd_base + [create_args.upstream_ws_src_abs_path])
         if has_ws_packages:
