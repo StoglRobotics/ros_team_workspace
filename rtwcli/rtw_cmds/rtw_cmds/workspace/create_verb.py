@@ -71,6 +71,7 @@ DEFAULT_APT_PACKAGES = [
     "git-lfs",
     "iputils-ping",
     "nano",
+    "openssh-client",
     "python3-colcon-common-extensions",
     "python3-pip",
     "python3-vcstool",
