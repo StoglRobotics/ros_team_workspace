@@ -57,7 +57,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.8" radius="0.15"/>
+          <cylinder length="0.3" radius="0.15"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link2.dae" /> -->
         </geometry>
         <material name="grey"/>
@@ -65,7 +65,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.8" radius="0.15"/>
+          <cylinder length="0.3" radius="0.15"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link2.stl"  /> -->
         </geometry>
       </collision>
@@ -78,7 +78,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.5" radius="0.10"/>
+          <cylinder length="0.2" radius="0.1"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link3.dae" /> -->
         </geometry>
         <material name="orange"/>
@@ -86,7 +86,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.5" radius="0.10"/>
+          <cylinder length="0.2" radius="0.1"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link3.stl"  /> -->
         </geometry>
       </collision>
@@ -99,7 +99,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.1" radius="0.2"/>
+          <cylinder length="0.1" radius="0.1"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link4.dae" /> -->
         </geometry>
         <material name="brown"/>
@@ -107,7 +107,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.1" radius="0.2"/>
+          <cylinder length="0.1" radius="0.1"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link4.stl"  /> -->
         </geometry>
       </collision>
@@ -120,7 +120,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.2" radius="0.1"/>
+          <cylinder length="0.15" radius="0.1"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link5.dae" /> -->
         </geometry>
         <material name="red"/>
@@ -128,7 +128,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.2" radius="0.1"/>
+          <cylinder length="0.15" radius="0.1"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link5.stl" /> -->
         </geometry>
       </collision>
@@ -141,7 +141,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.05" radius="0.1"/>
+          <cylinder length="0.05" radius="0.075"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/visual/link6.dae" /> -->
         </geometry>
         <material name="white"/>
@@ -149,7 +149,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <cylinder length="0.05" radius="0.1"/>
+          <cylinder length="0.05" radius="0.075"/>
           <!--           <mesh filename="package://$PKG_NAME$/meshes/$ROBOT_NAME$/collision/link6.stl" /> -->
         </geometry>
       </collision>
@@ -186,7 +186,7 @@
     </joint>
     <!-- joint 2 -->
     <joint name="${prefix}joint2" type="revolute">
-      <origin xyz="0 0 0.3" rpy="${pi/2} 0 0"/>
+      <origin xyz="0 0 -0.3" rpy="${pi/2} 0 0"/>
       <parent link="${prefix}link1"/>
       <child link="${prefix}link2"/>
       <axis xyz="0 0 1"/>
@@ -202,7 +202,7 @@
     </joint>
     <!-- joint 4 -->
     <joint name="${prefix}joint4" type="revolute">
-      <origin xyz="0 0.1 0" rpy="0 ${-pi/2} 0"/>
+      <origin xyz="0.15 0 0" rpy="0 ${-pi/2} 0"/>
       <parent link="${prefix}link3"/>
       <child link="${prefix}link4"/>
       <axis xyz="0 0 1"/>
@@ -210,7 +210,7 @@
     </joint>
     <!-- joint 5 -->
     <joint name="${prefix}joint5" type="revolute">
-      <origin xyz="0 0 -0.1" rpy="0 ${pi/2} 0"/>
+      <origin xyz="0 0 -0.15" rpy="0 ${pi/2} 0"/>
       <parent link="${prefix}link4"/>
       <child link="${prefix}link5"/>
       <axis xyz="0 0 1"/>
@@ -218,7 +218,7 @@
     </joint>
     <!-- joint 6 -->
     <joint name="${prefix}joint6" type="revolute">
-      <origin xyz="0 0 0.1" rpy="0 ${-pi/2} 0"/>
+      <origin xyz="0.125 0 0" rpy="0 ${-pi/2} 0"/>
       <parent link="${prefix}link5"/>
       <child link="${prefix}link6"/>
       <axis xyz="0 0 1"/>
