@@ -57,7 +57,7 @@ from rtwcli.workspace_manger import (
 )
 
 
-DEFAULT_BASE_IMAGE_NAME_FORMAT = "osrf/ros:{ros_distro}-desktop-{ubuntu_codename}"
+DEFAULT_BASE_IMAGE_NAME_FORMAT = "osrf/ros:{ros_distro}-desktop"
 DEFAULT_FINAL_IMAGE_NAME_FORMAT = "rtw_{workspace_name}_final"
 DEFAULT_CONTAINER_NAME_FORMAT = "{final_image_name}-instance"
 DEFAULT_RTW_DOCKER_BRANCH = "rtw_ws_create"
@@ -93,7 +93,6 @@ DISPLAY_MANAGER_WAYLAND = "wayland"
 class CreateVerbArgs:
     ws_abs_path: str
     ros_distro: str
-    ubuntu_codename: str
     docker: bool = False
     repos_containing_repository_url: str = None
     repos_branch: str = None
@@ -277,7 +276,7 @@ class CreateVerbArgs:
         # docker related attributes
         if not self.base_image_name:
             self.base_image_name = DEFAULT_BASE_IMAGE_NAME_FORMAT.format(
-                ros_distro=self.ros_distro, ubuntu_codename=self.ubuntu_codename
+                ros_distro=self.ros_distro
             )
         if not self.final_image_name:
             self.final_image_name = DEFAULT_FINAL_IMAGE_NAME_FORMAT.format(
@@ -323,13 +322,6 @@ class CreateVerb(VerbExtension):
             help="ROS distro to use for the workspace.",
             required=True,
             choices=["humble", "rolling"],
-        )
-        parser.add_argument(
-            "--ubuntu-codename",
-            type=str,
-            help="Ubuntu codename to use for the base image.",
-            required=True,
-            choices=["jammy", "noble"],
         )
         parser.add_argument(
             "--docker", action="store_true", help="Create a docker workspace.", default=False
