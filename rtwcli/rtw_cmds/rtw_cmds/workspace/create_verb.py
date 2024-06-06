@@ -773,7 +773,7 @@ class CreateVerb(VerbExtension):
                 f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path}"
             )
 
-        rocker_flags.append("--x11")
+        rocker_flags.append("--x11tmp")
         rocker_flags.extend(["--mode", "interactive"])
         rocker_flags.extend(["--image-name", f"{create_args.final_image_name}"])
 
