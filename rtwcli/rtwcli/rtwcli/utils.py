@@ -13,10 +13,13 @@
 # limitations under the License.
 
 
+import argparse
+from dataclasses import Field
+import getpass
 import os
 import subprocess
 import tempfile
-from typing import Any
+from typing import Any, Dict, List
 
 import yaml
 
@@ -149,3 +152,24 @@ def git_clone(url: str, branch: str, path: str) -> bool:
     Return True if the clone was successful.
     """
     return run_command(["git", "clone", url, "--branch", branch, path])
+
+
+def replace_user_name_in_path(
+    path: str, new_user: str, current_user: str = getpass.getuser()
+) -> str:
+    return path.replace(f"/home/{current_user}", f"/home/{new_user}")
+
+
+def get_display_manager() -> str:
+    # Command to get the display manager type
+    cmd = "loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}'"
+    result = subprocess.run(["bash", "-c", cmd], capture_output=True, text=True)
+
+    # Capture the output and remove any trailing newlines or spaces
+    return result.stdout.strip()
+
+
+def get_filtered_args(args: argparse.Namespace, dataclass_fields: List[Field]) -> Dict[str, Any]:
+    args_dict = vars(args)
+    valid_fields = {field.name for field in dataclass_fields}
+    return {key: args_dict[key] for key in valid_fields if key in args_dict}
