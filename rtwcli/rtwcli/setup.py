@@ -19,10 +19,7 @@ setup(
     name="rtwcli",
     version="0.2.0",
     packages=find_packages(exclude=["test"]),
-    install_requires=["docker", "questionary", "rocker"],
-    extras_require={
-        "completion": ["argcomplete"],
-    },
+    install_requires=["argcomplete", "docker", "questionary", "rocker"],
     zip_safe=False,
     keywords=[],
     classifiers=[
