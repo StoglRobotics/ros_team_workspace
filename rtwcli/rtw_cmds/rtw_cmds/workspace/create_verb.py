@@ -14,17 +14,17 @@
 
 
 import argparse
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 import os
 import pathlib
 from pprint import pprint
 import shutil
-import subprocess
 import textwrap
 from typing import Any, List
 import questionary
 from rtwcli.constants import (
     BASHRC_PATH,
+    DISPLAY_MANAGER_WAYLAND,
     ROS_TEAM_WS_GIT_HTTPS_URL,
     SKEL_BASHRC_PATH,
     WORKSPACES_PATH,
@@ -37,12 +37,15 @@ from rtwcli.docker_utils import (
     docker_stop,
     is_docker_tag_valid,
 )
+from rtwcli.rocker_utils import execute_rocker_cmd, generate_rocker_flags
 from rtwcli.utils import (
     create_file_and_write,
     create_temp_file,
+    get_display_manager,
+    get_filtered_args,
     git_clone,
+    replace_user_name_in_path,
     run_bash_command,
-    run_command,
     vcs_import,
 )
 from rtwcli.verb import VerbExtension
@@ -60,6 +63,7 @@ from rtwcli.workspace_manger import (
 DEFAULT_BASE_IMAGE_NAME_FORMAT = "osrf/ros:{ros_distro}-desktop"
 DEFAULT_FINAL_IMAGE_NAME_FORMAT = "rtw_{workspace_name}_final"
 DEFAULT_CONTAINER_NAME_FORMAT = "{final_image_name}-instance"
+DEFAULT_HOSTNAME_FORMAT = "rtw-{workspace_name}-docker"
 DEFAULT_RTW_DOCKER_BRANCH = "rtw_ws_create"
 DEFAULT_RTW_DOCKER_PATH = os.path.expanduser("~/ros_team_workspace")
 DEFAULT_UPSTREAM_WS_NAME_FORMAT = "{workspace_name}_upstream"
@@ -86,55 +90,89 @@ DEFAULT_PYTHON_PACKAGES = ["pre-commit"]
 DEFAULT_SSH_ABS_PATH = os.path.expanduser("~/.ssh")
 DEFAULT_INTERMEDIATE_DOCKERFILE_NAME = "Dockerfile"
 DEFAULT_INTERMEDIATE_DOCKERFILE_SAVE_FOLDER_FORMAT = "{ws_folder}/docker"
-DISPLAY_MANAGER_WAYLAND = "wayland"
+WS_SRC_FOLDER = "src"
 
 
 @dataclass
 class CreateVerbArgs:
     ws_abs_path: str
     ros_distro: str
-    docker: bool = False
-    repos_containing_repository_url: str = None
-    repos_branch: str = None
-    repos_no_skip_existing: bool = False
-    disable_nvidia: bool = False
-    ws_repos_file_name: str = None
-    upstream_ws_repos_file_name: str = None
-    upstream_ws_name: str = None
-    base_image_name: str = None
-    final_image_name: str = None
-    container_name: str = None
-    rtw_docker_repo_url: str = None
-    rtw_docker_branch: str = None
-    rtw_docker_clone_abs_path: str = None
-    apt_packages: List[str] = None
-    python_packages: List[str] = None
-    ssh_abs_path: str = None
-    intermediate_dockerfile_name: str = None
-    intermediate_dockerfile_save_folder: str = None
+    repos_containing_repository_url: str
+    repos_branch: str
+    ws_repos_file_name: str
+    upstream_ws_repos_file_name: str
+    upstream_ws_name: str
+    base_image_name: str
+    final_image_name: str
+    container_name: str
+    rtw_docker_repo_url: str
+    rtw_docker_branch: str
+    rtw_docker_clone_abs_path: str
+    ssh_abs_path: str
+    intermediate_dockerfile_name: str
+    intermediate_dockerfile_save_folder: str
+    hostname: str
+    user_override_name: str
     has_upstream_ws: bool = False
     ignore_ws_cmd_error: bool = False
+    apt_packages: List[str] = field(default_factory=list)
+    python_packages: List[str] = field(default_factory=list)
+    standalone: bool = False
+    repos_no_skip_existing: bool = False
+    disable_nvidia: bool = False
+    docker: bool = False
 
     @property
     def ws_name(self) -> str:
         return pathlib.Path(self.ws_abs_path).name
 
     @property
+    def ssh_abs_path_in_docker(self) -> str:
+        if self.user_override_name:
+            return replace_user_name_in_path(self.ssh_abs_path or "", self.user_override_name)
+        return self.ssh_abs_path
+
+    @property
     def ws_src_abs_path(self) -> str:
-        return os.path.join(self.ws_abs_path, "src")
+        return os.path.join(self.ws_abs_path, WS_SRC_FOLDER)
+
+    @property
+    def ws_src_abs_path_in_docker(self) -> str:
+        return os.path.join(self.ws_abs_path_in_docker, WS_SRC_FOLDER)
+
+    @property
+    def ws_abs_path_in_docker(self) -> str:
+        if self.user_override_name:
+            return replace_user_name_in_path(self.ws_abs_path, self.user_override_name)
+        return self.ws_abs_path
 
     @property
     def upstream_ws_abs_path(self) -> str:
         return os.path.normpath(os.path.join(self.ws_abs_path, "..", self.upstream_ws_name))
 
     @property
+    def upstream_ws_abs_path_in_docker(self) -> str:
+        if self.user_override_name:
+            return replace_user_name_in_path(self.upstream_ws_abs_path, self.user_override_name)
+        return self.upstream_ws_abs_path
+
+    @property
     def upstream_ws_src_abs_path(self) -> str:
-        return os.path.join(self.upstream_ws_abs_path, "src")
+        return os.path.join(self.upstream_ws_abs_path, WS_SRC_FOLDER)
+
+    @property
+    def upstream_ws_src_abs_path_in_docker(self) -> str:
+        return os.path.join(self.upstream_ws_abs_path_in_docker, WS_SRC_FOLDER)
+
+    @property
+    def rocker_base_image_name(self) -> str:
+        # currently no caching, so single image is used
+        return self.final_image_name
 
     @property
     def repos_containing_repository_name(self) -> str:
         if not self.repos_containing_repository_url:
-            return None
+            return ""
         return self.repos_containing_repository_url.split("/")[-1].split(".")[0]
 
     @property
@@ -154,17 +192,6 @@ class CreateVerbArgs:
         return os.path.join(
             self.intermediate_dockerfile_save_folder, self.intermediate_dockerfile_name
         )
-
-    @property
-    def display_manager(self) -> str:
-        # Command to get the display manager type
-        cmd = "loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}'"
-        result = subprocess.run(["bash", "-c", cmd], capture_output=True, text=True)
-
-        # Capture the output and remove any trailing newlines or spaces
-        display_manager = result.stdout.strip()
-
-        return display_manager
 
     def handle_main_ws_repos(self):
         if not vcs_import(
@@ -272,6 +299,8 @@ class CreateVerbArgs:
             self.upstream_ws_name = DEFAULT_UPSTREAM_WS_NAME_FORMAT.format(
                 workspace_name=self.ws_name
             )
+        if not self.hostname:
+            self.hostname = DEFAULT_HOSTNAME_FORMAT.format(workspace_name=self.ws_name)
 
         # docker related attributes
         if not self.base_image_name:
@@ -306,6 +335,11 @@ class CreateVerbArgs:
             self.handle_repos()
         else:
             print("No repos containing repository URL provided. Not importing any repos.")
+
+        if self.user_override_name:
+            self.rtw_docker_clone_abs_path = replace_user_name_in_path(
+                self.rtw_docker_clone_abs_path, self.user_override_name
+            )
 
 
 class CreateVerb(VerbExtension):
@@ -405,6 +439,12 @@ class CreateVerb(VerbExtension):
             default=None,
         )
         parser.add_argument(
+            "--standalone",
+            action="store_true",
+            help="Make the Docker image standalone by copying workspace data into the image.",
+            default=False,
+        )
+        parser.add_argument(
             "--rtw-docker-repo-url",
             type=str,
             help="URL to the ros_team_workspace repo for the docker workspace.",
@@ -462,6 +502,22 @@ class CreateVerb(VerbExtension):
             help="Ignore errors when executing workspace commands (rosdep install, colcon build).",
             default=False,
         )
+        parser.add_argument(
+            "--hostname",
+            type=str,
+            help=(
+                "Hostname to use for the docker workspace. If not provided, "
+                "default format is used: "
+                f"{DEFAULT_HOSTNAME_FORMAT}"
+            ),
+            default=None,
+        )
+        parser.add_argument(
+            "--user-override-name",
+            type=str,
+            help="Override the user name for the workspace.",
+            default=None,
+        )
 
     def generate_intermediate_dockerfile_content(self, create_args: CreateVerbArgs) -> str:
         if create_args.apt_packages:
@@ -516,6 +572,31 @@ class CreateVerb(VerbExtension):
             ]
         )
 
+        # Copy the workspace data into the Docker image if standalone is enabled
+        if create_args.standalone:
+            ws_source_path = create_args.ws_name
+            copy_workspace_cmd = " ".join(
+                [
+                    "ADD",
+                    ws_source_path,
+                    create_args.ws_abs_path_in_docker,
+                ]
+            )
+            if create_args.has_upstream_ws:
+                upstream_ws_source_path = create_args.upstream_ws_name
+                copy_upstream_workspace_cmd = " ".join(
+                    [
+                        "ADD",
+                        upstream_ws_source_path,
+                        create_args.upstream_ws_abs_path_in_docker,
+                    ]
+                )
+            else:
+                copy_upstream_workspace_cmd = "# no upstream workspace to copy"
+        else:
+            copy_workspace_cmd = "# workspace will be mounted as volume"
+            copy_upstream_workspace_cmd = "# upstream workspace will be mounted as volume"
+
         return textwrap.dedent(
             f"""
             FROM {create_args.base_image_name}
@@ -524,6 +605,8 @@ class CreateVerb(VerbExtension):
             {python_packages_cmd}
             {rtw_clone_cmd}
             {rtw_install_cmd}
+            {copy_workspace_cmd}
+            {copy_upstream_workspace_cmd}
             RUN rm -rf /var/lib/apt/lists/*
             """
         )
@@ -541,9 +624,9 @@ class CreateVerb(VerbExtension):
 
         # build intermediate docker image
         if not docker_build(
-            create_args.final_image_name,
-            create_args.intermediate_dockerfile_save_folder,
-            create_args.intermediate_dockerfile_abs_path,
+            tag=create_args.final_image_name,
+            dockerfile_path=os.path.join(create_args.intermediate_dockerfile_save_folder, "../.."),
+            file=create_args.intermediate_dockerfile_abs_path,
         ):
             raise RuntimeError(
                 "Failed to build intermediate docker image for "
@@ -557,11 +640,14 @@ class CreateVerb(VerbExtension):
             )
 
     def run_intermediate_container(self, create_args: CreateVerbArgs) -> Any:
-        volumes = [f"{create_args.ws_abs_path}:{create_args.ws_abs_path}"]
-        if create_args.has_upstream_ws:
-            volumes.append(
-                f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path}"
-            )
+        if create_args.standalone:
+            volumes = []  # No volumes needed for standalone
+        else:
+            volumes = [f"{create_args.ws_abs_path}:{create_args.ws_abs_path}"]
+            if create_args.has_upstream_ws:
+                volumes.append(
+                    f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path}"
+                )
 
         print(f"Creating intermediate docker container with volumes: {volumes}")
         try:
@@ -575,9 +661,9 @@ class CreateVerb(VerbExtension):
                 volumes=volumes,
             )
         except (
-            docker.errors.ContainerError,
-            docker.errors.ImageNotFound,
-            docker.errors.APIError,
+            docker.errors.ContainerError,  # type: ignore
+            docker.errors.ImageNotFound,  # type: ignore
+            docker.errors.APIError,  # type: ignore
         ) as e:
             raise RuntimeError(f"Failed to create intermediate docker container: {e}")
 
@@ -600,30 +686,47 @@ class CreateVerb(VerbExtension):
             "--from-paths",
         ]
         if has_upstream_ws_packages:
-            rosdep_cmds.append(rosdep_install_cmd_base + [create_args.upstream_ws_src_abs_path])
+            if create_args.docker:
+                upstream_ws_src_abs_path = create_args.upstream_ws_src_abs_path_in_docker
+            else:
+                upstream_ws_src_abs_path = create_args.upstream_ws_src_abs_path
+            rosdep_cmds.append(rosdep_install_cmd_base + [upstream_ws_src_abs_path])
         if has_ws_packages:
-            rosdep_cmds.append(rosdep_install_cmd_base + [create_args.ws_src_abs_path])
+            if create_args.docker:
+                ws_src_abs_path = create_args.ws_src_abs_path_in_docker
+            else:
+                ws_src_abs_path = create_args.ws_src_abs_path
+            rosdep_cmds.append(rosdep_install_cmd_base + [ws_src_abs_path])
         rosdep_cmds.append(["sudo", "rm", "-rf", "/var/lib/apt/lists/*"])
 
         compile_cmds = []
+        if create_args.docker:
+            ws_abs_path = create_args.ws_abs_path_in_docker
+        else:
+            ws_abs_path = create_args.ws_abs_path
         if create_args.has_upstream_ws:
-            compile_cmds.append(
-                get_compile_cmd(create_args.upstream_ws_abs_path, create_args.ros_distro)
-            )
+            if create_args.docker:
+                upstream_ws_abs_path = create_args.upstream_ws_abs_path_in_docker
+            else:
+                upstream_ws_abs_path = create_args.upstream_ws_abs_path
+            compile_cmds.append(get_compile_cmd(upstream_ws_abs_path, create_args.ros_distro))
             compile_cmds.append(
                 get_compile_cmd(
-                    create_args.ws_abs_path,
+                    ws_abs_path,
                     create_args.ros_distro,
-                    upstream_ws_abs_path=create_args.upstream_ws_abs_path,
+                    upstream_ws_abs_path=upstream_ws_abs_path,
                 )
             )
         else:
-            compile_cmds.append(get_compile_cmd(create_args.ws_abs_path, create_args.ros_distro))
+            compile_cmds.append(get_compile_cmd(ws_abs_path, create_args.ros_distro))
         return rosdep_cmds + compile_cmds
 
     def execute_ws_cmds(
-        self, create_args: CreateVerbArgs, ws_cmds: List[List[str]], intermediate_container=None
-    ):
+        self,
+        create_args: CreateVerbArgs,
+        ws_cmds: List[List[str]],
+        intermediate_container: Any = None,
+    ) -> None:
         for ws_cmd in ws_cmds:
             print(f"Running ws command: {ws_cmd}")
             ws_cmd_str = " ".join(ws_cmd)
@@ -646,21 +749,23 @@ class CreateVerb(VerbExtension):
         self, create_args: CreateVerbArgs, intermediate_container: Any
     ):
         print("Changing workspace folder permissions in the intermediate container.")
-        if not change_docker_path_permissions(intermediate_container.id, create_args.ws_abs_path):
+        if not change_docker_path_permissions(
+            intermediate_container.id, create_args.ws_abs_path_in_docker
+        ):
             docker_stop(intermediate_container.id)
             raise RuntimeError(
                 "Failed to change permissions for the main workspace folder "
-                f"{create_args.ws_abs_path}"
+                f"{create_args.ws_abs_path_in_docker}"
             )
 
         if create_args.has_upstream_ws:
             if not change_docker_path_permissions(
-                intermediate_container.id, create_args.upstream_ws_abs_path
+                intermediate_container.id, create_args.upstream_ws_abs_path_in_docker
             ):
                 docker_stop(intermediate_container.id)
                 raise RuntimeError(
                     "Failed to change permissions for the upstream workspace folder "
-                    f"{create_args.upstream_ws_abs_path}"
+                    f"{create_args.upstream_ws_abs_path_in_docker}"
                 )
 
     def setup_rtw_in_intermediate_image(
@@ -670,18 +775,18 @@ class CreateVerb(VerbExtension):
         docker_workspaces_config = WorkspacesConfig()
         if create_args.has_upstream_ws:
             docker_workspaces_config.add_workspace(
-                create_args.upstream_ws_name,
                 Workspace(
+                    ws_name=create_args.upstream_ws_name,
                     distro=create_args.ros_distro,
-                    ws_folder=create_args.upstream_ws_abs_path,
+                    ws_folder=create_args.upstream_ws_abs_path_in_docker,
                 ),
             )
         docker_workspaces_config.add_workspace(
-            create_args.ws_name,
             Workspace(
+                ws_name=create_args.ws_name,
                 distro=create_args.ros_distro,
-                ws_folder=create_args.ws_abs_path,
-                base_ws=create_args.upstream_ws_name if create_args.has_upstream_ws else None,
+                ws_folder=create_args.ws_abs_path_in_docker,
+                base_ws=create_args.upstream_ws_name if create_args.has_upstream_ws else "",
             ),
         )
 
@@ -690,7 +795,15 @@ class CreateVerb(VerbExtension):
             docker_stop(intermediate_container.id)
             raise RuntimeError("Failed to save rtw workspaces file.")
 
-        if not docker_cp(intermediate_container.id, temp_rtw_file, WORKSPACES_PATH):
+        if not docker_cp(
+            container_name=intermediate_container.id,
+            src_path=temp_rtw_file,
+            dest_path=(
+                replace_user_name_in_path(WORKSPACES_PATH, create_args.user_override_name)
+                if create_args.user_override_name
+                else WORKSPACES_PATH
+            ),
+        ):
             docker_stop(intermediate_container.id)
             raise RuntimeError("Failed to copy rtw workspaces file to container.")
 
@@ -719,99 +832,57 @@ class CreateVerb(VerbExtension):
 
         # write the default bashrc with the extra content to the container
         temp_bashrc_file = create_temp_file(content=default_bashrc_content + extra_bashrc_content)
-        if not docker_cp(intermediate_container.id, temp_bashrc_file, BASHRC_PATH):
+        if not docker_cp(
+            intermediate_container.id,
+            temp_bashrc_file,
+            (
+                replace_user_name_in_path(BASHRC_PATH, create_args.user_override_name)
+                if create_args.user_override_name
+                else BASHRC_PATH
+            ),
+        ):
             docker_stop(intermediate_container.id)
             raise RuntimeError("Failed to copy bashrc file to container.")
 
         # change ownership of the whole home folder
-        if not change_docker_path_permissions(intermediate_container.id, os.path.expanduser("~")):
+        if not change_docker_path_permissions(
+            intermediate_container.id,
+            (
+                replace_user_name_in_path(os.path.expanduser("~"), create_args.user_override_name)
+                if create_args.user_override_name
+                else os.path.expanduser("~")
+            ),
+        ):
             raise RuntimeError("Failed to change permissions for the home folder.")
 
         print(f"Committing container '{intermediate_container.id}'")
         try:
             intermediate_container.commit(create_args.final_image_name)
-        except docker.errors.APIError as e:
+        except docker.errors.APIError as e:  # type: ignore
             docker_stop(intermediate_container.id)
             raise RuntimeError(f"Failed to commit container '{intermediate_container.id}': {e}")
 
         # stop the intermediate container after committing
         docker_stop(intermediate_container.id)
 
-    def generate_rocker_flags(self, create_args: CreateVerbArgs) -> List[str]:
-        # rocker flags have order, see rocker --help
-        rocker_flags = ["--nocache", "--nocleanup", "--git"]
-
-        rocker_flags.extend(["-e", "QT_QPA_PLATFORM=xcb"])
-        if not create_args.disable_nvidia:
-            rocker_flags.extend(["-e", "__GLX_VENDOR_LIBRARY_NAME=nvidia"])
-            rocker_flags.extend(["-e", "__NV_PRIME_RENDER_OFFLOAD=1"])
-        if create_args.display_manager == DISPLAY_MANAGER_WAYLAND:
-            waylad_display = os.environ.get("WAYLAND_DISPLAY", None)
-            if not waylad_display:
-                raise RuntimeError("WAYLAND_DISPLAY is not set.")
-            rocker_flags.extend(["-e", "XDG_RUNTIME_DIR=/tmp"])
-            rocker_flags.extend(["-e", f"WAYLAND_DISPLAY={waylad_display}"])
-            rocker_flags.extend(
-                ["-v", f"{os.environ['XDG_RUNTIME_DIR']}/{waylad_display}:/tmp/{waylad_display}"]
-            )
-
-        rocker_flags.extend(["--hostname", f"rtw-{create_args.ws_name}-docker"])
-        rocker_flags.extend(["--name", f"{create_args.container_name}"])
-        rocker_flags.extend(["--network", "host"])
-
-        if not create_args.disable_nvidia:
-            rocker_flags.extend(["--nvidia", "gpus"])
-
-        rocker_flags.extend(["--user", "--user-preserve-home"])
-
-        # rocker volumes
-        rocker_flags.append("--volume")
-        rocker_flags.append(f"{create_args.ssh_abs_path}:{create_args.ssh_abs_path}:ro")
-        rocker_flags.append(f"{create_args.ws_abs_path}:{create_args.ws_abs_path}")
-        if create_args.has_upstream_ws:
-            rocker_flags.append(
-                f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path}"
-            )
-
-        rocker_flags.append("--x11tmp")
-        rocker_flags.extend(["--mode", "interactive"])
-        rocker_flags.extend(["--image-name", f"{create_args.final_image_name}"])
-
-        return rocker_flags
-
-    def execute_rocker_cmd(self, create_args: CreateVerbArgs) -> bool:
-        rocker_flags = self.generate_rocker_flags(create_args)
-        rocker_base_image_name = create_args.final_image_name
-        rocker_cmd = ["rocker"] + rocker_flags + [rocker_base_image_name]
-        rocker_cmd_str = " ".join(rocker_cmd)
-
-        print(
-            f"Creating final image '{create_args.final_image_name}' "
-            f"and container '{create_args.container_name}' "
-            f"with command '{rocker_cmd_str}'"
-        )
-
-        return run_command(rocker_cmd)
-
     def main(self, *, args):
-        args_dict = vars(args)
-        valid_fields = {field.name for field in fields(CreateVerbArgs)}
-        filtered_args = {key: args_dict[key] for key in valid_fields if key in args_dict}
+        ws_name = os.path.basename(args.ws_folder)
+        if ws_name in get_workspace_names():
+            raise RuntimeError(
+                f"Workspace with name '{ws_name}' already exists. "
+                "Overwriting existing workspaces is not supported yet."
+            )
+
+        if get_display_manager() == DISPLAY_MANAGER_WAYLAND:
+            print(f"Wayland display manager detected: '{DISPLAY_MANAGER_WAYLAND}'.")
+
+        filtered_args = get_filtered_args(args, list(fields(CreateVerbArgs)))
         filtered_args["ws_abs_path"] = os.path.normpath(os.path.abspath(args.ws_folder))
 
         create_args = CreateVerbArgs(**filtered_args)
         print("### CREATE ARGS ###")
         pprint(create_args)
         print("### CREATE ARGS ###")
-        if create_args.display_manager == DISPLAY_MANAGER_WAYLAND:
-            print(f"Wayland display manager detected: '{create_args.display_manager}'")
-
-        ws_names = get_workspace_names()
-        if create_args.ws_name in ws_names:
-            raise RuntimeError(
-                f"Workspace with name '{create_args.ws_name}' already exists. "
-                "Overwriting existing workspaces is not supported yet."
-            )
 
         if create_args.docker:
             self.build_intermediate_docker_image(create_args)
@@ -829,7 +900,29 @@ class CreateVerb(VerbExtension):
         if create_args.docker:
             self.change_ws_folder_permissions(create_args, intermediate_container)
             self.setup_rtw_in_intermediate_image(create_args, intermediate_container)
-            if not self.execute_rocker_cmd(create_args):
+
+            rocker_ws_volumes = []
+            if not create_args.standalone:
+                rocker_ws_volumes.append(
+                    f"{create_args.ws_abs_path}:{create_args.ws_abs_path_in_docker}"
+                )
+                if create_args.has_upstream_ws:
+                    rocker_ws_volumes.append(
+                        f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path_in_docker}"
+                    )
+
+            rocker_flags = generate_rocker_flags(
+                disable_nvidia=create_args.disable_nvidia,
+                container_name=create_args.container_name,
+                hostname=create_args.hostname,
+                ssh_abs_path=create_args.ssh_abs_path,
+                ssh_abs_path_in_docker=create_args.ssh_abs_path_in_docker,
+                final_image_name=create_args.final_image_name,
+                ws_volumes=rocker_ws_volumes,
+                user_override_name=create_args.user_override_name,
+            )
+
+            if not execute_rocker_cmd(rocker_flags, create_args.rocker_base_image_name):
                 # ask the user to still save ws config even if there was a rocker error
                 still_save_config = questionary.confirm(
                     "Rocker command failed. Do you still want to save the workspace config?"
@@ -840,25 +933,33 @@ class CreateVerb(VerbExtension):
         # create local upstream workspace
         if create_args.has_upstream_ws:
             local_upstream_ws = Workspace(
+                ws_name=create_args.upstream_ws_name,
                 ws_folder=create_args.upstream_ws_abs_path,
                 distro=create_args.ros_distro,
                 ws_docker_support=True if create_args.docker else False,
-                docker_tag=create_args.final_image_name if create_args.docker else None,
-                docker_container_name=create_args.container_name if create_args.docker else None,
+                docker_tag=create_args.final_image_name if create_args.docker else "",
+                docker_container_name=create_args.container_name if create_args.docker else "",
+                standalone=create_args.standalone,
             )
-            if not update_workspaces_config(
-                WORKSPACES_PATH, create_args.upstream_ws_name, local_upstream_ws
-            ):
+            if not update_workspaces_config(WORKSPACES_PATH, local_upstream_ws):
                 raise RuntimeError("Failed to update workspaces config with upstream workspace.")
 
         # create local main workspace
         local_main_ws = Workspace(
+            ws_name=create_args.ws_name,
             ws_folder=create_args.ws_abs_path,
             distro=create_args.ros_distro,
             ws_docker_support=True if create_args.docker else False,
-            docker_tag=create_args.final_image_name if create_args.docker else None,
-            base_ws=create_args.upstream_ws_name if create_args.has_upstream_ws else None,
-            docker_container_name=create_args.container_name if create_args.docker else None,
+            docker_tag=create_args.final_image_name if create_args.docker else "",
+            base_ws=create_args.upstream_ws_name if create_args.has_upstream_ws else "",
+            docker_container_name=create_args.container_name if create_args.docker else "",
+            standalone=create_args.standalone,
         )
-        if not update_workspaces_config(WORKSPACES_PATH, create_args.ws_name, local_main_ws):
+        if not update_workspaces_config(WORKSPACES_PATH, local_main_ws):
             raise RuntimeError("Failed to update workspaces config with main workspace.")
+
+        # remove the local files if the standalone flag is set
+        if create_args.standalone:
+            shutil.rmtree(create_args.ws_abs_path)
+            if create_args.has_upstream_ws:
+                shutil.rmtree(create_args.upstream_ws_abs_path)

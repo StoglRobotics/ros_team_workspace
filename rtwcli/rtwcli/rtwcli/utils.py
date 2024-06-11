@@ -13,10 +13,13 @@
 # limitations under the License.
 
 
+import argparse
+from dataclasses import Field
+import getpass
 import os
 import subprocess
 import tempfile
-from typing import Any
+from typing import Any, Dict, List, Union
 
 import yaml
 
@@ -85,7 +88,12 @@ def create_file_and_write(file_path: str, content: str) -> bool:
         return False
 
 
-def run_command(command, shell: bool = False, cwd: str = None, ignore_codes=None) -> bool:
+def run_command(
+    command,
+    shell: bool = False,
+    cwd: Union[str, None] = None,
+    ignore_codes: Union[List[int], None] = None,
+) -> bool:
     """Run a command and return True if it was successful."""
     print(f"Running command: '{command}'")
     try:
@@ -100,12 +108,12 @@ def run_command(command, shell: bool = False, cwd: str = None, ignore_codes=None
     return False
 
 
-def run_bash_command(command: str, shell: bool = False, cwd: str = None) -> bool:
+def run_bash_command(command: str, shell: bool = False, cwd: Union[str, None] = None) -> bool:
     """Run a bash command and return True if it was successful."""
     return run_command(["bash", "-c", command], shell=shell, cwd=cwd)
 
 
-def create_temp_file(content: str = None) -> str:
+def create_temp_file(content: Union[str, None] = None) -> str:
     """Create a temporary file and return its path."""
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
         if content:
@@ -149,3 +157,24 @@ def git_clone(url: str, branch: str, path: str) -> bool:
     Return True if the clone was successful.
     """
     return run_command(["git", "clone", url, "--branch", branch, path])
+
+
+def replace_user_name_in_path(
+    path: str, new_user: str, current_user: str = getpass.getuser()
+) -> str:
+    return path.replace(f"/home/{current_user}", f"/home/{new_user}")
+
+
+def get_display_manager() -> str:
+    # Command to get the display manager type
+    cmd = "loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}'"
+    result = subprocess.run(["bash", "-c", cmd], capture_output=True, text=True)
+
+    # Capture the output and remove any trailing newlines or spaces
+    return result.stdout.strip()
+
+
+def get_filtered_args(args: argparse.Namespace, dataclass_fields: List[Field]) -> Dict[str, Any]:
+    args_dict = vars(args)
+    valid_fields = {field.name for field in dataclass_fields}
+    return {key: args_dict[key] for key in valid_fields if key in args_dict}

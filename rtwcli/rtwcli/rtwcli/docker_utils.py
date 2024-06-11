@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import os
+from typing import Union
 
-from rtwcli.utils import run_command
+from rtwcli.utils import create_file_if_not_exists, run_command
 import docker
 
 
@@ -23,13 +24,20 @@ def is_docker_tag_valid(tag: str) -> bool:
     try:
         docker_client = docker.from_env()
         return docker_client.images.get(tag) is not None
-    except (docker.errors.ImageNotFound, docker.errors.APIError) as e:
+    except (
+        docker.errors.ImageNotFound,  # type: ignore
+        docker.errors.APIError,  # type: ignore
+    ) as e:
         print(f"Failed to get docker image '{tag}': {e}")
         return False
 
 
 def docker_build(
-    tag: str, dockerfile_path: str, file: str = None, pull: bool = True, no_cache: bool = True
+    tag: str,
+    dockerfile_path: str,
+    file: Union[str, None] = None,
+    pull: bool = True,
+    no_cache: bool = True,
 ) -> bool:
     """Build a docker image with the given tag from the given dockerfile path."""
     docker_build_command = ["docker", "build", "-t", tag]
@@ -112,16 +120,97 @@ def is_docker_container_running(id_or_name: str, running_status: str = "running"
         docker_client = docker.from_env()
         container = docker_client.containers.get(id_or_name)
         return container.status == running_status
-    except (docker.errors.NotFound, docker.errors.APIError) as e:
+    except (
+        docker.errors.NotFound,  # type: ignore
+        docker.errors.APIError,  # type: ignore
+    ) as e:
         print(f"Failed to get docker container '{id_or_name}': {e}")
         return False
 
 
 def change_docker_path_permissions(
-    container_name: str, path: str, user_in: str = None, group_in: str = None
+    container_name: str,
+    path: str,
+    user_in: Union[str, None] = None,
+    group_in: Union[str, None] = None,
 ) -> bool:
     """Change the permissions of the given path in the given container to the given user and group."""
     user = user_in if user_in else os.getuid()
     group = group_in if group_in else os.getgid()
     print(f"Changing permissions of the path '{path}' to '{user}:{group}' in '{container_name}'.")
     return docker_exec_bash_cmd(container_name, f"chown -R {user}:{group} {path}")
+
+
+def fix_missing_xauth_file(
+    container_name: str,
+    mounts_attr: str = "Mounts",
+    source_key: str = "Source",
+    xauth_file_ext: str = ".xauth",
+) -> bool:
+    """Fix missing xauth file for the given container."""
+    try:
+        docker_client = docker.from_env()
+        container = docker_client.containers.get(container_name)
+    except (
+        docker.errors.NotFound,  # type: ignore
+        docker.errors.APIError,  # type: ignore
+    ) as e:
+        print(f"Failed to get docker container '{container_name}': {e}")
+        return False
+
+    if not container:
+        print(f"Container object is None for container '{container_name}'.")
+        return False
+
+    if not container.attrs:
+        print(f"Container attributes are None for container '{container_name}'.")
+        return False
+
+    if mounts_attr not in container.attrs:
+        print(
+            f"Container attributes do not contain '{mounts_attr}' for container '{container_name}'."
+        )
+        return False
+
+    xauth_file_abs_path = None
+    for mount in container.attrs[mounts_attr]:
+        if source_key in mount and xauth_file_ext in mount[source_key]:
+            xauth_file_abs_path = mount[source_key]
+            print(
+                f"Found {xauth_file_ext} file '{xauth_file_abs_path}' for container '{container_name}'."
+            )
+            break
+
+    if not xauth_file_abs_path:
+        print(
+            f"There is no {xauth_file_ext} file for container '{container_name}'. Nothing to do."
+        )
+        return True
+
+    if os.path.isfile(xauth_file_abs_path):
+        print(f"File '{xauth_file_abs_path}' already exists.")
+        return True
+
+    if os.path.isdir(xauth_file_abs_path):
+        print(f"Path '{xauth_file_abs_path}' is a directory, removing it.")
+        try:
+            os.rmdir(xauth_file_abs_path)
+        except OSError as e:
+            print(f"Failed to remove directory '{xauth_file_abs_path}': {e}")
+            print("========================================")
+            print("Please remove it manually and try again.")
+            print("========================================")
+            return False
+
+    if not create_file_if_not_exists(xauth_file_abs_path):
+        print(f"Failed to create file '{xauth_file_abs_path}'.")
+        return False
+
+    cmd = f"xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f {xauth_file_abs_path} nmerge -"
+
+    if not run_command(cmd, shell=True):
+        print(f"Failed to run command '{cmd}'. File '{xauth_file_abs_path}' will be removed.")
+        os.remove(xauth_file_abs_path)
+        return False
+
+    return True
