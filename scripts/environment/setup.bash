@@ -84,7 +84,7 @@ elif [[ $ros_version == 2 ]]; then
   if [[ $RosTeamWS_WS_DOCKER_SUPPORT == true && $RosTeamWS_STANDALONE == true ]]; then
     export ROS_WS=$RosTeamWS_WS_NAME
     echo -e "${TERMINAL_COLOR_YELLOW}RosTeamWS: In standalone docker mode there is nothing \
-  to source locally. Please switch to docker container first.${TERMINAL_COLOR_NC}"
+to source locally. Please switch to docker container first.${TERMINAL_COLOR_NC}"
     return
   fi
 
