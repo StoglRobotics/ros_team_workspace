@@ -866,6 +866,16 @@ class CreateVerb(VerbExtension):
         docker_stop(intermediate_container.id)
 
     def main(self, *, args):
+        ws_name = os.path.basename(args.ws_folder)
+        if ws_name in get_workspace_names():
+            raise RuntimeError(
+                f"Workspace with name '{ws_name}' already exists. "
+                "Overwriting existing workspaces is not supported yet."
+            )
+
+        if get_display_manager() == DISPLAY_MANAGER_WAYLAND:
+            print(f"Wayland display manager detected: '{DISPLAY_MANAGER_WAYLAND}'.")
+
         filtered_args = get_filtered_args(args, list(fields(CreateVerbArgs)))
         filtered_args["ws_abs_path"] = os.path.normpath(os.path.abspath(args.ws_folder))
 
@@ -873,16 +883,6 @@ class CreateVerb(VerbExtension):
         print("### CREATE ARGS ###")
         pprint(create_args)
         print("### CREATE ARGS ###")
-        display_manager = get_display_manager()
-        if display_manager == DISPLAY_MANAGER_WAYLAND:
-            print(f"Wayland display manager detected: '{display_manager}'")
-
-        ws_names = get_workspace_names()
-        if create_args.ws_name in ws_names:
-            raise RuntimeError(
-                f"Workspace with name '{create_args.ws_name}' already exists. "
-                "Overwriting existing workspaces is not supported yet."
-            )
 
         if create_args.docker:
             self.build_intermediate_docker_image(create_args)
