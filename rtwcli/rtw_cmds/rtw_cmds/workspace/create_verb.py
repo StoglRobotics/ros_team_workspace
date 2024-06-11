@@ -960,6 +960,11 @@ class CreateVerb(VerbExtension):
 
         # remove the local files if the standalone flag is set
         if create_args.standalone:
+            print("Standalone flag is set. Removing the local workspace files.")
             shutil.rmtree(create_args.ws_abs_path)
+            print(f"Removed the workspace folder '{create_args.ws_abs_path}'")
             if create_args.has_upstream_ws:
                 shutil.rmtree(create_args.upstream_ws_abs_path)
+                print(
+                    f"Removed the upstream workspace folder '{create_args.upstream_ws_abs_path}'"
+                )
