@@ -26,7 +26,7 @@ export ROS_WS_CACHE_SOURCED_TIME=0
 function update_ros_ws_variables {
   local python_constants_file="$setup_script_own_dir/rtwcli/rtwcli/rtwcli/constants.py"
   local ws_use_bash_file_path_format
-  ws_use_bash_file_path_format=$(python -c "
+  ws_use_bash_file_path_format=$(python3 -c "
 import os; import pathlib; import sys
 sys.path.insert(0, os.path.dirname('$python_constants_file'))
 from rtwcli.constants import WS_USE_BASH_FILE_PATH_FORMAT
