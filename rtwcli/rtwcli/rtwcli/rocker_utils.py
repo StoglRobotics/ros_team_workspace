@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-from typing import List
+from typing import List, Union
 
 from rtwcli.constants import DISPLAY_MANAGER_WAYLAND
 from rtwcli.utils import get_display_manager, run_command
@@ -26,8 +26,8 @@ def generate_rocker_flags(
     ssh_abs_path: str,
     ssh_abs_path_in_docker: str,
     final_image_name: str,
-    ws_volumes: List[str] = None,
-    user_override_name: str = None,
+    ws_volumes: Union[List[str], None] = None,
+    user_override_name: Union[str, None] = None,
 ) -> List[str]:
     # rocker flags have order, see rocker --help
     rocker_flags = ["--nocache", "--nocleanup", "--git"]

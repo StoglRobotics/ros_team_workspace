@@ -97,30 +97,30 @@ WS_SRC_FOLDER = "src"
 class CreateVerbArgs:
     ws_abs_path: str
     ros_distro: str
-    docker: bool = False
-    repos_containing_repository_url: str = ""
-    repos_branch: str = ""
-    repos_no_skip_existing: bool = False
-    disable_nvidia: bool = False
-    ws_repos_file_name: str = ""
-    upstream_ws_repos_file_name: str = ""
-    upstream_ws_name: str = ""
-    base_image_name: str = ""
-    final_image_name: str = ""
-    container_name: str = ""
-    standalone: bool = False
-    rtw_docker_repo_url: str = ""
-    rtw_docker_branch: str = ""
-    rtw_docker_clone_abs_path: str = ""
-    apt_packages: List[str] = field(default_factory=list)
-    python_packages: List[str] = field(default_factory=list)
-    ssh_abs_path: str = ""
-    intermediate_dockerfile_name: str = ""
-    intermediate_dockerfile_save_folder: str = ""
+    repos_containing_repository_url: str
+    repos_branch: str
+    ws_repos_file_name: str
+    upstream_ws_repos_file_name: str
+    upstream_ws_name: str
+    base_image_name: str
+    final_image_name: str
+    container_name: str
+    rtw_docker_repo_url: str
+    rtw_docker_branch: str
+    rtw_docker_clone_abs_path: str
+    ssh_abs_path: str
+    intermediate_dockerfile_name: str
+    intermediate_dockerfile_save_folder: str
+    hostname: str
+    user_override_name: str
     has_upstream_ws: bool = False
     ignore_ws_cmd_error: bool = False
-    hostname: str = ""
-    user_override_name: str = ""
+    apt_packages: List[str] = field(default_factory=list)
+    python_packages: List[str] = field(default_factory=list)
+    standalone: bool = False
+    repos_no_skip_existing: bool = False
+    disable_nvidia: bool = False
+    docker: bool = False
 
     @property
     def ws_name(self) -> str:
@@ -129,7 +129,7 @@ class CreateVerbArgs:
     @property
     def ssh_abs_path_in_docker(self) -> str:
         if self.user_override_name:
-            return replace_user_name_in_path(self.ssh_abs_path, self.user_override_name)
+            return replace_user_name_in_path(self.ssh_abs_path or "", self.user_override_name)
         return self.ssh_abs_path
 
     @property
@@ -775,15 +775,15 @@ class CreateVerb(VerbExtension):
         docker_workspaces_config = WorkspacesConfig()
         if create_args.has_upstream_ws:
             docker_workspaces_config.add_workspace(
-                create_args.upstream_ws_name,
                 Workspace(
+                    ws_name=create_args.upstream_ws_name,
                     distro=create_args.ros_distro,
                     ws_folder=create_args.upstream_ws_abs_path_in_docker,
                 ),
             )
         docker_workspaces_config.add_workspace(
-            create_args.ws_name,
             Workspace(
+                ws_name=create_args.ws_name,
                 distro=create_args.ros_distro,
                 ws_folder=create_args.ws_abs_path_in_docker,
                 base_ws=create_args.upstream_ws_name if create_args.has_upstream_ws else "",
@@ -933,27 +933,29 @@ class CreateVerb(VerbExtension):
         # create local upstream workspace
         if create_args.has_upstream_ws:
             local_upstream_ws = Workspace(
+                ws_name=create_args.upstream_ws_name,
                 ws_folder=create_args.upstream_ws_abs_path,
                 distro=create_args.ros_distro,
                 ws_docker_support=True if create_args.docker else False,
                 docker_tag=create_args.final_image_name if create_args.docker else "",
                 docker_container_name=create_args.container_name if create_args.docker else "",
+                standalone=create_args.standalone,
             )
-            if not update_workspaces_config(
-                WORKSPACES_PATH, create_args.upstream_ws_name, local_upstream_ws
-            ):
+            if not update_workspaces_config(WORKSPACES_PATH, local_upstream_ws):
                 raise RuntimeError("Failed to update workspaces config with upstream workspace.")
 
         # create local main workspace
         local_main_ws = Workspace(
+            ws_name=create_args.ws_name,
             ws_folder=create_args.ws_abs_path,
             distro=create_args.ros_distro,
             ws_docker_support=True if create_args.docker else False,
             docker_tag=create_args.final_image_name if create_args.docker else "",
             base_ws=create_args.upstream_ws_name if create_args.has_upstream_ws else "",
             docker_container_name=create_args.container_name if create_args.docker else "",
+            standalone=create_args.standalone,
         )
-        if not update_workspaces_config(WORKSPACES_PATH, create_args.ws_name, local_main_ws):
+        if not update_workspaces_config(WORKSPACES_PATH, local_main_ws):
             raise RuntimeError("Failed to update workspaces config with main workspace.")
 
         # remove the local files if the standalone flag is set

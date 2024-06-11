@@ -18,7 +18,7 @@ import os
 from rtwcli.constants import (
     F_DISTRO,
     F_WS_FOLDER,
-    WS_FOLDER_ENV_VAR,
+    ROS_TEAM_WS_WS_FOLDER_ENV_VAR,
     ROS_TEAM_WS_RC_PATH,
     ROS_TEAM_WS_ENV_VARIABLES,
 )
@@ -85,7 +85,7 @@ class PortVerb(VerbExtension):
                 workspace_data_to_port[ws_var] = ws_var_value
 
             print("Generating workspace name from workspace path with first folder letters: ")
-            ws_path = script_ws_data[WS_FOLDER_ENV_VAR]
+            ws_path = script_ws_data[ROS_TEAM_WS_WS_FOLDER_ENV_VAR]
             new_ws_name = os.path.basename(ws_path)
             print(f"\t'{ws_path}' -> {new_ws_name}")
 
@@ -123,7 +123,12 @@ class PortVerb(VerbExtension):
             workspace_data_to_port[ws_var] = ws_var_value
 
         print("Generating workspace name from workspace path with first folder letters: ")
-        ws_path = os.environ.get(WS_FOLDER_ENV_VAR)
+        ws_path = os.environ.get(ROS_TEAM_WS_WS_FOLDER_ENV_VAR)
+        if not ws_path:
+            raise RuntimeError(
+                f"Environment variable '{ROS_TEAM_WS_WS_FOLDER_ENV_VAR}' is not set."
+            )
+
         new_ws_name = os.path.basename(ws_path)
         print(f"\t'{ws_path}' -> {new_ws_name}")
 

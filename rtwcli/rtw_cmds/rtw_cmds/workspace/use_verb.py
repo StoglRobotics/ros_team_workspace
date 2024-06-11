@@ -13,10 +13,13 @@
 # limitations under the License.
 
 import argparse
-import copy
 import os
 import questionary
-from rtwcli.constants import USE_WORKSPACE_SCRIPT_PATH, WORKSPACES_KEY, WORKSPACES_PATH
+from rtwcli.constants import (
+    USE_WORKSPACE_SCRIPT_PATH,
+    WORKSPACES_PATH,
+    WS_USE_BASH_FILE_PATH_FORMAT,
+)
 from rtwcli.utils import create_file_and_write
 from rtwcli.verb import VerbExtension
 from rtwcli.workspace_manger import (
@@ -32,7 +35,7 @@ def add_rtw_workspace_use_args(parser: argparse.ArgumentParser):
         help="The workspace name",
         nargs="?",
     )
-    arg.completer = workspace_name_completer
+    arg.completer = workspace_name_completer  # type: ignore
 
 
 class UseVerb(VerbExtension):
@@ -55,7 +58,7 @@ class UseVerb(VerbExtension):
                 "Choose workspace",
                 ws_names,
                 qmark="'Tab' to see all workspaces, type to filter, 'Enter' to select\n",
-                meta_information=copy.deepcopy(workspaces_config.to_dict()[WORKSPACES_KEY]),
+                meta_information=workspaces_config.ws_meta_information,
                 validate=lambda ws_choice: ws_choice in ws_names,
                 style=questionary.Style([("answer", "bg:ansiwhite")]),
                 match_middle=True,
@@ -72,7 +75,7 @@ class UseVerb(VerbExtension):
         script_content = create_bash_script_content_for_using_ws(
             workspace, USE_WORKSPACE_SCRIPT_PATH
         )
-        tmp_file = f"/tmp/ros_team_workspace/wokspace_{os.getppid()}.bash"
+        tmp_file = WS_USE_BASH_FILE_PATH_FORMAT.format(ppid=os.getppid())
         print(f"Following text will be written into file '{tmp_file}':\n{script_content}")
         if not create_file_and_write(tmp_file, content=script_content):
             return f"Failed to write workspace data to a file {tmp_file}."

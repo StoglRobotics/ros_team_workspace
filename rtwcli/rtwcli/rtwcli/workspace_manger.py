@@ -17,7 +17,7 @@ import datetime
 import os
 import re
 import shutil
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple, Union
 import questionary
 
 from rtwcli.constants import (
@@ -26,11 +26,12 @@ from rtwcli.constants import (
     F_DOCKER_CONTAINER_NAME,
     F_DOCKER_TAG,
     F_WS_DOCKER_SUPPORT,
+    F_WS_NAME,
     ROS_TEAM_WS_PREFIX,
     WORKSPACES_KEY,
     WORKSPACES_PATH,
     WORKSPACES_PATH_BACKUP_FORMAT,
-    WS_FOLDER_ENV_VAR,
+    ROS_TEAM_WS_WS_NAME_ENV_VAR,
 )
 from rtwcli.docker_utils import is_docker_tag_valid
 from rtwcli.utils import create_file_if_not_exists, load_yaml_file, write_to_yaml_file
@@ -40,12 +41,14 @@ from rtwcli.utils import create_file_if_not_exists, load_yaml_file, write_to_yam
 class Workspace:
     """A dataclass representing a workspace."""
 
+    ws_name: str
     distro: str
     ws_folder: str
     ws_docker_support: bool = False
-    docker_tag: str = None
-    docker_container_name: str = None
-    base_ws: str = None
+    docker_tag: str = ""
+    docker_container_name: str = ""
+    base_ws: str = ""
+    standalone: bool = False
 
     def __post_init__(self):
         self.distro = str(self.distro)
@@ -58,6 +61,13 @@ class Workspace:
         if self.docker_container_name is not None:
             self.docker_container_name = str(self.docker_container_name)
 
+    def to_dict(self) -> Dict[str, Any]:
+        result = dataclasses.asdict(self)
+        for key, value in result.items():
+            if value == "":
+                result[key] = None
+        return result
+
 
 @dataclasses.dataclass
 class WorkspacesConfig:
@@ -65,34 +75,35 @@ class WorkspacesConfig:
 
     workspaces: Dict[str, Workspace] = dataclasses.field(default_factory=dict)
 
+    @property
+    def ws_meta_information(self) -> Dict[str, Any]:
+        return self.to_dict()[WORKSPACES_KEY]
+
     @classmethod
     def from_dict(cls, data: Dict[str, Dict[str, dict]]) -> "WorkspacesConfig":
         if not data:
             return cls({})
 
-        workspaces = {
-            ws_name: Workspace(**ws_data)
-            for ws_name, ws_data in data.get(WORKSPACES_KEY, {}).items()
-        }
+        workspaces = {}
+        for ws_name, ws_data in data.get(WORKSPACES_KEY, {}).items():
+            if F_WS_NAME not in ws_data:
+                ws_data[F_WS_NAME] = ws_name
+            workspaces[ws_name] = Workspace(**ws_data)
         return cls(workspaces)
 
     def to_dict(self) -> Dict[str, Dict[str, dict]]:
-        return {
-            WORKSPACES_KEY: {
-                ws_name: dataclasses.asdict(ws) for ws_name, ws in self.workspaces.items()
-            }
-        }
+        return {WORKSPACES_KEY: {ws_name: ws.to_dict() for ws_name, ws in self.workspaces.items()}}
 
     def get_ws_names(self) -> List[str]:
         if not self.workspaces:
             return []
         return list(self.workspaces.keys())
 
-    def add_workspace(self, ws_name: str, workspace: Workspace) -> bool:
-        if ws_name in self.workspaces:
-            print(f"Workspace '{ws_name}' already exists in the config.")
+    def add_workspace(self, workspace: Workspace) -> bool:
+        if workspace.ws_name in self.workspaces:
+            print(f"Workspace '{workspace.ws_name}' already exists in the config.")
             return False
-        self.workspaces[ws_name] = workspace
+        self.workspaces[workspace.ws_name] = workspace
         return True
 
 
@@ -106,15 +117,15 @@ def save_workspaces_config(filepath: str, config: WorkspacesConfig):
     return write_to_yaml_file(filepath, config.to_dict())
 
 
-def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspace) -> bool:
+def update_workspaces_config(config_path: str, workspace: Workspace) -> bool:
     """Update the workspaces config with a new workspace."""
     if not create_file_if_not_exists(config_path):
         print("Could not create workspaces config file. Cannot proceed with porting.")
         return False
 
     workspaces_config = load_workspaces_config_from_yaml_file(config_path)
-    if not workspaces_config.add_workspace(ws_name, workspace):
-        print(f"Failed to add workspace '{ws_name}' to the config.")
+    if not workspaces_config.add_workspace(workspace):
+        print(f"Failed to add workspace '{workspace.ws_name}' to the config.")
         return False
 
     # Backup current config file
@@ -128,11 +139,11 @@ def update_workspaces_config(config_path: str, ws_name: str, workspace: Workspac
         print(f"Failed to update YAML file '{config_path}'.")
         return False
 
-    print(f"Updated YAML file '{config_path}' with a new workspace '{ws_name}'")
+    print(f"Updated YAML file '{config_path}' with a new workspace '{workspace.ws_name}'")
     return True
 
 
-def get_current_workspace() -> Workspace:
+def get_current_workspace() -> Union[Workspace, None]:
     """Retrieve the current workspace from the workspaces config."""
     ws_name = get_current_workspace_name()
     if not ws_name:
@@ -145,14 +156,14 @@ def get_current_workspace() -> Workspace:
     return workspaces_config.workspaces.get(ws_name, None)
 
 
-def get_current_workspace_name() -> str:
+def get_current_workspace_name() -> Union[str, None]:
     """Retrieve the current workspace name from the environment variable."""
-    ros_ws_folder = os.environ.get(WS_FOLDER_ENV_VAR, None)
-    if not ros_ws_folder:
-        print(f"Environment variable '{WS_FOLDER_ENV_VAR}' not set.")
+    ros_ws_name = os.environ.get(ROS_TEAM_WS_WS_NAME_ENV_VAR, None)
+    if not ros_ws_name:
+        print(f"Environment variable '{ROS_TEAM_WS_WS_NAME_ENV_VAR}' not set.")
         return None
 
-    return os.path.basename(ros_ws_folder)
+    return ros_ws_name
 
 
 def extract_workspaces_from_bash_script(script_path: str) -> Dict[str, dict]:
@@ -163,7 +174,7 @@ def extract_workspaces_from_bash_script(script_path: str) -> Dict[str, dict]:
     workspaces = re.findall(r"(\w+ \(\) \{[^}]+\})", data, re.MULTILINE)
     workspaces_dict = {}
     for workspace in workspaces:
-        ws_name = re.search(r"(\w+) \(", workspace).group(1)
+        ws_name = re.search(r"(\w+) \(", workspace).group(1)  # type: ignore
         workspaces_dict[ws_name] = {}
         variables = re.findall(r'(?:export )?(\w+)=(".*?"|\'.*?\'|[^ ]+)', workspace)
         for var, val in variables:
@@ -172,7 +183,7 @@ def extract_workspaces_from_bash_script(script_path: str) -> Dict[str, dict]:
     return workspaces_dict
 
 
-def env_var_to_workspace_var(env_var: str, env_var_value: str) -> str:
+def env_var_to_workspace_var(env_var: str, env_var_value: Union[str, None]) -> Tuple[str, Any]:
     """Convert an environment variable to a workspace variable."""
     ws_var = env_var.replace(ROS_TEAM_WS_PREFIX, "").lower()
     if env_var_value == "false":
@@ -184,7 +195,7 @@ def env_var_to_workspace_var(env_var: str, env_var_value: str) -> str:
     return ws_var, ws_var_value
 
 
-def workspace_var_to_env_var(ws_var: str, ws_var_value: Any) -> str:
+def workspace_var_to_env_var(ws_var: str, ws_var_value: Any) -> Tuple[str, str]:
     """Convert a workspace variable to an environment variable."""
     env_var = ROS_TEAM_WS_PREFIX + ws_var.upper()
     if type(ws_var_value) is bool:
@@ -200,7 +211,7 @@ def create_bash_script_content_for_using_ws(
     """Create a bash script content for using a workspace."""
     bash_script_content = "#!/bin/bash\n"
 
-    ws_data = dataclasses.asdict(workspace)
+    ws_data = workspace.to_dict()
     for ws_var, ws_var_value in ws_data.items():
         env_var, env_var_value = workspace_var_to_env_var(ws_var, ws_var_value)
         bash_script_content += f"export {env_var}='{env_var_value}'\n"
@@ -228,6 +239,8 @@ def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str)
         workspace_data_to_port[F_BASE_WS] = None
     if F_DOCKER_CONTAINER_NAME not in workspace_data_to_port:
         workspace_data_to_port[F_DOCKER_CONTAINER_NAME] = None
+    if F_WS_NAME not in workspace_data_to_port:
+        workspace_data_to_port[F_WS_NAME] = new_ws_name
 
     # validate workspace fields
     if not workspace_data_to_port[F_WS_DOCKER_SUPPORT]:
@@ -273,7 +286,7 @@ def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str)
 
     workspace_to_port = Workspace(**workspace_data_to_port)
     print(f"Updating workspace config in '{WORKSPACES_PATH}'")
-    success = update_workspaces_config(WORKSPACES_PATH, new_ws_name, workspace_to_port)
+    success = update_workspaces_config(WORKSPACES_PATH, workspace_to_port)
     if success:
         print(f"Updated workspace config in '{WORKSPACES_PATH}'")
         return True
@@ -285,7 +298,7 @@ def try_port_workspace(workspace_data_to_port: Dict[str, Any], new_ws_name: str)
 def get_compile_cmd(
     ws_path_abs: str,
     distro: str,
-    upstream_ws_abs_path: str = None,
+    upstream_ws_abs_path: Union[str, None] = None,
     distro_setup_bash_format: str = "/opt/ros/{distro}/setup.bash",
     upstream_ws_setup_bash_format: str = "{upstream_ws_abs_path}/install/setup.bash",
 ) -> List[str]:

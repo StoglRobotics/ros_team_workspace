@@ -36,11 +36,13 @@ class ImportVerbArgs:
     standalone_docker_image: str
     docker: bool = True
     disable_nvidia: bool = False
+    standalone: bool = True
     final_image_name: str = ""
     container_name: str = ""
     ssh_abs_path: str = ""
     hostname: str = ""
     user_override_name: str = ""
+    ws_abs_path: str = ""
 
     @property
     def ssh_abs_path_in_docker(self) -> str:
@@ -150,11 +152,13 @@ class ImportVerb(VerbExtension):
 
         # create local main workspace
         local_main_ws = Workspace(
-            ws_folder="",
+            ws_name=import_args.ws_name,
+            ws_folder=import_args.ws_abs_path,
             distro=import_args.ros_distro,
             ws_docker_support=import_args.docker,
             docker_tag=import_args.final_image_name,
             docker_container_name=import_args.container_name,
+            standalone=import_args.standalone,
         )
-        if not update_workspaces_config(WORKSPACES_PATH, import_args.ws_name, local_main_ws):
+        if not update_workspaces_config(WORKSPACES_PATH, local_main_ws):
             raise RuntimeError("Failed to update workspaces config with main workspace.")
