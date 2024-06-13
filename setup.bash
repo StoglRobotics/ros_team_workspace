@@ -24,7 +24,7 @@ source $setup_script_own_dir/rtwcli/rtwcli/completion/rtw-argcomplete.bash
 # rtwcli: export ros workspace variables if chosen (rtw workspace use)
 export ROS_WS_CACHE_SOURCED_TIME=0
 function update_ros_ws_variables {
-  local file_name="/tmp/ros_team_workspace/workspace_{$$}.bash"
+  local file_name="/tmp/ros_team_workspace/workspace_$$.bash"
   if [[ -f $file_name ]]; then # If file exists
     local file_mod_time
     file_mod_time=$(stat -c %Y $file_name)
