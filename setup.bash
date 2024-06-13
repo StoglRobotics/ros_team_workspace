@@ -24,28 +24,16 @@ source $setup_script_own_dir/rtwcli/rtwcli/completion/rtw-argcomplete.bash
 # rtwcli: export ros workspace variables if chosen (rtw workspace use)
 export ROS_WS_CACHE_SOURCED_TIME=0
 function update_ros_ws_variables {
-  local python_constants_file="$setup_script_own_dir/rtwcli/rtwcli/rtwcli/constants.py"
-  local ws_use_bash_file_path_format
-  ws_use_bash_file_path_format=$(python3 -c "
-import os; import pathlib; import sys
-sys.path.insert(0, os.path.dirname('$python_constants_file'))
-from rtwcli.constants import WS_USE_BASH_FILE_PATH_FORMAT
-print(WS_USE_BASH_FILE_PATH_FORMAT)")
+  local file_name="/tmp/ros_team_workspace/workspace_{$$}.bash"
+  if [[ -f $file_name ]]; then # If file exists
+    local file_mod_time
+    file_mod_time=$(stat -c %Y $file_name)
 
-  if [[ -z $ws_use_bash_file_path_format ]]; then
-    echo "Error: Could not get WS_USE_BASH_FILE_PATH_FORMAT from $python_constants_file"
-  else
-    local file_name="${ws_use_bash_file_path_format//\{ppid\}/$$}"
-    if [[ -f $file_name ]]; then # If file exists
-      local file_mod_time
-      file_mod_time=$(stat -c %Y $file_name)
-
-      # If file was modified after the last source operation
-      if ((file_mod_time > ROS_WS_CACHE_SOURCED_TIME)); then
-        source "$file_name"
-        ROS_WS_CACHE_SOURCED_TIME=$file_mod_time
-        export ROS_WS_CACHE_SOURCED_TIME
-      fi
+    # If file was modified after the last source operation
+    if ((file_mod_time > ROS_WS_CACHE_SOURCED_TIME)); then
+      source "$file_name"
+      ROS_WS_CACHE_SOURCED_TIME=$file_mod_time
+      export ROS_WS_CACHE_SOURCED_TIME
     fi
   fi
 }
