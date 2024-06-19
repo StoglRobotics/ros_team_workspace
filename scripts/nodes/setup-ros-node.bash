@@ -60,7 +60,7 @@ choice=${choice:="1"}
 if [ "$choice" != 0 ]; then
   echo -n -e "${TERMINAL_COLOR_USER_INPUT_DECISION}Insert your company or personal name (copyright): ${TERMINAL_COLOR_NC}"
   read NAME_ON_LICENSE
-  NAME_ON_LICENSE=${NAME_ON_LICENSE=""}
+  NAME_ON_LICENSE=${NAME_ON_LICENSE:=""}
   YEAR_ON_LICENSE=$(date +%Y)
 fi
 
