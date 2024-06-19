@@ -23,7 +23,7 @@ check_and_set_ros_distro_and_version "${ROS_DISTRO}"
 
 FILE_NAME=$1
 if [ -z "$FILE_NAME" ]; then
-  print_and_exit "ERROR: You should provide robot name! Nothing to do 😯" "$usage"
+  print_and_exit "ERROR: You should provide node file name! Nothing to do 😯" "$usage"
 fi
 
 PKG_DEPS=$2
