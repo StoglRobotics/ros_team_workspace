@@ -99,7 +99,7 @@ function rtw-find-and-remove-core-files () {
 
   user_decision "Do you want to delete those files?" user_answer
   if [[ " ${positive_answers[*]} " =~ " ${user_answer} " ]]; then
-  find "${search_dir}" -type f -regex ".*core\.[0-9]+"
+    find "${search_dir}" -type f -regex ".*core\.[0-9]+"
     notify_user "Files ARE deleted!"
   else
     notify_user "Files NOT deleted!"
