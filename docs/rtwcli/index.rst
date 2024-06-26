@@ -56,8 +56,8 @@ streamlining the setup process for complex projects with multiple repositories.
         containing the ``.repos`` files
         * Main ws repos format: ``{repo_name}.{ros_distro}.repos``
         * Upstream ws repos format: ``{repo_name}.{ros_distro}.upstream.repos``
-      * ``--repos-branch``: Branch of the repository containing the ``.repos``
-        files
+      * ``--repos-branch <branch>``: Branch of the repository containing the
+        ``.repos`` files
 
 * Example:
 
@@ -75,6 +75,47 @@ streamlining the setup process for complex projects with multiple repositories.
    * This command will create a new dockerized workspace named ``dummy_ws``
      with ROS distribution ``humble`` using the ``.repos`` files from the
      repository ``sr_dummy_packages`` on branch ``dummy_demo_pkg``.
+
+* Example of a ``standalone`` workspace and ``robot`` user:
+
+.. code-block:: bash
+
+   rtw workspace create \
+      --ws-folder dummy_ws \
+      --ros-distro humble \
+      --docker \
+      --repos-containing-repository-url \
+         git@github.com:StoglRobotics/sr_dummy_packages.git \
+      --repos-branch dummy_demo_pkg \
+      --standalone \
+      --user-override-name robot
+..
+
+   * This command will create a new dockerized standalone workspace named
+     ``dummy_ws`` with ROS distribution ``humble`` using the
+     ``.repos`` files from the repository ``sr_dummy_packages`` on branch
+     ``dummy_demo_pkg``.
+
+     However, for exporting the workspace docker image, the commit command must
+     be executed first:
+
+     .. code-block:: bash
+
+         docker commit rtw_dummy_ws_final-instance rtw_dummy_ws_export
+
+     When importing the workspace docker image, the following command must be
+     executed:
+
+     .. code-block:: bash
+
+         rtw workspace import \
+            --ws-name dummy_import_ws \
+            --ros-distro humble \
+            --standalone-docker-image rtw_dummy_ws_export \
+            --user-override-name robot
+
+     The ``--user-override-name`` flag is necessary to create the user with
+     the same name as the one used in the exported workspace.
 
 .. important::
    After PC restart, the ``.xauth`` cookie file will be removed. Therefore,
