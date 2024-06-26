@@ -26,19 +26,18 @@ ENV LC_ALL en_US.UTF-8
 # Make sure UTF-8 is supported
 RUN locale
 
-# install nala and upgrade
-RUN apt update -y && apt install -y nala
-RUN nala upgrade -y
+# upgrade the system
+RUN apt update -y && apt upgrade -y
 
 # Nvidia variables
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
 # Install basic utilities
-RUN nala update && nala install -y git git-lfs nano sudo tmux tree vim iputils-ping wget bash-completion pip trash-cli
+RUN apt update && apt install -y git git-lfs nano sudo tmux tree vim iputils-ping wget bash-completion pip trash-cli
 RUN pip install pre-commit
 
 # install ROS:ROS_DUMMY_VERSION dependencies
-RUN nala install -y curl gnupg gnupg2 lsb-release software-properties-common && apt-add-repository universe
+RUN apt install -y curl gnupg gnupg2 lsb-release software-properties-common && apt-add-repository universe
 
 # Add key to keyring
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o /usr/share/keyrings/ros-archive-keyring.gpg
@@ -47,7 +46,7 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
 # install ROS:ROS_DUMMY_VERSION and things needed for ros development, DEBIAN_FRONTEND is needed to ignore interactive keyboard layout setting while install
-RUN nala update && DEBIAN_FRONTEND=noniteractive nala install -y ros-ROS_DUMMY_VERSION-desktop python3-colcon-common-extensions python3-vcstool
+RUN apt update && DEBIAN_FRONTEND=noniteractive apt install -y ros-ROS_DUMMY_VERSION-desktop python3-colcon-common-extensions python3-vcstool
 RUN pip install -U rosdep && \
     rosdep init
 
