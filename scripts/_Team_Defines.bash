@@ -81,6 +81,31 @@ alias ros2_control_setup-controller-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/ro
 # setup auto-sourcing
 alias setup-auto-sourcing=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup_auto_sourcing.bash
 
+# VCS Aliases and helpers
+function rtw-ws-import () {
+  # TODO: if not argument use WS default path for this after #169 is merged
+  vcs import --debug -w 1 --input "$*" $ROS_WS/src
+}
+
+# Temporary files cleaning
+function rtw-find-and-remove-core-files () {
+  if [ -z "$1" ]; then
+    search_dir="${HOME}"
+  else
+    search_dir=$1
+  fi
+
+  find "${search_dir}" -type f -regex ".*core\.[0-9]+"
+
+  user_decision "Do you want to delete those files?" user_answer
+  if [[ " ${positive_answers[*]} " =~ " ${user_answer} " ]]; then
+    find "${search_dir}" -type f -regex ".*core\.[0-9]+" -delete
+    notify_user "Files ARE deleted!"
+  else
+    notify_user "Files NOT deleted!"
+  fi
+}
+
 # Team General aliases and functions
 function generate_gif_from_video {
 
