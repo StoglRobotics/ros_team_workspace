@@ -122,6 +122,7 @@ rosdep update
 # Python tools
 sudo apt -y install python3-pip \
   python3-colcon-common-extensions \
+  python3-colcon-cd \
   python3-flake8 \
   python3-flake8-blind-except \
   python3-flake8-builtins \
