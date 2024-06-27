@@ -82,6 +82,8 @@ elif [[ $ros_version == 2 ]]; then
   setup_ros2_exports
   setup_ros2_aliases
 
+  source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash # setup colcon tab completion
+
   #/opt/rti.com/rti_connext_dds-5.3.1/setenv_ros2rti.bash
   # export LANG=de_DE.UTF-8
   WS_FOLDER=""
