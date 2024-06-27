@@ -376,16 +376,10 @@ create_workspace_docker () {
     let CUT_LINE=$TEST_LINE+0
     tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
 
-    # Add repositories for Nala
-    mv $DOCKER_FILE "$TMP_FILE"
-    TEST_LINE=`awk '$1 == "#" && $2 == "install" && $3 == "nala" { print NR }' $TMP_FILE`  # get line before `# install nala and upgrade` dependency
-    let CUT_LINE=$TEST_LINE-0
-    head -$CUT_LINE $TMP_FILE > $DOCKER_FILE
 
     # Add last part
     let CUT_LINE=$TEST_LINE+2
     tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
-
     # Cleanup temp files
     rm $TMP_FILE
   fi
