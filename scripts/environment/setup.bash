@@ -120,6 +120,10 @@ elif [[ $ros_version == 2 ]]; then
   fi
   source "$FILE_TO_SOURCE"
 
+  # Colcon tools
+  source /usr/share/colcon_cd/function/colcon_cd.sh  # enable 'colcon_cd' command
+  export _colcon_cd_root=/opt/ros/$ros_distro/       # enable 'colcon_cd' command
+
   echo ""
   echo -e "${TERMINAL_COLOR_BLUE}RosTeamWS: Sourced file: ${FILE_TO_SOURCE}${TERMINAL_COLOR_NC}"
 fi
