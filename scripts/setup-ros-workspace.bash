@@ -380,7 +380,6 @@ create_workspace_docker () {
     # Add last part
     let CUT_LINE=$TEST_LINE+2
     tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
-    
     # Cleanup temp files
     rm $TMP_FILE
   fi
