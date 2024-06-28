@@ -26,7 +26,7 @@ from rtwcli.constants import WORKSPACES_PATH
 from rtwcli.rocker_utils import execute_rocker_cmd, generate_rocker_flags
 from rtwcli.utils import get_filtered_args, replace_user_name_in_path
 from rtwcli.verb import VerbExtension
-from rtwcli.workspace_manger import Workspace, update_workspaces_config
+from rtwcli.workspace_utils import Workspace, update_workspaces_config
 
 
 @dataclass

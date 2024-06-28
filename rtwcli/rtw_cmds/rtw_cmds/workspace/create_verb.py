@@ -50,7 +50,7 @@ from rtwcli.utils import (
 )
 from rtwcli.verb import VerbExtension
 import docker
-from rtwcli.workspace_manger import (
+from rtwcli.workspace_utils import (
     Workspace,
     WorkspacesConfig,
     get_compile_cmd,

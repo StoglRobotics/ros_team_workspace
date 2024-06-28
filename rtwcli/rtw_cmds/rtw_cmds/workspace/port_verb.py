@@ -23,7 +23,7 @@ from rtwcli.constants import (
     ROS_TEAM_WS_ENV_VARIABLES,
 )
 from rtwcli.verb import VerbExtension
-from rtwcli.workspace_manger import (
+from rtwcli.workspace_utils import (
     env_var_to_workspace_var,
     try_port_workspace,
     extract_workspaces_from_bash_script,

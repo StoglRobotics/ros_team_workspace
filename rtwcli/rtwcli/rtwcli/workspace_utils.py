@@ -35,6 +35,7 @@ from rtwcli.constants import (
 )
 from rtwcli.docker_utils import is_docker_tag_valid
 from rtwcli.utils import create_file_if_not_exists, load_yaml_file, write_to_yaml_file
+from rtwcli import logger
 
 
 @dataclasses.dataclass
@@ -106,13 +107,20 @@ class WorkspacesConfig:
         self.workspaces[workspace.ws_name] = workspace
         return True
 
+    def remove_workspace(self, workspace_name: str) -> bool:
+        if workspace_name not in self.workspaces:
+            logger.warning(f"Workspace '{workspace_name}' does not exist in the config.")
+            return False
+        del self.workspaces[workspace_name]
+        return True
 
-def load_workspaces_config_from_yaml_file(file_path: str):
+
+def load_workspaces_config_from_yaml_file(file_path: str) -> WorkspacesConfig:
     """Load a WorkspacesConfig from a YAML file."""
     return WorkspacesConfig.from_dict(load_yaml_file(file_path))
 
 
-def save_workspaces_config(filepath: str, config: WorkspacesConfig):
+def save_workspaces_config(filepath: str, config: WorkspacesConfig) -> bool:
     """Save a WorkspacesConfig to a YAML file."""
     return write_to_yaml_file(filepath, config.to_dict())
 
