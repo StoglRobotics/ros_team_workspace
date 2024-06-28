@@ -14,5 +14,4 @@
 
 from .logging_config import logger
 
-# You can now use the logger throughout your package
 logger.debug("rtwcli package initialized")
