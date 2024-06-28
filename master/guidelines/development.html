@@ -4,7 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script defer data-domain="rtw.stoglrobotics.de" src="https://plausible.io/js/script.js"></script>
@@ -41,6 +41,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -117,6 +118,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../use-cases/index.html">Use Cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docker/index.html">Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rtwcli/index.html">RosTeamWS CLI (Experimental)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQ</a></li>
 </ul>
 
@@ -190,18 +192,18 @@
            <div itemprop="articleBody">
             
   <section id="development-guidelines">
-<h1>Development Guidelines<a class="headerlink" href="#development-guidelines" title="Permalink to this headline"></a></h1>
+<h1>Development Guidelines<a class="headerlink" href="#development-guidelines" title="Permalink to this heading"></a></h1>
 <p id="guidelines-development">This documents proposes development guidelines to increase work efficiency and synergy within the rest of the team.</p>
 <p><strong>NOTE</strong>: All the proposal here are the results of authors’ personal experiences. Saying that, if you have any idea to make them better you are very welcome to create a PR.</p>
 <section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
 <ol class="arabic simple">
 <li><p><a class="reference external" href="#code-changes-and-pull-request-submissions">Making changes to the code-base by submitting a Pull Request</a></p></li>
 <li><p><a class="reference external" href="#use-pre-commit-for-formatting-and-linting">Using *pre-commit*</a></p></li>
 </ol>
 </section>
 <section id="code-changes-and-pull-request-submissions">
-<h2>Code Changes and Pull Request Submissions<a class="headerlink" href="#code-changes-and-pull-request-submissions" title="Permalink to this headline"></a></h2>
+<h2>Code Changes and Pull Request Submissions<a class="headerlink" href="#code-changes-and-pull-request-submissions" title="Permalink to this heading"></a></h2>
 <p>To make a change of the existing code base, Pull Request (GitHub) or Merge Request (GitLab) are used.
 This section describes in short the process with valuable tips to make your and reviewers’ life easier.</p>
 <ol class="arabic">
@@ -246,11 +248,11 @@ Many people get very angry if you provide messy code, usually so much that you h
 </ol>
 </section>
 <section id="use-pre-commit-for-formatting-and-linting">
-<h2>Use <em>pre-commit</em> for formatting and linting<a class="headerlink" href="#use-pre-commit-for-formatting-and-linting" title="Permalink to this headline"></a></h2>
+<h2>Use <em>pre-commit</em> for formatting and linting<a class="headerlink" href="#use-pre-commit-for-formatting-and-linting" title="Permalink to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> is a program that adds hooks into <code class="docutils literal notranslate"><span class="pre">git</span></code> so when you commit something, actions can be automatically executed.
 There are many different possibility with <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> but it is mostly used for integrating code linters and formatters to always commit clean code.</p>
 <section id="getting-started-with-pre-commit">
-<h3>Getting started with <em>pre-commit</em><a class="headerlink" href="#getting-started-with-pre-commit" title="Permalink to this headline"></a></h3>
+<h3>Getting started with <em>pre-commit</em><a class="headerlink" href="#getting-started-with-pre-commit" title="Permalink to this heading"></a></h3>
 <p>First install it to you computer using:</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pre-commit
@@ -272,7 +274,7 @@ If you don’t know where to start with <em>pre-commit</em> configuration in you
 </div>
 </section>
 <section id="useful-commands-and-options">
-<h3>Useful commands and options<a class="headerlink" href="#useful-commands-and-options" title="Permalink to this headline"></a></h3>
+<h3>Useful commands and options<a class="headerlink" href="#useful-commands-and-options" title="Permalink to this heading"></a></h3>
 <ul>
 <li><p>Update all the hooks in the configuration</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>autoupdate

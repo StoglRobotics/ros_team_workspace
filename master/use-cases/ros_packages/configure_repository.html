@@ -4,7 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script defer data-domain="rtw.stoglrobotics.de" src="https://plausible.io/js/script.js"></script>
@@ -41,6 +41,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -124,6 +125,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../docker/index.html">Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rtwcli/index.html">RosTeamWS CLI (Experimental)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQ</a></li>
 </ul>
 
@@ -197,9 +199,9 @@
            <div itemprop="articleBody">
             
   <section id="configure-repository">
-<h1>Configure Repository<a class="headerlink" href="#configure-repository" title="Permalink to this headline"></a></h1>
+<h1>Configure Repository<a class="headerlink" href="#configure-repository" title="Permalink to this heading"></a></h1>
 <section id="setup-repository-ci-configuration-github">
-<span id="uc-configure-repo"></span><h2>Setup Repository CI configuration (GitHub)<a class="headerlink" href="#setup-repository-ci-configuration-github" title="Permalink to this headline"></a></h2>
+<span id="uc-configure-repo"></span><h2>Setup Repository CI configuration (GitHub)<a class="headerlink" href="#setup-repository-ci-configuration-github" title="Permalink to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">setup-repository-ci</span></code> script is used, accepting the github repository name and github user/organization namespace as parameters.</p>
 <blockquote>
 <div><div class="admonition warning">
@@ -222,15 +224,15 @@ Please remember that each workflow you would like to run on schedule has to be i
 Then try to push new files to a GitHub-repository and open a PR.
 You should then already see new workflows active.</p>
 <section id="details-about-ci-setup-and-created-workflows">
-<h3>Details about CI setup and created workflows<a class="headerlink" href="#details-about-ci-setup-and-created-workflows" title="Permalink to this headline"></a></h3>
+<h3>Details about CI setup and created workflows<a class="headerlink" href="#details-about-ci-setup-and-created-workflows" title="Permalink to this heading"></a></h3>
 <section id="code-formatters-and-linters">
-<h4>Code formatters and linters<a class="headerlink" href="#code-formatters-and-linters" title="Permalink to this headline"></a></h4>
+<h4>Code formatters and linters<a class="headerlink" href="#code-formatters-and-linters" title="Permalink to this heading"></a></h4>
 <p>For executing formatters, <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> program is used and automatically setup.
 To use it in a cloned repository (if there is <code class="docutils literal notranslate"><span class="pre">.pre-commit-conifg.yaml</span></code> file), execute once <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">install</span></code>.
 Clang-Format is used as the main code formatting program.</p>
 </section>
 <section id="building-packages">
-<h4>Building packages<a class="headerlink" href="#building-packages" title="Permalink to this headline"></a></h4>
+<h4>Building packages<a class="headerlink" href="#building-packages" title="Permalink to this heading"></a></h4>
 <p>This script creates three stages of build configuration for each ROS 2 version.
 Each of those stages test different compatibility levels where users can experience issues with actively developed repositories and ensures future compatibility of the repository.
 In the following each stage is explained.</p>

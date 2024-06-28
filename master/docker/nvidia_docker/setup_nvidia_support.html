@@ -4,7 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script defer data-domain="rtw.stoglrobotics.de" src="https://plausible.io/js/script.js"></script>
@@ -41,6 +41,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -129,6 +130,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../supported_versions/supported_versions.html">Supported ros versions and operating systems</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../rtwcli/index.html">RosTeamWS CLI (Experimental)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQ</a></li>
 </ul>
 
@@ -202,14 +204,14 @@
            <div itemprop="articleBody">
             
   <section id="nvidia-support-for-docker">
-<h1>Nvidia support for docker<a class="headerlink" href="#nvidia-support-for-docker" title="Permalink to this headline"></a></h1>
+<h1>Nvidia support for docker<a class="headerlink" href="#nvidia-support-for-docker" title="Permalink to this heading"></a></h1>
 <p id="docker-nvidia-support-how-to">If you want to expose your nvidia driver into the docker container this is possible by using the <a class="reference external" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/overview.html">NVIDIA Container Toolkit</a>.</p>
 <section id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading"></a></h2>
 <p>Before we can install the NVIDIA Container Toolkit we have to install the nvidia drivers for our platform and install docker.</p>
 <p><strong>NOTE</strong>: Check the end of the file for some tips about throubleshoting.</p>
 <section id="nvidia-drivers">
-<h3>Nvidia drivers<a class="headerlink" href="#nvidia-drivers" title="Permalink to this headline"></a></h3>
+<h3>Nvidia drivers<a class="headerlink" href="#nvidia-drivers" title="Permalink to this heading"></a></h3>
 <p>Make sure you have the NVIDIA drivers for your Linux distribution installed. This can either be done by using your package manager or you can download the <code class="docutils literal notranslate"><span class="pre">.run</span></code> installers from <a class="reference external" href="https://www.nvidia.com/Download/index.aspx?lang=en-us">NVIDIA Driver Downloads</a>.
 This depends on the operating system and package manager you are using so you have to look it up.
 You can then check your drivers by typing</p>
@@ -243,14 +245,14 @@ You can then check your drivers by typing</p>
 </div>
 </section>
 <section id="docker-installation">
-<h3>Docker installation<a class="headerlink" href="#docker-installation" title="Permalink to this headline"></a></h3>
+<h3>Docker installation<a class="headerlink" href="#docker-installation" title="Permalink to this heading"></a></h3>
 <p id="docker-nvidia-support-prerequisites-docker">Make sure docker is installed and it’s working correctly. For instructions on how to install docker have a look <a class="reference internal" href="../general_information_docker/general_information_docker.html#general-info-on-docker-installation"><span class="std std-ref">in general info on docker installation</span></a>.</p>
 </section>
 </section>
 <section id="how-to-setup-a-container-with-nvidia-support">
-<h2>How to setup a container with nvidia support<a class="headerlink" href="#how-to-setup-a-container-with-nvidia-support" title="Permalink to this headline"></a></h2>
+<h2>How to setup a container with nvidia support<a class="headerlink" href="#how-to-setup-a-container-with-nvidia-support" title="Permalink to this heading"></a></h2>
 <section id="install-nvidia-docker">
-<h3>Install nvidia-docker<a class="headerlink" href="#install-nvidia-docker" title="Permalink to this headline"></a></h3>
+<h3>Install nvidia-docker<a class="headerlink" href="#install-nvidia-docker" title="Permalink to this heading"></a></h3>
 <p><strong>NOTE</strong>: If you already have installed nvidia-docker, you can skip this and go right to the next section.</p>
 <ol class="arabic">
 <li><p>You then have to install the NVIDIA Container Toolkit for docker as described <a class="reference external" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker">in official documentation</a>.
@@ -306,7 +308,7 @@ For Ubuntu this can be done as follows:</p>
 </div></blockquote>
 </section>
 <section id="change-the-dockerfile">
-<h3>Change the Dockerfile<a class="headerlink" href="#change-the-dockerfile" title="Permalink to this headline"></a></h3>
+<h3>Change the Dockerfile<a class="headerlink" href="#change-the-dockerfile" title="Permalink to this heading"></a></h3>
 <dl>
 <dt>(1.) If you haven’t done so already:</dt><dd><p>Create a new docker workspace with the <a class="reference internal" href="../../use-cases/operating_system/create_setup_workspace.html#uc-setup-docker-workspace"><span class="std std-ref">setup-ros-workspace-docker</span></a> command.</p>
 <p><strong>NOTE</strong>: If you set up a nvidia-docker container, you are finished at this point.</p>
@@ -314,7 +316,7 @@ For Ubuntu this can be done as follows:</p>
 </dl>
 <ol class="arabic" start="2">
 <li><p>Replace the the <code class="docutils literal notranslate"><span class="pre">FROM</span> <span class="pre">ubuntu:&lt;version&gt;</span></code> directive in your Dockerfile with the nvidia container of your needs. The following table gives you a quick overview:</p>
-<table class="colwidths-auto docutils align-default" id="id1">
+<table class="docutils align-default" id="id1">
 <caption><span class="caption-text">Examples for nvidia containers</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
 <thead>
 <tr class="row-odd"><th class="head stub"><p>Ubuntu version directive</p></th>
@@ -351,9 +353,9 @@ Go inside the <code class="docutils literal notranslate"><span class="pre">.rtw_
 </section>
 </section>
 <section id="troubleshoting">
-<h2>Troubleshoting<a class="headerlink" href="#troubleshoting" title="Permalink to this headline"></a></h2>
+<h2>Troubleshoting<a class="headerlink" href="#troubleshoting" title="Permalink to this heading"></a></h2>
 <section id="be-sure-that-graphics-card-driver-is-installed-properly">
-<h3>Be sure that graphics card driver is installed properly<a class="headerlink" href="#be-sure-that-graphics-card-driver-is-installed-properly" title="Permalink to this headline"></a></h3>
+<h3>Be sure that graphics card driver is installed properly<a class="headerlink" href="#be-sure-that-graphics-card-driver-is-installed-properly" title="Permalink to this heading"></a></h3>
 <p>Check if drivers and libraries are installed properly by executing <code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> after a fresh system start (Yes, you have to restart your computer!).
 There you should see expected version of Nvidia driver.
 If you get any error follow the next steps to be sure that the expected version of driver is installed properly.</p>
@@ -379,17 +381,17 @@ If you get any error follow the next steps to be sure that the expected version 
 </ol>
 </section>
 <section id="graphics-card-should-be-used-in-the-performance-mode">
-<h3>Graphics card should be used in the <code class="docutils literal notranslate"><span class="pre">Performance</span></code> mode<a class="headerlink" href="#graphics-card-should-be-used-in-the-performance-mode" title="Permalink to this headline"></a></h3>
+<h3>Graphics card should be used in the <code class="docutils literal notranslate"><span class="pre">Performance</span></code> mode<a class="headerlink" href="#graphics-card-should-be-used-in-the-performance-mode" title="Permalink to this heading"></a></h3>
 <p>If you have only <code class="docutils literal notranslate"><span class="pre">X</span></code> in the output from <code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> than make sure that the graphics card uses <code class="docutils literal notranslate"><span class="pre">Performance</span> <span class="pre">Mode</span></code> in <code class="docutils literal notranslate"><span class="pre">PRIME</span> <span class="pre">profile</span></code> section of “NVIDIA X Server Settings” application.</p>
 </section>
 <section id="nvidia-smi-command-inside-docker-container">
-<h3><code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> command inside docker container<a class="headerlink" href="#nvidia-smi-command-inside-docker-container" title="Permalink to this headline"></a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> command inside docker container<a class="headerlink" href="#nvidia-smi-command-inside-docker-container" title="Permalink to this heading"></a></h3>
 <p>Take a note that <code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> command in the docker container is necessary test to see if docker has access to the graphic card, but it doesn’t shows any applications that are using it.
 You can see on your host if a docker application is using graphic card and how much.</p>
 </section>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>[Docker configuration for rviz using nvidia graphics card (by &#64;ruffsl)](<a class="reference external" href="https://gist.github.com/ruffsl/e7ca631a618ece3eb0be8e4bf168accb">https://gist.github.com/ruffsl/e7ca631a618ece3eb0be8e4bf168accb</a>)</p></li>
 </ul>

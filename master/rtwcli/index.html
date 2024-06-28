@@ -1,0 +1,396 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script defer data-domain="rtw.stoglrobotics.de" src="https://plausible.io/js/script.js"></script>
+  
+  <title>RosTeamWS CLI (Experimental) &mdash; ROS Team Workspace Documentation: Galactic Jun 2024 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon-bg.png"/>
+  
+
+  
+  
+
+  
+    <link rel="canonical" href="https://rtw.stoglrobotics.de/galactic//galactic/rtwcli/index.html" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FAQ" href="../faq/index.html" />
+    <link rel="prev" title="Supported ros versions and operating systems" href="../docker/supported_versions/supported_versions.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/galactic-small.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guidelines/index.html">Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/index.html">Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docker/index.html">Docker</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">RosTeamWS CLI (Experimental)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-install-the-cli">How to install the CLI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-use-the-cli">How to use the CLI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-a-new-workspace-from-repos-files">Setting up a new workspace from <code class="docutils literal notranslate"><span class="pre">.repos</span></code> files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ROS Team Workspace Documentation: Galactic</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>RosTeamWS CLI (Experimental)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            
+              <a href="https://github.com/StoglRobotics/ros_team_workspace/blob/master//docs/rtwcli/index.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="rosteamws-cli-experimental">
+<h1>RosTeamWS CLI (Experimental)<a class="headerlink" href="#rosteamws-cli-experimental" title="Permalink to this heading"></a></h1>
+<p>RosTeamWS has a command line interface (CLI) that provides a set of commands to
+manage ROS workspaces incl. Docker workspaces. The CLI is designed to have a
+more user-friendly overview of the available RTW commands and to provide a more
+intuitive way to interact with RTW.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The CLI is still in the experimental stage and may have bugs or issues.
+Please report any bugs or issues to the RosTeamWS GitHub repository.</p>
+</div>
+<section id="how-to-install-the-cli">
+<h2>How to install the CLI<a class="headerlink" href="#how-to-install-the-cli" title="Permalink to this heading"></a></h2>
+<p>Follow the instructions in the <code class="docutils literal notranslate"><span class="pre">README.md</span></code> inside the <code class="docutils literal notranslate"><span class="pre">rtwcli</span></code> folder.</p>
+</section>
+<section id="how-to-use-the-cli">
+<h2>How to use the CLI<a class="headerlink" href="#how-to-use-the-cli" title="Permalink to this heading"></a></h2>
+<p>The CLI currently supports the following commands:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">rtw</span> <span class="pre">workspace</span></code>: Various workspace related sub-commands</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">create</span></code>: Create a new ROS workspace (local or dockerized)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">use</span></code>: Select and source an existing ROS workspace</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">port</span></code>: Port existing RTW workspace(s)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">rtw</span> <span class="pre">docker</span></code>: Various Docker related sub-commands</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">enter</span></code>: Enter a Docker container for a dockerized workspace</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rtw</span> <span class="pre">ws</span></code>: Alias for <code class="docutils literal notranslate"><span class="pre">rtw</span> <span class="pre">workspace</span> <span class="pre">use</span></code></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more detailed usage of each command or sub-command, run
+<code class="docutils literal notranslate"><span class="pre">rtw</span> <span class="pre">&lt;command&gt;</span> <span class="pre">-h</span></code> or <code class="docutils literal notranslate"><span class="pre">rtw</span> <span class="pre">&lt;command&gt;</span> <span class="pre">&lt;sub-command&gt;</span> <span class="pre">-h</span></code>.</p>
+</div>
+</section>
+<section id="setting-up-a-new-workspace-from-repos-files">
+<h2>Setting up a new workspace from <code class="docutils literal notranslate"><span class="pre">.repos</span></code> files<a class="headerlink" href="#setting-up-a-new-workspace-from-repos-files" title="Permalink to this heading"></a></h2>
+<p>PR <a class="reference external" href="https://github.com/RosTeamWS/RosTeamWS/pull/169">#169</a> introduced a new
+feature to create a new workspace (local or dockerized) from <code class="docutils literal notranslate"><span class="pre">.repos</span></code> files,
+streamlining the setup process for complex projects with multiple repositories.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Usage:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">rtw</span> <span class="pre">workspace</span> <span class="pre">create</span></code>
+<code class="docutils literal notranslate"><span class="pre">--ws-folder</span> <span class="pre">&lt;path_to_workspace&gt;</span></code>
+<code class="docutils literal notranslate"><span class="pre">--ros-distro</span> <span class="pre">&lt;distribution&gt;</span></code>
+<code class="docutils literal notranslate"><span class="pre">[options]</span></code></p></li>
+<li><dl class="simple">
+<dt>Main <code class="docutils literal notranslate"><span class="pre">[options]</span></code>:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">--docker</span></code>: Create workspace(s) in a docker environment</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--repos-containing-repository-url</span> <span class="pre">&lt;url&gt;</span></code>: URL of the repository
+containing the <code class="docutils literal notranslate"><span class="pre">.repos</span></code> files
+* Main ws repos format: <code class="docutils literal notranslate"><span class="pre">{repo_name}.{ros_distro}.repos</span></code>
+* Upstream ws repos format: <code class="docutils literal notranslate"><span class="pre">{repo_name}.{ros_distro}.upstream.repos</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--repos-branch</span> <span class="pre">&lt;branch&gt;</span></code>: Branch of the repository containing the
+<code class="docutils literal notranslate"><span class="pre">.repos</span></code> files</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Example:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtw<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ws-folder<span class="w"> </span>dummy_ws<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ros-distro<span class="w"> </span>humble<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--docker<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--repos-containing-repository-url<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>git@github.com:StoglRobotics/sr_dummy_packages.git<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--repos-branch<span class="w"> </span>dummy_demo_pkg
+</pre></div>
+</div>
+<blockquote>
+<div><ul class="simple">
+<li><p>This command will create a new dockerized workspace named <code class="docutils literal notranslate"><span class="pre">dummy_ws</span></code>
+with ROS distribution <code class="docutils literal notranslate"><span class="pre">humble</span></code> using the <code class="docutils literal notranslate"><span class="pre">.repos</span></code> files from the
+repository <code class="docutils literal notranslate"><span class="pre">sr_dummy_packages</span></code> on branch <code class="docutils literal notranslate"><span class="pre">dummy_demo_pkg</span></code>.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>Example of a <code class="docutils literal notranslate"><span class="pre">standalone</span></code> workspace and <code class="docutils literal notranslate"><span class="pre">robot</span></code> user:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtw<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ws-folder<span class="w"> </span>dummy_ws<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ros-distro<span class="w"> </span>humble<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--docker<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--repos-containing-repository-url<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>git@github.com:StoglRobotics/sr_dummy_packages.git<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--repos-branch<span class="w"> </span>dummy_demo_pkg<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--standalone<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--user-override-name<span class="w"> </span>robot
+</pre></div>
+</div>
+<blockquote>
+<div><ul>
+<li><p>This command will create a new dockerized standalone workspace named
+<code class="docutils literal notranslate"><span class="pre">dummy_ws</span></code> with ROS distribution <code class="docutils literal notranslate"><span class="pre">humble</span></code> using the
+<code class="docutils literal notranslate"><span class="pre">.repos</span></code> files from the repository <code class="docutils literal notranslate"><span class="pre">sr_dummy_packages</span></code> on branch
+<code class="docutils literal notranslate"><span class="pre">dummy_demo_pkg</span></code>.</p>
+<p>However, for exporting the workspace docker image, the commit command must
+be executed first:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>commit<span class="w"> </span>rtw_dummy_ws_final-instance<span class="w"> </span>rtw_dummy_ws_export
+</pre></div>
+</div>
+<p>When importing the workspace docker image, the following command must be
+executed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtw<span class="w"> </span>workspace<span class="w"> </span>import<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ws-name<span class="w"> </span>dummy_import_ws<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ros-distro<span class="w"> </span>humble<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--standalone-docker-image<span class="w"> </span>rtw_dummy_ws_export<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--user-override-name<span class="w"> </span>robot
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--user-override-name</span></code> flag is necessary to create the user with
+the same name as the one used in the exported workspace.</p>
+</li>
+</ul>
+</div></blockquote>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>After PC restart, the <code class="docutils literal notranslate"><span class="pre">.xauth</span></code> cookie file will be removed. Therefore,
+before attaching VSCode, execute <code class="docutils literal notranslate"><span class="pre">rtw</span> <span class="pre">ws</span> <span class="pre">&lt;ws-name&gt;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rtw</span> <span class="pre">docker</span> <span class="pre">enter</span></code> to create the necessary <code class="docutils literal notranslate"><span class="pre">.xauth</span></code> cookie file.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>After creating a new dockerized workspace, the rocker will start interactive
+bash session in the container.</p>
+<p>Only after exiting the container, the
+corresponding workspace config will be saved.</p>
+<p>This is done due to the fact that the setting up of the rocker container
+fails often.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../faq/index.html" class="btn btn-neutral float-right" title="FAQ" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../docker/supported_versions/supported_versions.html" class="btn btn-neutral float-left" title="Supported ros versions and operating systems" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2024, Stogl Robotics Consulting UG (haftungsbeschränkt).
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Other Versions</span>
+    v: master
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>ROS Team Workspace - Galactic and Rolling</dt>
+      <dd><a href="index.html">Master (latest)</a></dd>
+    </dl>
+    <dl>
+      <dt>ROS Team Workspace - Foxy</dt>
+        <dd><a href="../../foxy/index.html">Foxy</a></dd>
+   </dl>
+  </div>
+</div>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
