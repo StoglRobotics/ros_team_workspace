@@ -60,3 +60,10 @@ ROS_TEAM_WS_ENV_VARIABLES = [
 ]
 
 DISPLAY_MANAGER_WAYLAND = "wayland"
+
+RICH_TREE_LABEL_COLOR = "[bold green]"
+RICH_TREE_GUIDE_STYLE = "bold"
+RICH_TREE_FST_LVL_COLOR = "[bold blue]"
+RICH_TREE_SND_LVL_COLOR = "[yellow]"
+RICH_TREE_TRD_LVL_COLOR = "[cyan]"
+RICH_TREE_STATUS_COLOR = "[bold magenta]"

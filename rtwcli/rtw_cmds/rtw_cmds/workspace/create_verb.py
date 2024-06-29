@@ -936,9 +936,9 @@ class CreateVerb(VerbExtension):
                 ws_name=create_args.upstream_ws_name,
                 ws_folder=create_args.upstream_ws_abs_path,
                 distro=create_args.ros_distro,
-                ws_docker_support=True if create_args.docker else False,
-                docker_tag=create_args.final_image_name if create_args.docker else "",
-                docker_container_name=create_args.container_name if create_args.docker else "",
+                ws_docker_support=create_args.docker,
+                docker_tag=create_args.final_image_name if create_args.docker else None,
+                docker_container_name=create_args.container_name if create_args.docker else None,
                 standalone=create_args.standalone,
             )
             if not update_workspaces_config(WORKSPACES_PATH, local_upstream_ws):
