@@ -81,6 +81,8 @@ elif [[ $ros_version == 2 ]]; then
   setup_ros2_exports
   setup_ros2_aliases
 
+  source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash # setup colcon tab completion
+
   if [[ $RosTeamWS_WS_DOCKER_SUPPORT == true && $RosTeamWS_STANDALONE == true ]]; then
     export ROS_WS=$RosTeamWS_WS_NAME
     echo -e "${TERMINAL_COLOR_YELLOW}RosTeamWS: In standalone docker mode there is nothing \
@@ -125,6 +127,10 @@ to source locally. Please switch to docker container first.${TERMINAL_COLOR_NC}"
     FILE_TO_SOURCE="/opt/ros/$ros_distro/setup.bash"
   fi
   source "$FILE_TO_SOURCE"
+
+  # Colcon tools
+  source /usr/share/colcon_cd/function/colcon_cd.sh  # enable 'colcon_cd' command
+  export _colcon_cd_root=/opt/ros/$ros_distro/       # enable 'colcon_cd' command
 
   echo ""
   echo -e "${TERMINAL_COLOR_BLUE}RosTeamWS: Sourced file: ${FILE_TO_SOURCE}${TERMINAL_COLOR_NC}"
