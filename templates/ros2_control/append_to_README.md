@@ -81,7 +81,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
 
 1. If you want to test hardware with `ForwardCommandController` first load and configure it. Controller types are e.g., "position", "velocity", and depend on configured names in the [`config/$ROBOT_NAME$_controllers.yaml`](config/$ROBOT_NAME$_controllers.yaml):
    ```
-   ros2 control load_configure_controller forward_<controller_type>_controller
+   ros2 control load_configure_controller forward_command_controller
    ```
    Check if controller is loaded properly:
    ```
@@ -90,12 +90,12 @@ Now you should also see your robot represented correctly in the `rviz2`.
    You should get the response:
    ```
    joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
-   forward_<controller_type>_controller[forward_command_controller/ForwardCommandController] inactive
+   forward_command_controller[forward_command_controller/ForwardCommandController] inactive
    ```
 
 2. Now start the controller:
    ```
-   ros2 control switch_controllers --start-controllers forward_<controller_type>_controller
+   ros2 control switch_controllers --start-controllers forward_command_controller
    ```
    Check if controllers are activated:
    ```
@@ -104,7 +104,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    You should get `active` in the response:
    ```
    joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
-   forward_<controller_type>_controller[forward_command_controller/ForwardCommandController] active
+   forward_command_controller[forward_command_controller/ForwardCommandController] active
    ```
 
 **NOTE**: You can do this in only one step by using `load_start_controller` verb instead of `load_configure_controller`.
@@ -113,7 +113,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
 
    a. Manually using ROS 2 cli interface:
    ```
-   ros2 topic pub /forward_<controller_type>_controller/commands std_msgs/msg/Float64MultiArray "data:
+   ros2 topic pub /forward_command_controller/commands std_msgs/msg/Float64MultiArray "data:
    - 0.5
    - 0.5
    - 0.5
@@ -130,7 +130,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
 
 1. If a `ForwardCommandController` is started you should stop it first by using:
    ```
-   ros2 control switch_controllers --stop-controllers forward_<controller_type>_controller
+   ros2 control switch_controllers --stop-controllers forward_command_controller
    ```
    Check if controllers are activated:
    ```
@@ -139,7 +139,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
    You should get `active` in the response:
    ```
    joint_state_broadcaster[joint_state_broadcaster/JointStateController] active
-   forward_<controller_type>_controller[forward_command_controller/ForwardCommandController] inactive
+   forward_command_controller[forward_command_controller/ForwardCommandController] inactive
    ```
 
 2. If you want to test hardware with `JointTrajectoryController` first load, configure and start it:
@@ -163,7 +163,7 @@ Now you should also see your robot represented correctly in the `rviz2`.
 
 **NOTE**: You can switch controllers (step 1 and 2) also with one command:
 ```
-ros2 control switch_controllers --stop-controllers forward_<controller_type>_controller --start-controllers joint_trajectory_controller
+ros2 control switch_controllers --stop-controllers forward_command_controller --start-controllers joint_trajectory_controller
 ```
 
 

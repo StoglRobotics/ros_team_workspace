@@ -178,7 +178,7 @@ For example to create a new ROS 2 package called `example_package` with a node c
 Here are some useful references for developing with ROS 2:
 
  - [Official ROS 2 Tutorials](https://index.ros.org/doc/ros2/Tutorials/)
-   * [Luanchfile](https://index.ros.org/doc/ros2/Tutorials/Launch-Files/Creating-Launch-Files/)
+   * [Launchfile](https://index.ros.org/doc/ros2/Tutorials/Launch-Files/Creating-Launch-Files/)
    * [Package](https://index.ros.org/doc/ros2/Tutorials/Creating-Your-First-ROS2-Package/)
    * [Parameters](https://index.ros.org/doc/ros2/Tutorials/Parameters/Understanding-ROS2-Parameters/)
    * [Workspace](https://index.ros.org/doc/ros2/Tutorials/Workspace/Creating-A-Workspace/)
