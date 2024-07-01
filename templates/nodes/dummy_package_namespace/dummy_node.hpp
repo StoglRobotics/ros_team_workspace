@@ -15,8 +15,11 @@
 #ifndef TEMPLATES__NODES__DUMMY_PACKAGE_NAMESPACE__DUMMY_NODE_HPP_
 #define TEMPLATES__NODES__DUMMY_PACKAGE_NAMESPACE__DUMMY_NODE_HPP_
 
+#include <memory>
 #include <string>
 
+#include "dummy_node_parameters.hpp"
+#include "dummy_package_namespace/visibility_control.h"
 #include "rclcpp/node.hpp"
 #include "rclcpp/rclcpp.hpp"
 
@@ -28,6 +31,10 @@ public:
   explicit DummyNode(const std::string & node_name = "dummy_node");
 
   virtual ~DummyNode() = default;
+
+protected:
+  std::shared_ptr<dummy_node::ParamListener> param_listener_;
+  dummy_node::Params params_;
 };
 
 }  // namespace dummy_package_namespace

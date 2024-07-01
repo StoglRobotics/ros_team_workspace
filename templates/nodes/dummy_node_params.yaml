@@ -1,0 +1,4 @@
+dummy_node:
+  ros__parameters:
+
+    perfect_number: "twentyeight"
