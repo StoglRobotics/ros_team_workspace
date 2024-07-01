@@ -15,14 +15,6 @@
 import os
 from rtwcli.command import CommandExtension
 
-ROS_TEAM_WS_VARIABLES = [
-    "RosTeamWS_BASE_WS",
-    "RosTeamWS_DISTRO",
-    "RosTeamWS_WS_FOLDER",
-    "RosTeamWS_WS_DOCKER_SUPPORT",
-    "RosTeamWS_DOCKER_TAG",
-]
-
 
 class InfoCommand(CommandExtension):
     """Provide useful information."""

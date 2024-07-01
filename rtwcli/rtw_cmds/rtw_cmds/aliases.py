@@ -14,7 +14,7 @@
 
 import argparse
 from rtwcli.command import CommandExtension
-from rtw_cmds.workspace.verbs import UseVerb, add_cli_workspace_args
+from rtw_cmds.workspace.use_verb import UseVerb, add_rtw_workspace_use_args
 
 
 class WSAlias(CommandExtension):
@@ -24,7 +24,7 @@ class WSAlias(CommandExtension):
         super().__init__()
 
     def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
-        add_cli_workspace_args(parser)
+        add_rtw_workspace_use_args(parser)
 
     def main(self, *, parser, args):
         use_verb = UseVerb()

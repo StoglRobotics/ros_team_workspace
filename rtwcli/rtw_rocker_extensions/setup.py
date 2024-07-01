@@ -16,10 +16,11 @@ from setuptools import find_packages
 from setuptools import setup
 
 setup(
-    name="rtwcli",
-    version="0.2.0",
+    name="rtw_rocker_extensions",
+    version="0.1.0",
     packages=find_packages(exclude=["test"]),
-    install_requires=["argcomplete", "docker", "questionary", "rich", "rocker"],
+    install_requires=["rocker"],
+    extras_require={},
     zip_safe=False,
     keywords=[],
     classifiers=[
@@ -28,23 +29,13 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
     ],
-    description="Framework for ROS Team Workspace command line tools.",
-    long_description="""\
-The framework provides a single command line script which can be extended with
-commands and verbs.""",
+    description="Extra plugins for rocker.",
+    long_description="Extra plugins for rocker",
     license="Apache License, Version 2.0",
     tests_require=["pytest"],
     entry_points={
-        "rtwcli.command": [
-            "extension_points = rtwcli.command.extension_points:ExtensionPointsCommand",
-            "extensions = rtwcli.command.extensions:ExtensionsCommand",
-            "info = rtwcli.command.info:InfoCommand",
-        ],
-        "rtwcli.extension_point": [
-            "rtwcli.command = rtwcli.command:CommandExtension",
-        ],
-        "console_scripts": [
-            "rtw = rtwcli.cli:main",
+        "rocker.extensions": [
+            "rtw_x11tmp = rtw_rocker_extensions.x11tmp:X11Tmp",
         ],
     },
 )
