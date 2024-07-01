@@ -19,7 +19,7 @@ from rtwcli.docker_utils import (
     is_docker_container_running,
 )
 from rtwcli.verb import VerbExtension
-from rtwcli.workspace_manger import get_current_workspace
+from rtwcli.workspace_utils import get_current_workspace
 
 
 class EnterVerb(VerbExtension):

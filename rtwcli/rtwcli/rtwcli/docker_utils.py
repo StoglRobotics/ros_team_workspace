@@ -15,6 +15,7 @@
 import os
 from typing import Union
 
+from rtwcli import logger
 from rtwcli.utils import create_file_if_not_exists, run_command
 import docker
 
@@ -28,7 +29,7 @@ def is_docker_tag_valid(tag: str) -> bool:
         docker.errors.ImageNotFound,  # type: ignore
         docker.errors.APIError,  # type: ignore
     ) as e:
-        print(f"Failed to get docker image '{tag}': {e}")
+        logger.error(f"Failed to get docker image '{tag}': {e}")
         return False
 
 
@@ -114,6 +115,50 @@ def docker_stop(container_name: str) -> bool:
     return run_command(["docker", "stop", container_name])
 
 
+def remove_docker_image(tag: str, force: bool = False) -> bool:
+    """Remove a docker image with the given tag."""
+    try:
+        docker_client = docker.from_env()
+        image = docker_client.images.get(tag)
+        docker_client.images.remove(image.id, force=force)
+        return True
+    except (
+        docker.errors.ImageNotFound,  # type: ignore
+        docker.errors.APIError,  # type: ignore
+    ) as e:
+        logger.error(f"Failed to remove docker image '{tag}': {e}")
+        return False
+
+
+def docker_container_exists(id_or_name: str) -> bool:
+    """Check if a docker container with the given id or name exists."""
+    try:
+        docker_client = docker.from_env()
+        docker_client.containers.get(id_or_name)
+        return True
+    except (
+        docker.errors.NotFound,  # type: ignore
+        docker.errors.APIError,  # type: ignore
+    ) as e:
+        logger.error(f"Failed to get docker container '{id_or_name}': {e}")
+        return False
+
+
+def remove_docker_container(id_or_name: str, force: bool = False) -> bool:
+    """Remove a docker container with the given id or name."""
+    try:
+        docker_client = docker.from_env()
+        container = docker_client.containers.get(id_or_name)
+        container.remove(force=force)
+        return True
+    except (
+        docker.errors.NotFound,  # type: ignore
+        docker.errors.APIError,  # type: ignore
+    ) as e:
+        logger.error(f"Failed to remove docker container '{id_or_name}': {e}")
+        return False
+
+
 def is_docker_container_running(id_or_name: str, running_status: str = "running") -> bool:
     """Check if a docker container with the given id or name is running."""
     try:
@@ -124,7 +169,7 @@ def is_docker_container_running(id_or_name: str, running_status: str = "running"
         docker.errors.NotFound,  # type: ignore
         docker.errors.APIError,  # type: ignore
     ) as e:
-        print(f"Failed to get docker container '{id_or_name}': {e}")
+        logger.error(f"Failed to get docker container '{id_or_name}': {e}")
         return False
 
 
@@ -137,7 +182,9 @@ def change_docker_path_permissions(
     """Change the permissions of the given path in the given container to the given user and group."""
     user = user_in if user_in else os.getuid()
     group = group_in if group_in else os.getgid()
-    print(f"Changing permissions of the path '{path}' to '{user}:{group}' in '{container_name}'.")
+    logger.info(
+        f"Changing permissions of the path '{path}' to '{user}:{group}' in '{container_name}'."
+    )
     return docker_exec_bash_cmd(container_name, f"chown -R {user}:{group} {path}")
 
 
@@ -155,19 +202,19 @@ def fix_missing_xauth_file(
         docker.errors.NotFound,  # type: ignore
         docker.errors.APIError,  # type: ignore
     ) as e:
-        print(f"Failed to get docker container '{container_name}': {e}")
+        logger.error(f"Failed to get docker container '{container_name}': {e}")
         return False
 
     if not container:
-        print(f"Container object is None for container '{container_name}'.")
+        logger.error(f"Container object is None for container '{container_name}'.")
         return False
 
     if not container.attrs:
-        print(f"Container attributes are None for container '{container_name}'.")
+        logger.error(f"Container attributes are None for container '{container_name}'.")
         return False
 
     if mounts_attr not in container.attrs:
-        print(
+        logger.error(
             f"Container attributes do not contain '{mounts_attr}' for container '{container_name}'."
         )
         return False
@@ -176,40 +223,42 @@ def fix_missing_xauth_file(
     for mount in container.attrs[mounts_attr]:
         if source_key in mount and xauth_file_ext in mount[source_key]:
             xauth_file_abs_path = mount[source_key]
-            print(
+            logger.info(
                 f"Found {xauth_file_ext} file '{xauth_file_abs_path}' for container '{container_name}'."
             )
             break
 
     if not xauth_file_abs_path:
-        print(
+        logger.info(
             f"There is no {xauth_file_ext} file for container '{container_name}'. Nothing to do."
         )
         return True
 
     if os.path.isfile(xauth_file_abs_path):
-        print(f"File '{xauth_file_abs_path}' already exists.")
+        logger.info(f"File '{xauth_file_abs_path}' already exists.")
         return True
 
     if os.path.isdir(xauth_file_abs_path):
-        print(f"Path '{xauth_file_abs_path}' is a directory, removing it.")
+        logger.info(f"Path '{xauth_file_abs_path}' is a directory, removing it.")
         try:
             os.rmdir(xauth_file_abs_path)
         except OSError as e:
-            print(f"Failed to remove directory '{xauth_file_abs_path}': {e}")
-            print("========================================")
-            print("Please remove it manually and try again.")
-            print("========================================")
+            logger.error(f"Failed to remove directory '{xauth_file_abs_path}': {e}")
+            logger.error("========================================")
+            logger.error("Please remove it manually and try again.")
+            logger.error("========================================")
             return False
 
     if not create_file_if_not_exists(xauth_file_abs_path):
-        print(f"Failed to create file '{xauth_file_abs_path}'.")
+        logger.error(f"Failed to create file '{xauth_file_abs_path}'.")
         return False
 
     cmd = f"xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f {xauth_file_abs_path} nmerge -"
 
     if not run_command(cmd, shell=True):
-        print(f"Failed to run command '{cmd}'. File '{xauth_file_abs_path}' will be removed.")
+        logger.error(
+            f"Failed to run command '{cmd}'. File '{xauth_file_abs_path}' will be removed."
+        )
         os.remove(xauth_file_abs_path)
         return False
 

@@ -50,7 +50,7 @@ from rtwcli.utils import (
 )
 from rtwcli.verb import VerbExtension
 import docker
-from rtwcli.workspace_manger import (
+from rtwcli.workspace_utils import (
     Workspace,
     WorkspacesConfig,
     get_compile_cmd,
@@ -64,7 +64,7 @@ DEFAULT_BASE_IMAGE_NAME_FORMAT = "osrf/ros:{ros_distro}-desktop"
 DEFAULT_FINAL_IMAGE_NAME_FORMAT = "rtw_{workspace_name}_final"
 DEFAULT_CONTAINER_NAME_FORMAT = "{final_image_name}-instance"
 DEFAULT_HOSTNAME_FORMAT = "rtw-{workspace_name}-docker"
-DEFAULT_RTW_DOCKER_BRANCH = "rtw_ws_create"
+DEFAULT_RTW_DOCKER_BRANCH = "master"
 DEFAULT_RTW_DOCKER_PATH = os.path.expanduser("~/ros_team_workspace")
 DEFAULT_UPSTREAM_WS_NAME_FORMAT = "{workspace_name}_upstream"
 DEFAULT_WS_REPOS_FILE_FORMAT = "{repo_name}.{ros_distro}.repos"
@@ -936,9 +936,9 @@ class CreateVerb(VerbExtension):
                 ws_name=create_args.upstream_ws_name,
                 ws_folder=create_args.upstream_ws_abs_path,
                 distro=create_args.ros_distro,
-                ws_docker_support=True if create_args.docker else False,
-                docker_tag=create_args.final_image_name if create_args.docker else "",
-                docker_container_name=create_args.container_name if create_args.docker else "",
+                ws_docker_support=create_args.docker,
+                docker_tag=create_args.final_image_name if create_args.docker else None,
+                docker_container_name=create_args.container_name if create_args.docker else None,
                 standalone=create_args.standalone,
             )
             if not update_workspaces_config(WORKSPACES_PATH, local_upstream_ws):

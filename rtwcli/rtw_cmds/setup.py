@@ -55,6 +55,7 @@ The package provides the commands for the ROS Team Workspace command line tools.
         ],
         "rtw_cmds.workspace.verbs": [
             "create = rtw_cmds.workspace.create_verb:CreateVerb",
+            "delete = rtw_cmds.workspace.delete_verb:DeleteVerb",
             "import = rtw_cmds.workspace.import_verb:ImportVerb",
             "port = rtw_cmds.workspace.port_verb:PortVerb",
             "use = rtw_cmds.workspace.use_verb:UseVerb",

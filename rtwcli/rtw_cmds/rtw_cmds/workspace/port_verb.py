@@ -13,127 +13,229 @@
 # limitations under the License.
 
 import argparse
-import os
+from enum import Enum
+import re
+from typing import Dict, List
 
+import rich
+import rich.tree
+from rtwcli import logger
 from rtwcli.constants import (
-    F_DISTRO,
-    F_WS_FOLDER,
+    RICH_TREE_FST_LVL_COLOR,
+    RICH_TREE_GUIDE_STYLE,
+    RICH_TREE_LABEL_COLOR,
+    RICH_TREE_STATUS_COLOR,
+    ROS_TEAM_WS_BASE_WS_ENV_VAR,
+    ROS_TEAM_WS_DISTRO_ENV_VAR,
+    ROS_TEAM_WS_DOCKER_CONTAINER_NAME_ENV_VAR,
+    ROS_TEAM_WS_DOCKER_TAG_ENV_VAR,
+    ROS_TEAM_WS_PREFIX,
+    ROS_TEAM_WS_WS_DOCKER_SUPPORT_ENV_VAR,
     ROS_TEAM_WS_WS_FOLDER_ENV_VAR,
     ROS_TEAM_WS_RC_PATH,
-    ROS_TEAM_WS_ENV_VARIABLES,
+    WORKSPACES_PATH,
 )
 from rtwcli.verb import VerbExtension
-from rtwcli.workspace_manger import (
-    env_var_to_workspace_var,
-    try_port_workspace,
-    extract_workspaces_from_bash_script,
+from rtwcli.workspace_utils import (
+    Workspace,
+    get_selected_ws_names_from_user,
+    update_workspaces_config,
 )
+
+
+WS_FUNCTION_PREFIX = ROS_TEAM_WS_PREFIX + "setup_"
+BASE_WS_CURRENT = "<current>"
+EMPTY_DOCKER_TAG = "-"
+DEFAULT_DOCKER_CONTAINER_NAME_FORMAT = "{docker_tag}-instance"
+
+
+class PortStatus(Enum):
+    """Port status enum."""
+
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+
+def extract_workspaces_from_bash_script(script_path: str) -> Dict[str, Workspace]:
+    """Extract workspaces from a bash script."""
+    with open(script_path) as file:
+        data = file.read()
+
+    # regex: find all functions in the script
+    ws_functions = re.findall(r"(\w+ \(\) \{[^}]+\})", data, re.MULTILINE)
+    logger.debug(
+        f"Found workspace functions: {len(ws_functions)}"
+        f"\nFirst ws function: \n{ws_functions[0]} \nLast ws function: \n{ws_functions[-1]}"
+    )
+
+    workspaces: Dict[str, Workspace] = {}
+    for ws_function in ws_functions:
+        ws_function_name = re.search(r"(\w+) \(", ws_function).group(1)  # type: ignore
+        if WS_FUNCTION_PREFIX not in ws_function_name:
+            logger.info(
+                f"WS function name '{ws_function_name}' does not contain "
+                f"ws function prefix '{WS_FUNCTION_PREFIX}', skipping."
+            )
+            continue
+        ws_name = ws_function_name[len(WS_FUNCTION_PREFIX) :]
+        logger.debug(f"WS name: '{ws_name}'")
+
+        # regex: find all variables and values in the function
+        # e.g. (export) RosTeamWS_DISTRO="humble"
+        variables_and_values: Dict[str, str] = {
+            var: val.strip('"')
+            for var, val in re.findall(r'(?:export )?(\w+)=(".*?"|\'.*?\'|[^ ]+)', ws_function)
+        }
+        logger.debug(f"WS function variables and values: {variables_and_values}")
+
+        if ROS_TEAM_WS_DISTRO_ENV_VAR not in variables_and_values:
+            logger.error(
+                f"Workspace '{ws_name}' does not have distro '{ROS_TEAM_WS_DISTRO_ENV_VAR}', "
+                "skipping."
+            )
+            continue
+        distro = variables_and_values[ROS_TEAM_WS_DISTRO_ENV_VAR]
+
+        if ROS_TEAM_WS_WS_FOLDER_ENV_VAR not in variables_and_values:
+            logger.error(
+                f"Workspace '{ws_name}' does not have ws folder '{ROS_TEAM_WS_WS_FOLDER_ENV_VAR}', "
+                "skipping."
+            )
+            continue
+        ws_folder = variables_and_values[ROS_TEAM_WS_WS_FOLDER_ENV_VAR]
+
+        base_ws = None
+        if (
+            ROS_TEAM_WS_BASE_WS_ENV_VAR in variables_and_values
+            and variables_and_values[ROS_TEAM_WS_BASE_WS_ENV_VAR] != BASE_WS_CURRENT
+        ):
+            logger.debug(
+                f"Workspace '{ws_name}' has base ws that is not '{BASE_WS_CURRENT}', "
+                "setting it."
+            )
+            base_ws = variables_and_values[ROS_TEAM_WS_BASE_WS_ENV_VAR]
+
+        ws_docker_support = False
+        if (
+            ROS_TEAM_WS_WS_DOCKER_SUPPORT_ENV_VAR in variables_and_values
+            and variables_and_values[ROS_TEAM_WS_WS_DOCKER_SUPPORT_ENV_VAR] == "true"
+        ):
+            logger.debug(
+                f"Workspace '{ws_name}' has docker support ('{ROS_TEAM_WS_WS_DOCKER_SUPPORT_ENV_VAR}')"
+            )
+            ws_docker_support = True
+
+        docker_tag = None
+        if ws_docker_support:
+            if ROS_TEAM_WS_DOCKER_TAG_ENV_VAR not in variables_and_values:
+                logger.error(
+                    f"Workspace '{ws_name}' has docker support but does not have docker tag "
+                    f"variable '{ROS_TEAM_WS_DOCKER_TAG_ENV_VAR}', skipping."
+                )
+                continue
+            docker_tag = variables_and_values[ROS_TEAM_WS_DOCKER_TAG_ENV_VAR]
+
+        docker_container_name = None
+        if ws_docker_support:
+            if ROS_TEAM_WS_DOCKER_CONTAINER_NAME_ENV_VAR in variables_and_values:
+                logger.debug(
+                    f"Workspace '{ws_name}' has docker container name "
+                    f"'{ROS_TEAM_WS_DOCKER_CONTAINER_NAME_ENV_VAR}', setting it."
+                )
+                docker_container_name = variables_and_values[
+                    ROS_TEAM_WS_DOCKER_CONTAINER_NAME_ENV_VAR
+                ]
+            else:
+                docker_container_name = DEFAULT_DOCKER_CONTAINER_NAME_FORMAT.format(
+                    docker_tag=docker_tag
+                )
+                logger.info(
+                    f"Workspace '{ws_name}' has docker support but does not have docker container name "
+                    f"variable, setting it to {docker_container_name}"
+                )
+
+        ws = Workspace(
+            ws_name=ws_name,
+            distro=distro,
+            ws_folder=ws_folder,
+            ws_docker_support=ws_docker_support,
+            docker_tag=docker_tag if docker_tag else "",
+            docker_container_name=docker_container_name if docker_container_name else "",
+            base_ws=base_ws if base_ws else "",
+        )
+        workspaces[ws_name] = ws
+
+    return workspaces
+
+
+def port_workspace_name_completer(**kwargs) -> List[str]:
+    workspaces = extract_workspaces_from_bash_script(ROS_TEAM_WS_RC_PATH)
+    if not workspaces:
+        return ["NO_WORKSPACES_FOUND"]
+    return [ws_name for ws_name in workspaces.keys()]
+
+
+def print_port_stats(ported: List[str], to_be_ported: List[str]) -> None:
+    total = len(to_be_ported)
+    completed = len(ported)
+    tree = rich.tree.Tree(
+        f"{RICH_TREE_LABEL_COLOR}Workspace Porting Statistics: {completed}/{total}",
+        guide_style=RICH_TREE_GUIDE_STYLE,
+    )
+    for ws_i, ws_name in enumerate(to_be_ported, start=1):
+        status = PortStatus.SUCCESS if ws_name in ported else PortStatus.FAILED
+        tree.add(
+            f"{RICH_TREE_FST_LVL_COLOR}{ws_i}. {ws_name} - {RICH_TREE_STATUS_COLOR}{status.name}",
+            highlight=True,
+        )
+    rich.print(tree)
 
 
 class PortVerb(VerbExtension):
     """Port workspace(s) by creating the corresponding config entry."""
 
-    def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
-        parser.add_argument(
-            "--all",
-            action="store_true",
-            default=False,
-            help=f"Port all workspaces (from '{ROS_TEAM_WS_RC_PATH}')",
+    def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str) -> None:
+        arg = parser.add_argument(
+            "workspace_name",
+            help="The workspace name",
+            nargs="?",
         )
-        parser.add_argument(
-            "--current",
-            action="store_true",
-            default=False,
-            help="Port the currently sourced workspace",
-        )
+        arg.completer = port_workspace_name_completer  # type: ignore
 
     def main(self, *, args):
-        if args.all and args.current:
-            print("Please specify only single argument: '--all' or '--current'.")
-        elif args.all:
-            self.port_all_workspaces()
-        elif args.current:
-            self.port_current_workspace()
-        else:
-            print("Please specify what to port: '--all' or '--current'.")
-
-    def port_all_workspaces(
-        self,
-        var_str_format: str = "\t{:>30} -> {:<20}: {}",
-        sep_line: str = "-" * 50,
-        summary_sep_line: str = "#" * 50,
-    ):
-        print(f"Reading workspaces from script '{ROS_TEAM_WS_RC_PATH}'")
-
         script_workspaces = extract_workspaces_from_bash_script(ROS_TEAM_WS_RC_PATH)
-        ws_num = len(script_workspaces)
-        print(f"Found {ws_num} workspaces in script '{ROS_TEAM_WS_RC_PATH}'")
+        if not script_workspaces:
+            logger.info(f"No workspaces found in script '{ROS_TEAM_WS_RC_PATH}'")
+            return
 
-        # For statistics:
-        porting_stats = {
-            "successful": [],
-            "failed": [],
-        }
+        logger.debug(
+            f"Script workspaces: {len(script_workspaces)}"
+            f"\nFirst script workspace: \n{list(script_workspaces.values())[0]}"
+            f"\nLast script workspace: \n{list(script_workspaces.values())[-1]}"
+        )
 
-        for i, (script_ws, script_ws_data) in enumerate(script_workspaces.items()):
-            ws_name_to_print = f"{i+1}/{ws_num} script workspace '{script_ws}'"
-            print(f"{sep_line}\n" f"Processing {ws_name_to_print}," f" ws_data: {script_ws_data}")
-            workspace_data_to_port = {}
-            for env_var, env_var_value in script_ws_data.items():
-                ws_var, ws_var_value = env_var_to_workspace_var(env_var, env_var_value)
-                print(var_str_format.format(env_var, ws_var, env_var_value))
-                workspace_data_to_port[ws_var] = ws_var_value
-
-            print("Generating workspace name from workspace path with first folder letters: ")
-            ws_path = script_ws_data[ROS_TEAM_WS_WS_FOLDER_ENV_VAR]
-            new_ws_name = os.path.basename(ws_path)
-            print(f"\t'{ws_path}' -> {new_ws_name}")
-
-            success = try_port_workspace(workspace_data_to_port, new_ws_name)
-            if success:
-                print(f"Ported workspace '{new_ws_name}' successfully")
-                porting_stats["successful"].append(ws_name_to_print)
-            else:
-                print(f"Porting workspace '{new_ws_name}' failed")
-                porting_stats["failed"].append(ws_name_to_print)
-
-        # Print the final summary:
-        print("\n" + summary_sep_line)
-        print("Porting Summary:")
-        print(f"Total Workspaces: {ws_num}")
-        print(f"Successfully Ported: {len(porting_stats['successful'])}")
-        for ws_name in porting_stats["successful"]:
-            print(f" - {ws_name}")
-        print(f"Failed to Port: {len(porting_stats['failed'])}")
-        for ws_name in porting_stats["failed"]:
-            print(f" - {ws_name}")
-        print(summary_sep_line)
-
-    def port_current_workspace(self, var_str_format: str = "\t{:>30} -> {:<20}: {}"):
-        workspace_data_to_port = {}
-        print(f"Reading workspace environment variables: {ROS_TEAM_WS_ENV_VARIABLES}")
-        for env_var in ROS_TEAM_WS_ENV_VARIABLES:
-            env_var_value = os.environ.get(env_var, None)
-            ws_var, ws_var_value = env_var_to_workspace_var(env_var, env_var_value)
-            # check if variable is exported
-            if ws_var in [F_DISTRO, F_WS_FOLDER] and ws_var_value is None:
-                print(f"Variable {env_var} is not exported. Cannot proceed with porting.")
-                return
-            print(var_str_format.format(env_var, ws_var, env_var_value))
-            workspace_data_to_port[ws_var] = ws_var_value
-
-        print("Generating workspace name from workspace path with first folder letters: ")
-        ws_path = os.environ.get(ROS_TEAM_WS_WS_FOLDER_ENV_VAR)
-        if not ws_path:
-            raise RuntimeError(
-                f"Environment variable '{ROS_TEAM_WS_WS_FOLDER_ENV_VAR}' is not set."
-            )
-
-        new_ws_name = os.path.basename(ws_path)
-        print(f"\t'{ws_path}' -> {new_ws_name}")
-
-        success = try_port_workspace(workspace_data_to_port, new_ws_name)
-        if success:
-            print(f"Ported workspace '{new_ws_name}' successfully")
+        if args.workspace_name:
+            logger.debug(f"Porting workspace from args: {args.workspace_name}")
+            ws_names_to_port = [args.workspace_name]
         else:
-            print(f"Porting workspace '{new_ws_name}' failed")
+            ws_names_to_port = get_selected_ws_names_from_user(
+                workspaces=script_workspaces,
+                select_question_msg="Select workspaces to port",
+                confirm_question_msg="Are you sure you want to port the selected workspaces?",
+            )
+            if not ws_names_to_port:
+                logger.info("No workspaces selected to port.")
+                return
+        logger.debug(f"Ws names to port: {ws_names_to_port}")
+
+        ported = []
+        for ws_name in ws_names_to_port:
+            if update_workspaces_config(WORKSPACES_PATH, script_workspaces[ws_name]):
+                ported.append(ws_name)
+                logger.debug(f"Ported workspace: {ws_name}")
+            else:
+                logger.error(
+                    f"Failed to port workspace: {ws_name}. Please see the logs for details."
+                )
+
+        print_port_stats(ported=ported, to_be_ported=ws_names_to_port)

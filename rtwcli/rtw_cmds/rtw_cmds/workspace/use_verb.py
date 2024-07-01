@@ -22,7 +22,7 @@ from rtwcli.constants import (
 )
 from rtwcli.utils import create_file_and_write
 from rtwcli.verb import VerbExtension
-from rtwcli.workspace_manger import (
+from rtwcli.workspace_utils import (
     create_bash_script_content_for_using_ws,
     load_workspaces_config_from_yaml_file,
     workspace_name_completer,
