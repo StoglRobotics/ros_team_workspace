@@ -1,0 +1,64 @@
+<!--
+Copyright (c) 2024, Stogl Robotics Consulting UG (haftungsbeschränkt)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Source of this file are templates in https://github.com/StoglRobotics/ros_team_workspace repository.
+-->
+
+<launch>
+    <!-- Launch arguments -->
+    <arg name="description_package" default="$DESCR_PKG_NAME$" description="Package with the robot URDF/XACRO files. Usually the argument is not set, it enables use of a custom setup."/>
+    <arg name="description_file" default="$ROBOT_NAME$.urdf.xacro" description="URDF/XACRO description file Usually the argument is not set, it enables use of a custom setup"/>
+    <arg name="moveit_package" default="$PKG_NAME$" description="MoveIt config package with robot SRDF/XACRO files. Usually the argument is not set, it enables use of a custom setup."/>
+    <arg name="semantic_description_file" default="$ROBOT_NAME$.srdf.xacro" description="MoveIt SRDF/XACRO description file with the robot. Usually the argument is not set, it enables use of a custom setup."/>
+
+    <arg name="prefix" default="" description="Prefix of the joint names, useful for multi-robot setup. If changed then also joint names in the controllers' configuration have to be updated."/>
+    <arg name="use_mock_hardware" default="true" description="Start robot with mock hardware mirroring command to its states." />
+    <arg name="mock_sensor_commands" default="false" description="Enable mock command interfaces for sensors used for simple simulations. Used only if 'use_mock_hardware' parameter is true."/>
+    <arg name="use_sim_time" default="false" description="Use simulation clock instead of world clock." />
+    <arg name="severity" default="INFO" description="Logging level for the nodes. Available levels, in order of severity: DEBUG, INFO, WARN, ERROR, FATAL." />
+
+    <!-- Robot parameters -->
+    <let name="robot_description" value="$(command 'xacro $(find-pkg-share $(var description_package))/urdf/$(var description_file) 
+    prefix:=$(var prefix) 
+    use_mock_hardware:=$(var use_mock_hardware) 
+    mock_sensor_commands:=$(var mock_sensor_commands)
+    ')" />
+    <let name="robot_description_semantic" value="$(command 'xacro $(find-pkg-share $(var moveit_package))/srdf/$(var semantic_description_file) 
+    prefix:=$(var prefix)
+    ')"/>
+    <let name="planning_config" value="$(find-pkg-share $(var moveit_package))/config/ompl_planning.yaml"/>
+    <let name="move_group_config" value="$(find-pkg-share $(var moveit_package))/config/move_group.yaml"/>
+
+    <!-- Moveit2 node -->
+    <node pkg="moveit_ros_move_group" exec="move_group" output="screen"
+    args="--ros-args --log-level $(var severity)">
+        <param name="robot_description" value="$(var robot_description)"/>
+        <param name="robot_description_semantic" value="$(var robot_description_semantic)"/>
+        <param name="use_sim_time" value="$(var use_sim_time)"/>
+        <param from="$(var planning_config)"/>
+        <param from="$(var move_group_config)"/>
+    </node>
+
+    <!-- Rviz2 node -->
+    <arg name="rviz_config" default="$(find-pkg-share $(var moveit_package))/rviz/moveit.rviz"/>
+    <node pkg="rviz2" exec="rviz2" output="screen" 
+    args="-d $(var rviz_config) --ros-args --log-level WARN" >
+        <param name="robot_description" value="$(var robot_description)"/>
+        <param name="robot_description_semantic" value="$(var robot_description_semantic)"/>
+        <param name="use_sim_time" value="$(var use_sim_time)"/>
+        <param from="$(var planning_config)"/>
+        <param from="$(var move_group_config)"/>
+    </node>
+</launch>

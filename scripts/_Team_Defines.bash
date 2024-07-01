@@ -74,6 +74,8 @@ alias setup-robot-bringup=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-robot-bringup.
 
 alias setup-robot-description=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-robot-description.bash
 
+alias setup-robot-moveit=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-robot-moveit.bash
+
 # ros2_control
 alias ros2_control_setup-hardware-interface-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/ros2_control/setup-hardware-interface-package.bash
 alias ros2_control_setup-controller-package=$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/ros2_control/setup-controller-package.bash
