@@ -183,6 +183,7 @@ for SED_FILE in "${FILES_TO_SED[@]}"; do
   sed -i "s/TEMPLATES__ROS2_CONTROL__CONTROLLER__DUMMY_PACKAGE_NAMESPACE/${PKG_NAME^^}/g" $SED_FILE # package name for include guard
   sed -i "s/TEMPLATES__ROS2_CONTROL__VISIBILITY/${PKG_NAME^^}__VISIBILITY/g" $SED_FILE # visibility defines
   sed -i "s/dummy_package_namespace/${PKG_NAME}/g" $SED_FILE # package name for includes
+  sed -i "s/dummy_library_path/${FILE_NAME}/g" $SED_FILE # library path for pluginlib
   sed -i "s/dummy_controller/${FILE_NAME}/g" $SED_FILE # file name
   sed -i "s/dummy_chainable_controller/${FILE_NAME}/g" $SED_FILE # file name
   sed -i "s/DUMMY_CONTROLLER/${FILE_NAME^^}/g" $SED_FILE # file name for include guard
@@ -355,11 +356,11 @@ if [[ "$package_configured" == "no" ]]; then
 
   for DEP_PKG in "${DEP_PKGS[@]}"; do
     # package.xml
-    if `grep -q "<depend>${DEP_PKG}</depend>" package.xml`; then
+    if grep -q "<depend>${DEP_PKG}</depend>" package.xml; then
       echo "'$DEP_PKG' is already listed in package.xml"
     else
       append_to_string="<build_depend>generate_parameter_library<\/build_depend>"
-      sed -i "s/$append_to_string/$append_to_string\\n\\n  <depend>${DEP_PKG}<\/depend>/g" package.xml
+      sed -i "s/$append_to_string/$append_to_string\\n  <depend>${DEP_PKG}<\/depend>/g" package.xml
     fi
   done
 fi
@@ -371,19 +372,19 @@ TEST_DEP_PKGS=("ros2_control_test_assets" "hardware_interface" "controller_manag
 for DEP_PKG in "${TEST_DEP_PKGS[@]}"; do
 
   # CMakeLists.txt
-  if `grep -q "  find_package(${DEP_PKG} REQUIRED)" CMakeLists.txt`; then
+  if grep -q "  find_package(${DEP_PKG} REQUIRED)" CMakeLists.txt; then
     echo "'$DEP_PKG' is already listed in CMakeLists.txt"
   else
-    append_to_string="ament_lint_auto_find_test_dependencies()"
+    append_to_string="if(BUILD_TESTING)"
     sed -i "s/$append_to_string/$append_to_string\\n  find_package(${DEP_PKG} REQUIRED)/g" CMakeLists.txt
   fi
 
   # package.xml
-  if `grep -q "<test_depend>${DEP_PKG}</test_depend>" package.xml`; then
+  if grep -q "<test_depend>${DEP_PKG}</test_depend>" package.xml; then
     echo "'$DEP_PKG' is already listed in package.xml"
   else
-    append_to_string="<test_depend>ament_lint_common<\/test_depend>"
-    sed -i "s/$append_to_string/$append_to_string\\n  <test_depend>${DEP_PKG}<\/test_depend>/g" package.xml
+    append_to_string="<export>"
+    sed -i "s/$append_to_string/<test_depend>${DEP_PKG}<\/test_depend>\\n  $append_to_string/g" package.xml
   fi
 done
 

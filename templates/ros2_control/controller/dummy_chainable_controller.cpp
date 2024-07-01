@@ -245,7 +245,8 @@ controller_interface::CallbackReturn DummyClassName::on_deactivate(
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-controller_interface::return_type DummyClassName::update_reference_from_subscribers()
+controller_interface::return_type DummyClassName::update_reference_from_subscribers(
+  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
   auto current_ref = input_ref_.readFromRT();
 

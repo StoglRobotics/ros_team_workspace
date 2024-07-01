@@ -18,7 +18,7 @@ Source of this file are templates in
 [RosTeamWorkspace](https://github.com/StoglRobotics/ros_team_workspace) repository.
 -->
 
-<library path="dummy_package_namespace">
+<library path="dummy_library_path">
   <class name="dummy_package_namespace/DummyClassName"
          type="dummy_package_namespace::DummyClassName" base_class_type="controller_interface::ChainableControllerInterface">
   <description>
