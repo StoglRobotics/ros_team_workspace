@@ -125,12 +125,10 @@ function RosTeamWS_setup_exports {
 # TODO(denis): add this into setup.bash
 function RosTeamWS_setup_aliases {
 
-# ROS
-  alias rosd="cd \$ROS_WS"
+  # ROS
   alias rosds="cd \$ROS_WS/src"
   alias rosdb="cd \$ROS_WS/build"
   alias rosdi="cd \$ROS_WS/install"
-
 }
 
 function RosTeamWS_setup_ros1_exports {
@@ -143,6 +141,7 @@ export ROSCONSOLE_CONFIG_FILE='~/workspace/ros_ws/rosconsole.config'
 function RosTeamWS_setup_ros1_aliases {
 
 # ROS
+  alias rosd="rtw_ros_cd"
   alias rosdd="cd \$ROS_WS/devel"
 
 # Catkin
@@ -160,7 +159,7 @@ function RosTeamWS_setup_ros2_exports {
 function RosTeamWS_setup_ros2_aliases {
 
 # ROS
-  alias rosdi="cd \$ROS_WS/install"
+  alias rosd="rtw_ros2_cd"
 
 # COLCON
   alias cb="colcon_build"
@@ -179,6 +178,22 @@ function RosTeamWS_setup_ros2_aliases {
   alias caup="colcon_all_up_to"
 
   alias crm="colcon_remove"
+}
+
+function rtw_ros_cd {
+  if [ -z "$1" ]; then
+    cd $ROS_WS
+  else
+    roscd $1
+  fi
+}
+
+function rtw_ros2_cd {
+  if [ -z "$1" ]; then
+    cd $ROS_WS
+  else
+    colcon_cd $1
+  fi
 }
 
 

@@ -1,4 +1,4 @@
-setup_script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+setup_script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
 # Load RosTeamWS defines
 source $setup_script_own_dir/scripts/_RosTeamWs_Defines.bash
@@ -24,16 +24,16 @@ source $setup_script_own_dir/rtwcli/rtwcli/completion/rtw-argcomplete.bash
 # rtwcli: export ros workspace variables if chosen (rtw workspace use)
 export ROS_WS_CACHE_SOURCED_TIME=0
 function update_ros_ws_variables {
-  local file_name="/tmp/ros_team_workspace/wokspace_$$.bash"
-  # If file exists
-  if [[ -f $file_name ]]; then
-    local file_mod_time=$(stat -c %Y $file_name)
+  local file_name="/tmp/ros_team_workspace/workspace_$$.bash"
+  if [[ -f $file_name ]]; then # If file exists
+    local file_mod_time
+    file_mod_time=$(stat -c %Y $file_name)
 
     # If file was modified after the last source operation
-    if (( file_mod_time > ROS_WS_CACHE_SOURCED_TIME )); then
-        source $file_name
-        ROS_WS_CACHE_SOURCED_TIME=$file_mod_time
-        export ROS_WS_CACHE_SOURCED_TIME
+    if ((file_mod_time > ROS_WS_CACHE_SOURCED_TIME)); then
+      source "$file_name"
+      ROS_WS_CACHE_SOURCED_TIME=$file_mod_time
+      export ROS_WS_CACHE_SOURCED_TIME
     fi
   fi
 }

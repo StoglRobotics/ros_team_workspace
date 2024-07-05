@@ -10,7 +10,7 @@ usage='setup.bash "ros_distro" "workspace_folder" "ros_ws_prefix" "ros_ws_suffix
 # read -p "Starting..."
 
 # Load Framework defines
-script_own_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
+script_own_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 source $script_own_dir/../_RosTeamWs_Defines.bash
 source $script_own_dir/../_RosTeamWs_Docker_Defines.bash
 source $script_own_dir/../_Team_Defines.bash
@@ -74,13 +74,21 @@ if [[ $ros_version == 1 ]]; then
   echo ""
   echo "RosTeamWS: Sourced file: $WS_FOLDER/devel/setup.bash"
 
-
 elif [[ $ros_version == 2 ]]; then
 
   setup_exports
   setup_aliases
   setup_ros2_exports
   setup_ros2_aliases
+
+  source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash # setup colcon tab completion
+
+  if [[ $RosTeamWS_WS_DOCKER_SUPPORT == true && $RosTeamWS_STANDALONE == true ]]; then
+    export ROS_WS=$RosTeamWS_WS_NAME
+    echo -e "${TERMINAL_COLOR_YELLOW}RosTeamWS: In standalone docker mode there is nothing \
+to source locally. Please switch to docker container first.${TERMINAL_COLOR_NC}"
+    return
+  fi
 
   #/opt/rti.com/rti_connext_dds-5.3.1/setenv_ros2rti.bash
   # export LANG=de_DE.UTF-8
@@ -119,6 +127,10 @@ elif [[ $ros_version == 2 ]]; then
     FILE_TO_SOURCE="/opt/ros/$ros_distro/setup.bash"
   fi
   source "$FILE_TO_SOURCE"
+
+  # Colcon tools
+  source /usr/share/colcon_cd/function/colcon_cd.sh  # enable 'colcon_cd' command
+  export _colcon_cd_root=/opt/ros/$ros_distro/       # enable 'colcon_cd' command
 
   echo ""
   echo -e "${TERMINAL_COLOR_BLUE}RosTeamWS: Sourced file: ${FILE_TO_SOURCE}${TERMINAL_COLOR_NC}"

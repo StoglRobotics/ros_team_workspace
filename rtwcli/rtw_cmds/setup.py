@@ -21,7 +21,7 @@ setup(
     name=package_name,
     version="0.2.0",
     packages=find_packages(exclude=["test"]),
-    install_requires=["questionary", "rtwcli"],
+    install_requires=["rtwcli"],
     zip_safe=True,
     keywords=[],
     classifiers=[
@@ -54,10 +54,11 @@ The package provides the commands for the ROS Team Workspace command line tools.
             "create = rtw_cmds.pkg.verbs:CreateVerb",
         ],
         "rtw_cmds.workspace.verbs": [
-            "create = rtw_cmds.workspace.verbs:CreateVerb",
-            "port = rtw_cmds.workspace.verbs:PortVerb",
-            "port_all = rtw_cmds.workspace.verbs:PortAllVerb",
-            "use = rtw_cmds.workspace.verbs:UseVerb",
+            "create = rtw_cmds.workspace.create_verb:CreateVerb",
+            "delete = rtw_cmds.workspace.delete_verb:DeleteVerb",
+            "import = rtw_cmds.workspace.import_verb:ImportVerb",
+            "port = rtw_cmds.workspace.port_verb:PortVerb",
+            "use = rtw_cmds.workspace.use_verb:UseVerb",
         ],
     },
 )

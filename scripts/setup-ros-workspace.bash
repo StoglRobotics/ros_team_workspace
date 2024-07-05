@@ -376,21 +376,10 @@ create_workspace_docker () {
     let CUT_LINE=$TEST_LINE+0
     tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
 
-    # Add repositories for Nala
-    mv $DOCKER_FILE "$TMP_FILE"
-    TEST_LINE=`awk '$1 == "#" && $2 == "install" && $3 == "nala" { print NR }' $TMP_FILE`  # get line before `# install nala and upgrade` dependency
-    let CUT_LINE=$TEST_LINE-0
-    head -$CUT_LINE $TMP_FILE > $DOCKER_FILE
-
-    echo "RUN apt update -y && apt install -y wget" >> $DOCKER_FILE
-    echo "RUN echo \"deb [arch=amd64,arm64,armhf] http://deb.volian.org/volian/ scar main\" | tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list" >> $DOCKER_FILE
-    echo "RUN wget -qO - https://deb.volian.org/volian/scar.key | tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg > /dev/null" >> $DOCKER_FILE
-    echo "RUN apt update -y && apt install -y nala-legacy" >> $DOCKER_FILE
 
     # Add last part
     let CUT_LINE=$TEST_LINE+2
     tail -n +$CUT_LINE $TMP_FILE >> $DOCKER_FILE
-
     # Cleanup temp files
     rm $TMP_FILE
   fi

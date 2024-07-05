@@ -12,6 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .logging_config import logger
+import logging
+from rich.logging import RichHandler
 
-logger.debug("rtwcli package initialized")
+
+def setup_logging() -> logging.Logger:
+    FORMAT = "%(message)s"
+    logging.basicConfig(
+        level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
+    )
+
+    logger = logging.getLogger("rtwcli")
+    logger.setLevel(logging.DEBUG)  # global log level
+
+    return logger
+
+
+# Create and export the logger
+logger = setup_logging()
