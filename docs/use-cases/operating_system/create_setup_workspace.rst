@@ -5,6 +5,9 @@ Setup a new Workspace
 
 This use-case describes how to setup a new ROS workspace using scripts from the ROS Team Workspace (RosTeamWS) framework. Besides the creation of a local workspace, creation of a Ubuntu-based docker container is supported. For more details have a look below in the `Docker workspace`_ section.
 
+.. important::
+   If you want to use Ubuntu 24.04 and ROS 2 Jazzy and Rolling (from May 2024) then checkout :ref:`RosTeamWS CLI workspace setup<rtwcli-setup-workspace>`.
+
 Local workspace
 ----------------
 

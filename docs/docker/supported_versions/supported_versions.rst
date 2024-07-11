@@ -13,18 +13,31 @@ For the supported Ubuntu and ros version combinations have a look at the table b
    * - ros version
      - ubuntu 20.04
      - ubuntu 22.04
+     - ubuntu 24.04
    * - foxy
      - X
+     -
      -
    * - galactic
      - X
      -
+     -
    * - humble
      -
      - X
+     -
    * - iron
      -
      - X
+     -
    * - rolling
-     - X
-     - X
+     - X*
+     - X*
+     - X (rtwcli only)
+   * - jazzy
+     -
+     -
+     - X (rtwcli only)
+
+
+\* - last release for that Ubuntu distro - no ``rosdep`` support anymore.
