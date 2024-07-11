@@ -198,7 +198,23 @@ If you have only ``X`` in the output from ``nvidia-smi`` than make sure that the
 Take a note that ``nvidia-smi`` command in the docker container is necessary test to see if docker has access to the graphic card, but it doesn't shows any applications that are using it.
 You can see on your host if a docker application is using graphic card and how much.
 
+Workaround for Error: ``Failed to initialize NVML: Unknown Error``
+---------------------------------------------------------
+If you execute this ``docker run --rm --gpus all nvidia/cuda:11.7.1-base-ubuntu22.04 nvidia-smi`` and get this error, try the follwing `fix <https://bbs.archlinux.org/viewtopic.php?id=266915>`_ 
 
+    nvidia-container configuration In the file
+    
+    ``/etc/nvidia-container-runtime/config.toml``
+    
+    set the parameter
+    
+    ``no-cgroups = false``
+    
+    After that restart docker and run test container:
+    
+    ``sudo systemctl restart docker``
+    ``sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi``
+  
 References
 """""""""""
 
