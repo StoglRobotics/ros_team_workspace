@@ -14,12 +14,14 @@ intuitive way to interact with RTW.
 
 How to install the CLI
 """"""""""""""""""""""""
+.. _rtwcli-setup:
 
 Follow the instructions in the ``README.md`` inside the ``rtwcli`` folder.
 
 
 How to use the CLI
 """"""""""""""""""""
+.. _rtwcli-usage:
 
 The CLI currently supports the following commands:
 
@@ -38,12 +40,21 @@ The CLI currently supports the following commands:
    ``rtw <command> -h`` or ``rtw <command> <sub-command> -h``.
 
 
-Setting up a new workspace from ``.repos`` files
-"""""""""""""""""""""""""""""""""""""""""""""""""
+Setting up a new workspace
+"""""""""""""""""""""""""""""
+.. _rtwcli-setup-workspace:
 
-PR `#169 <https://github.com/RosTeamWS/RosTeamWS/pull/169>`_ introduced a new
-feature to create a new workspace (local or dockerized) from ``.repos`` files,
-streamlining the setup process for complex projects with multiple repositories.
+PR `#169 <https://github.com/StoglRobotics/ros_team_workspace/pull/169>`_ introduced a new feature to create a new local or dockerized workspace.
+The workspace can additionally be created using ``.repos`` files in your repository, streamlining the setup process for complex projects with multiple repositories.
+
+.. important::
+   **From May 2024** If you want to setup a dockerized workspace with nvidia support based on Ubuntu 24.04 (for Jazzy and Rolling) - make sure to use the updated ``rocker`` from `PR #279 <https://github.com/osrf/rocker/pull/279>`_. Until this PR is merged you are encoruged to setup the rocker with:
+
+   .. code-block:: bash
+
+      pip3 uninstall rocker   # is you have installed it with `sudo` use it here too
+      git clone https://github.com/StoglRobotics-forks/rocker.git --branch try_24
+      cd rocker && pip3 install -e . && cd -
 
 * Usage:
    * ``rtw workspace create``
