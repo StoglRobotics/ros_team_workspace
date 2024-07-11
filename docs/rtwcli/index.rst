@@ -49,10 +49,12 @@ The workspace can additionally be created using ``.repos`` files in your reposit
 
 .. important::
    **From May 2024** If you want to setup a dockerized workspace with nvidia support based on Ubuntu 24.04 (for Jazzy and Rolling) - make sure to use the updated ``rocker`` from `PR #279 <https://github.com/osrf/rocker/pull/279>`_. Until this PR is merged you are encoruged to setup the rocker with:
-   ```bash
-   git clone https://github.com/StoglRobotics-forks/rocker.git --branch try_24
-   cd rocker && pip3 install -e . && cd -
-   ```
+
+   .. code-block:: bash
+
+      pip3 uninstall rocker   # is you have installed it with `sudo` use it here too
+      git clone https://github.com/StoglRobotics-forks/rocker.git --branch try_24
+      cd rocker && pip3 install -e . && cd -
 
 * Usage:
    * ``rtw workspace create``
