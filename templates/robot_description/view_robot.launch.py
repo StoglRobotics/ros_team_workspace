@@ -30,7 +30,7 @@ def generate_launch_description():
     robot_description_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
-                [FindPackageShare("$PKG_NAME$"), "launch", "$ROBOT_NAME$.launch.py"]
+                [FindPackageShare("$PKG_NAME$"), "launch", "$ROBOT_NAME$_description.launch.py"]
             )
         ),
         launch_arguments={"launch_rviz": "true"}.items(),
