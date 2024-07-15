@@ -101,7 +101,7 @@ for file_type in "${LAUNCH_FILE_TYPES[@]}"; do
   cp -n "$ROS2_CONTROL_TEMPLATES/test_joint_trajectory_controller.launch${file_type}" "${TEST_JTC_LAUNCH}"
 
   # sed all needed files
-  FILES_TO_SED=($ROBOT_CONTROL_LAUNCH $TEST_FWD_POS_CTRL_LAUNCH $TEST_JTC_LAUNCH)
+  FILES_TO_SED=($ROBOT_LAUNCH $ROBOT_CONTROL_LAUNCH $TEST_FWD_POS_CTRL_LAUNCH $TEST_JTC_LAUNCH)
 
   for SED_FILE in "${FILES_TO_SED[@]}"; do
     sed -i "s/\\\$PKG_NAME\\\$/${PKG_NAME}/g" $SED_FILE
