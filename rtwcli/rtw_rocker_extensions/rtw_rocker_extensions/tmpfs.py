@@ -19,30 +19,25 @@ from rocker.extensions import name_to_argument
 from rocker.core import RockerExtension
 
 
-class X11Tmp(RockerExtension):
+class Tmpfs(RockerExtension):
     @staticmethod
     def get_name() -> str:
-        return "x11tmp"
+        return "tmpfs"
 
     def __init__(self):
-        self.name = X11Tmp.get_name()
+        self.name = Tmpfs.get_name()
 
     def get_docker_args(self, cliargs: dict) -> str:
-        args = [" "]  # To separate from the previous argument
-        args.extend(["-e", "DISPLAY"])
-        args.extend(["-e", "TERM"])
-        args.extend(["-e", "QT_X11_NO_MITSHM=1"])
+        args = [" "]  # To separate from the previous
         args.extend(["--tmpfs", "/tmp"])
-        args.extend(["-v", "/tmp/.X11-unix:/tmp/.X11-unix"])
-        args.extend(["-v", "/etc/localtime:/etc/localtime:ro"])
         args.append(" ")  # To separate from the next argument
         return " ".join(args)
 
     @staticmethod
     def register_arguments(parser: argparse.ArgumentParser, defaults: dict = {}) -> None:
         parser.add_argument(
-            name_to_argument(X11Tmp.get_name()),
+            name_to_argument(Tmpfs.get_name()),
             action="store_true",
-            default=defaults.get(X11Tmp.get_name(), None),
-            help="Enable x11tmp extension",
+            default=defaults.get(Tmpfs.get_name(), None),
+            help="Enable tmpfs for /tmp in the container.",
         )

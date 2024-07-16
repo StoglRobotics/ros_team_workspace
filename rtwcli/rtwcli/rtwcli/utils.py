@@ -22,6 +22,7 @@ import tempfile
 from typing import Any, Dict, List, Union
 
 import yaml
+from rtwcli import logger
 
 
 def create_file_if_not_exists(file_path: str) -> bool:
@@ -42,7 +43,7 @@ def create_file_if_not_exists(file_path: str) -> bool:
         with open(file_path, "w"):
             return True
     except OSError as e:
-        print(f"Failed to create file in {file_path}. Error: {e}")
+        logger.error(f"Failed to create file in {file_path}. Error: {e}")
         return False
 
 
@@ -56,7 +57,7 @@ def load_yaml_file(file_path: str) -> Any:
         with open(file_path) as file:
             return yaml.safe_load(file)
     except (OSError, yaml.YAMLError) as e:
-        print(f"Failed to load YAML file. Error: {e}")
+        logger.error(f"Failed to load YAML file. Error: {e}")
         return None
 
 
@@ -67,7 +68,7 @@ def write_to_yaml_file(file_path: str, yaml_data: Any) -> bool:
             yaml.dump(yaml_data, file)
             return True
     except (OSError, yaml.YAMLError) as e:
-        print(f"Failed to write to a YAML file. Error: {e}")
+        logger.error(f"Failed to write to a YAML file. Error: {e}")
         return False
 
 
@@ -84,7 +85,7 @@ def create_file_and_write(file_path: str, content: str) -> bool:
             file.write(f"{content}")
             return True
     except OSError as e:
-        print(f"Failed to write to a file. Error: {e}", e)
+        logger.error(f"Failed to write to a file. Error: {e}", e)
         return False
 
 
@@ -95,16 +96,16 @@ def run_command(
     ignore_codes: Union[List[int], None] = None,
 ) -> bool:
     """Run a command and return True if it was successful."""
-    print(f"Running command: '{command}'")
+    logger.info(f"Running command: '{command}'")
     try:
         subprocess.run(command, shell=shell, check=True, cwd=cwd)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"Command '{command}' failed with exit code {e.returncode}")
+        logger.error(f"Command '{command}' failed with exit code {e.returncode}")
         if ignore_codes and e.returncode in ignore_codes:
             return True
     except Exception as e:
-        print(f"Command '{command}' failed: {e}")
+        logger.error(f"Command '{command}' failed: {e}")
     return False
 
 
@@ -131,15 +132,23 @@ def vcs_import(
 ) -> bool:
     """Import repositories from a file using vcs. Return True if the import was successful."""
     if not os.path.isfile(repos_file_path):
-        print(f"Repos file '{repos_file_path}' does not exist. Nothing to import.")
+        msg = f"Repos file '{repos_file_path}' does not exist. Nothing to import."
+        if non_existing_ok:
+            logger.info(msg)
+        else:
+            logger.error(msg)
         return non_existing_ok
 
     # check if the file is empty
     if os.path.getsize(repos_file_path) == 0:
-        print(f"Repos file '{repos_file_path}' is empty. Nothing to import.")
+        msg = f"Repos file '{repos_file_path}' is empty. Nothing to import."
+        if empty_ok:
+            logger.info(msg)
+        else:
+            logger.error(msg)
         return empty_ok
 
-    print(f"Found non-empty repos file '{repos_file_path}', importing repos.")
+    logger.info(f"Found non-empty repos file '{repos_file_path}', importing repos.")
 
     if makedirs:
         os.makedirs(path, exist_ok=True)

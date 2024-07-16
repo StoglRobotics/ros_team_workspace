@@ -12,21 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 from rtwcli.command import add_subparsers_on_demand
 from rtwcli.command import CommandExtension
 
 
 class BaseCommand(CommandExtension):
-    def __init__(self, verbs_group):
+    def __init__(self, verbs_group: str):
         super().__init__()
         self.verbs_group = verbs_group
 
-    def add_arguments(self, parser, cli_name):
+    def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
         self._subparser = parser
         # add arguments and sub-commands of verbs
         add_subparsers_on_demand(parser, cli_name, "_verb", self.verbs_group, required=False)
 
-    def main(self, *, parser, args):
+    def main(self, *, parser: argparse.ArgumentParser, args: argparse.Namespace):
         if not hasattr(args, "_verb"):
             # in case no verb was passed
             self._subparser.print_help()
