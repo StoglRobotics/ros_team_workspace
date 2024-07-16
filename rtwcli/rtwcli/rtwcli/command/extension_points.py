@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 from rtwcli.command import CommandExtension
 from rtwcli.entry_points import EXTENSION_POINT_GROUP_NAME
 from rtwcli.entry_points import get_entry_points
@@ -23,7 +24,7 @@ from rtwcli.entry_points import get_first_line_doc
 class ExtensionPointsCommand(CommandExtension):
     """List extension points."""
 
-    def add_arguments(self, parser, cli_name):
+    def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str):
         parser.add_argument(
             "--all",
             "-a",

@@ -15,6 +15,7 @@
 import argparse
 import os
 import questionary
+from rtwcli import logger
 from rtwcli.constants import (
     USE_WORKSPACE_SCRIPT_PATH,
     WORKSPACES_PATH,
@@ -47,7 +48,7 @@ class UseVerb(VerbExtension):
     def main(self, *, args):
         workspaces_config = load_workspaces_config_from_yaml_file(WORKSPACES_PATH)
         if not workspaces_config.workspaces:
-            print(f"No workspaces found in config file '{WORKSPACES_PATH}'")
+            logger.info(f"No workspaces found in config file '{WORKSPACES_PATH}'")
             return
 
         ws_names = workspaces_config.get_ws_names()
@@ -68,16 +69,18 @@ class UseVerb(VerbExtension):
 
         workspace = workspaces_config.workspaces.get(ws_name)
         if not workspace:
-            return f"Workspace '{ws_name}' not found."
+            logger.error(f"Workspace '{ws_name}' not found.")
+            return
 
-        print(f"Workspace data: {workspace}")
+        logger.info(f"Workspace data: {workspace}")
 
         script_content = create_bash_script_content_for_using_ws(
             workspace, USE_WORKSPACE_SCRIPT_PATH
         )
         tmp_file = WS_USE_BASH_FILE_PATH_FORMAT.format(ppid=os.getppid())
-        print(f"Following text will be written into file '{tmp_file}':\n{script_content}")
+        logger.info(f"Following content will be written into file '{tmp_file}':\n{script_content}")
         if not create_file_and_write(tmp_file, content=script_content):
-            return f"Failed to write workspace data to a file {tmp_file}."
+            logger.error(f"Failed to write workspace data to a file {tmp_file}.")
+            return
 
-        print(f"Using workspace '{ws_name}'")
+        logger.info(f"Using workspace '{ws_name}'")

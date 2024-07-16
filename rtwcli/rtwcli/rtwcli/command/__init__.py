@@ -18,6 +18,7 @@ import argparse
 import inspect
 import os
 import types
+from typing import Optional
 
 from rtwcli.entry_points import get_entry_points
 from rtwcli.entry_points import get_first_line_doc
@@ -47,14 +48,14 @@ class CommandExtension:
         super().__init__()
         satisfies_version(PLUGIN_SYSTEM_VERSION, "^0.1")
 
-    def add_arguments(self, parser, cli_name, *, argv=None):
+    def add_arguments(self, parser: argparse.ArgumentParser, cli_name: str, *, argv=None):
         pass
 
-    def main(self, *, parser, args):
+    def main(self, *, parser: argparse.ArgumentParser, args: argparse.Namespace):
         raise NotImplementedError()
 
 
-def get_command_extensions(group_name, *, exclude_names=None):
+def get_command_extensions(group_name: str, *, exclude_names=None):
     extensions = instantiate_extensions(group_name, exclude_names=exclude_names)
     for name, extension in extensions.items():
         extension.NAME = name
@@ -75,7 +76,13 @@ class MutableString:
 
 
 def add_subparsers_on_demand(
-    parser, cli_name, dest, group_name, hide_extensions=None, required=True, argv=None
+    parser: argparse.ArgumentParser,
+    cli_name: str,
+    dest: str,
+    group_name: str,
+    hide_extensions: Optional[list] = None,
+    required: bool = True,
+    argv: Optional[list] = None,
 ):
     """
     Create argparse subparser for each extension on demand.

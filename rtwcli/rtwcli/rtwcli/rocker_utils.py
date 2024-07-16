@@ -15,6 +15,7 @@
 import os
 from typing import List, Union
 
+from rtwcli import logger
 from rtwcli.constants import DISPLAY_MANAGER_WAYLAND
 from rtwcli.utils import get_display_manager, run_command
 
@@ -66,7 +67,8 @@ def generate_rocker_flags(
     if ws_volumes:
         rocker_flags.extend(ws_volumes)
 
-    rocker_flags.append("--x11tmp")
+    rocker_flags.append("--tmpfs")
+    rocker_flags.append("--x11")
     rocker_flags.extend(["--mode", "interactive"])
     rocker_flags.extend(["--image-name", f"{final_image_name}"])
 
@@ -76,5 +78,5 @@ def generate_rocker_flags(
 def execute_rocker_cmd(rocker_flags: List[str], rocker_base_image_name: str) -> bool:
     rocker_cmd = ["rocker"] + rocker_flags + [rocker_base_image_name]
     rocker_cmd_str = " ".join(rocker_cmd)
-    print(f"Executing rocker command '{rocker_cmd_str}'")
+    logger.info(f"Executing rocker command '{rocker_cmd_str}'")
     return run_command(rocker_cmd)

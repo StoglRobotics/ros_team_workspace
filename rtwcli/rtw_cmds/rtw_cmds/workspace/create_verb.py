@@ -17,11 +17,12 @@ import argparse
 from dataclasses import dataclass, field, fields
 import os
 import pathlib
-from pprint import pprint
 import shutil
 import textwrap
 from typing import Any, List
 import questionary
+import rich
+from rtwcli import logger
 from rtwcli.constants import (
     BASHRC_PATH,
     DISPLAY_MANAGER_WAYLAND,
@@ -221,7 +222,7 @@ class CreateVerbArgs:
             )
 
         self.has_upstream_ws = True
-        print(
+        logger.info(
             f"Imported upstream ws repos from '{self.upstream_ws_repos_file_abs_path}' "
             f"to '{self.upstream_ws_src_abs_path}'"
         )
@@ -235,7 +236,7 @@ class CreateVerbArgs:
                 "and create only the main workspace?"
             ).ask()
             if remove_upstream_ws:
-                print(f"Removing upstream workspace folder '{self.upstream_ws_abs_path}'")
+                logger.info(f"Removing upstream workspace folder '{self.upstream_ws_abs_path}'")
                 shutil.rmtree(self.upstream_ws_abs_path)
                 self.has_upstream_ws = False
 
@@ -257,31 +258,31 @@ class CreateVerbArgs:
                 f"branch='{self.repos_branch}', path='{self.repos_clone_abs_path}'"
             )
 
-        print(
+        logger.info(
             f"Successfully cloned repo='{self.repos_containing_repository_url}', "
             f"branch='{self.repos_branch}', path='{self.repos_clone_abs_path}'"
         )
 
         # main ws repos
         if os.path.exists(self.ws_repos_file_abs_path):
-            print(f"Found ws repos file '{self.ws_repos_file_abs_path}'")
+            logger.info(f"Found ws repos file '{self.ws_repos_file_abs_path}'")
             self.handle_main_ws_repos()
-            print(
+            logger.info(
                 f"Imported repos from '{self.ws_repos_file_abs_path}' to '{self.ws_src_abs_path}'"
             )
         else:
-            print(f"Main ws repos file '{self.ws_repos_file_abs_path}' does not exist.")
+            logger.info(f"Main ws repos file '{self.ws_repos_file_abs_path}' does not exist.")
 
         # upstream ws repos
         if os.path.isfile(self.upstream_ws_repos_file_abs_path):
-            print(f"Found upstream ws repos file '{self.upstream_ws_repos_file_abs_path}'")
+            logger.info(f"Found upstream ws repos file '{self.upstream_ws_repos_file_abs_path}'")
             self.handle_upstream_ws_repos()
-            print(
+            logger.info(
                 f"Imported upstream ws repos from '{self.upstream_ws_repos_file_abs_path}' "
                 f"to '{self.upstream_ws_src_abs_path}'"
             )
         else:
-            print(
+            logger.info(
                 f"Upstream ws repos file '{self.upstream_ws_repos_file_abs_path}' does not exist."
             )
 
@@ -334,7 +335,7 @@ class CreateVerbArgs:
         if self.repos_containing_repository_url:
             self.handle_repos()
         else:
-            print("No repos containing repository URL provided. Not importing any repos.")
+            logger.info("No repos containing repository URL provided. Not importing any repos.")
 
         if self.user_override_name:
             self.rtw_docker_clone_abs_path = replace_user_name_in_path(
@@ -649,7 +650,7 @@ class CreateVerb(VerbExtension):
                     f"{create_args.upstream_ws_abs_path}:{create_args.upstream_ws_abs_path}"
                 )
 
-        print(f"Creating intermediate docker container with volumes: {volumes}")
+        logger.info(f"Creating intermediate docker container with volumes: {volumes}")
         try:
             docker_client = docker.from_env()
             intermediate_container = docker_client.containers.run(
@@ -728,27 +729,27 @@ class CreateVerb(VerbExtension):
         intermediate_container: Any = None,
     ) -> None:
         for ws_cmd in ws_cmds:
-            print(f"Running ws command: {ws_cmd}")
+            logger.info(f"Running ws command: {ws_cmd}")
             ws_cmd_str = " ".join(ws_cmd)
             error_msg = f"Failed to execute ws command '{ws_cmd_str}'"
             if create_args.docker:
                 if not docker_exec_bash_cmd(intermediate_container.id, ws_cmd_str):
                     if create_args.ignore_ws_cmd_error:
-                        print(error_msg)
+                        logger.warn(error_msg)
                     else:
                         docker_stop(intermediate_container.id)
                         raise RuntimeError(error_msg)
             else:
                 if not run_bash_command(ws_cmd_str):
                     if create_args.ignore_ws_cmd_error:
-                        print(error_msg)
+                        logger.warn(error_msg)
                     else:
                         raise RuntimeError(error_msg)
 
     def change_ws_folder_permissions(
         self, create_args: CreateVerbArgs, intermediate_container: Any
     ):
-        print("Changing workspace folder permissions in the intermediate container.")
+        logger.info("Changing workspace folder permissions in the intermediate container.")
         if not change_docker_path_permissions(
             intermediate_container.id, create_args.ws_abs_path_in_docker
         ):
@@ -855,7 +856,7 @@ class CreateVerb(VerbExtension):
         ):
             raise RuntimeError("Failed to change permissions for the home folder.")
 
-        print(f"Committing container '{intermediate_container.id}'")
+        logger.info(f"Committing container '{intermediate_container.id}'")
         try:
             intermediate_container.commit(create_args.final_image_name)
         except docker.errors.APIError as e:  # type: ignore
@@ -874,15 +875,15 @@ class CreateVerb(VerbExtension):
             )
 
         if get_display_manager() == DISPLAY_MANAGER_WAYLAND:
-            print(f"Wayland display manager detected: '{DISPLAY_MANAGER_WAYLAND}'.")
+            logger.info(f"Wayland display manager detected: '{DISPLAY_MANAGER_WAYLAND}'.")
 
         filtered_args = get_filtered_args(args, list(fields(CreateVerbArgs)))
         filtered_args["ws_abs_path"] = os.path.normpath(os.path.abspath(args.ws_folder))
 
         create_args = CreateVerbArgs(**filtered_args)
-        print("### CREATE ARGS ###")
-        pprint(create_args)
-        print("### CREATE ARGS ###")
+        logger.info("### CREATE ARGS ###")
+        rich.print(create_args)
+        logger.info("### CREATE ARGS ###")
 
         if create_args.docker:
             self.build_intermediate_docker_image(create_args)
@@ -892,9 +893,9 @@ class CreateVerb(VerbExtension):
             intermediate_container = self.run_intermediate_container(create_args)
 
         ws_cmds = self.get_ws_cmds(create_args)
-        print("### WS CMDS ###")
-        pprint(ws_cmds)
-        print("### WS CMDS ###")
+        logger.info("### WS CMDS ###")
+        rich.print(ws_cmds)
+        logger.info("### WS CMDS ###")
         self.execute_ws_cmds(create_args, ws_cmds, intermediate_container)
 
         if create_args.docker:
@@ -960,11 +961,11 @@ class CreateVerb(VerbExtension):
 
         # remove the local files if the standalone flag is set
         if create_args.standalone:
-            print("Standalone flag is set. Removing the local workspace files.")
+            logger.info("Standalone flag is set. Removing the local workspace files.")
             shutil.rmtree(create_args.ws_abs_path)
-            print(f"Removed the workspace folder '{create_args.ws_abs_path}'")
+            logger.info(f"Removed the workspace folder '{create_args.ws_abs_path}'")
             if create_args.has_upstream_ws:
                 shutil.rmtree(create_args.upstream_ws_abs_path)
-                print(
+                logger.info(
                     f"Removed the upstream workspace folder '{create_args.upstream_ws_abs_path}'"
                 )
