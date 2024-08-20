@@ -24,7 +24,7 @@ You can verify that you have docker successfully installed by running:
 which should print out a "Hello from Docker!" message.
 
 .. note::
-  However make sure your user is in the docker group. Check with: ``groups`` command. To add your user to the docker group run: ``sudo usermod -aG docker <username>``.
+  However make sure your user is in the docker group. Check with: ``groups`` command. To add your user to the docker group run: ``sudo usermod -aG docker $(whoami)``.
 
 Useful commands
 """"""""""""""""
