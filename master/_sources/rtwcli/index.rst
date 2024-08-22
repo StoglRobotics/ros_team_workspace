@@ -16,7 +16,7 @@ How to install the CLI
 """"""""""""""""""""""""
 .. _rtwcli-setup:
 
-Follow the instructions in the ``README.md`` inside the ``rtwcli`` folder.
+Follow the instructions in the ``README.md`` inside the ``rtwcli`` folder `#here <https://github.com/StoglRobotics/ros_team_workspace/blob/master/rtwcli/README.md>`_.
 
 
 How to use the CLI
