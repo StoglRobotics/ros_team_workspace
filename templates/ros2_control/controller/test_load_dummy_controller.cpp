@@ -35,8 +35,7 @@ TEST(TestLoadDummyClassName, load_controller)
     std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
 
   controller_manager::ControllerManager cm(
-    executor, ros2_control_test_assets::minimal_robot_urdf, 
-    true, "test_controller_manager");
+    executor, ros2_control_test_assets::minimal_robot_urdf, true, "test_controller_manager");
 
   ASSERT_NO_THROW(
     cm.load_controller("test_dummy_package_namespace", "dummy_package_namespace/DummyClassName"));
