@@ -122,6 +122,7 @@ class CreateVerbArgs:
     repos_no_skip_existing: bool = False
     disable_nvidia: bool = False
     docker: bool = False
+    disable_upgrade: bool = False
 
     @property
     def ws_name(self) -> str:
@@ -386,6 +387,14 @@ class CreateVerb(VerbExtension):
             default=False,
         )
         parser.add_argument(
+            "--disable-upgrade",
+            action="store_true",
+            help="Disable upgrade flag",
+            default=False,
+        )
+        
+        
+        parser.add_argument(
             "--ws-repos-file-name",
             type=str,
             help=(
@@ -601,7 +610,7 @@ class CreateVerb(VerbExtension):
         return textwrap.dedent(
             f"""
             FROM {create_args.base_image_name}
-            RUN apt-get update && apt-get upgrade -y
+            RUN apt-get update {"&& apt-get upgrade -y" if not create_args.disable_upgrade else ""}
             {apt_packages_cmd}
             {python_packages_cmd}
             {rtw_clone_cmd}

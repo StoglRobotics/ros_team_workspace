@@ -36,6 +36,7 @@ class ImportVerbArgs:
     standalone_docker_image: str
     docker: bool = True
     disable_nvidia: bool = False
+    disable_upgrade: bool = False
     standalone: bool = True
     final_image_name: str = ""
     container_name: str = ""
@@ -89,6 +90,12 @@ class ImportVerb(VerbExtension):
             default=False,
         )
         parser.add_argument(
+            "--disable-upgrade",
+            action="store_true",
+            help="Disable upgrade flag",
+            default=False,
+        )
+        parser.add_argument(
             "--final-image-name",
             type=str,
             help=(
@@ -134,6 +141,7 @@ class ImportVerb(VerbExtension):
         import_args = ImportVerbArgs(**filtered_args)
         rocker_flags = generate_rocker_flags(
             disable_nvidia=import_args.disable_nvidia,
+            disable_upgrade=import_args.disable_upgrade,
             container_name=import_args.container_name,
             hostname=import_args.hostname,
             ssh_abs_path=import_args.ssh_abs_path,
