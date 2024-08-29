@@ -27,7 +27,7 @@ This section describes in short the process with valuable tips to make your and 
 
    .. note::
 
-      In *Stogl Robotics* we have the organization called `StoglRobotics-forks <https://github.com/StoglRobotics-forks>`_ where all forks of public repositories live and are accessible for writing by all team members.
+      In *Stogl Robotics* we have the organization called `StoglRobotics-forks <https://github.com/StoglRobotics-forks>`_ where all forks of 3\ :sup:`rd` party public repositories live and are accessible for writing by all team members.
       This simplifies collaboration inside the team - there is no need for individual access grants when using forks under your user.
       **Always** check if there is already a fork in *StoglRobotics-forks* organization and if not create it.
 
