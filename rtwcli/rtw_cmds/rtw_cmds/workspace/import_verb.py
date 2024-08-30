@@ -141,7 +141,6 @@ class ImportVerb(VerbExtension):
         import_args = ImportVerbArgs(**filtered_args)
         rocker_flags = generate_rocker_flags(
             disable_nvidia=import_args.disable_nvidia,
-            disable_upgrade=import_args.disable_upgrade,
             container_name=import_args.container_name,
             hostname=import_args.hostname,
             ssh_abs_path=import_args.ssh_abs_path,
