@@ -392,8 +392,6 @@ class CreateVerb(VerbExtension):
             help="Disable upgrade flag",
             default=False,
         )
-        
-        
         parser.add_argument(
             "--ws-repos-file-name",
             type=str,
