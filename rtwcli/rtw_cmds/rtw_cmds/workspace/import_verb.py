@@ -36,7 +36,6 @@ class ImportVerbArgs:
     standalone_docker_image: str
     docker: bool = True
     disable_nvidia: bool = False
-    disable_upgrade: bool = False
     standalone: bool = True
     final_image_name: str = ""
     container_name: str = ""
