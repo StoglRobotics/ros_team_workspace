@@ -142,3 +142,30 @@ The workspace can additionally be created using ``.repos`` files in your reposit
 
    This is done due to the fact that the setting up of the rocker container
    fails often.
+
+How to setup ROS2 RTW for inter communication
+""""""""""""""""""""""""""""""""""""""""""""""
+.. _rtwcli-ipc-usage:
+
+The CLI provides a way to setup ROS2 RTW for inter communication between RTW workspaces.
+
+.. important::
+    make sure to use the updated ``rocker`` from `PR #285 <https://github.com/osrf/rocker/pull/285>`_. Until this PR is merged you are encouraged to setup the rocker with:
+
+* Example:
+
+.. code-block:: bash
+
+   rtw workspace create \
+      --ws-folder humble_ws \
+      --ros-distro humble \
+      --docker --enable-ipc
+
+   rtw workspace create \
+      --ws-folder rolling_ws \
+      --ros-distro rolling \
+      --docker --enable-ipc
+
+   (humble_ws)$ ros2 run demo_nodes_cpp talker
+
+   (rolling_ws)$ ros2 run demo_nodes_cpp listener
