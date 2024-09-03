@@ -123,6 +123,7 @@ class CreateVerbArgs:
     disable_nvidia: bool = False
     docker: bool = False
     enable_ipc: bool = False
+    disable_upgrade: bool = False
 
     @property
     def ws_name(self) -> str:
@@ -393,6 +394,12 @@ class CreateVerb(VerbExtension):
             default=False,
         )
         parser.add_argument(
+            "--disable-upgrade",
+            action="store_true",
+            help="Disable execution of 'apt-get upgrade' when creating workspace.",
+            default=False,
+        )
+        parser.add_argument(
             "--ws-repos-file-name",
             type=str,
             help=(
@@ -608,7 +615,7 @@ class CreateVerb(VerbExtension):
         return textwrap.dedent(
             f"""
             FROM {create_args.base_image_name}
-            RUN apt-get update && apt-get upgrade -y
+            RUN apt-get update {"&& apt-get upgrade -y" if not create_args.disable_upgrade else ""}
             {apt_packages_cmd}
             {python_packages_cmd}
             {rtw_clone_cmd}
