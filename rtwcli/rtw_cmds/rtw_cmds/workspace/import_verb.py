@@ -89,12 +89,6 @@ class ImportVerb(VerbExtension):
             default=False,
         )
         parser.add_argument(
-            "--disable-upgrade",
-            action="store_true",
-            help="Disable upgrade flag",
-            default=False,
-        )
-        parser.add_argument(
             "--final-image-name",
             type=str,
             help=(
