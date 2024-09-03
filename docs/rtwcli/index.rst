@@ -150,7 +150,12 @@ How to setup ROS2 RTW for inter communication
 The CLI provides a way to setup ROS2 RTW for inter communication between RTW workspaces.
 
 .. important::
-    make sure to use the updated ``rocker`` from `PR #285 <https://github.com/osrf/rocker/pull/285>`_. Until this PR is merged you are encouraged to setup the rocker with:
+   Make sure to use the updated ``rocker`` from `PR #285 <https://github.com/osrf/rocker/pull/285>`_. Until this PR is merged you are encouraged to setup the rocker with:
+   .. code-block:: bash
+
+      pip3 uninstall rocker   # is you have installed it with `sudo` use it here too
+      git clone https://github.com/StoglRobotics-forks/rocker.git --branch feature/added-ipc-flag
+      cd rocker && pip3 install -e . && cd -
 
 * Example:
 
@@ -159,12 +164,14 @@ The CLI provides a way to setup ROS2 RTW for inter communication between RTW wor
    rtw workspace create \
       --ws-folder humble_ws \
       --ros-distro humble \
-      --docker --enable-ipc
+      --docker \
+      --enable-ipc
 
    rtw workspace create \
       --ws-folder rolling_ws \
       --ros-distro rolling \
-      --docker --enable-ipc
+      --docker \
+      --enable-ipc
 
    (humble_ws)$ ros2 run demo_nodes_cpp talker
 
