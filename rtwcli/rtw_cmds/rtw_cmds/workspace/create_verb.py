@@ -389,7 +389,7 @@ class CreateVerb(VerbExtension):
         parser.add_argument(
             "--disable-upgrade",
             action="store_true",
-            help="Disable upgrade flag",
+            help="Disable execution of 'apt-get upgrade' when creating workspace.",
             default=False,
         )
         parser.add_argument(
