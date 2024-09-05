@@ -122,6 +122,7 @@ class CreateVerbArgs:
     repos_no_skip_existing: bool = False
     disable_nvidia: bool = False
     docker: bool = False
+    enable_ipc: bool = False
     disable_upgrade: bool = False
 
     @property
@@ -384,6 +385,12 @@ class CreateVerb(VerbExtension):
             "--disable-nvidia",
             action="store_true",
             help="Disable nvidia rocker flag",
+            default=False,
+        )
+        parser.add_argument(
+            "--enable-ipc",
+            action="store_true",
+            help="Enable IPC for the docker workspace.",
             default=False,
         )
         parser.add_argument(
@@ -923,6 +930,7 @@ class CreateVerb(VerbExtension):
                 disable_nvidia=create_args.disable_nvidia,
                 container_name=create_args.container_name,
                 hostname=create_args.hostname,
+                enable_ipc=create_args.enable_ipc,
                 ssh_abs_path=create_args.ssh_abs_path,
                 ssh_abs_path_in_docker=create_args.ssh_abs_path_in_docker,
                 final_image_name=create_args.final_image_name,

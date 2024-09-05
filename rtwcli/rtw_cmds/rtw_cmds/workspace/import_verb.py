@@ -36,6 +36,7 @@ class ImportVerbArgs:
     standalone_docker_image: str
     docker: bool = True
     disable_nvidia: bool = False
+    enable_ipc: bool = False
     standalone: bool = True
     final_image_name: str = ""
     container_name: str = ""
@@ -89,6 +90,12 @@ class ImportVerb(VerbExtension):
             default=False,
         )
         parser.add_argument(
+            "--enable-ipc",
+            action="store_true",
+            help="Enable IPC for the docker workspace.",
+            default=False,
+        )
+        parser.add_argument(
             "--final-image-name",
             type=str,
             help=(
@@ -136,6 +143,7 @@ class ImportVerb(VerbExtension):
             disable_nvidia=import_args.disable_nvidia,
             container_name=import_args.container_name,
             hostname=import_args.hostname,
+            enable_ipc=import_args.enable_ipc,
             ssh_abs_path=import_args.ssh_abs_path,
             ssh_abs_path_in_docker=import_args.ssh_abs_path_in_docker,
             final_image_name=import_args.final_image_name,

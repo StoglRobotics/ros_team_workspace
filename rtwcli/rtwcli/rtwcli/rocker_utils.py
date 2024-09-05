@@ -24,6 +24,7 @@ def generate_rocker_flags(
     disable_nvidia: bool,
     container_name: str,
     hostname: str,
+    enable_ipc: bool,
     ssh_abs_path: str,
     ssh_abs_path_in_docker: str,
     final_image_name: str,
@@ -53,6 +54,9 @@ def generate_rocker_flags(
     rocker_flags.extend(["--hostname", hostname])
     rocker_flags.extend(["--name", container_name])
     rocker_flags.extend(["--network", "host"])
+
+    if enable_ipc:
+        rocker_flags.extend(["--ipc", "host"])
 
     if not disable_nvidia:
         rocker_flags.extend(["--nvidia", "gpus"])

@@ -16,7 +16,8 @@ How to install the CLI
 """"""""""""""""""""""""
 .. _rtwcli-setup:
 
-Follow the instructions in the ``README.md`` inside the ``rtwcli`` folder `#here <https://github.com/StoglRobotics/ros_team_workspace/blob/master/rtwcli/README.md>`_.
+Follow the instructions in the ``README.md`` inside the ``rtwcli`` folder
+`#here <https://github.com/StoglRobotics/ros_team_workspace/blob/master/rtwcli/README.md>`_.
 
 
 How to use the CLI
@@ -41,20 +42,14 @@ The CLI currently supports the following commands:
 
 
 Setting up a new workspace
-"""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""
 .. _rtwcli-setup-workspace:
 
-PR `#169 <https://github.com/StoglRobotics/ros_team_workspace/pull/169>`_ introduced a new feature to create a new local or dockerized workspace.
-The workspace can additionally be created using ``.repos`` files in your repository, streamlining the setup process for complex projects with multiple repositories.
-
-.. important::
-   **From May 2024** If you want to setup a dockerized workspace with nvidia support based on Ubuntu 24.04 (for Jazzy and Rolling) - make sure to use the updated ``rocker`` from `PR #279 <https://github.com/osrf/rocker/pull/279>`_. Until this PR is merged you are encoruged to setup the rocker with:
-
-   .. code-block:: bash
-
-      pip3 uninstall rocker   # is you have installed it with `sudo` use it here too
-      git clone https://github.com/StoglRobotics-forks/rocker.git --branch try_24
-      cd rocker && pip3 install -e . && cd -
+PR `#169 <https://github.com/StoglRobotics/ros_team_workspace/pull/169>`_
+introduced a new feature to create a new local or dockerized workspace.
+The workspace can additionally be created using ``.repos`` files in your
+repository, streamlining the setup process for complex projects with multiple
+repositories.
 
 * Usage:
    * ``rtw workspace create``
@@ -142,3 +137,44 @@ The workspace can additionally be created using ``.repos`` files in your reposit
 
    This is done due to the fact that the setting up of the rocker container
    fails often.
+
+
+How to setup ROS2 RTW for inter communication
+"""""""""""""""""""""""""""""""""""""""""""""""
+.. _rtwcli-ipc-usage:
+
+The CLI provides a way to setup ROS2 RTW for inter communication between RTW
+workspaces.
+
+* Example:
+
+.. code-block:: bash
+
+   rtw workspace create \
+      --ws-folder humble_ws \
+      --ros-distro humble \
+      --docker \
+      --enable-ipc
+
+   rtw workspace create \
+      --ws-folder rolling_ws \
+      --ros-distro rolling \
+      --docker \
+      --enable-ipc
+
+   (humble_ws)$ ros2 run demo_nodes_cpp talker
+
+   (rolling_ws)$ ros2 run demo_nodes_cpp listener
+
+
+How to install rocker fork with the new features
+""""""""""""""""""""""""""""""""""""""""""""""""""
+.. _rtwcli-setup-rocker-fork:
+
+Until rocker PR is merged you are encouraged to install your rocker fork with:
+
+.. code-block:: bash
+
+   pip3 uninstall rocker   # if you have installed it with 'sudo' use it here too
+   git clone https://github.com/StoglRobotics-forks/rocker.git --branch <your-feature-branch>
+   cd rocker && pip3 install -e . && cd -
