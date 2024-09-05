@@ -109,6 +109,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#how-to-install-the-cli">How to install the CLI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-use-the-cli">How to use the CLI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#setting-up-a-new-workspace">Setting up a new workspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-setup-ros2-rtw-for-inter-communication">How to setup ROS2 RTW for inter communication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-install-rocker-fork-with-the-new-features">How to install rocker fork with the new features</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQ</a></li>
@@ -194,7 +196,8 @@ Please report any bugs or issues to the RosTeamWS GitHub repository.</p>
 </div>
 <section id="how-to-install-the-cli">
 <h2>How to install the CLI<a class="headerlink" href="#how-to-install-the-cli" title="Permalink to this heading"></a></h2>
-<p id="rtwcli-setup">Follow the instructions in the <code class="docutils literal notranslate"><span class="pre">README.md</span></code> inside the <code class="docutils literal notranslate"><span class="pre">rtwcli</span></code> folder <a class="reference external" href="https://github.com/StoglRobotics/ros_team_workspace/blob/master/rtwcli/README.md">#here</a>.</p>
+<p id="rtwcli-setup">Follow the instructions in the <code class="docutils literal notranslate"><span class="pre">README.md</span></code> inside the <code class="docutils literal notranslate"><span class="pre">rtwcli</span></code> folder
+<a class="reference external" href="https://github.com/StoglRobotics/ros_team_workspace/blob/master/rtwcli/README.md">#here</a>.</p>
 </section>
 <section id="how-to-use-the-cli">
 <h2>How to use the CLI<a class="headerlink" href="#how-to-use-the-cli" title="Permalink to this heading"></a></h2>
@@ -226,17 +229,11 @@ Please report any bugs or issues to the RosTeamWS GitHub repository.</p>
 </section>
 <section id="setting-up-a-new-workspace">
 <h2>Setting up a new workspace<a class="headerlink" href="#setting-up-a-new-workspace" title="Permalink to this heading"></a></h2>
-<p id="rtwcli-setup-workspace">PR <a class="reference external" href="https://github.com/StoglRobotics/ros_team_workspace/pull/169">#169</a> introduced a new feature to create a new local or dockerized workspace.
-The workspace can additionally be created using <code class="docutils literal notranslate"><span class="pre">.repos</span></code> files in your repository, streamlining the setup process for complex projects with multiple repositories.</p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p><strong>From May 2024</strong> If you want to setup a dockerized workspace with nvidia support based on Ubuntu 24.04 (for Jazzy and Rolling) - make sure to use the updated <code class="docutils literal notranslate"><span class="pre">rocker</span></code> from <a class="reference external" href="https://github.com/osrf/rocker/pull/279">PR #279</a>. Until this PR is merged you are encoruged to setup the rocker with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip3<span class="w"> </span>uninstall<span class="w"> </span>rocker<span class="w">   </span><span class="c1"># is you have installed it with `sudo` use it here too</span>
-git<span class="w"> </span>clone<span class="w"> </span>https://github.com/StoglRobotics-forks/rocker.git<span class="w"> </span>--branch<span class="w"> </span>try_24
-<span class="nb">cd</span><span class="w"> </span>rocker<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>-
-</pre></div>
-</div>
-</div>
+<p id="rtwcli-setup-workspace">PR <a class="reference external" href="https://github.com/StoglRobotics/ros_team_workspace/pull/169">#169</a>
+introduced a new feature to create a new local or dockerized workspace.
+The workspace can additionally be created using <code class="docutils literal notranslate"><span class="pre">.repos</span></code> files in your
+repository, streamlining the setup process for complex projects with multiple
+repositories.</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt>Usage:</dt><dd><ul>
@@ -332,6 +329,40 @@ bash session in the container.</p>
 corresponding workspace config will be saved.</p>
 <p>This is done due to the fact that the setting up of the rocker container
 fails often.</p>
+</div>
+</section>
+<section id="how-to-setup-ros2-rtw-for-inter-communication">
+<h2>How to setup ROS2 RTW for inter communication<a class="headerlink" href="#how-to-setup-ros2-rtw-for-inter-communication" title="Permalink to this heading"></a></h2>
+<p id="rtwcli-ipc-usage">The CLI provides a way to setup ROS2 RTW for inter communication between RTW
+workspaces.</p>
+<ul class="simple">
+<li><p>Example:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rtw<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ws-folder<span class="w"> </span>humble_ws<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ros-distro<span class="w"> </span>humble<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--docker<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--enable-ipc
+
+rtw<span class="w"> </span>workspace<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ws-folder<span class="w"> </span>rolling_ws<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ros-distro<span class="w"> </span>rolling<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--docker<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--enable-ipc
+
+<span class="o">(</span>humble_ws<span class="o">)</span>$<span class="w"> </span>ros2<span class="w"> </span>run<span class="w"> </span>demo_nodes_cpp<span class="w"> </span>talker
+
+<span class="o">(</span>rolling_ws<span class="o">)</span>$<span class="w"> </span>ros2<span class="w"> </span>run<span class="w"> </span>demo_nodes_cpp<span class="w"> </span>listener
+</pre></div>
+</div>
+</section>
+<section id="how-to-install-rocker-fork-with-the-new-features">
+<h2>How to install rocker fork with the new features<a class="headerlink" href="#how-to-install-rocker-fork-with-the-new-features" title="Permalink to this heading"></a></h2>
+<p id="rtwcli-setup-rocker-fork">Until rocker PR is merged you are encouraged to install your rocker fork with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip3<span class="w"> </span>uninstall<span class="w"> </span>rocker<span class="w">   </span><span class="c1"># if you have installed it with &#39;sudo&#39; use it here too</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/StoglRobotics-forks/rocker.git<span class="w"> </span>--branch<span class="w"> </span>&lt;your-feature-branch&gt;
+<span class="nb">cd</span><span class="w"> </span>rocker<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>-
+</pre></div>
 </div>
 </section>
 </section>
