@@ -46,18 +46,30 @@ RTW_WS_create_docker_container_instance () {
   fi
   # END: Needed for Nvidia support
 
+  # BEGIN: Needed for Wayland Support
+  # Source: https://unix.stackexchange.com/questions/202891/how-to-know-whether-wayland-or-x11-is-being-used?newreg=cfdd28ee51204440bf9a72816fdee63d
+  display_manager=`loginctl show-session $(awk '/tty/ {print $1}' <(loginctl)) -p Type | awk -F= '{print $2}'`
+  notify_user "Using '$display_manager' display manager."
+  # END: Needed for Wayland Support
+
   notify_user "Instantiating docker image '$docker_image_tag' and mapping workspace folder to '$ws_folder'."
   xhost +local:docker
   docker run \
   --net=host \
-  $([ $(ls -la /dev | grep nvidia | wc -l) "!=" "0" ] && echo "--gpus all") \
   -h ${docker_host_name} \
+  $([ $(ls -la /dev | grep nvidia | wc -l) "!=" "0" ] && echo "--gpus all") \
+  $([ $(ls -la /dev | grep nvidia | wc -l) "!=" "0" ] && echo "-e __GLX_VENDOR_LIBRARY_NAME=nvidia") \
+  $([ $(ls -la /dev | grep nvidia | wc -l) "!=" "0" ] && echo "-e __NV_PRIME_RENDER_OFFLOAD=1") \
   -e DISPLAY \
   -e QT_X11_NO_MITSHM=1 \
+  -e QT_QPA_PLATFORM=xcb \
   -e XAUTHORITY=$xauth_file_name \
   --tmpfs /tmp \
   -v "$xauth_file_name:$xauth_file_name" \
   -v /tmp/.X11-unix/:/tmp/.X11-unix:rw \
+  $([ "$display_manager" "==" "wayland"  ] && echo "-e XDG_RUNTIME_DIR=/tmp") \
+  $([ "$display_manager" "==" "wayland"  ] && echo "-e WAYLAND_DISPLAY=$WAYLAND_DISPLAY") \
+  $([ "$display_manager" "==" "wayland"  ] && echo "-v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY") \
   -v "$HOME/.ssh":"$HOME/.ssh":ro \
   -v "$ws_folder":"$ws_folder":rw \
   --name "$docker_image_tag"-instance \
