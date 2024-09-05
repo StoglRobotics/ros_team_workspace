@@ -33,6 +33,7 @@
 #include "hardware_interface/loaned_command_interface.hpp"
 #include "hardware_interface/loaned_state_interface.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
+#include "rclcpp/executor.hpp"
 #include "rclcpp/parameter_value.hpp"
 #include "rclcpp/time.hpp"
 #include "rclcpp/utilities.hpp"
@@ -132,7 +133,9 @@ public:
 protected:
   void SetUpController(const std::string controller_name = "test_dummy_controller")
   {
-    ASSERT_EQ(controller_->init(controller_name), controller_interface::return_type::OK);
+    ASSERT_EQ(
+      controller_->init(controller_name, "", 0, "", controller_->define_custom_node_options()),
+      controller_interface::return_type::OK);
 
     std::vector<hardware_interface::LoanedCommandInterface> command_ifs;
     command_itfs_.reserve(joint_command_values_.size());

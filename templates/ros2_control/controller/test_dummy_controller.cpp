@@ -18,6 +18,7 @@
 //
 
 #include "test_dummy_controller.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 #include <limits>
 #include <memory>
