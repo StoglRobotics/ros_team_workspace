@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2024, Stogl Robotics Consulting UG (haftungsbeschränkt)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Source of this file are templates in https://github.com/StoglRobotics/ros_team_workspace repository.
+-->
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:macro name="$ROBOT_NAME$_srdf" params="prefix">
+        <!--GROUPS - Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
+        <group name="${prefix}$ROBOT_NAME$_manipulator">
+            <chain base_link="${prefix}base_link" tip_link="${prefix}tool0"/>
+        </group>
+        <!--LINKS - When a link is specified, the parent joint of that link (if it exists) is automatically included-->
+        <!--JOINTS - When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
+        <!--CHAINS - When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
+        <!--SUBGROUPS - Groups can also be formed by referencing to already defined group names-->
+        <!--PASSIVE JOINT - This element is used to mark joints that are not actuated-->
+        <!--DISABLE COLLISIONS - By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. 
+        This tag disables collision checking between a specified pair of links. -->
+        <disable_collisions link1="${prefix}base_link" link2="${prefix}link1" reason="Adjacent"/>
+        <disable_collisions link1="${prefix}base_link" link2="${prefix}link2" reason="Adjacent"/>
+        <disable_collisions link1="${prefix}link1" link2="${prefix}link2" reason="Adjacent"/>
+        <disable_collisions link1="${prefix}link3" link2="${prefix}link4" reason="Adjacent"/>
+        <disable_collisions link1="${prefix}link3" link2="${prefix}link5" reason="Adjacent"/>
+        <disable_collisions link1="${prefix}link3" link2="${prefix}link6" reason="Adjacent"/>
+        <disable_collisions link1="${prefix}link4" link2="${prefix}link5" reason="Adjacent"/>
+        <disable_collisions link1="${prefix}link4" link2="${prefix}link6" reason="Adjacent"/>
+        <disable_collisions link1="${prefix}link5" link2="${prefix}link6" reason="Adjacent"/>
+    </xacro:macro>
+</robot>
