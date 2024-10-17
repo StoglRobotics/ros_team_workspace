@@ -572,7 +572,7 @@ function compile_and_source_package {
       print_and_exit "Error no workspace sourced. Please source the workspace folder and compile manually."
     fi
 
-    user_decision "Is \"${sourced_ws_dirname} the correct sourced workspace?"
+    user_decision "Is \"${sourced_ws_dirname}\" the correct sourced workspace?"
     if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
       print_and_exit "Aborting. Not the correct workspace sourced. Please source the correct workspace folder and compile manually."
     fi
