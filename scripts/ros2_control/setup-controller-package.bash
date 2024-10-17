@@ -374,8 +374,8 @@ for DEP_PKG in "${TEST_DEP_PKGS[@]}"; do
   if `grep -q "  find_package(${DEP_PKG} REQUIRED)" CMakeLists.txt`; then
     echo "'$DEP_PKG' is already listed in CMakeLists.txt"
   else
-    append_to_string="ament_lint_auto_find_test_dependencies()"
-    sed -i "s/$append_to_string/$append_to_string\\n  find_package(${DEP_PKG} REQUIRED)/g" CMakeLists.txt
+    append_to_string="find_package(generate_parameter_library REQUIRED)"
+    sed -i "s/$append_to_string/$append_to_string\\nfind_package(${DEP_PKG} REQUIRED)/g" CMakeLists.txt
   fi
 
   # package.xml
