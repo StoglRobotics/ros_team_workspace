@@ -33,6 +33,7 @@ from rtwcli.constants import (
 from rtwcli.docker_utils import (
     change_docker_path_permissions,
     docker_build,
+    docker_container_exists,
     docker_cp,
     docker_exec_bash_cmd,
     docker_stop,
@@ -898,6 +899,15 @@ class CreateVerb(VerbExtension):
         logger.info("### CREATE ARGS ###")
         rich.print(create_args)
         logger.info("### CREATE ARGS ###")
+
+        if create_args.docker and docker_container_exists(create_args.container_name):
+            raise RuntimeError(
+                f"Docker container with name '{create_args.container_name}' already exists.\n"
+                "Options:\n"
+                " - renaming the workspace folder\n"
+                " - renaming the container name\n"
+                " - removing the existing container\n"
+            )
 
         if create_args.docker:
             self.build_intermediate_docker_image(create_args)
