@@ -16,6 +16,7 @@
 
 import argparse
 import signal
+from rich.console import Console
 
 from rtwcli.command import add_subparsers_on_demand
 
@@ -66,11 +67,14 @@ def main(*, script_name="rtw", argv=None, description=None, extension=None):
         parser.print_help()
         return 0
 
+    console = Console()
+
     # call the main method of the extension
     try:
         rc = extension.main(parser=parser, args=args)
     except KeyboardInterrupt:
         rc = signal.SIGINT
-    except RuntimeError as e:
-        rc = str(e)
+    except RuntimeError:
+        console.print_exception()
+        return 1
     return rc
