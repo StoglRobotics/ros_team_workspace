@@ -17,14 +17,14 @@
 // [RosTeamWorkspace](https://github.com/StoglRobotics/ros_team_workspace) repository.
 //
 
-#include "test_dummy_controller.hpp"
-#include "rclcpp/rclcpp.hpp"
-
 #include <limits>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "rclcpp/rclcpp.hpp"
+#include "test_dummy_controller.hpp"
 
 using dummy_package_namespace::CMD_MY_ITFS;
 using dummy_package_namespace::control_mode_type;
