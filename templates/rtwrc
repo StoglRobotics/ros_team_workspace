@@ -1,0 +1,42 @@
+#!/bin/bash
+
+TEAM_LICENSE="Apache License 2.0"
+
+TEAM_REPOSITORY_SERVER="https://github.com"
+
+TEAM_PRIVATE_CONFIG_PATH=""
+
+# set this to the location of RosTeamWorkspace
+source <PATH TO ros_team_workspace>/setup.bash
+
+# User specific setup/variables
+# DDS setup
+#export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+#export CYCLONEDDS_URI=~/workspace/cyclonedds.xml
+
+export ROS_DOMAIN_ID=28
+export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST  # Doc: https://docs.ros.org/en/rolling/Tutorials/Advanced/Improved-Dynamic-Discovery.html
+#export ROS_STATIC_PEERS=<Your Robot>;<Your b.controled Control Box IP>
+
+# needed to execute cppcheck version 2.7 used in pre-commit
+export AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=true
+
+# if you did not install ROS under /opt/ros/<ros-distro>/ then you have to set the ALTERNATIVE_ROS_<ROS_DISTRO>_LOCATION
+# to point to your installation folder e.g. ALTERNATIVE_ROS_ROLLING_LOCATION=/home/user/my_installation_folder/rolling/
+# For other ros versions simply add ALTERNATIVE_ROS_<ros-distro>_LOCATION e.g. ALTERNATIVE_ROS_FOXY_LOCATION
+# This also enables support for older ROS 2 version within docker (for example useful to run `rviz2` outside of the container)
+export ALTERNATIVE_ROS_FOXY_LOCATION="/opt/ros/rolling"
+export ALTERNATIVE_ROS_GALACTIC_LOCATION="/opt/ros/rolling"
+# export ALTERNATIVE_ROS_HUMBLE_LOCATION="/opt/ros/rolling"
+export ALTERNATIVE_ROS_IRON_LOCATION="/opt/ros/rolling"
+
+# Logging setup
+# export RCUTILS_LOGGING_CONFIG_FILE="~/.ros/ros2_logging_config"
+#export RCUTILS_CONSOLE_OUTPUT_FORMAT="[{severity} {time}] [{name}]: {message} ({function_name}() at {file_name}:{line_number})"  # Custom logging format
+export RCUTILS_COLORIZED_OUTPUT=1
+#export RCUTILS_LOGGING_USE_STDOUT=1  # force all logging output to stdout
+
+# Stogl Robotics custom setup for nice colors and showing ROS workspace
+#source <Path to ros_team_workspace>/scripts/configuration/terminal_coloring.bash
+
+# WORKSPACES
