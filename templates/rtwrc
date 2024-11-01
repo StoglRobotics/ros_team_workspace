@@ -1,10 +1,18 @@
 #!/bin/bash
 
+# Setup for RTW-Pro version
 TEAM_LICENSE="Apache License 2.0"
-
 TEAM_REPOSITORY_SERVER="https://github.com"
-
 TEAM_PRIVATE_CONFIG_PATH=""
+
+# if you did not install ROS under /opt/ros/<ros-distro>/ then you have to set the ALTERNATIVE_ROS_<ROS_DISTRO>_LOCATION
+# to point to your installation folder e.g. ALTERNATIVE_ROS_ROLLING_LOCATION=/home/user/my_installation_folder/rolling/
+# For other ros versions simply add ALTERNATIVE_ROS_<ros-distro>_LOCATION e.g. ALTERNATIVE_ROS_FOXY_LOCATION
+# This also enables support for older ROS 2 version within docker (for example useful to run `rviz2` outside of the container)
+export ALTERNATIVE_ROS_FOXY_LOCATION="/opt/ros/rolling"
+export ALTERNATIVE_ROS_GALACTIC_LOCATION="/opt/ros/rolling"
+# export ALTERNATIVE_ROS_HUMBLE_LOCATION="/opt/ros/rolling"
+export ALTERNATIVE_ROS_IRON_LOCATION="/opt/ros/rolling"
 
 # set this to the location of RosTeamWorkspace
 source <PATH TO ros_team_workspace>/setup.bash
@@ -20,15 +28,6 @@ export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST  # Doc: https://docs.ros.org/en/r
 
 # needed to execute cppcheck version 2.7 used in pre-commit
 export AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=true
-
-# if you did not install ROS under /opt/ros/<ros-distro>/ then you have to set the ALTERNATIVE_ROS_<ROS_DISTRO>_LOCATION
-# to point to your installation folder e.g. ALTERNATIVE_ROS_ROLLING_LOCATION=/home/user/my_installation_folder/rolling/
-# For other ros versions simply add ALTERNATIVE_ROS_<ros-distro>_LOCATION e.g. ALTERNATIVE_ROS_FOXY_LOCATION
-# This also enables support for older ROS 2 version within docker (for example useful to run `rviz2` outside of the container)
-export ALTERNATIVE_ROS_FOXY_LOCATION="/opt/ros/rolling"
-export ALTERNATIVE_ROS_GALACTIC_LOCATION="/opt/ros/rolling"
-# export ALTERNATIVE_ROS_HUMBLE_LOCATION="/opt/ros/rolling"
-export ALTERNATIVE_ROS_IRON_LOCATION="/opt/ros/rolling"
 
 # Logging setup
 # export RCUTILS_LOGGING_CONFIG_FILE="~/.ros/ros2_logging_config"
