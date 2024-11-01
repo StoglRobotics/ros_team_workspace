@@ -22,12 +22,12 @@ if [[ " ${negative_answers[*]} " =~ " ${user_answer} " ]]; then
     print_and_exit "Aborting the setup of autosourcing. Exiting..."
 fi
 
-rtw_file=".ros_team_ws_rc"
+rtw_file="rtwrc"
 rtw_file_location=~/"$rtw_file"
 template_location="$FRAMEWORK_BASE_PATH/templates/$rtw_file"
 echo "Copying ${rtw_file} to your home folder."
 if ! [ -f "$HOME/$rtw_file" ]; then
-    cp "${template_location}" ~/.
+    cp "${template_location}" ~/.ros_team_workspace/.
 else
     echo ""
     notify_user "${rtw_file} already exists."
@@ -63,7 +63,8 @@ echo "Updating your .bashrc file."
 bashrc_location=~/.bashrc
 if ! ( grep -q '\..*\.ros_team_ws_rc' $bashrc_location || grep -q 'source.*\.ros_team_ws_rc' $bashrc_location ); then
     echo "" >> $bashrc_location
-    echo "# automatically source RosTeamWorkspace if the .ros_team_ws file is present in your home folder." >> $bashrc_location
+    echo "# Automatically source RosTeamWorkspace if the ~/.ros_team_workspace/rtwrc file is present in your home folder." >> $bashrc_location
+    echo "# Some ROS 2 related varialbes are set in this configuration file, check if you have any configuration-related issues." >> $bashrc_location
     echo "if [ -f ~/.ros_team_ws_rc ]; then" >> $bashrc_location
     echo "    . ~/.ros_team_ws_rc" >> $bashrc_location
     echo "fi" >> $bashrc_location
