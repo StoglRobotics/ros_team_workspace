@@ -19,6 +19,11 @@ Clone and source the RosTeamWorkspace
    setup-auto-sourcing  # Make RosTeamWorkspace automatically sourced when open a new terminal (The best experience)
 
 
+.. warning::
+    Before move to the next setup be aware of that **RTW work only ament_cmake build option**. 
+    If you create a python packages, you will get cmake error and cannot run the launch files.
+    Always choice the **amet_cmake**.
+
 Create new package in an existing workspace
 --------------------------------------------------------
 For more details check :ref:`use-case description <uc-new-package>`.
