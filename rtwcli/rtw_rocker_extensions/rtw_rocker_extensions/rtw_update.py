@@ -19,25 +19,22 @@ from rocker.extensions import name_to_argument
 from rocker.core import RockerExtension
 
 
-class Tmpfs(RockerExtension):
+class RTWUPdate(RockerExtension):
     @staticmethod
     def get_name() -> str:
-        return "tmpfs"
+        return "rtw_update"
 
     def __init__(self):
-        self.name = Tmpfs.get_name()
+        self.name = RTWUPdate.get_name()
 
-    def get_docker_args(self, cliargs: dict) -> str:
-        args = [" "]  # To separate from the previous
-        args.extend(["--tmpfs", "/tmp"])
-        args.append(" ")  # To separate from the next argument
-        return " ".join(args)
+    def get_user_snippet(self, cliargs):
+        return "RUN sudo apt-get update && rosdep update"
 
     @staticmethod
     def register_arguments(parser: argparse.ArgumentParser, defaults: dict = {}) -> None:
         parser.add_argument(
-            name_to_argument(Tmpfs.get_name()),
+            name_to_argument(RTWUPdate.get_name()),
             action="store_true",
-            default=defaults.get(Tmpfs.get_name(), None),
-            help="Enable tmpfs for /tmp in the container.",
+            default=defaults.get(RTWUPdate.get_name(), None),
+            help="RTW: Update after finishing",
         )
