@@ -71,7 +71,8 @@ def generate_rocker_flags(
     if ws_volumes:
         rocker_flags.extend(ws_volumes)
 
-    rocker_flags.append("--tmpfs")
+    rocker_flags.append("--rtw-tmpfs")
+    rocker_flags.append("--rtw-update")
     rocker_flags.append("--x11")
     rocker_flags.extend(["--mode", "interactive"])
     rocker_flags.extend(["--image-name", f"{final_image_name}"])

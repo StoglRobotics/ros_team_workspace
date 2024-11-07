@@ -35,7 +35,8 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "rocker.extensions": [
-            "rtw_tmpfs = rtw_rocker_extensions.tmpfs:Tmpfs",
+            "rtw_tmpfs = rtw_rocker_extensions.rtw_tmpfs:RTWTmpfs",
+            "rtw_update = rtw_rocker_extensions.rtw_update:RTWUPdate",
         ],
     },
 )
