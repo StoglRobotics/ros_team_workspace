@@ -19,11 +19,6 @@ Clone and source the RosTeamWorkspace
    setup-auto-sourcing  # Make RosTeamWorkspace automatically sourced when open a new terminal (The best experience)
 
 
-.. warning::
-    Before move to the next setup be aware of that **RTW work only ament_cmake build option**. 
-    If you create a python packages, you will get cmake error and cannot run the launch files.
-    Always choice the **amet_cmake**.
-
 Create new package in an existing workspace
 --------------------------------------------------------
 For more details check :ref:`use-case description <uc-new-package>`.
@@ -43,7 +38,14 @@ Create robot description package
 -------------------------------------------------
 For more details check :ref:`use-case description <uc-setup-robot-description>`.
 
-requirement: have a <my_cool_robot_description_package_name> package to hold the robot description
+.. warning::
+
+   You must have a <my_cool_robot_description_package_name> package to hold the robot description.
+
+   Before move to the next setup be aware of that **RTW work only ament_cmake build option**.
+   If you create a python packages, you will get cmake error and cannot run the launch files.
+   Always choice the **amet_cmake**.
+
 
 .. code-block:: bash
 
@@ -57,7 +59,8 @@ Create robot bringup package
 -----------------------------------------------
 For more details check :ref:`use-case description <uc-setup-robot-bringup>`.
 
-requirement: have a <my_cool_robot_bringup_package_name> package to hold the robot bringup
+.. warning::
+   You must have a <my_cool_robot_bringup_package_name> package to hold the robot bringup.
 
 .. code-block:: bash
 
@@ -71,7 +74,8 @@ Setup  ros2_control control hardware
 -------------------------------------------------
 For more details check :ref:`use-case description <uc-setup-ros2-control-hardware>`.
 
-requirement: have a <my_cool_robot_control_package_name> package to hold the robot's ros2_control hardware interface
+.. warning::
+   You must have a <my_cool_robot_control_package_name> package to hold the robot's ros2_control hardware interface.
 
 .. code-block:: bash
 
@@ -85,7 +89,8 @@ Setup  ros2_control controller
 -----------------------------------------------
 For more details check :ref:`use-case description <uc-setup-ros2-controller>`.
 
-requirement: have a <my_cool_robot_controller_package_name> package to hold the robot's ros2_control controller
+.. warning::
+   You must have a <my_cool_robot_controller_package_name> package to hold the robot's ros2_control controller.
 
 .. code-block:: bash
 
