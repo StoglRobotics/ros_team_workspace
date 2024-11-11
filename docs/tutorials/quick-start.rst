@@ -3,8 +3,10 @@ Quick start with RosTeamWorkspace
 ==================================
 .. _tutorial-quick-start:
 
-This tutorial shows use of RosTeamWorkspace for very common use-cases that can be done without permanent changes to your environment.
-First you have to clone and source the workspace and then continue with the use-case you are interested in:
+This tutorial shows use of RosTeamWorkspace for very common use-cases that can
+be done without permanent changes to your environment. First you have to clone
+and source the workspace and then continue with the use-case you are
+interested in:
 
 .. toctree::
    :maxdepth: 1
@@ -36,16 +38,13 @@ For more details check :ref:`use-case description <uc-new-package>`.
 
 Create robot description package
 -------------------------------------------------
-For more details check :ref:`use-case description <uc-setup-robot-description>`.
+For more details check
+:ref:`use-case description <uc-setup-robot-description>`.
 
 .. warning::
 
-   You must have a <my_cool_robot_description_package_name> package to hold the robot description.
-
-   Before move to the next setup be aware of that **RTW work only ament_cmake build option**.
-   If you create a python packages, you will get cmake error and cannot run the launch files.
-   Always choice the **amet_cmake**.
-
+   You must have a <my_cool_robot_description_package_name> package of
+   build type **ament_cmake** to hold the robot description.
 
 .. code-block:: bash
 
@@ -60,7 +59,8 @@ Create robot bringup package
 For more details check :ref:`use-case description <uc-setup-robot-bringup>`.
 
 .. warning::
-   You must have a <my_cool_robot_bringup_package_name> package to hold the robot bringup.
+   You must have a <my_cool_robot_bringup_package_name> package of
+   build type **ament_cmake** to hold the robot bringup.
 
 .. code-block:: bash
 
@@ -72,10 +72,13 @@ For more details check :ref:`use-case description <uc-setup-robot-bringup>`.
 
 Setup  ros2_control control hardware
 -------------------------------------------------
-For more details check :ref:`use-case description <uc-setup-ros2-control-hardware>`.
+For more details check
+:ref:`use-case description <uc-setup-ros2-control-hardware>`.
 
 .. warning::
-   You must have a <my_cool_robot_control_package_name> package to hold the robot's ros2_control hardware interface.
+   You must have a <my_cool_robot_control_package_name> package of
+   build type **ament_cmake** to hold the robot's ros2_control
+   hardware interface.
 
 .. code-block:: bash
 
@@ -90,7 +93,8 @@ Setup  ros2_control controller
 For more details check :ref:`use-case description <uc-setup-ros2-controller>`.
 
 .. warning::
-   You must have a <my_cool_robot_controller_package_name> package to hold the robot's ros2_control controller.
+   You must have a <my_cool_robot_controller_package_name> package of
+   build type **ament_cmake** to hold the robot's ros2_control controller.
 
 .. code-block:: bash
 
