@@ -192,17 +192,22 @@
             
   <section id="ros2-control-setup-controller-package">
 <h1>ros2_control: Setup controller package<a class="headerlink" href="#ros2-control-setup-controller-package" title="Permalink to this heading"></a></h1>
-<p id="uc-setup-ros2-controller">This use-case describes how to set up a controller for the ros2_control framework using scripts from ROS Team Workspace (RosTeamWS) framework.
-The scripts uses template files from <code class="docutils literal notranslate"><span class="pre">templates/ros2_control/controller</span></code> folder.
-The script creates a full skeleton of a controller with plugin description and tests for loading controller and checking its basic functionality.</p>
+<p id="uc-setup-ros2-controller">This use-case describes how to set up a controller for the ros2_control
+framework using scripts from ROS Team Workspace (RosTeamWS) framework.
+The scripts uses template files from
+<code class="docutils literal notranslate"><span class="pre">templates/ros2_control/controller</span></code> folder.
+The script creates a full skeleton of a controller with plugin description
+and tests for loading controller and checking its basic functionality.</p>
 <blockquote>
 <div><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>it is recommended to setup your package using <a class="reference internal" href="../ros_packages/create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> script.</p>
+<p>it is recommended to setup your package using
+<a class="reference internal" href="../ros_packages/create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> script.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The script <strong>has to be executed</strong> from the folder where the package should be generated.</p>
+<p>The script <strong>has to be executed</strong> in the root folder of the
+<strong>ament_cmake</strong> package where the controller files are to be generated.</p>
 </div>
 </div></blockquote>
 <section id="usage">
@@ -224,7 +229,8 @@ If not set, it is guessed by camel-casing the file name.</p></li>
 </div></blockquote>
 <p>The script will ask for some additional input.</p>
 <p>The package name is obtained from the ‘package.xml’ file.</p>
-<p>After all files are copied and placeholders set, changes are automatically staged in git.</p>
+<p>After all files are copied and placeholders set, changes are automatically
+staged in git.</p>
 </section>
 </section>
 

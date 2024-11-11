@@ -192,30 +192,37 @@
             
   <section id="setup-robot-bringup">
 <h1>Setup robot bringup<a class="headerlink" href="#setup-robot-bringup" title="Permalink to this heading"></a></h1>
-<p id="uc-setup-robot-bringup">This use-case describes how to set up a robot bringup package using scripts from ROS Team Workspace (RosTeamWS) framework.
-The package follows as far as possible best practices for <a class="reference external" href="http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages">robot support packages</a> from ROS-Industrial consortia. (<strong>This has to be verified!</strong>)</p>
+<p id="uc-setup-robot-bringup">This use-case describes how to set up a robot bringup package using scripts
+from ROS Team Workspace (RosTeamWS) framework.
+The package follows as far as possible best practices for
+<a class="reference external" href="http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages">robot support packages</a>
+from ROS-Industrial consortia. (<strong>This has to be verified!</strong>)</p>
 <section id="script-for-setting-up-a-bringup-package">
 <h2>Script for Setting up a Bringup Package<a class="headerlink" href="#script-for-setting-up-a-bringup-package" title="Permalink to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">setup-robot-bringup</span></code> script accepts the robot name and the robot description package name.
-The package name is obtained from the ‘package.xml’ file.</p>
+<p><code class="docutils literal notranslate"><span class="pre">setup-robot-bringup</span></code> script accepts the robot name and the robot description
+package name. The package name is obtained from the ‘package.xml’ file.</p>
 <blockquote>
 <div><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>it is recommended to setup your package using <a class="reference internal" href="create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> script.</p>
+<p>It is recommended to setup your package using
+<a class="reference internal" href="create_package.html#uc-new-package"><span class="std std-ref">setup-new-package</span></a> script.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The script <strong>has to be executed</strong> from the folder where the package should be generated.</p>
+<p>The script <strong>has to be executed</strong> in the root folder of the
+<strong>ament_cmake</strong> package where the robot bringup files are to be generated.</p>
 </div>
 </div></blockquote>
-<p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/robot_bringup</span></code> folder, renames the files, and replaces the placeholders.</p>
+<p>The scripts copies template files from the <code class="docutils literal notranslate"><span class="pre">templates/robot_bringup</span></code> folder,
+renames the files, and replaces the placeholders.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Usage of script for setting up the robot bringup.</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>setup-robot-bringup<span class="w"> </span>ROBOT_NAME<span class="w"> </span>DESCRIPTION_PKG_NAME
 </pre></div>
 </div>
 </div>
-<p>After all files are copied and placeholders set, changes are automatically staged in git.</p>
+<p>After all files are copied and placeholders set, changes are automatically
+staged in git.</p>
 </section>
 </section>
 
