@@ -129,6 +129,7 @@ function RosTeamWS_setup_aliases {
   alias rosds="cd \$ROS_WS/src"
   alias rosdb="cd \$ROS_WS/build"
   alias rosdi="cd \$ROS_WS/install"
+  alias rosdepi="rosdep install -y -i --from-paths \$ROS_WS/src"
 }
 
 function RosTeamWS_setup_ros1_exports {
