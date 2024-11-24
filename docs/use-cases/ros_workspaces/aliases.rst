@@ -36,7 +36,7 @@ rosdi
   Alias for command: ``cd $ROS_WS/install``
 
 
-Installling dependecies
+Installling dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 rosdepi
