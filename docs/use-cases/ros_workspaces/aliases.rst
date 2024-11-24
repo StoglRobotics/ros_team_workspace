@@ -36,6 +36,14 @@ rosdi
   Alias for command: ``cd $ROS_WS/install``
 
 
+Installling dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+rosdepi
+  Installing dependencies for the packages in ``$ROS_WS/src`` folder.
+  Makes the ``rosdep`` command shorter and simpler to use: ``rosdep install -y -i --from-paths \$ROS_WS/src``
+
+
 Building Packages in Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Every alias has optional package names. If none is provided the whole workspace is built.
