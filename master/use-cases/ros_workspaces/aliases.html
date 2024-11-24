@@ -114,6 +114,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#standard-rtw-aliases">Standard RTW Aliases</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#explanation-of-standard-aliases">Explanation of Standard Aliases</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#entering-workspace-folders">Entering Workspace Folders</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#installling-dependencies">Installling dependencies</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#building-packages-in-workspace">Building Packages in Workspace</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#executing-package-tests">Executing Package Tests</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#executing-multiple-commands">Executing Multiple Commands</a></li>
@@ -228,6 +229,14 @@ Alias for command: <code class="docutils literal notranslate"><span class="pre">
 </dd>
 <dt>rosdi</dt><dd><p>Enter <code class="docutils literal notranslate"><span class="pre">install</span></code> directory of the ROS workspace.
 Alias for command: <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">$ROS_WS/install</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="installling-dependencies">
+<h4>Installling dependencies<a class="headerlink" href="#installling-dependencies" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>rosdepi</dt><dd><p>Installing dependencies for the packages in <code class="docutils literal notranslate"><span class="pre">$ROS_WS/src</span></code> folder.
+Makes the <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> command shorter and simpler to use: <code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">install</span> <span class="pre">-y</span> <span class="pre">-i</span> <span class="pre">--from-paths</span> <span class="pre">\$ROS_WS/src</span></code></p>
 </dd>
 </dl>
 </section>
