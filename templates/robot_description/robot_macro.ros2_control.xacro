@@ -16,6 +16,7 @@
         <xacro:if value="${use_mock_hardware}">
           <plugin>mock_components/GenericSystem</plugin>
           <param name="mock_sensor_commands">${mock_sensor_commands}</param>
+          <param name="calculate_dynamics">true</param>
         </xacro:if>
         <xacro:if value="${sim_gazebo_classic}">
           <plugin>gazebo_ros2_control/GazeboSystem</plugin>
@@ -35,8 +36,12 @@
         <state_interface name="position">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="velocity"/>
-        <state_interface name="acceleration"/>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="acceleration">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
       <joint name="${prefix}joint2">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
@@ -46,8 +51,12 @@
         <state_interface name="position">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="velocity"/>
-        <state_interface name="acceleration"/>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="acceleration">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
       <joint name="${prefix}joint3">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
@@ -57,8 +66,12 @@
         <state_interface name="position">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="velocity"/>
-        <state_interface name="acceleration"/>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="acceleration">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
       <joint name="${prefix}joint4">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
@@ -68,8 +81,12 @@
         <state_interface name="position">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="velocity"/>
-        <state_interface name="acceleration"/>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="acceleration">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
       <joint name="${prefix}joint5">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
@@ -79,8 +96,12 @@
         <state_interface name="position">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="velocity"/>
-        <state_interface name="acceleration"/>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="acceleration">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
       <joint name="${prefix}joint6">
         <command_interface name="position">     <!-- Add/Remove interfaces as needed -->
@@ -90,16 +111,32 @@
         <state_interface name="position">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="velocity"/>
-        <state_interface name="acceleration"/>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="acceleration">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
       <sensor name="tcp_fts_sensor">            <!-- Remove/change sensors as needed -->
-        <state_interface name="fx"/>
-        <state_interface name="fy"/>
-        <state_interface name="fz"/>
-        <state_interface name="tx"/>
-        <state_interface name="ty"/>
-        <state_interface name="tz"/>
+        <state_interface name="fx">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="fy">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="fz">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="tx">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="ty">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="tz">
+          <param name="initial_value">0.0</param>
+        </state_interface>
         <param name="frame_id">tool0</param>    <!-- Change sensors as needed -->
         <param name="min_fx">-100</param>
         <param name="max_fx">100</param>

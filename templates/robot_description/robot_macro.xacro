@@ -4,6 +4,10 @@
   <xacro:include filename="$(find $PKG_NAME$)/urdf/common/inertials.xacro"/>
   <xacro:include filename="$(find $PKG_NAME$)/urdf/common/materials.xacro"/>
 
+
+  <!-- ATTTTTTEEEEENNNNNNNTTTTTIIIIIIOOOOOOONNNNNN -->
+  <!-- If you are dealing with a mobile robot, remove fixing it to the world!! -->
+
   <xacro:macro name="$ROBOT_NAME$" params="prefix parent *origin">
     <!-- LINKS -->
     <!-- base link -->
