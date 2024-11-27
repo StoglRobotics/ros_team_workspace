@@ -451,6 +451,7 @@ function set_framework_default_paths {
   RosTeamWS_FRAMEWORK_OS_CONFIGURE_PATH="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH/os_configure"
   # Script-specific variables
   PACKAGE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/package"
+  NODE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/nodes"
   ROBOT_DESCRIPTION_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/robot_description"
   ROS2_CONTROL_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/ros2_control"
   ROS2_CONTROL_HW_ITF_TEMPLATES="$ROS2_CONTROL_TEMPLATES/hardware"
