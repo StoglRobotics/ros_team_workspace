@@ -26,6 +26,7 @@
         move_group/MoveGroupExecuteTrajectoryAction
         pilz_industrial_motion_planner/MoveGroupSequenceAction
         pilz_industrial_motion_planner/MoveGroupSequenceService
+        move_group/TfPublisher
 
     # Trajectory execution manager parameters
     allow_trajectory_execution: true
