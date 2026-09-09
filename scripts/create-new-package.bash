@@ -237,7 +237,7 @@ case "$choice" in
       cd $PKG_NAME
     fi
 
-    $RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash $PKG_NAME "$PKG_DESCRIPTION" $LICENSE
+    $RosTeamWS_FRAMEWORK_SCRIPTS_PATH/setup-repository.bash $PKG_NAME "$PKG_DESCRIPTION" "$LICENSE"
 
   else
 

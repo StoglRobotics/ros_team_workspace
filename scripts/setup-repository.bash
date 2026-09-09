@@ -87,7 +87,8 @@ case "$choice" in
   ;;
 "2")
   cp --update=none $PACKAGE_TEMPLATES/.gitlab-ci.yml .
-  cp --update=none $PACKAGE_TEMPLATES/.ci.repos .
+  cp --update=none $PACKAGE_TEMPLATES/pkg_name.repos .ci.repos
+  cp --update=none $PACKAGE_TEMPLATES/README.md.gitlab README.md
   repository="gitlab"
   ;;
 *)
@@ -125,12 +126,19 @@ read -p "Enter namespace of the repository [default: $PKG_NAME]: " NAMESPACE
 NAMESPACE=${NAMESPACE:=$PKG_NAME}
 
 license_web="${LICENSE// /%20}"
-sed -i 's/\$NAME\$/'${PKG_NAME}'/g' README.md
-sed -i 's/\$ROS_DISTRO\$/'${ros_distro}'/g' README.md
-sed -i 's/\$Ros_distro\$/'${ros_distro^}'/g' README.md
-sed -i 's/\$DESCRIPTION\$/'"${PKG_DESCRIPTION}"'/g' README.md
-sed -i 's/\$LICENSE\$/'${license_web}'/g' README.md
-sed -i 's/\$NAMESPACE\$/'${NAMESPACE}'/g' README.md
+# Use '|' as the sed delimiter (not '/', which NAMESPACE and DESCRIPTION can
+# contain, e.g. a GitLab "group/subproject" namespace) and escape '&'/'\'/'|'
+# in each replacement value, so it can't be read as a sed backreference or
+# break the substitution (e.g. a proprietary license holder with '&' in it).
+escape_sed_replacement() {
+  printf '%s' "$1" | sed -e 's/[&\|]/\\&/g'
+}
+sed -i 's|\$NAME\$|'"$(escape_sed_replacement "${PKG_NAME}")"'|g' README.md
+sed -i 's|\$ROS_DISTRO\$|'"$(escape_sed_replacement "${ros_distro}")"'|g' README.md
+sed -i 's|\$Ros_distro\$|'"$(escape_sed_replacement "${ros_distro^}")"'|g' README.md
+sed -i 's|\$DESCRIPTION\$|'"$(escape_sed_replacement "${PKG_DESCRIPTION}")"'|g' README.md
+sed -i 's|\$LICENSE\$|'"$(escape_sed_replacement "${license_web}")"'|g' README.md
+sed -i 's|\$NAMESPACE\$|'"$(escape_sed_replacement "${NAMESPACE}")"'|g' README.md
 
 # Check if it is metapackage
 if [[ ! -f "package.xml" ]]; then

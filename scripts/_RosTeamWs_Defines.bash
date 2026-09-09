@@ -535,8 +535,11 @@ let_user_select_license() {
     "$licence_proprietary")
       read -p "Enter name of license (e.g. 'Proprietary License'): " NAME_OF_LICENSE
       YEAR=$(date +'%Y')
+      # Escape sed replacement-text metacharacters (& = whole match, \ = escape)
+      # so a holder name like "Vorwerk Elektrowerke GmbH & Co. KG" isn't corrupted.
+      NAME_OF_LICENSE_ESCAPED=$(printf '%s' "${NAME_OF_LICENSE}" | sed -e 's/[&\]/\\&/g')
       license=$(<"${LICENSE_TEMPLATES}/proprietary_company_header.txt")
-      license=$(echo "${license}" | sed -e "s/\\\$YEAR\\\$/${YEAR}/g; s/\\\$NAME_ON_LICENSE\\\$/${NAME_OF_LICENSE}/g")
+      license=$(echo "${license}" | sed -e "s/\\\$YEAR\\\$/${YEAR}/g; s/\\\$NAME_ON_LICENSE\\\$/${NAME_OF_LICENSE_ESCAPED}/g")
       break
       ;;
     *)
