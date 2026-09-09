@@ -595,7 +595,8 @@ function check_ros_distro {
     else
       echo -e "${TERMINAL_COLOR_USER_INPUT_DECISION}The ROS distribution {${ros_distro}} you chose is not supported by RosTeamWS. Please choose either of the following:${rtw_supported_ros_distributions[*]}"
     fi
-      read ros_distro
+    # 'read' fails on end of input (<CTRL> + D) or when it is interrupted (<CTRL> + C)
+    read ros_distro || return 1
   done
 
   # inside docker container we don't need to check if ros distro is present on system
@@ -665,7 +666,7 @@ function check_and_set_ros_distro_and_version {
     use_docker=$2
   fi
 
-  check_ros_distro "${ros_distro}" "${use_docker}"
+  check_ros_distro "${ros_distro}" "${use_docker}" || return 1
   set_ros_version_for_distro "${ros_distro}"
 }
 

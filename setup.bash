@@ -32,9 +32,9 @@ function update_ros_ws_variables {
 
     # If file was modified after the last source operation
     if ((file_mod_time > ROS_WS_CACHE_SOURCED_TIME)); then
-      source "$file_name"
       ROS_WS_CACHE_SOURCED_TIME=$file_mod_time
       export ROS_WS_CACHE_SOURCED_TIME
+      source "$file_name"
     fi
   fi
 }

@@ -17,7 +17,7 @@ source $script_own_dir/../_Team_Defines.bash
 
 # ros distribution name will be set in $ros_distro
 # RosTeamWS_WS_DOCKER_SUPPORT is set via .ros_team_ws_rc
-check_and_set_ros_distro_and_version $1 $RosTeamWS_WS_DOCKER_SUPPORT
+check_and_set_ros_distro_and_version $1 $RosTeamWS_WS_DOCKER_SUPPORT || return 1
 
 ws_folder="$2"
 if [ "$2" == "-" ]; then
