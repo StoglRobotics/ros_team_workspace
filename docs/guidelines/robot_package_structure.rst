@@ -72,3 +72,47 @@ The here down proposed architecture tries to split the robot's files to minimize
       │       └── <robot_specific_controller>.hpp
       └── src/
           └── <robot_specific_controller>.cpp
+
+Do you need a separate ``*_bringup`` package?
+----------------------------------------------
+
+The split above is for a robot-support repository meant to be reused
+across multiple projects — ``*_bringup`` earns its place there because
+it is the thin, per-project wiring layer on top of otherwise-reusable
+description/hardware-interface packages.
+
+A single-cell, single-scenario project (nothing here is meant to be
+reused elsewhere) doesn't need that separation. Fold the robot
+description, MoveIt setup (SRDF, planning/kinematics YAMLs), launch
+files, and any integration config into one ``*_configuration`` package
+instead:
+
+.. code:: text
+
+  <project_name>_configuration/
+  ├── CMakeLists.txt
+  ├── package.xml
+  ├── config/                    # controllers.yaml, MoveIt planning/kinematics YAMLs, any integration config
+  ├── launch/                    # this project's launch files
+  ├── meshes/
+  ├── rviz/
+  ├── srdf/                      # MoveIt semantic description
+  └── urdf/
+
+Decide by how many launch variants there actually are to orchestrate,
+not by project size:
+
+- **Nothing to orchestrate** (one robot, one scenario): skip
+  ``*_bringup``, use one ``*_configuration`` package as above.
+- **Multiple robots, multiple launch variants (sim/real/offline), or
+  multiple equipment units**: keep a dedicated ``*_bringup`` package —
+  the orchestration itself is real work and earns the package.
+- **Reusable description/hardware-interface packages**: use the full
+  split above; ``*_bringup`` staying thin there is correct, not a
+  smell.
+
+If a ``*_bringup`` package does exist, keep it to launch files and
+config only — no application/business-logic nodes. If it's down to
+one or two launch files and no real config, that's the signal to fold
+it into ``*_configuration`` (or the relevant description package)
+instead of keeping it out of inertia.
