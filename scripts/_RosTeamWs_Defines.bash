@@ -566,6 +566,7 @@ function set_framework_default_paths {
   LICENSE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/licenses"
   DOCKER_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/docker"
   OS_CONFIGURE_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/os_configure"
+  TESTING_TEMPLATES="$FRAMEWORK_BASE_PATH/templates/testing"
 }
 
 function is_valid_ros_distribution {

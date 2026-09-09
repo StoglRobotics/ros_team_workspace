@@ -133,3 +133,31 @@ For more details, check :ref:`use-case description <uc-setup-ros2-controller>`.
    cd <src folder of your ROS workspace>/<my_cool_robot_controller_package_name>
 
    ros2_control_setup-controller-package <my_controller_file_name>
+
+Add testcases using ``launch_testing``
+---------------------------------------
+
+For more details, check :ref:`use-case description <uc-setup-launch-testing>`.
+
+.. warning::
+   You must be at the top-level of an **ament_cmake** package (containing ``package.xml``
+   and ``CMakeLists.txt``) before running this script.
+
+.. code-block:: bash
+
+   source <path to your ROS workspace>/install/setup.bash
+   cd <src folder of your ROS workspace>/<my_package_name>
+
+   setup-launch-testing  # creates test/, patches package.xml and CMakeLists.txt
+
+Then edit ``test/test_<my_package_name>.launch.py``:
+
+1. Replace the ``generate_test_description`` body with your system's launch setup.
+2. Add testcase methods to the generated test class.
+3. Build and run:
+
+.. code-block:: bash
+
+   cb <my_package_name>    # build
+   ct <my_package_name>    # test
+   ctres                   # show results
