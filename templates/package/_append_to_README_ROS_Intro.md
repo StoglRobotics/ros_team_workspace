@@ -45,11 +45,11 @@ Installation of docker depends on the operating system you are using. Instructio
 
 Using [Ros Team Workspace (RTW)](https://rtw.b-robotized.com) you can easily with the following command:
 ```
-setup-ros-workspace-docker WS_FOLDER_NAME ROS_DISTRO
+rtw workspace create --docker --ws-folder WS_FOLDER_NAME --ros-distro ROS_DISTRO
 ```
-and then after sourcing the new workspace with the `_WS_FOLDER_NAME` command, you can switch to the workspace with the:
+and then after sourcing the new workspace with the `rtw ws WS_FOLDER_NAME` command, you can switch to the workspace with the:
 ```
-rtw_switch_to_docker
+rtw docker enter
 ```
 command.
 

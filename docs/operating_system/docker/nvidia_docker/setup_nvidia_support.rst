@@ -122,9 +122,11 @@ Install nvidia-docker
 Change the Dockerfile
 ----------------------------------
 (1.) If you haven't done so already:
-   Create a new docker workspace with the :ref:`setup-ros-workspace-docker<uc-setup-docker-workspace>` command.
+   Create a new docker workspace with the :ref:`rtw workspace create<rtwcli-setup-workspace>` command.
 
-   **NOTE**: If you set up a nvidia-docker container, you are finished at this point.
+   **NOTE**: ``rtw workspace create --docker`` enables Nvidia GPU support
+   by default (``--disable-nvidia`` turns it off) — if that's enough for
+   your case, you are finished at this point.
 
 2. Replace the the ``FROM ubuntu:<version>`` directive in your Dockerfile with the nvidia container of your needs. The following table gives you a quick overview:
 
@@ -152,14 +154,20 @@ Change the Dockerfile
 
       docker image rm <image-name>
 
-4. Recreate your container.
-   Go inside the ``.rtw_docker_defines`` directory in your workspace folder and the execute:
+4. Recreate your container by re-running workspace creation with
+   ``--no-cache`` (see :ref:`Docker build control<rtwcli-advanced-docker-usage>`):
 
    .. code-block:: bash
 
-      ./recreate_docker.sh
+      rtw workspace create --docker --no-cache --ws-folder <path> --ros-distro <distro>
 
-You now should have a docker container which exposes your nvidia drivers and can switch to your workspace with ``rtw_switch_to_docker``.
+You now should have a docker container which exposes your nvidia drivers; use ``rtw docker enter`` to switch to your workspace.
+
+.. note::
+   This manual-Dockerfile workflow only applies if you maintain your own
+   Dockerfile. Workspaces created with ``rtw workspace create --docker``
+   build their image from CLI flags (rocker), not a checked-in
+   Dockerfile — use ``--disable-nvidia`` there instead of steps 1-4 above.
 
 Troubleshoting
 """"""""""""""

@@ -64,13 +64,6 @@ alias setup-repository-ci="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-repository-c
 
 alias setup-formatting="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-formatting.bash
 
-alias setup-ros-workspace="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-ros-workspace.bash
-
-setup-ros-workspace () {
-  source "$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-ros-workspace.bash
-  create_workspace "$@"
-}
-
 # Robot packages related setup scripts
 alias setup-robot-bringup="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-robot-bringup.bash
 alias setup-robot-description="$RosTeamWS_FRAMEWORK_SCRIPTS_PATH"/setup-robot-description.bash

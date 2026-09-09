@@ -13,6 +13,6 @@ All use cases with docker support are listed below. For a detailed description o
    * - use case
      - docker command
      - description
-   * - :ref:`Setup a new Workspace<uc-setup-docker-workspace>` with ``setup-ros-workspace``
-     - ``setup-ros-workspace-docker``
-     - Creates a new workspace and maps the workspace inside a docker container. You can then switch to docker using ``rtw_switch_to_docker``.
+   * - :ref:`Setup a new Workspace<rtwcli-setup-workspace>` with the ``rtw`` CLI
+     - ``rtw workspace create --docker``
+     - Creates a new workspace and maps it inside a Docker container. Use ``rtw docker enter`` to connect to it afterwards.
