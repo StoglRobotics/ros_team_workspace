@@ -12,7 +12,7 @@
 
     <ros2_control name="${name}" type="system">
       <hardware>
-        <xacro:if value="${use_mock}">
+        <xacro:if value="${use_mock and not sim_gazebo}">
           <plugin>mock_components/GenericSystem</plugin>
           <param name="mock_sensor_commands">${mock_sensor_commands}</param>
         </xacro:if>

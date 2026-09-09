@@ -141,9 +141,46 @@ ros2 launch my_robot_description load_description.launch.xml &
 PID_DESC=$!
 wait_for_robot_description 20 10 2
 
-kill $PID_DESC
+kill $PID_DESC 2>/dev/null || true
+wait $PID_DESC 2>/dev/null || true
 PID_DESC=""
-sleep 5
+sleep 2
+
+# Regression test: sim_gazebo/use_mock must select the Gazebo hardware plugin,
+# not the mock one, and must forward simulation_controllers into the URDF.
+echo -e "${TERMINAL_COLOR_BLUE}Launching my_robot_description load_description.launch.xml with sim_gazebo:=true...${TERMINAL_COLOR_NC}"
+ros2 launch my_robot_description load_description.launch.xml sim_gazebo:=true use_mock:=false simulation_controllers:=/tmp/dummy_controllers.yaml &
+PID_DESC=$!
+wait_for_robot_description 20 10 2
+
+echo -e "${TERMINAL_COLOR_YELLOW}Checking robot_description content for the Gazebo hardware plugin...${TERMINAL_COLOR_NC}"
+ROBOT_DESCRIPTION_CONTENT=$(ros2 topic echo /robot_description --once --timeout 10 --full-length 2>/dev/null)
+
+if echo "$ROBOT_DESCRIPTION_CONTENT" | grep -q "gz_ros2_control/GazeboSimSystem"; then
+    echo -e "${TERMINAL_COLOR_GREEN}Success: GazeboSimSystem plugin present.${TERMINAL_COLOR_NC}"
+else
+    echo -e "${TERMINAL_COLOR_RED}Error: GazeboSimSystem plugin missing from robot_description with sim_gazebo:=true.${TERMINAL_COLOR_NC}"
+    exit 1
+fi
+
+if echo "$ROBOT_DESCRIPTION_CONTENT" | grep -q "mock_components/GenericSystem"; then
+    echo -e "${TERMINAL_COLOR_RED}Error: GenericSystem (mock) plugin still present with sim_gazebo:=true use_mock:=false.${TERMINAL_COLOR_NC}"
+    exit 1
+else
+    echo -e "${TERMINAL_COLOR_GREEN}Success: GenericSystem plugin correctly absent.${TERMINAL_COLOR_NC}"
+fi
+
+if echo "$ROBOT_DESCRIPTION_CONTENT" | grep -q "/tmp/dummy_controllers.yaml"; then
+    echo -e "${TERMINAL_COLOR_GREEN}Success: simulation_controllers path forwarded into robot_description.${TERMINAL_COLOR_NC}"
+else
+    echo -e "${TERMINAL_COLOR_RED}Error: simulation_controllers path missing from robot_description.${TERMINAL_COLOR_NC}"
+    exit 1
+fi
+
+kill $PID_DESC 2>/dev/null || true
+wait $PID_DESC 2>/dev/null || true
+PID_DESC=""
+sleep 2
 
 # Test bringup launch
 echo -e "${TERMINAL_COLOR_BLUE}Launching my_robot_control start_offline.launch.xml...${TERMINAL_COLOR_NC}"
