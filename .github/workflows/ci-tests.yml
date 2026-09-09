@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/ros-controls/ros:${{ inputs.ros_distro || 'jazzy' }}-ubuntu
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install dependencies
         run: |
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/ros-controls/ros:${{ inputs.ros_distro || 'jazzy' }}-ubuntu
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install dependencies
         run: |
