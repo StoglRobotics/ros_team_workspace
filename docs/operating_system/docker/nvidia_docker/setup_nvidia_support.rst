@@ -60,13 +60,12 @@ Install nvidia-docker
 **NOTE**: If you already have installed nvidia-docker, you can skip this and go right to the next section.
 
 1. You then have to install the NVIDIA Container Toolkit for docker as described `in official documentation <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker>`_.
-   For Ubuntu or Debian this can be done as follows (the command detects your distribution from ``/etc/os-release`` automatically):
+   For Ubuntu or Debian this can be done as follows (NVIDIA's repository is not distribution-specific, the same steps work for both):
 
    .. code-block:: bash
 
-      distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
-         && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-         && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+      curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+         && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
             sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
             sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
@@ -186,7 +185,7 @@ If you get any error follow the next steps to be sure that the expected version 
    1. Close your eyes and breathe slowely in and out at least once :)
    2. You probably didn't install everything properly so the open-source ``nouveau`` driver is used which is not adequate for this scenario.
    3. Use ``<CTRL> + <ALT> + <F2-3-4...>`` keys to switch to a linux terminal.
-   4. Login there and execute ``ubuntu-drivers`` command to install missing drivers.
+   4. Login there and install the missing driver: on Ubuntu, execute the ``ubuntu-drivers`` command; on Debian, use whichever install path you chose above (the ``nvidia-driver`` package or NVIDIA's ``.run`` installer).
    5. Now restart again and everything should work properly.
 
 5. Now check again output of the ``ṅvidia-smi`` command

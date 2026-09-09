@@ -45,6 +45,6 @@ For the supported Ubuntu and ros version combinations have a look at the table b
 Debian
 """"""
 
-Debian is not a native ``rosdep``/ROS target.
+Debian has no native ROS binary distribution — the Ubuntu/ROS combinations in the table above don't apply to it directly.
 It is used as a **real-time docker host**: a Debian PC provides the PREEMPT_RT kernel and Docker runtime, while ROS itself still runs inside one of the Ubuntu containers from the table above.
 See :ref:`Setup Real-Time Kernel (Debian, prebuilt package) <uc-setup-rt-kernel-debian>` for the full setup.
