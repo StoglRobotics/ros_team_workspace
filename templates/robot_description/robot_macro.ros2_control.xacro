@@ -7,7 +7,11 @@
                use_mock:=false
                mock_sensor_commands:=false
                sim_gazebo:=false
-               simulation_controllers"
+               simulation_controllers
+               use_isaac:=false
+               isaac_joint_commands_topic:=/isaac/joint_commands
+               isaac_joint_states_topic:=/isaac/joint_states
+               isaac_ft_wrench_topic:=/isaac/ft_sensor/wrench"
                >
 
     <ros2_control name="${name}" type="system">
@@ -19,7 +23,17 @@
         <xacro:if value="${sim_gazebo}">
           <plugin>gz_ros2_control/GazeboSimSystem</plugin>
         </xacro:if>
-        <xacro:unless value="${use_mock or sim_gazebo}">
+        <!-- Isaac Sim: no custom hardware interface needed, TopicBasedSystem
+             reads/writes whatever an Isaac Sim Action Graph publishes/subscribes
+             on these topics. Override the topics per robot when more than one
+             robot shares the same Isaac scene (Isaac can't tell identically-named
+             joints on two robots apart, so each robot needs its own topic pair). -->
+        <xacro:if value="${use_isaac}">
+          <plugin>topic_based_ros2_control/TopicBasedSystem</plugin>
+          <param name="joint_commands_topic">${isaac_joint_commands_topic}</param>
+          <param name="joint_states_topic">${isaac_joint_states_topic}</param>
+        </xacro:if>
+        <xacro:unless value="${use_mock or sim_gazebo or use_isaac}">
           <plugin>robot_hardware_interface/RobotHardwareInterface</plugin>
         </xacro:unless>
       </hardware>
@@ -89,28 +103,52 @@
         <state_interface name="velocity"/>
         <state_interface name="acceleration"/>
       </joint>
-      <sensor name="tcp_fts_sensor">            <!-- Remove/change sensors as needed -->
-        <state_interface name="fx"/>
-        <state_interface name="fy"/>
-        <state_interface name="fz"/>
-        <state_interface name="tx"/>
-        <state_interface name="ty"/>
-        <state_interface name="tz"/>
-        <param name="frame_id">tool0</param>    <!-- Change sensors as needed -->
-        <param name="min_fx">-100</param>
-        <param name="max_fx">100</param>
-        <param name="min_fy">-100</param>
-        <param name="max_fy">100</param>
-        <param name="min_fz">-200</param>
-        <param name="max_fz">200</param>
-        <param name="min_tx">-10</param>
-        <param name="max_tx">10</param>
-        <param name="min_ty">-10</param>
-        <param name="max_ty">10</param>
-        <param name="min_tz">-15</param>
-        <param name="max_tz">15</param>
-      </sensor>
+      <!-- Isaac Sim: TopicBasedSystem (above) cannot carry a nested <sensor> -
+           see the separate FrankaFtSensorInterface-style component below instead. -->
+      <xacro:unless value="${use_isaac}">
+        <sensor name="tcp_fts_sensor">            <!-- Remove/change sensors as needed -->
+          <state_interface name="fx"/>
+          <state_interface name="fy"/>
+          <state_interface name="fz"/>
+          <state_interface name="tx"/>
+          <state_interface name="ty"/>
+          <state_interface name="tz"/>
+          <param name="frame_id">tool0</param>    <!-- Change sensors as needed -->
+          <param name="min_fx">-100</param>
+          <param name="max_fx">100</param>
+          <param name="min_fy">-100</param>
+          <param name="max_fy">100</param>
+          <param name="min_fz">-200</param>
+          <param name="max_fz">200</param>
+          <param name="min_tx">-10</param>
+          <param name="max_tx">10</param>
+          <param name="min_ty">-10</param>
+          <param name="max_ty">10</param>
+          <param name="min_tz">-15</param>
+          <param name="max_tz">15</param>
+        </sensor>
+      </xacro:unless>
     </ros2_control>
+
+    <!-- Isaac Sim: FT sensor as its own hardware component, since
+         topic_based_ros2_control's TopicBasedSystem can't carry a nested
+         <sensor>. Remove this block if the robot has no FT sensor in Isaac. -->
+    <xacro:if value="${use_isaac}">
+      <ros2_control name="${name}_ft_sensor" type="sensor">
+        <hardware>
+          <plugin>topic_based_ft_ros2_control/TopicBasedFtSensor</plugin>
+          <param name="wrench_topic">${isaac_ft_wrench_topic}</param>
+        </hardware>
+        <sensor name="${prefix}tcp_fts_sensor">
+          <state_interface name="force.x"/>
+          <state_interface name="force.y"/>
+          <state_interface name="force.z"/>
+          <state_interface name="torque.x"/>
+          <state_interface name="torque.y"/>
+          <state_interface name="torque.z"/>
+        </sensor>
+      </ros2_control>
+    </xacro:if>
 
     <xacro:if value="$(arg sim_gazebo)">
       <!-- Gazebo plugins -->

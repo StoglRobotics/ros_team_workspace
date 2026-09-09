@@ -9,6 +9,10 @@
   <xacro:arg name="mock_sensor_commands" default="false"/>
   <xacro:arg name="sim_gazebo" default="false"/>
   <xacro:arg name="simulation_controllers" default=""/>
+  <xacro:arg name="use_isaac" default="false"/>
+  <xacro:arg name="isaac_joint_commands_topic" default="/isaac/joint_commands"/>
+  <xacro:arg name="isaac_joint_states_topic" default="/isaac/joint_states"/>
+  <xacro:arg name="isaac_ft_wrench_topic" default="/isaac/ft_sensor/wrench"/>
 
   <xacro:include filename="$(find $PKG_NAME$)/urdf/$ROBOT_NAME$/$ROBOT_NAME$_macro.xacro"/>
   <xacro:include filename="$(find $PKG_NAME$)/urdf/$ROBOT_NAME$/$ROBOT_NAME$_macro.ros2_control.xacro"/>
@@ -38,6 +42,10 @@
     use_mock="$(arg use_mock)"
     mock_sensor_commands="$(arg mock_sensor_commands)"
     sim_gazebo="$(arg sim_gazebo)"
-    simulation_controllers="$(arg simulation_controllers)"/>
+    simulation_controllers="$(arg simulation_controllers)"
+    use_isaac="$(arg use_isaac)"
+    isaac_joint_commands_topic="$(arg isaac_joint_commands_topic)"
+    isaac_joint_states_topic="$(arg isaac_joint_states_topic)"
+    isaac_ft_wrench_topic="$(arg isaac_ft_wrench_topic)"/>
 
 </robot>

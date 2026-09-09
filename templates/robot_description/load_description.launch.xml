@@ -34,11 +34,14 @@ Author: Dr. Denis
   <arg name="use_mock"
        default="true"
        description="Choose if to start mock hardware or real hardware."/>
+  <arg name="use_isaac"
+       default="false"
+       description="Choose if to control the robot through Isaac Sim (topic_based_ros2_control) instead of mock/real hardware."/>
   <arg name="robot_ip"
        default="192.168.28.28"
        description="IP address of the robot controller."/>
 
-  <let name="robot_description_content" value="$(command '$(find-exec xacro) $(find-pkg-share $(var description_package))/urdf/$(var description_file).urdf.xacro prefix:=$(var prefix) attach_world:=$(var attach_world) use_mock:=$(var use_mock) robot_ip:=$(var robot_ip)')"/>
+  <let name="robot_description_content" value="$(command '$(find-exec xacro) $(find-pkg-share $(var description_package))/urdf/$(var description_file).urdf.xacro prefix:=$(var prefix) attach_world:=$(var attach_world) use_mock:=$(var use_mock) use_isaac:=$(var use_isaac) robot_ip:=$(var robot_ip)')"/>
 
   <node pkg="robot_state_publisher" exec="robot_state_publisher" output="both">
     <param name="robot_description" value="$(var robot_description_content)" />

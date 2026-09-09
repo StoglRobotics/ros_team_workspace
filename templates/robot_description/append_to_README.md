@@ -58,3 +58,35 @@ ros2 launch $PKG_NAME$ view_$ROBOT_NAME$.launch.py
 
 If there are no issues with the description, two windows are opened: `rviz2` and `Joint State Publisher`.
 Rviz2 visualizes the robot's state and Joint state Publisher to changes joint values using sliders or generates random but valid configurations.
+
+### Controlling the robot through Isaac Sim
+
+`<robot_name>_macro.ros2_control.xacro`'s `use_isaac` option wires the robot up to
+[`topic_based_ros2_control`](https://github.com/PickNikRobotics/topic_based_ros2_control)'s
+`TopicBasedSystem` instead of a real or mock hardware interface — no custom hardware
+interface is needed, `TopicBasedSystem` just reads/writes whatever joint states/commands
+an Isaac Sim Action Graph publishes/subscribes on `isaac_joint_states_topic` /
+`isaac_joint_commands_topic`. If the robot has an FT sensor, it comes through as a
+*separate* `<ros2_control type="sensor">` component using
+[`topic_based_ft_ros2_control`](https://github.com/PickNikRobotics/topic_based_ft_ros2_control)
+on `isaac_ft_wrench_topic` — `TopicBasedSystem` can't carry a nested `<sensor>`, so this
+can't be folded into the main block the way a real hardware interface's FT sensor is.
+
+Whatever package brings this description up with Isaac needs `topic_based_ros2_control`
+(and `topic_based_ft_ros2_control`, if using the FT sensor block) as a dependency and in
+its workspace `.repos` file — this description package intentionally doesn't declare
+them, the same way it doesn't declare `mock_components`/`gz_ros2_control`/the real
+hardware interface package either.
+
+Two gotchas worth knowing before debugging either one from scratch:
+
+- **Multiple robots in one Isaac scene**: Isaac can't tell apart identically-named joints
+  on two robot prims of the same type, so `isaac_joint_commands_topic` /
+  `isaac_joint_states_topic` / `isaac_ft_wrench_topic` must be overridden per robot
+  (typically per `prefix`), and the Isaac-side Action Graph needs its joint names fed in
+  explicitly rather than read from the topic.
+- **Stale commands across controller switches**: `TopicBasedSystem::write()` republishes
+  every command field every cycle, regardless of which controller currently claims it —
+  nothing clears a field when its owning controller is deactivated. If more than one
+  controller type (e.g. position and effort) can be active on the same joints, add a
+  small node that gates which command field Isaac's Action Graph should honor.
